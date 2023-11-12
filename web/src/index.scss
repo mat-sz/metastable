@@ -114,7 +114,9 @@ h3 {
 }
 
 input,
-textarea {
+textarea,
+select,
+option {
   background: var(--color-primary);
   border: none;
   color: var(--color-fg);

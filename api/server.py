@@ -19,6 +19,8 @@ import mimetypes
 
 import folder_paths
 
+import comfy.samplers
+
 class BinaryEventTypes:
     PREVIEW_IMAGE = 1
     UNENCODED_PREVIEW_IMAGE = 2
@@ -184,6 +186,14 @@ class PromptServer():
                         return web.FileResponse(file, headers={"Content-Disposition": f"filename=\"{filename}\""})
 
             return web.Response(status=404)
+    
+        @routes.get("/info")
+        async def info(request):
+            return web.json_response({
+                "samplers": comfy.samplers.KSampler.SAMPLERS,
+                "schedulers": comfy.samplers.KSampler.SCHEDULERS,
+                "checkpoints": folder_paths.get_filename_list("checkpoints")
+            })
 
         @routes.post("/project")
         async def create_project(request):

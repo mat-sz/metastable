@@ -10,6 +10,20 @@ export const Prompt: React.FC = observer(() => {
 
   return (
     <div className={styles.prompt}>
+      <select
+        value={project.prompt.checkpoint_name}
+        onChange={e => {
+          runInAction(() => {
+            project.prompt.checkpoint_name = e.target.value;
+          });
+        }}
+      >
+        {mainStore.info.checkpoints.map(name => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </select>
       <textarea
         value={project.prompt.positive_prompt}
         onChange={e => {
@@ -26,6 +40,34 @@ export const Prompt: React.FC = observer(() => {
           });
         }}
       />
+      <select
+        value={project.prompt.sampler_name}
+        onChange={e => {
+          runInAction(() => {
+            project.prompt.sampler_name = e.target.value;
+          });
+        }}
+      >
+        {mainStore.info.samplers.map(name => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </select>
+      <select
+        value={project.prompt.scheduler_name}
+        onChange={e => {
+          runInAction(() => {
+            project.prompt.scheduler_name = e.target.value;
+          });
+        }}
+      >
+        {mainStore.info.schedulers.map(name => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </select>
       <button
         onClick={() => {
           project.request();

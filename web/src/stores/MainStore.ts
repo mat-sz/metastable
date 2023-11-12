@@ -45,6 +45,12 @@ interface ExecutedMessageModel extends MessageModel {
 
 type Message = StatusMessageModel | ProgressMessageModel | ExecutedMessageModel;
 
+interface Info {
+  samplers: string[];
+  schedulers: string[];
+  checkpoints: string[];
+}
+
 class MainStore {
   project = new Project();
   connected = false;
@@ -53,6 +59,11 @@ class MainStore {
     retryOnClose: true,
     retryTime: 1000,
   });
+  info: Info = {
+    samplers: [],
+    schedulers: [],
+    checkpoints: [],
+  };
 
   remaining = 0;
   progressValue = 0;
@@ -69,6 +80,13 @@ class MainStore {
     this.socket.on('disconnected', () => this.onDisconnected());
     this.socket.on('message', message => this.onMessage(message));
     this.socket.connect();
+
+    this.init();
+  }
+
+  async init() {
+    const res = await fetch(getUrl('/info'));
+    this.info = await res.json();
   }
 
   onConnected() {
