@@ -1,0 +1,10 @@
+{
+  "name": "metastable",
+  "private": true,
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "start": "cd web && yarn start"
+  }
+}

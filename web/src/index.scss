@@ -1,0 +1,141 @@
+:root {
+  --dark-gradient: linear-gradient(135deg, #00000000 0%, #00000044 100%);
+  --color-accent: #ff6f06;
+  --color-bg-transparent: #1b1b1d00;
+  --color-bg: #1b1b1d;
+  --color-bg-soft: #252529;
+  --color-primary: #35353b;
+  --color-primary-soft: #575760;
+  --color-fg-dark: #000000;
+  --color-fg-soft: #aaaaaa;
+  --color-fg: #ffffff;
+  --green: #3ea74e;
+  --green-soft: #3ea74ecc;
+  --red: #ff5c5c;
+  --red-soft: #ff5c5ccc;
+  --error: #ff4a4a;
+  --warning: #ffff5e;
+  --ok: #5bff5b;
+  --main-padding: 15px;
+}
+
+/* Firefox */
+* {
+  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  background-clip: content-box;
+  border: 5px solid transparent;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 3px solid transparent;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  line-height: 1.4;
+  user-select: none;
+
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  height: 100%;
+  touch-action: none;
+}
+
+body,
+input,
+button,
+textarea,
+a {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  touch-action: none;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+progress {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  overflow: hidden;
+  height: 6px;
+  display: block;
+  margin: 4px 0;
+  width: 200px;
+
+  &::-moz-progress-bar {
+    background-color: var(--color-accent);
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--color-accent);
+  }
+
+  &::-webkit-progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+  }
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+input,
+textarea {
+  background: var(--color-primary);
+  border: none;
+  color: var(--color-fg);
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+button {
+  display: inline-block;
+  background-color: var(--color-primary);
+  color: var(--color-fg);
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: 0.1s ease-in-out all;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  text-shadow: none;
+
+  &:hover {
+    background-color: var(--color-primary-soft);
+  }
+}

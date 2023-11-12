@@ -1,0 +1,14 @@
+lib
+node_modules
+
+npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+
+coverage
+
+__pycache__
+*.py[cod]
+/temp/
+cache.json
