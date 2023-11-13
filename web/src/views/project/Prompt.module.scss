@@ -1,6 +1,7 @@
 .prompt {
   display: flex;
   flex-direction: column;
+  background: var(--color-bg-panel);
 
   & > * {
     margin-bottom: 0.5rem;

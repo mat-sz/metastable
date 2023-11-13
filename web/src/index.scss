@@ -1,24 +1,13 @@
 @import 'react-var-ui/index.css';
 
 :root {
-  --dark-gradient: linear-gradient(135deg, #00000000 0%, #00000044 100%);
-  --color-accent: #ff6f06;
-  --color-bg-transparent: #1b1b1d00;
-  --color-bg: #1b1b1d;
-  --color-bg-soft: #252529;
-  --color-primary: #35353b;
-  --color-primary-soft: #575760;
-  --color-fg-dark: #000000;
-  --color-fg-soft: #aaaaaa;
-  --color-fg: #ffffff;
-  --green: #3ea74e;
-  --green-soft: #3ea74ecc;
-  --red: #ff5c5c;
-  --red-soft: #ff5c5ccc;
-  --error: #ff4a4a;
-  --warning: #ffff5e;
-  --ok: #5bff5b;
-  --main-padding: 15px;
+  --color-bg: #11111a;
+  --color-bg-panel: #22222a;
+  --color-bg-interactive: #33333a;
+  --color-bg-interactive-hover: #44444a;
+  --color-accent: #77f;
+  --color-fg-soft: #aaa;
+  --color-fg: #ddd;
 }
 
 /* Firefox */
@@ -86,11 +75,11 @@ body,
 progress {
   background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   -webkit-appearance: none;
   -moz-appearance: none;
   overflow: hidden;
-  height: 6px;
+  height: 12px;
   display: block;
   margin: 4px 0;
   width: 200px;
@@ -119,7 +108,7 @@ input,
 textarea,
 select,
 option {
-  background: var(--color-primary);
+  background: var(--color-bg-interactive);
   border: none;
   color: var(--color-fg);
   padding: 10px 20px;
@@ -128,7 +117,7 @@ option {
 
 button {
   display: inline-block;
-  background-color: var(--color-primary);
+  background-color: var(--color-bg-interactive);
   color: var(--color-fg);
   padding: 10px 20px;
   font-size: 14px;
@@ -140,6 +129,14 @@ button {
   text-shadow: none;
 
   &:hover {
-    background-color: var(--color-primary-soft);
+    background-color: var(--color-bg-interactive-hover);
   }
+}
+
+.react-var-ui {
+  background: none;
+}
+
+.react-var-ui-category-title {
+  font-weight: bold;
 }
