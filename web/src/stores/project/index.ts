@@ -1,5 +1,6 @@
 import { makeAutoObservable, toJS } from 'mobx';
 import { getUrl } from '../../config';
+import { randomSeed } from '../../helpers';
 
 interface Prompt {
   batch_size: number;
@@ -9,17 +10,11 @@ interface Prompt {
   positive_prompt: string;
   negative_prompt: string;
   seed: number;
+  seed_randomize: boolean;
   steps: number;
   cfg: number;
   sampler_name: string;
   scheduler_name: string;
-}
-
-function randomSeed() {
-  const min = -1125899906842624;
-  const max = 1125899906842624;
-  const range = max - min;
-  return Math.random() * range + min;
 }
 
 export class Project {
@@ -31,7 +26,8 @@ export class Project {
     checkpoint_name: 'v1-5-pruned-emaonly.safetensors',
     positive_prompt: 'an image of a banana',
     negative_prompt: 'bad quality',
-    seed: 1234,
+    seed: randomSeed(),
+    seed_randomize: true,
     steps: 20,
     cfg: 8.0,
     sampler_name: 'dpm_2',
@@ -44,7 +40,10 @@ export class Project {
   }
 
   async request() {
-    this.prompt.seed = randomSeed();
+    if (this.prompt.seed_randomize) {
+      this.prompt.seed = randomSeed();
+    }
+
     await fetch(getUrl('/prompt'), {
       method: 'POST',
       headers: {
