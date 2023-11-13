@@ -5,7 +5,7 @@ import styles from './Preview.module.scss';
 import { mainStore } from '../../stores/MainStore';
 
 export const Preview: React.FC = observer(() => {
-  const project = mainStore.project;
+  const project = mainStore.project!;
 
   return (
     <div className={styles.preview}>

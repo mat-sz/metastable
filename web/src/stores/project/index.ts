@@ -18,7 +18,6 @@ interface Prompt {
 }
 
 export class Project {
-  id = 'test_project';
   prompt: Prompt = {
     batch_size: 1,
     width: 512,
@@ -35,7 +34,7 @@ export class Project {
   };
   outputFilenames: string[] = [];
 
-  constructor() {
+  constructor(public id: string) {
     makeAutoObservable(this);
   }
 

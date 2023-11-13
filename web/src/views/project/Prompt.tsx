@@ -16,7 +16,7 @@ import styles from './Prompt.module.scss';
 import { mainStore } from '../../stores/MainStore';
 
 export const Prompt: React.FC = observer(() => {
-  const project = mainStore.project;
+  const project = mainStore.project!;
 
   return (
     <div className={styles.prompt}>

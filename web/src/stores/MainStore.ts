@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
-import { Project } from './project';
 import { TypeSocket } from 'typesocket';
 import { getUrl } from '../config';
+import { ProjectStore } from './ProjectStore';
 
 declare global {
   // eslint-disable-next-line
@@ -52,7 +52,7 @@ interface Info {
 }
 
 class MainStore {
-  project = new Project();
+  projects = new ProjectStore();
   connected = false;
   private socket = new TypeSocket<Message>(getUrl('/ws', 'ws'), {
     maxRetries: 0,
@@ -84,6 +84,10 @@ class MainStore {
     this.init();
   }
 
+  get project() {
+    return this.projects.current;
+  }
+
   async init() {
     const res = await fetch(getUrl('/info'));
     this.info = await res.json();
@@ -107,7 +111,11 @@ class MainStore {
         this.progressMax = message.data.max;
         break;
       case MessageType.EXECUTED:
-        this.project.outputFilenames = message.data.output_filenames;
+        for (const project of this.projects.projects) {
+          if (project.id === message.data.project_id) {
+            project.outputFilenames = message.data.output_filenames;
+          }
+        }
         break;
     }
   }
