@@ -93,7 +93,7 @@ export const Prompt: React.FC = observer(() => {
           <VarNumber
             label="Seed"
             path="seed"
-            disabled={project.prompt.seed_randomize}
+            readOnly={project.prompt.seed_randomize}
           />
           <VarToggle label="Randomize seed" path="seed_randomize" />
           <VarSelect
