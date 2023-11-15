@@ -1,6 +1,12 @@
 {
   "name": "api",
   "scripts": {
+    "setup:amd:rocm5.6": "pip install --target=./.pip torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6",
+    "setup:amd:rocm5.7": "pip install --target=./.pip --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm5.7",
+    "setup:nvidia": "pip install --target=./.pip torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121",
+    "setup:other": "pip install torch torchvision torchaudio",
+    "setup:amd": "yarn setup:amd:rocm5.6",
+    "setup:pip": "pip install --target=./.pip -r requirements.txt",
     "start": "python main.py"
   }
 }

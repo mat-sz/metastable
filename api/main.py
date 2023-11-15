@@ -1,7 +1,10 @@
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), ".pip"))
+
 import comfy.options
 comfy.options.enable_args_parsing()
 
-import os
 import importlib.util
 import folder_paths
 import time
