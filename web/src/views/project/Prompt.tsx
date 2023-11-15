@@ -21,31 +21,21 @@ export const Prompt: React.FC = observer(() => {
   return (
     <div className={styles.prompt}>
       <VarUI
-        updateValues={values => {
+        onChange={values => {
           runInAction(() => {
             project.prompt = values;
           });
         }}
         values={toJS(project.prompt)}
       >
-        <VarCategory label="Models">
-          <VarSelect
-            label="Checkpoint"
-            path="checkpoint_name"
-            options={mainStore.info.checkpoints.map(name => ({
-              key: name,
-              label: name,
-            }))}
-          />
-        </VarCategory>
         <VarCategory label="Conditioning">
-          <VarString label="Positive prompt" path="positive_prompt" multiline />
-          <VarString label="Negative prompt" path="negative_prompt" multiline />
+          <VarString label="Positive" path="conditioning.positive" multiline />
+          <VarString label="Negative" path="conditioning.negative" multiline />
         </VarCategory>
         <VarCategory label="Latent">
           <VarSlider
             label="Width"
-            path="width"
+            path="input.width"
             min={64}
             max={2048}
             step={8}
@@ -54,7 +44,7 @@ export const Prompt: React.FC = observer(() => {
           />
           <VarSlider
             label="Height"
-            path="height"
+            path="input.height"
             min={64}
             max={2048}
             step={8}
@@ -63,7 +53,7 @@ export const Prompt: React.FC = observer(() => {
           />
           <VarSlider
             label="Batch size"
-            path="batch_size"
+            path="input.batch_size"
             min={1}
             max={16}
             step={1}
@@ -72,9 +62,15 @@ export const Prompt: React.FC = observer(() => {
           />
         </VarCategory>
         <VarCategory label="Sampler settings">
+          <VarNumber
+            label="Seed"
+            path="sampler.seed"
+            readOnly={project.prompt.sampler.seed_randomize}
+          />
+          <VarToggle label="Randomize seed" path="sampler.seed_randomize" />
           <VarSlider
             label="CFG"
-            path="cfg"
+            path="sampler.cfg"
             min={0}
             max={30}
             step={0.5}
@@ -83,22 +79,25 @@ export const Prompt: React.FC = observer(() => {
           />
           <VarSlider
             label="Steps"
-            path="steps"
+            path="sampler.steps"
             min={1}
             max={150}
             step={1}
             defaultValue={20}
             showInput
           />
-          <VarNumber
-            label="Seed"
-            path="seed"
-            readOnly={project.prompt.seed_randomize}
+          <VarSlider
+            label="Denoise"
+            path="sampler.denoise"
+            min={0}
+            max={1}
+            step={0.01}
+            defaultValue={1}
+            showInput
           />
-          <VarToggle label="Randomize seed" path="seed_randomize" />
           <VarSelect
             label="Sampler"
-            path="sampler_name"
+            path="sampler.sampler"
             options={mainStore.info.samplers.map(name => ({
               key: name,
               label: name,
@@ -106,7 +105,7 @@ export const Prompt: React.FC = observer(() => {
           />
           <VarSelect
             label="Scheduler"
-            path="scheduler_name"
+            path="sampler.scheduler"
             options={mainStore.info.schedulers.map(name => ({
               key: name,
               label: name,

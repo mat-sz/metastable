@@ -36,26 +36,39 @@ def clip_encode(clip, text):
     cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
     return [[cond, {"pooled_output": pooled}]]
 
-def empty_latent_image(batch_size, width, height):
+def empty_latent_image(settings):
+    batch_size, height, width = settings["batch_size"], settings["height"], settings["width"]
     return torch.zeros([batch_size, 4, height // 8, width // 8])
 
-def txt2img(server, prompt, prompt_id):
-    ckpt_path = folder_paths.get_full_path("checkpoints", prompt["checkpoint_name"])
-    (model, clip, vae, _) = comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=None)
+def create_conditioning(clip, settings):
+    return (clip_encode(clip, settings["positive"]), clip_encode(clip, settings["negative"]))
 
-    positive = clip_encode(clip, prompt["positive_prompt"])
-    negative = clip_encode(clip, prompt["negative_prompt"])
-
-    latent = empty_latent_image(prompt["batch_size"], prompt["width"], prompt["height"])
-
-    noise = comfy.sample.prepare_noise(latent, prompt["seed"], None)
+def ksampler(model, latent, conditioning, settings):
+    positive, negative = conditioning
+    seed = settings["seed"]
+    noise = comfy.sample.prepare_noise(latent, seed, None)
 
     disable_pbar = not comfy.utils.PROGRESS_BAR_ENABLED
-    callback = latent_preview.prepare_callback(model, prompt["steps"])
-    samples = comfy.sample.sample(model, noise, prompt["steps"], prompt["cfg"], prompt["sampler_name"], prompt["scheduler_name"], positive, negative, latent,
-                                                                denoise=1.0, disable_noise=False, start_step=None, last_step=None,
-                                                                force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=disable_pbar, seed=prompt["seed"])
+    steps = settings["steps"]
+    callback = latent_preview.prepare_callback(model, steps)
 
+    denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
+    return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent,
+                                                                denoise=denoise, disable_noise=False, start_step=None, last_step=None,
+                                                                force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=disable_pbar, seed=seed)
+
+def load_checkpoint(settings):
+    ckpt_path = folder_paths.get_full_path("checkpoints", settings["name"])
+    return comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=None)
+    
+
+def txt2img(server, prompt, prompt_id):
+    models_settings = prompt["models"]
+    (model, clip, vae, _) = load_checkpoint(models_settings["base"])
+
+    conditioning = create_conditioning(clip, prompt["conditioning"])
+    latent = empty_latent_image(prompt["input"])
+    samples = ksampler(model, latent, conditioning, prompt["sampler"])
     images = vae.decode(samples)
 
     project_id = prompt["project_id"]

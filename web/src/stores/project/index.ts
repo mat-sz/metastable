@@ -3,34 +3,42 @@ import { getUrl } from '../../config';
 import { randomSeed } from '../../helpers';
 
 interface Prompt {
-  batch_size: number;
-  width: number;
-  height: number;
-  checkpoint_name: string;
-  positive_prompt: string;
-  negative_prompt: string;
-  seed: number;
-  seed_randomize: boolean;
-  steps: number;
-  cfg: number;
-  sampler_name: string;
-  scheduler_name: string;
+  input: { batch_size: number; width: number; height: number };
+  models: {
+    base: { name: string };
+  };
+  conditioning: {
+    positive: string;
+    negative: string;
+  };
+  sampler: {
+    seed: number;
+    seed_randomize: boolean;
+    steps: number;
+    cfg: number;
+    denoise: number;
+    sampler: string;
+    scheduler: string;
+  };
 }
 
 export class Project {
   prompt: Prompt = {
-    batch_size: 1,
-    width: 512,
-    height: 512,
-    checkpoint_name: 'v1-5-pruned-emaonly.safetensors',
-    positive_prompt: 'an image of a banana',
-    negative_prompt: 'bad quality',
-    seed: randomSeed(),
-    seed_randomize: true,
-    steps: 20,
-    cfg: 8.0,
-    sampler_name: 'dpm_2',
-    scheduler_name: 'karras',
+    input: { batch_size: 1, width: 512, height: 512 },
+    models: { base: { name: 'v1-5-pruned-emaonly.safetensors' } },
+    conditioning: {
+      positive: 'an image of a banana',
+      negative: 'bad quality',
+    },
+    sampler: {
+      seed: randomSeed(),
+      seed_randomize: true,
+      steps: 20,
+      cfg: 8.0,
+      denoise: 1,
+      sampler: 'dpm_2',
+      scheduler: 'karras',
+    },
   };
   outputFilenames: string[] = [];
 
@@ -39,8 +47,8 @@ export class Project {
   }
 
   async request() {
-    if (this.prompt.seed_randomize) {
-      this.prompt.seed = randomSeed();
+    if (this.prompt.sampler.seed_randomize) {
+      this.prompt.sampler.seed = randomSeed();
     }
 
     await fetch(getUrl('/prompt'), {
