@@ -68,4 +68,13 @@ export class Project {
     url.searchParams.append('filename', filename);
     return url.toString();
   }
+
+  addLora(name: string, strength = 1) {
+    const prompt = { ...this.prompt };
+    prompt.models.loras.push({
+      name,
+      strength,
+    });
+    this.prompt = prompt;
+  }
 }

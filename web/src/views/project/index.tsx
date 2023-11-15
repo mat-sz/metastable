@@ -13,8 +13,8 @@ export const Project: React.FC = observer(() => {
 
   return (
     <div className={styles.project}>
-      <Prompt />
       <Preview />
+      <Prompt />
     </div>
   );
 });

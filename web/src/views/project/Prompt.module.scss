@@ -1,3 +1,31 @@
+.settings {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+}
+
+.categories {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background: var(--color-bg-panel-dark);
+
+  li {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    padding: 0.4rem;
+    font-weight: bold;
+    cursor: pointer;
+
+    &.active {
+      background: var(--color-bg-panel);
+    }
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
+}
+
 .prompt {
   display: flex;
   flex-direction: column;
