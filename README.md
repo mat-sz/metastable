@@ -14,9 +14,6 @@ pip -r requirements.txt
 
 Place your models in `./models/`.
 
-## Usage
-
 ```
-cd api && python main.py
-cd web && yarn start
+yarn start
 ```

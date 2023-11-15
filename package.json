@@ -2,9 +2,11 @@
   "name": "metastable",
   "private": true,
   "workspaces": [
+    "api",
     "web"
   ],
   "scripts": {
-    "start": "cd web && yarn start"
-  }
+    "start": "yarn workspaces foreach -Api run start"
+  },
+  "packageManager": "yarn@4.0.2"
 }

@@ -1,0 +1,6 @@
+{
+  "name": "api",
+  "scripts": {
+    "start": "python main.py"
+  }
+}
