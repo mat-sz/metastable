@@ -55,10 +55,10 @@ class PromptServer():
 
         mimetypes.init()
 
+        self.download_queue = None
         self.prompt_queue = None
         self.loop = loop
         self.messages = asyncio.Queue()
-        self.number = 0
 
         middlewares = []
         middlewares.append(create_cors_middleware('*'))
@@ -86,11 +86,12 @@ class PromptServer():
             self.sockets[sid] = ws
 
             try:
-                data = self.get_queue_info()
+                data = self.get_prompt_queue_info()
                 data["sid"] = sid
                 # Send initial state to the new client
-                await self.send("status", data, sid)
-                        
+                await self.send("prompt.queue", data, sid)
+                await self.send("download.queue", self.get_download_queue_info(), sid)
+                
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.ERROR:
                         print('ws connection closed with exception %s' % ws.exception())
@@ -204,13 +205,20 @@ class PromptServer():
 
         @routes.post("/prompt")
         async def post_prompt(request):
-            number = self.number
-            self.number += 1
             prompt = await request.json()
 
             prompt_id = str(uuid.uuid4())
-            self.prompt_queue.put((number, prompt_id, prompt))
-            response = {"prompt_id": prompt_id, "number": number}
+            self.prompt_queue.put((prompt_id, prompt))
+            response = {"prompt_id": prompt_id}
+            return web.json_response(response)
+
+        @routes.post("/download")
+        async def post_download(request):
+            settings = await request.json()
+
+            download_id = str(uuid.uuid4())
+            self.download_queue.put((download_id, settings))
+            response = {"download_id": download_id}
             return web.json_response(response)
 
     async def send(self, event, data, sid=None):
@@ -296,11 +304,18 @@ class PromptServer():
     def add_routes(self):
         self.app.add_routes(self.routes)
 
+    def get_download_queue_info(self):
+        return {
+            "queue_remaining": self.download_queue.get_tasks_remaining()
+        }
 
-    def get_queue_info(self):
+    def get_prompt_queue_info(self):
         return {
             "queue_remaining": self.prompt_queue.get_tasks_remaining()
         }
 
-    def queue_updated(self):
-        self.send_sync("status", self.get_queue_info())
+    def prompt_queue_updated(self):
+        self.send_sync("prompt.queue", self.get_prompt_queue_info())
+
+    def download_queue_updated(self):
+        self.send_sync("download.queue", self.get_download_queue_info())

@@ -100,7 +100,7 @@ def txt2img(server, prompt, prompt_id):
         output_filenames.append(file)
         counter += 1
 
-    server.send_sync("executed", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": project_id }, server.client_id)
+    server.send_sync("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": project_id }, server.client_id)
 
 class PromptExecutor:
     def __init__(self, server):
@@ -129,7 +129,7 @@ class PromptExecutor:
             self.server.client_id = None
 
         if self.server.client_id is not None:
-            self.server.send_sync("execution_start", { "prompt_id": prompt_id}, self.server.client_id)
+            self.server.send_sync("prompt.start", { "prompt_id": prompt_id }, self.server.client_id)
 
         with torch.inference_mode():
             txt2img(self.server, prompt, prompt_id)
@@ -149,7 +149,7 @@ class PromptQueue:
     def put(self, item):
         with self.mutex:
             heapq.heappush(self.queue, item)
-            self.server.queue_updated()
+            self.server.prompt_queue_updated()
             self.not_empty.notify()
 
     def get(self):
@@ -160,16 +160,16 @@ class PromptQueue:
             i = self.task_counter
             self.currently_running[i] = copy.deepcopy(item)
             self.task_counter += 1
-            self.server.queue_updated()
+            self.server.prompt_queue_updated()
             return (item, i)
 
     def task_done(self, item_id, outputs):
         with self.mutex:
             prompt = self.currently_running.pop(item_id)
-            self.history[prompt[1]] = { "prompt": prompt, "outputs": {} }
+            self.history[prompt[0]] = { "prompt": prompt, "outputs": {} }
             for o in outputs:
-                self.history[prompt[1]]["outputs"][o] = outputs[o]
-            self.server.queue_updated()
+                self.history[prompt[0]]["outputs"][o] = outputs[o]
+            self.server.prompt_queue_updated()
 
     def get_current_queue(self):
         with self.mutex:
@@ -185,7 +185,7 @@ class PromptQueue:
     def wipe_queue(self):
         with self.mutex:
             self.queue = []
-            self.server.queue_updated()
+            self.server.prompt_queue_updated()
 
     def delete_queue_item(self, function):
         with self.mutex:
@@ -196,7 +196,7 @@ class PromptQueue:
                     else:
                         self.queue.pop(x)
                         heapq.heapify(self.queue)
-                    self.server.queue_updated()
+                    self.server.prompt_queue_updated()
                     return True
         return False
 

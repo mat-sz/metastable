@@ -33,6 +33,7 @@ import comfy.utils
 import yaml
 
 import execution
+import downloader
 import server
 from server import BinaryEventTypes
 import comfy.model_management
@@ -54,15 +55,27 @@ def prompt_worker(q, server):
     while True:
         item, item_id = q.get()
         execution_start_time = time.perf_counter()
-        prompt_id = item[1]
-        e.execute(item[2], prompt_id)
+        prompt_id = item[0]
+        e.execute(item[1], prompt_id)
         q.task_done(item_id, e.outputs_ui)
         if server.client_id is not None:
-            server.send_sync("executing", { "node": None, "prompt_id": prompt_id }, server.client_id)
+            server.send_sync("prompt.progress", { "value": 0, "max": 0 }, server.client_id)
 
         print("Prompt executed in {:.2f} seconds".format(time.perf_counter() - execution_start_time))
         gc.collect()
         comfy.model_management.soft_empty_cache()
+
+def download_worker(q, server):
+    e = downloader.Downloader(server)
+    while True:
+        item, item_id = q.get()
+        execution_start_time = time.perf_counter()
+        download_id = item[0]
+        e.execute(item[1], download_id)
+        q.task_done(item_id)
+
+        print("Download executed in {:.2f} seconds".format(time.perf_counter() - execution_start_time))
+        gc.collect()
 
 
 async def run(server, address='', port=8188, verbose=True):
@@ -72,7 +85,7 @@ async def run(server, address='', port=8188, verbose=True):
 def hijack_progress(server):
     def hook(value, total, preview_image):
         comfy.model_management.throw_exception_if_processing_interrupted()
-        server.send_sync("progress", {"value": value, "max": total}, server.client_id)
+        server.send_sync("prompt.progress", { "value": value, "max": total }, server.client_id)
         if preview_image is not None:
             server.send_sync(BinaryEventTypes.UNENCODED_PREVIEW_IMAGE, preview_image, server.client_id)
     comfy.utils.set_progress_bar_global_hook(hook)
@@ -88,14 +101,16 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     server = server.PromptServer(loop)
-    q = execution.PromptQueue(server)
+    prompt_queue = execution.PromptQueue(server)
+    download_queue = downloader.DownloadQueue(server)
 
     cuda_malloc_warning()
 
     server.add_routes()
     hijack_progress(server)
 
-    threading.Thread(target=prompt_worker, daemon=True, args=(q, server,)).start()
+    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue, server,)).start()
+    threading.Thread(target=download_worker, daemon=True, args=(download_queue, server,)).start()
 
     try:
         loop.run_until_complete(run(server, address=args.listen, port=args.port, verbose=not args.dont_print_server))

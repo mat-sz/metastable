@@ -119,9 +119,7 @@ def recursive_search(directory, excluded_dir_names=None):
 def filter_files_extensions(files, extensions):
         return sorted(list(filter(lambda a: os.path.splitext(a)[-1].lower() in extensions or len(extensions) == 0, files)))
 
-
-
-def get_full_path(folder_name, filename):
+def get_full_path(folder_name, filename, check_exists=True):
         global folder_names_and_paths
         if folder_name not in folder_names_and_paths:
                 return None
@@ -129,7 +127,7 @@ def get_full_path(folder_name, filename):
         filename = os.path.relpath(os.path.join("/", filename), "/")
         for x in folders[0]:
                 full_path = os.path.join(x, filename)
-                if os.path.isfile(full_path):
+                if not check_exists or os.path.isfile(full_path):
                         return full_path
 
         return None

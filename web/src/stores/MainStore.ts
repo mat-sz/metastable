@@ -1,49 +1,14 @@
 import { makeAutoObservable } from 'mobx';
 import { TypeSocket } from 'typesocket';
+
 import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
+import { Message } from '../types/websocket';
 
 declare global {
   // eslint-disable-next-line
   var _socket: TypeSocket<any> | undefined;
 }
-
-enum MessageType {
-  STATUS = 'status',
-  PROGRESS = 'progress',
-  EXECUTED = 'executed',
-}
-
-interface MessageModel {
-  type: MessageType;
-}
-
-interface StatusMessageModel extends MessageModel {
-  type: MessageType.STATUS;
-  data: {
-    queue_remaining: number;
-    sid?: string;
-  };
-}
-
-interface ProgressMessageModel extends MessageModel {
-  type: MessageType.PROGRESS;
-  data: {
-    max: number;
-    value: number;
-  };
-}
-
-interface ExecutedMessageModel extends MessageModel {
-  type: MessageType.EXECUTED;
-  data: {
-    prompt_id: string;
-    output_filenames: string[];
-    project_id: string;
-  };
-}
-
-type Message = StatusMessageModel | ProgressMessageModel | ExecutedMessageModel;
 
 interface Info {
   samplers: string[];
@@ -67,9 +32,13 @@ class MainStore {
     loras: [],
   };
 
-  remaining = 0;
-  progressValue = 0;
-  progressMax = 0;
+  promptRemaining = 0;
+  promptValue = 0;
+  promptMax = 0;
+
+  downloadRemaining = 0;
+  downloadValue = 0;
+  downloadMax = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -105,21 +74,38 @@ class MainStore {
 
   onMessage(message: Message) {
     switch (message.type) {
-      case MessageType.STATUS:
-        this.remaining = message.data.queue_remaining;
+      case 'prompt.queue':
+        this.promptRemaining = message.data.queue_remaining;
         break;
-      case MessageType.PROGRESS:
-        this.progressValue = message.data.value;
-        this.progressMax = message.data.max;
+      case 'prompt.progress':
+        this.promptValue = message.data.value;
+        this.promptMax = message.data.max;
         break;
-      case MessageType.EXECUTED:
+      case 'prompt.end':
         for (const project of this.projects.projects) {
           if (project.id === message.data.project_id) {
             project.outputFilenames = message.data.output_filenames;
           }
         }
         break;
+      case 'download.queue':
+        this.downloadRemaining = message.data.queue_remaining;
+        break;
+      case 'download.progress':
+        this.downloadValue = message.data.value;
+        this.downloadMax = message.data.max;
+        break;
     }
+  }
+
+  async download(type: string, url: string, filename: string) {
+    await fetch(getUrl('/download'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type, url, filename }),
+    });
   }
 }
 

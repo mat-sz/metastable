@@ -1,0 +1,56 @@
+export interface PromptQueueMessageModel {
+  type: 'prompt.queue';
+  data: {
+    queue_remaining: number;
+    sid?: string;
+  };
+}
+
+export interface PromptProgressMessageModel {
+  type: 'prompt.progress';
+  data: {
+    max: number;
+    value: number;
+  };
+}
+
+export interface PromptEndMessageModel {
+  type: 'prompt.end';
+  data: {
+    prompt_id: string;
+    output_filenames: string[];
+    project_id: string;
+  };
+}
+
+export interface DownloadQueueMessageModel {
+  type: 'download.queue';
+  data: {
+    queue_remaining: number;
+    sid?: string;
+  };
+}
+
+export interface DownloadProgressMessageModel {
+  type: 'download.progress';
+  data: {
+    download_id: string;
+    max: number;
+    value: number;
+  };
+}
+
+export interface DownloadEndMessageModel {
+  type: 'download.end';
+  data: {
+    download_id: string;
+  };
+}
+
+export type Message =
+  | PromptQueueMessageModel
+  | PromptProgressMessageModel
+  | PromptEndMessageModel
+  | DownloadQueueMessageModel
+  | DownloadProgressMessageModel
+  | DownloadEndMessageModel;
