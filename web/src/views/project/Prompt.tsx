@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { runInAction, toJS } from 'mobx';
 import {
+  VarArray,
   VarButton,
   VarCategory,
   VarNumber,
@@ -28,6 +29,50 @@ export const Prompt: React.FC = observer(() => {
         }}
         values={toJS(project.prompt)}
       >
+        <VarCategory label="Models">
+          <VarSelect
+            label="Checkpoint"
+            path="models.base.name"
+            options={mainStore.info.checkpoints.map(name => ({
+              key: name,
+              label: name,
+            }))}
+          />
+        </VarCategory>
+        <VarArray path="models.loras">
+          <VarCategory label="LoRA">
+            <VarSelect
+              label="Model"
+              path="name"
+              options={mainStore.info.loras.map(name => ({
+                key: name,
+                label: name,
+              }))}
+            />
+            <VarSlider
+              label="Strength"
+              path="strength"
+              min={0}
+              max={2}
+              step={0.01}
+              defaultValue={1}
+              showInput
+            />
+          </VarCategory>
+        </VarArray>
+        <VarButton
+          buttonLabel="Add LoRA"
+          onClick={() => {
+            runInAction(() => {
+              const prompt = toJS(project.prompt);
+              prompt.models.loras.push({
+                name: mainStore.info.loras[0],
+                strength: 1,
+              });
+              project.prompt = prompt;
+            });
+          }}
+        />
         <VarCategory label="Conditioning">
           <VarString label="Positive" path="conditioning.positive" multiline />
           <VarString label="Negative" path="conditioning.negative" multiline />

@@ -6,6 +6,7 @@ interface Prompt {
   input: { batch_size: number; width: number; height: number };
   models: {
     base: { name: string };
+    loras: { name: string; strength: number }[];
   };
   conditioning: {
     positive: string;
@@ -25,7 +26,7 @@ interface Prompt {
 export class Project {
   prompt: Prompt = {
     input: { batch_size: 1, width: 512, height: 512 },
-    models: { base: { name: 'v1-5-pruned-emaonly.safetensors' } },
+    models: { base: { name: 'v1-5-pruned-emaonly.safetensors' }, loras: [] },
     conditioning: {
       positive: 'an image of a banana',
       negative: 'bad quality',

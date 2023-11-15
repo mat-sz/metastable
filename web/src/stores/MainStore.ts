@@ -49,6 +49,7 @@ interface Info {
   samplers: string[];
   schedulers: string[];
   checkpoints: string[];
+  loras: string[];
 }
 
 class MainStore {
@@ -63,6 +64,7 @@ class MainStore {
     samplers: [],
     schedulers: [],
     checkpoints: [],
+    loras: [],
   };
 
   remaining = 0;

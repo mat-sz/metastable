@@ -62,9 +62,19 @@ def load_checkpoint(settings):
     return comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=None)
     
 
+def load_lora(model, clip, settings):
+    lora_path = folder_paths.get_full_path("loras", settings["name"])
+    lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
+
+    strength = settings["strength"]
+    return comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
+
 def txt2img(server, prompt, prompt_id):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint(models_settings["base"])
+
+    for lora_settings in models_settings["loras"]:
+        (model, clip) = load_lora(model, clip, lora_settings)
 
     conditioning = create_conditioning(clip, prompt["conditioning"])
     latent = empty_latent_image(prompt["input"])

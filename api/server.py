@@ -192,7 +192,8 @@ class PromptServer():
             return web.json_response({
                 "samplers": comfy.samplers.KSampler.SAMPLERS,
                 "schedulers": comfy.samplers.KSampler.SCHEDULERS,
-                "checkpoints": folder_paths.get_filename_list("checkpoints")
+                "checkpoints": folder_paths.get_filename_list("checkpoints"),
+                "loras": folder_paths.get_filename_list("loras")
             })
 
         @routes.post("/project")
