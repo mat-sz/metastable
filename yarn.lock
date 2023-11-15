@@ -2923,9 +2923,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-var-ui@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "react-var-ui@npm:1.4.1"
+"react-var-ui@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "react-var-ui@npm:1.4.2"
   dependencies:
     filesize: "npm:^8.0.6"
     radash: "npm:^11.0.0"
@@ -2933,7 +2933,7 @@ __metadata:
     react-use-pointer-drag: "npm:^0.1.1"
   peerDependencies:
     react: ">=16"
-  checksum: 307257cccf800e1b2e3f0d564eef4393ea46373fbe6351aa0182c69f3eff4b363205616dd8abaf97a1c4fa59cb3cd35ff48fc5d78ab643427e8ece98f9d738cc
+  checksum: ff22fffa550b78f7eb129dbafb7e31fe90be4b10321b5f547a28f1980f65fa04a38b684b6d2ff38e89fe2d597026160a8b5b93d13004ac0bd89a19bc25a39b47
   languageName: node
   linkType: hard
 
@@ -3487,7 +3487,7 @@ __metadata:
     react-dnd-html5-backend: "npm:^16.0.1"
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^4.11.0"
-    react-var-ui: "npm:^1.4.1"
+    react-var-ui: "npm:^1.4.2"
     sass: "npm:^1.66.1"
     typescript: "npm:^5.0.2"
     typesocket: "npm:^1.1.0"
