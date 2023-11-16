@@ -13,8 +13,21 @@ declare global {
 interface Info {
   samplers: string[];
   schedulers: string[];
-  checkpoints: string[];
-  loras: string[];
+  models: {
+    checkpoints: string[];
+    clip: string[];
+    clip_vision: string[];
+    controlnet: string[];
+    diffusers: string[];
+    embeddings: string[];
+    gligen: string[];
+    hypernetworks: string[];
+    loras: string[];
+    style_models: string[];
+    upscale_models: string[];
+    vae: string[];
+    vae_approx: string[];
+  };
 }
 
 class MainStore {
@@ -28,8 +41,21 @@ class MainStore {
   info: Info = {
     samplers: [],
     schedulers: [],
-    checkpoints: [],
-    loras: [],
+    models: {
+      checkpoints: [],
+      clip: [],
+      clip_vision: [],
+      controlnet: [],
+      diffusers: [],
+      embeddings: [],
+      gligen: [],
+      hypernetworks: [],
+      loras: [],
+      style_models: [],
+      upscale_models: [],
+      vae: [],
+      vae_approx: [],
+    },
   };
 
   promptRemaining = 0;

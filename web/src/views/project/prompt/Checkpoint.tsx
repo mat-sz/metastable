@@ -10,7 +10,7 @@ export const Checkpoint: React.FC = observer(() => {
       <VarSelect
         label="Checkpoint"
         path="models.base.name"
-        options={mainStore.info.checkpoints.map(name => ({
+        options={mainStore.info.models.checkpoints.map(name => ({
           key: name,
           label: name,
         }))}

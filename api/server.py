@@ -193,8 +193,21 @@ class PromptServer():
             return web.json_response({
                 "samplers": comfy.samplers.KSampler.SAMPLERS,
                 "schedulers": comfy.samplers.KSampler.SCHEDULERS,
-                "checkpoints": folder_paths.get_filename_list("checkpoints"),
-                "loras": folder_paths.get_filename_list("loras")
+                "models": {
+                    "checkpoints": folder_paths.get_filename_list("checkpoints"),
+                    "clip": folder_paths.get_filename_list("clip"),
+                    "clip_vision": folder_paths.get_filename_list("clip_vision"),
+                    "controlnet": folder_paths.get_filename_list("controlnet"),
+                    "diffusers": folder_paths.get_filename_list("diffusers"),
+                    "embeddings": folder_paths.get_filename_list("embeddings"),
+                    "gligen": folder_paths.get_filename_list("gligen"),
+                    "hypernetworks": folder_paths.get_filename_list("hypernetworks"),
+                    "loras": folder_paths.get_filename_list("loras"),
+                    "style_models": folder_paths.get_filename_list("style_models"),
+                    "upscale_models": folder_paths.get_filename_list("upscale_models"),
+                    "vae": folder_paths.get_filename_list("vae"),
+                    "vae_approx": folder_paths.get_filename_list("vae_approx"),
+                }
             })
 
         @routes.post("/project")
