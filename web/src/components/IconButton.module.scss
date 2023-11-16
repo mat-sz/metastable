@@ -1,0 +1,36 @@
+.iconButton {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  padding: 0;
+  color: var(--color-fg-soft);
+  font-size: 1rem;
+  position: relative;
+
+  &:hover {
+    color: var(--color-fg);
+    background: none;
+  }
+
+  &.round {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-bg);
+    background: var(--color-fg-soft);
+    border-radius: 100%;
+
+    &:hover {
+      color: var(--color-bg);
+      background: var(--color-fg);
+    }
+
+    svg {
+      width: auto;
+      height: 1.2rem;
+    }
+  }
+}

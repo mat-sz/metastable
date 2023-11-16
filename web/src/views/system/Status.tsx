@@ -12,6 +12,9 @@ export const Status: React.FC = observer(() => {
         <progress value={mainStore.promptValue} max={mainStore.promptMax} />
       )}
       <div>Queued downloads: {mainStore.downloads.remaining}</div>
+      <button onClick={() => mainStore.downloads.open()}>
+        Download manager
+      </button>
     </div>
   );
 });

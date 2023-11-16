@@ -5,6 +5,7 @@ import { Status } from './views/system/Status';
 import { Project } from './views/project';
 import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
+import { DownloadManager } from './views/download';
 
 export const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ export const App: React.FC = () => {
       <Projects />
       <Project />
       <Status />
+      <DownloadManager />
     </div>
   );
 };

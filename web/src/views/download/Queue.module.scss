@@ -1,0 +1,10 @@
+.item {
+  display: grid;
+  align-content: center;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 0.5rem 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-bg-interactive);
+  }
+}

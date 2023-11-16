@@ -1676,6 +1676,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"filesize@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "filesize@npm:10.1.0"
+  checksum: 4439d2d81ecd98503367cc6d2083ea94de0859a35953325d94f95c4a18302a333a77b80b5421bc9dc663cf9fb2fc1193f15963da4fd0dab3d49168902588a790
+  languageName: node
+  linkType: hard
+
 "filesize@npm:^8.0.6":
   version: 8.0.7
   resolution: "filesize@npm:8.0.7"
@@ -3477,6 +3484,7 @@ __metadata:
     eslint: "npm:^8.45.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.3"
+    filesize: "npm:^10.1.0"
     husky: "npm:^8.0.3"
     lint-staged: "npm:^14.0.1"
     mobx: "npm:^6.10.2"

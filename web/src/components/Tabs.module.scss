@@ -1,0 +1,29 @@
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-bg-interactive-hover);
+
+  .tab {
+    background: var(--color-bg-panel);
+    padding: 0 5px;
+    margin-right: 5px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+
+    &.selected {
+      background: var(--color-bg-interactive-hover);
+    }
+
+    button {
+      background: none;
+      padding: 0;
+      line-height: 0;
+    }
+  }
+}
+
+.panel {
+  background: var(--color-bg-panel);
+  padding: 0.5rem;
+  margin-top: 0;
+}

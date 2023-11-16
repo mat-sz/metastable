@@ -1,3 +1,5 @@
+import * as fsize from 'filesize';
+
 export function randomSeed() {
   const min = -1125899906842624;
   const max = 1125899906842624;
@@ -10,4 +12,8 @@ export function arrayMove<T>(array: T[], from: number, to?: number): T[] {
   const newArray = [...array];
   newArray.splice(to, 0, ...newArray.splice(from, 1));
   return newArray;
+}
+
+export function filesize(value: number) {
+  return fsize.filesize(value, { standard: 'jedec' });
 }
