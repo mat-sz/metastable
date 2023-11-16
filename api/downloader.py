@@ -28,7 +28,15 @@ class Downloader:
         url = settings["url"]
         buffer = io.BytesIO()
 
-        with urllib.request.urlopen(url) as response:
+        req = urllib.request.Request(
+            url, 
+            data=None, 
+            headers={
+                'User-Agent': 'Metastable/0.0.0'
+            }
+        )
+
+        with urllib.request.urlopen(req) as response:
             length = response.getheader('content-length')
             chunk_size = 5242880
 

@@ -34,6 +34,7 @@
     "react-icons": "^4.11.0",
     "react-var-ui": "^1.4.2",
     "sass": "^1.66.1",
+    "swr": "^2.2.4",
     "typesocket": "^1.1.0"
   },
   "devDependencies": {

@@ -1,0 +1,37 @@
+.carousel {
+  margin-top: 1rem;
+  position: relative;
+
+  .previous,
+  .next {
+    position: absolute;
+    top: 50%;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transform: translateY(-50%);
+    font-size: 3rem;
+  }
+
+  .previous {
+    left: 0;
+  }
+
+  .next {
+    right: 0;
+  }
+}
+
+.items {
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  height: 300px;
+
+  img {
+    width: auto;
+    margin-right: 10px;
+    height: 300px;
+  }
+}

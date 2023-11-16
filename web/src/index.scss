@@ -9,6 +9,9 @@
   --color-accent: #77f;
   --color-fg-soft: #aaa;
   --color-fg: #ddd;
+  --color-primary: #35353b;
+  --color-primary-soft: #575760;
+  --green: #3ea74e;
 }
 
 /* Firefox */
@@ -112,7 +115,7 @@ option {
   background: var(--color-bg-interactive);
   border: none;
   color: var(--color-fg);
-  padding: 10px 20px;
+  padding: 0.6rem;
   border-radius: 5px;
 }
 

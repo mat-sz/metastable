@@ -1,0 +1,45 @@
+.rating {
+  position: relative;
+  display: inline-block;
+}
+
+.background,
+.value {
+  display: flex;
+
+  svg {
+    min-width: 1.2rem;
+    margin: 0 0.1rem;
+  }
+}
+
+.background {
+  color: var(--color-fg-soft);
+}
+
+.value {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute;
+  overflow: hidden;
+  color: yellow;
+}
+
+.small {
+  .background,
+  .value {
+    svg {
+      min-width: 1rem;
+      margin: 0;
+    }
+  }
+
+  .background {
+    color: var(--color-bg);
+  }
+
+  .value {
+    color: var(--color-fg);
+  }
+}

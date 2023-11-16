@@ -5,6 +5,7 @@ import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
 import { Message } from '../types/websocket';
 import { DownloadStore } from './DownloadStore';
+import { ModelType } from '../types/model';
 
 declare global {
   // eslint-disable-next-line
@@ -134,6 +135,28 @@ class MainStore {
         });
         break;
     }
+  }
+
+  hasFile(type: ModelType, filename: string) {
+    if (this.info.models[type].includes(filename)) {
+      return 'downloaded';
+    }
+
+    const item = this.downloads.queue.find(
+      item =>
+        item.filename === filename &&
+        ['done', 'queued', 'in_progress'].includes(item.state),
+    );
+
+    if (item) {
+      if (item.state === 'done') {
+        return 'downloaded';
+      } else {
+        return 'queued';
+      }
+    }
+
+    return undefined;
   }
 }
 

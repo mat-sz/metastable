@@ -1,7 +1,7 @@
 .item {
   display: grid;
   align-content: center;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 0.5fr;
   padding: 0.5rem 0;
 
   &:not(:last-child) {
