@@ -4,6 +4,7 @@ import { TypeSocket } from 'typesocket';
 import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
 import { Message } from '../types/websocket';
+import { DownloadStore } from './DownloadStore';
 
 declare global {
   // eslint-disable-next-line
@@ -32,6 +33,7 @@ interface Info {
 
 class MainStore {
   projects = new ProjectStore();
+  downloads = new DownloadStore();
   connected = false;
   private socket = new TypeSocket<Message>(getUrl('/ws', 'ws'), {
     maxRetries: 0,
@@ -61,10 +63,6 @@ class MainStore {
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
-
-  downloadRemaining = 0;
-  downloadValue = 0;
-  downloadMax = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -115,23 +113,27 @@ class MainStore {
         }
         break;
       case 'download.queue':
-        this.downloadRemaining = message.data.queue_remaining;
+        this.downloads.remaining = message.data.queue_remaining;
+        break;
+      case 'download.start':
+        this.downloads.updateDownload(message.data.download_id, {
+          state: 'in_progress',
+        });
         break;
       case 'download.progress':
-        this.downloadValue = message.data.value;
-        this.downloadMax = message.data.max;
+        this.downloads.updateDownload(message.data.download_id, {
+          state: 'in_progress',
+          progress: message.data.progress,
+          size: message.data.size,
+          started_at: message.data.started_at,
+        });
+        break;
+      case 'download.end':
+        this.downloads.updateDownload(message.data.download_id, {
+          state: 'done',
+        });
         break;
     }
-  }
-
-  async download(type: string, url: string, filename: string) {
-    await fetch(getUrl('/download'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ type, url, filename }),
-    });
   }
 }
 

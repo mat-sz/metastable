@@ -225,6 +225,14 @@ class PromptServer():
             response = {"prompt_id": prompt_id}
             return web.json_response(response)
 
+        @routes.get("/prompt/queue")
+        async def get_queue(request):
+            queue_info = {}
+            current_queue = self.prompt_queue.get_current_queue()
+            queue_info['queue_running'] = current_queue[0]
+            queue_info['queue_pending'] = current_queue[1]
+            return web.json_response(queue_info)
+
         @routes.post("/download")
         async def post_download(request):
             settings = await request.json()
@@ -233,6 +241,24 @@ class PromptServer():
             self.download_queue.put((download_id, settings))
             response = {"download_id": download_id}
             return web.json_response(response)
+
+        @routes.delete("/download")
+        async def delete_download(request):
+            json = await request.json()
+            download_id = json['download_id']
+            delete_func = lambda a: a[0] == download_id
+            self.download_queue.delete_queue_item(delete_func)
+
+            response = {"download_id": download_id}
+            return web.json_response(response)
+
+        @routes.get("/download/queue")
+        async def get_queue(request):
+            queue_info = {}
+            current_queue = self.download_queue.get_current_queue()
+            queue_info['queue_running'] = current_queue[0]
+            queue_info['queue_pending'] = current_queue[1]
+            return web.json_response(queue_info)
 
     async def send(self, event, data, sid=None):
         if event == BinaryEventTypes.UNENCODED_PREVIEW_IMAGE:

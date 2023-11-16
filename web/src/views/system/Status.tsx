@@ -11,10 +11,7 @@ export const Status: React.FC = observer(() => {
       {mainStore.promptValue < mainStore.promptMax && (
         <progress value={mainStore.promptValue} max={mainStore.promptMax} />
       )}
-      <div>Queued downloads: {mainStore.downloadRemaining}</div>
-      {mainStore.downloadValue < mainStore.downloadMax && (
-        <progress value={mainStore.downloadValue} max={mainStore.downloadMax} />
-      )}
+      <div>Queued downloads: {mainStore.downloads.remaining}</div>
     </div>
   );
 });

@@ -9,6 +9,7 @@ import traceback
 import gc
 import urllib.request
 import io
+import time
 
 import folder_paths
 
@@ -29,15 +30,17 @@ class Downloader:
 
         with urllib.request.urlopen(url) as response:
             length = response.getheader('content-length')
-            chunk_size = 1000000
+            chunk_size = 5242880
+
+            started_at = round(time.time() * 1000)
 
             if length:
                 length = int(length)
-                chunk_size = max(4096, length // 20)
-                self.server.send_sync("download.progress", { "download_id": download_id, "value": 0, "max": length }, self.server.client_id)
+                self.server.send_sync("download.progress", { "download_id": download_id, "progress": 0, "size": length, "started_at": started_at }, self.server.client_id)
 
             offset = 0
             print(f"Download started: {url}")
+
 
             while True:
                 chunk = response.read(chunk_size)
@@ -49,7 +52,7 @@ class Downloader:
                 offset += len(chunk)
 
                 if length:
-                    self.server.send_sync("download.progress", { "download_id": download_id, "value": offset, "max": length }, self.server.client_id)
+                    self.server.send_sync("download.progress", { "download_id": download_id, "progress": offset, "size": length, "started_at": started_at }, self.server.client_id)
                     print(f"Download: {offset}/{length}")
 
         with open(path, "wb") as f:

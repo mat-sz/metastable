@@ -23,6 +23,13 @@ export interface PromptEndMessageModel {
   };
 }
 
+export interface DownloadStartMessageModel {
+  type: 'download.start';
+  data: {
+    download_id: string;
+  };
+}
+
 export interface DownloadQueueMessageModel {
   type: 'download.queue';
   data: {
@@ -35,8 +42,9 @@ export interface DownloadProgressMessageModel {
   type: 'download.progress';
   data: {
     download_id: string;
-    max: number;
-    value: number;
+    size: number;
+    progress: number;
+    started_at: number;
   };
 }
 
@@ -53,4 +61,5 @@ export type Message =
   | PromptEndMessageModel
   | DownloadQueueMessageModel
   | DownloadProgressMessageModel
+  | DownloadStartMessageModel
   | DownloadEndMessageModel;
