@@ -34,6 +34,7 @@ import yaml
 
 import execution
 import downloader
+import watcher
 import server
 from server import BinaryEventTypes
 import comfy.model_management
@@ -77,6 +78,9 @@ def download_worker(q, server):
         print("Download executed in {:.2f} seconds".format(time.perf_counter() - execution_start_time))
         gc.collect()
 
+def watcher_worker(w):
+    w.run()
+
 
 async def run(server, address='', port=8188, verbose=True):
     await asyncio.gather(server.start(address, port, verbose), server.publish_loop())
@@ -103,6 +107,7 @@ if __name__ == "__main__":
     server = server.PromptServer(loop)
     prompt_queue = execution.PromptQueue(server)
     download_queue = downloader.DownloadQueue(server)
+    w = watcher.Watcher(server);
 
     cuda_malloc_warning()
 
@@ -111,6 +116,7 @@ if __name__ == "__main__":
 
     threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue, server,)).start()
     threading.Thread(target=download_worker, daemon=True, args=(download_queue, server,)).start()
+    threading.Thread(target=watcher_worker, daemon=True, args=(w,)).start()
 
     try:
         loop.run_until_complete(run(server, address=args.listen, port=args.port, verbose=not args.dont_print_server))

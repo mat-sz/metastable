@@ -36,6 +36,10 @@ projects_directory = os.path.join(base_path, "projects")
 
 filename_list_cache = {}
 
+def get_models_dir():
+    global models_dir
+    return models_dir
+
 def create_if_not_found(path):
     if not os.path.exists(path):
         os.makedirs(path)

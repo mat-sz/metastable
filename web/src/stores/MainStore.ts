@@ -77,14 +77,14 @@ class MainStore {
     this.socket.on('message', message => this.onMessage(message));
     this.socket.connect();
 
-    this.init();
+    this.refresh();
   }
 
   get project() {
     return this.projects.current;
   }
 
-  async init() {
+  async refresh() {
     const res = await fetch(getUrl('/info'));
     this.info = await res.json();
   }
@@ -133,6 +133,10 @@ class MainStore {
         this.downloads.updateDownload(message.data.download_id, {
           state: 'done',
         });
+        this.refresh();
+        break;
+      case 'models.changed':
+        this.refresh();
         break;
     }
   }

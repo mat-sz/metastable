@@ -55,6 +55,11 @@ export interface DownloadEndMessageModel {
   };
 }
 
+export interface ModelsChangedMessageModel {
+  type: 'models.changed';
+  data: Record<string, never>;
+}
+
 export type Message =
   | PromptQueueMessageModel
   | PromptProgressMessageModel
@@ -62,4 +67,5 @@ export type Message =
   | DownloadQueueMessageModel
   | DownloadProgressMessageModel
   | DownloadStartMessageModel
-  | DownloadEndMessageModel;
+  | DownloadEndMessageModel
+  | ModelsChangedMessageModel;
