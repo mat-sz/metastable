@@ -5,7 +5,6 @@ import {
   BsDownload,
   BsHeartFill,
 } from 'react-icons/bs';
-import { observer } from 'mobx-react-lite';
 
 import styles from './Model.module.scss';
 import {
@@ -16,80 +15,60 @@ import {
 import { IconButton } from '../../../components/IconButton';
 import { Tab, TabPanel, TabView, Tabs } from '../../../components/Tabs';
 import { Rating } from '../../../components/Rating';
-import { mainStore } from '../../../stores/MainStore';
-import { filesize } from '../../../helpers';
 import { Carousel } from '../../../components/Carousel';
+import { DownloadButton } from '../DownloadButton';
 
 interface ModelVersionProps {
   model: CivitAIModel;
   version: CivitAIModelVersion;
 }
 
-const ModelVersion: React.FC<ModelVersionProps> = observer(
-  ({ model, version }) => {
-    const primaryFile = version.files.find(file => file.primary);
-    const type = CivitAITypeMap[model.type];
+const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
+  const primaryFile = version.files.find(file => file.primary);
+  const type = CivitAITypeMap[model.type];
 
-    const primaryFilename = `${version.id}_${primaryFile?.name}`;
-    const hasFile = mainStore.hasFile(type, primaryFilename);
-
-    return (
-      <div className={styles.version}>
-        <div className={styles.main}>
-          <div>
-            {type && primaryFile ? (
-              hasFile ? (
-                <div>
-                  {hasFile === 'downloaded'
-                    ? 'Already downloaded.'
-                    : 'Queued for download.'}
-                </div>
-              ) : (
-                <button
-                  onClick={() =>
-                    mainStore.downloads.download(
-                      type,
-                      primaryFile.downloadUrl,
-                      primaryFilename,
-                    )
-                  }
-                >
-                  Download ({filesize(primaryFile.sizeKB * 1024)})
-                </button>
-              )
-            ) : (
-              <div>Version not downloadable.</div>
-            )}
-          </div>
-          <div>
-            <div>
-              <div>Type: {version.baseModelType}</div>
-              <div>Base model: {version.baseModel}</div>
-              <div>Downloads: {version.stats.downloadCount}</div>
-              <div>
-                Rating: {version.stats.rating} out of 5 (
-                {version.stats.ratingCount} ratings)
-              </div>
-            </div>
-            <Rating value={version.stats.rating} />
-          </div>
-        </div>
-        <Carousel>
-          {version.images.map(image => (
-            <img
-              src={image.url}
-              key={image.id}
-              crossOrigin="anonymous"
-              width={image.width}
-              height={image.height}
+  return (
+    <div className={styles.version}>
+      <div className={styles.main}>
+        <div>
+          {type && primaryFile ? (
+            <DownloadButton
+              filename={`${version.id}_${primaryFile.name}`}
+              type={type}
+              url={primaryFile.downloadUrl}
+              size={primaryFile.sizeKB * 1024}
             />
-          ))}
-        </Carousel>
+          ) : (
+            <div>Version not downloadable.</div>
+          )}
+        </div>
+        <div>
+          <div>
+            <div>Type: {version.baseModelType}</div>
+            <div>Base model: {version.baseModel}</div>
+            <div>Downloads: {version.stats.downloadCount}</div>
+            <div>
+              Rating: {version.stats.rating} out of 5 (
+              {version.stats.ratingCount} ratings)
+            </div>
+          </div>
+          <Rating value={version.stats.rating} />
+        </div>
       </div>
-    );
-  },
-);
-
+      <Carousel>
+        {version.images.map(image => (
+          <img
+            src={image.url}
+            key={image.id}
+            crossOrigin="anonymous"
+            width={image.width}
+            height={image.height}
+          />
+        ))}
+      </Carousel>
+    </div>
+  );
+};
 interface ModelProps {
   model: CivitAIModel;
   onClose: () => void;

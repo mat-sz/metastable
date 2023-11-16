@@ -120,7 +120,8 @@ option {
 }
 
 button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   background-color: var(--color-bg-interactive);
   color: var(--color-fg);
   padding: 10px 20px;
@@ -129,10 +130,17 @@ button {
   transition: 0.1s ease-in-out all;
   border: none;
   font-weight: bold;
-  cursor: pointer;
   text-shadow: none;
 
-  &:hover {
-    background-color: var(--color-bg-interactive-hover);
+  &:not(:disabled) {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-bg-interactive-hover);
+    }
+  }
+
+  span {
+    margin-left: 0.5rem;
   }
 }
