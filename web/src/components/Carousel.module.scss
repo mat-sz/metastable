@@ -12,6 +12,10 @@
     cursor: pointer;
     transform: translateY(-50%);
     font-size: 3rem;
+
+    &:hover {
+      background: none;
+    }
   }
 
   .previous {

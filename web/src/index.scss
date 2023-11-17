@@ -122,6 +122,7 @@ option {
 button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   background-color: var(--color-bg-interactive);
   color: var(--color-fg);
   padding: 10px 20px;
