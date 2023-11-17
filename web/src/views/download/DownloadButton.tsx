@@ -3,36 +3,47 @@ import { observer } from 'mobx-react-lite';
 import { BsDownload } from 'react-icons/bs';
 
 import { mainStore } from '../../stores/MainStore';
-import { ModelType } from '../../types/model';
+import { DownloadFile } from '../../types/model';
 import { filesize } from '../../helpers';
 
 interface DownloadButtonProps {
-  filename: string;
-  url: string;
-  type: ModelType;
-  size?: number;
+  files: DownloadFile[];
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
-  ({ filename, type, size, url }) => {
-    const hasFile = mainStore.hasFile(type, filename);
+  ({ files }) => {
+    const fileState = files.map(file =>
+      mainStore.hasFile(file.type, file.filename),
+    );
+    const allDownloaded = fileState.every(state => state === 'downloaded');
+    const allQueued = fileState.every(
+      state => state === 'queued' || state === 'downloaded',
+    );
+    const remaining = files.filter(
+      (_, i) => typeof fileState[i] === 'undefined',
+    );
 
-    if (hasFile === 'downloaded') {
+    if (allDownloaded) {
       return (
         <button disabled>
           <BsDownload />
           <span>Already downloaded</span>
         </button>
       );
-    } else if (hasFile === 'queued') {
-      const item = mainStore.downloads.queue.find(
+    } else if (allQueued) {
+      const items = mainStore.downloads.queue.filter(
         item =>
-          item.filename === filename &&
+          !!files.find(file => file.filename === item.filename) &&
           ['done', 'queued', 'in_progress'].includes(item.state),
       );
 
-      if (item) {
-        const percent = Math.round((item.progress / item.size) * 100) || 0;
+      if (items.length) {
+        const percent =
+          Math.round(
+            (items.reduce((progress, item) => progress + item.progress, 0) /
+              items.reduce((size, item) => size + item.size, 0)) *
+              100,
+          ) || 0;
 
         return (
           <button disabled>
@@ -50,10 +61,21 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       }
     }
 
+    const size = remaining.reduce((size, item) => size + (item.size || 0), 0);
+
     return (
-      <button onClick={() => mainStore.downloads.download(type, url, filename)}>
+      <button
+        onClick={() => {
+          for (const file of remaining) {
+            mainStore.downloads.download(file.type, file.url, file.filename);
+          }
+        }}
+      >
         <BsDownload />
-        <span>Download {size && `(${filesize(size)})`}</span>
+        <span>
+          Download {remaining.length > 1 && `(${remaining.length} files)`}{' '}
+          {!!size && `(${filesize(size)})`}
+        </span>
       </button>
     );
   },

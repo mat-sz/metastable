@@ -33,10 +33,14 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
         <div>
           {type && primaryFile ? (
             <DownloadButton
-              filename={`${version.id}_${primaryFile.name}`}
-              type={type}
-              url={primaryFile.downloadUrl}
-              size={primaryFile.sizeKB * 1024}
+              files={[
+                {
+                  filename: `${version.id}_${primaryFile.name}`,
+                  type,
+                  url: primaryFile.downloadUrl,
+                  size: primaryFile.sizeKB * 1024,
+                },
+              ]}
             />
           ) : (
             <div>Version not downloadable.</div>

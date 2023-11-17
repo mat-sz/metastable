@@ -15,11 +15,7 @@ export const Recommended: React.FC = () => {
               return (
                 <div key={i} className={styles.model}>
                   <span>{model.name}</span>
-                  <DownloadButton
-                    filename={model.downloads[0].filename}
-                    type={model.downloads[0].type}
-                    url={model.downloads[0].url}
-                  />
+                  <DownloadButton files={model.downloads} />
                 </div>
               );
             })}

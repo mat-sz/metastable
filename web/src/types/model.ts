@@ -23,12 +23,15 @@ export interface Model {
   type: ModelType;
 }
 
+export interface DownloadFile {
+  filename: string;
+  type: ModelType;
+  url: string;
+  size?: number;
+}
+
 export interface DownloadableModel extends Omit<Model, 'id'> {
-  downloads: {
-    filename: string;
-    type: ModelType;
-    url: string;
-  }[];
+  downloads: DownloadFile[];
   recommended?: boolean;
 }
 
