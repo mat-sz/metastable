@@ -94,6 +94,7 @@ export const Model: React.FC<ModelProps> = ({ model, onClose }) => {
         </IconButton>
       </div>
       <div className={styles.stats}>
+        <div>{model.type}</div>
         <div>
           <Rating value={model.stats.rating} />
           <span>({model.stats.ratingCount})</span>

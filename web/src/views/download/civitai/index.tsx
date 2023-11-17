@@ -14,7 +14,7 @@ import { BsSearch } from 'react-icons/bs';
 
 interface CivitAIArgs {
   query: string;
-  type?: string;
+  type: string;
   nsfw: boolean;
   limit?: number;
   page?: number;
@@ -30,7 +30,7 @@ async function fetchCivitAI({
   const url = new URL('https://civitai.com/api/v1/models');
   url.searchParams.append('query', query);
   if (type) {
-    url.searchParams.append('type', type);
+    url.searchParams.append('types', type);
   }
   url.searchParams.append('nsfw', `${nsfw}`);
   url.searchParams.append('limit', `${limit}`);
@@ -40,11 +40,20 @@ async function fetchCivitAI({
   return await res.json();
 }
 
+const CivitAICategories = {
+  Checkpoint: 'Checkpoint',
+  TextualInversion: 'Embedding',
+  Hypernetwork: 'Hypernetwork',
+  LORA: 'LoRA',
+  Controlnet: 'Controlnet',
+};
+
 export const CivitAI: React.FC = observer(() => {
   const [query, setQuery] = useState('');
 
   const [args, setArgs] = useState<CivitAIArgs>({
     query: '',
+    type: 'Checkpoint',
     page: 1,
     nsfw: false,
   });
@@ -75,6 +84,16 @@ export const CivitAI: React.FC = observer(() => {
             <BsSearch />
           </IconButton>
         </form>
+        <select
+          value={args.type}
+          onChange={e => setArgs(args => ({ ...args, type: e.target.value }))}
+        >
+          {Object.entries(CivitAICategories).map(([key, name]) => (
+            <option key={key} value={key}>
+              {name}
+            </option>
+          ))}
+        </select>
         <Toggle
           label="NSFW"
           value={!!args.nsfw}
