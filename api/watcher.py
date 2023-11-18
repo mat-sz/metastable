@@ -22,5 +22,6 @@ class Handler(FileSystemEventHandler):
         if event.is_directory:
             return None
 
-        self.server.send_sync("models.changed", { }, self.server.client_id)
+        if event.event_type in ["moved", "deleted", "created", "modified"]:
+            self.server.send_sync("models.changed", { }, self.server.client_id)
         
