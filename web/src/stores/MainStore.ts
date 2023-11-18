@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { TypeSocket } from 'typesocket';
 
 import { getUrl } from '../config';
@@ -86,7 +86,10 @@ class MainStore {
 
   async refresh() {
     const res = await fetch(getUrl('/info'));
-    this.info = await res.json();
+    const data = await res.json();
+    runInAction(() => {
+      this.info = data;
+    });
   }
 
   onConnected() {

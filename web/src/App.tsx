@@ -1,7 +1,6 @@
 import React from 'react';
 
 import './index.scss';
-import { Status } from './views/system/Status';
 import { Project } from './views/project';
 import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
@@ -13,7 +12,6 @@ export const App: React.FC = () => {
       <Header />
       <Projects />
       <Project />
-      <Status />
       <DownloadManager />
     </div>
   );

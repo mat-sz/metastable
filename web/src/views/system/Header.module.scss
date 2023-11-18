@@ -1,9 +1,28 @@
 .header {
-  background: var(--color-bg-panel);
-  padding: 1rem;
+  display: flex;
   margin-bottom: 2px;
+
+  .menu {
+    flex: 1;
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+    background: var(--color-bg-panel);
+    padding: 1rem;
+
+    &:not(:last-child) {
+      margin-right: 2px;
+    }
+  }
 
   h1 {
     font-size: 1.2rem;
+  }
+
+  button {
+    padding: 0.3rem 0.6rem;
+    font-weight: normal;
   }
 }
