@@ -33,7 +33,7 @@ export class DownloadStore {
   }
 
   async refresh() {
-    // const res = await fetch(getUrl('/download/queue'));
+    // const res = await fetch(getUrl('/downloads'));
     // const json = (await res.json()) as Pick<Download, 'download_id' | 'filename' | 'url' | 'type'>[];
   }
 
@@ -46,7 +46,7 @@ export class DownloadStore {
   }
 
   async cancel(download_id: string) {
-    await fetch(getUrl('/download'), {
+    await fetch(getUrl(`/downloads/${download_id}`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export class DownloadStore {
   }
 
   async download(type: ModelType, url: string, filename: string) {
-    const res = await fetch(getUrl('/download'), {
+    const res = await fetch(getUrl('/downloads'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

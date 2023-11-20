@@ -210,13 +210,21 @@ class PromptServer():
                 }
             })
 
-        @routes.post("/project")
+        @routes.post("/projects")
         async def create_project(request):
             project_id = str(uuid.uuid4())
             response = {"project_id": project_id}
             return web.json_response(response)
 
-        @routes.post("/prompt")
+        @routes.get("/prompts")
+        async def get_queue(request):
+            queue_info = {}
+            current_queue = self.prompt_queue.get_current_queue()
+            queue_info['queue_running'] = current_queue[0]
+            queue_info['queue_pending'] = current_queue[1]
+            return web.json_response(queue_info)
+
+        @routes.post("/prompts")
         async def post_prompt(request):
             prompt = await request.json()
 
@@ -225,15 +233,15 @@ class PromptServer():
             response = {"prompt_id": prompt_id}
             return web.json_response(response)
 
-        @routes.get("/prompt/queue")
+        @routes.get("/downloads")
         async def get_queue(request):
             queue_info = {}
-            current_queue = self.prompt_queue.get_current_queue()
+            current_queue = self.download_queue.get_current_queue()
             queue_info['queue_running'] = current_queue[0]
             queue_info['queue_pending'] = current_queue[1]
             return web.json_response(queue_info)
 
-        @routes.post("/download")
+        @routes.post("/downloads")
         async def post_download(request):
             settings = await request.json()
 
@@ -242,23 +250,14 @@ class PromptServer():
             response = {"download_id": download_id}
             return web.json_response(response)
 
-        @routes.delete("/download")
+        @routes.delete("/downloads/{download_id}")
         async def delete_download(request):
-            json = await request.json()
-            download_id = json['download_id']
+            download_id = request.match_info.get('download_id', None)
             delete_func = lambda a: a[0] == download_id
             self.download_queue.delete_queue_item(delete_func)
 
             response = {"download_id": download_id}
             return web.json_response(response)
-
-        @routes.get("/download/queue")
-        async def get_queue(request):
-            queue_info = {}
-            current_queue = self.download_queue.get_current_queue()
-            queue_info['queue_running'] = current_queue[0]
-            queue_info['queue_pending'] = current_queue[1]
-            return web.json_response(queue_info)
 
     async def send(self, event, data, sid=None):
         if event == BinaryEventTypes.UNENCODED_PREVIEW_IMAGE:

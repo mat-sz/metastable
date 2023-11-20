@@ -52,7 +52,7 @@ export class Project {
       this.prompt.sampler.seed = randomSeed();
     }
 
-    await fetch(getUrl('/prompt'), {
+    await fetch(getUrl('/prompts'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
