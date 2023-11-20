@@ -18,6 +18,17 @@ export const Welcome: React.FC = observer(() => {
         <button onClick={() => mainStore.projects.create(projectName)}>
           Create a new project
         </button>
+        <div>
+          <ul>
+            {mainStore.projects.recent.map(({ id, name }) => (
+              <li key={id}>
+                <button onClick={() => mainStore.projects.open(id)}>
+                  {name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

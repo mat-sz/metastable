@@ -213,7 +213,8 @@ class PromptServer():
 
         @routes.get("/projects")
         async def get_projects(request):
-            return web.json_response(session.query(Project).all())
+            projects = session.query(Project).all()
+            return web.json_response({ "id": project.id, "name": project.name, "updated_at": project.updated_at.timestamp() * 1000, "created_at": project.created_at.timestamp() * 1000 } for project in projects)
 
         @routes.post("/projects")
         async def post_projects(request):
@@ -225,6 +226,16 @@ class PromptServer():
             folder_paths.create_project_tree(project.id)
             response = {"id": project.id}
             return web.json_response(response)
+
+        @routes.get("/projects/{project_id}")
+        async def get_projects(request):
+            project_id = request.match_info.get('project_id', None)
+            project = session.query(Project).get(int(project_id))
+
+            if project:
+                return web.json_response({ "id": project.id, "name": project.name, "settings": project.settings })
+            else:
+                return web.json_response(None)
 
         @routes.get("/prompts")
         async def get_prompts(request):
