@@ -19,7 +19,7 @@ export interface PromptEndMessageModel {
   data: {
     prompt_id: string;
     output_filenames: string[];
-    project_id: string;
+    project_id: number;
   };
 }
 

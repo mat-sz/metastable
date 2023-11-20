@@ -13,7 +13,7 @@ Base = declarative_base()
 class Project(Base):
     __tablename__ = 'projects'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     settings = Column(String)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -25,7 +25,7 @@ class Project(Base):
 class Model(Base):
     __tablename__ = 'models'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     description = Column(String)
     model_type = Column(String)

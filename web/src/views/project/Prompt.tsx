@@ -55,10 +55,10 @@ export const Prompt: React.FC = observer(() => {
         <VarUI
           onChange={values => {
             runInAction(() => {
-              project.prompt = values;
+              project.settings = values;
             });
           }}
-          values={toJS(project.prompt)}
+          values={toJS(project.settings)}
         >
           <VarCategory label="Actions">
             <VarButton

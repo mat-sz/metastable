@@ -1,18 +1,26 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 
 import './index.scss';
+import { mainStore } from './stores/MainStore';
 import { Project } from './views/project';
 import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
 import { DownloadManager } from './views/download';
+import { Welcome } from './views/system/Welcome';
 
-export const App: React.FC = () => {
+export const App: React.FC = observer(() => {
   return (
     <div className="app">
       <Header />
-      <Projects />
-      <Project />
+      {mainStore.projects.projects.length === 0 ? (
+        <Welcome />
+      ) : (
+        <>
+          <Projects /> <Project />
+        </>
+      )}
       <DownloadManager />
     </div>
   );
-};
+});

@@ -20,6 +20,7 @@ import mimetypes
 import folder_paths
 
 import comfy.samplers
+from database import session, Project, Model
 
 class BinaryEventTypes:
     PREVIEW_IMAGE = 1
@@ -210,14 +211,23 @@ class PromptServer():
                 }
             })
 
+        @routes.get("/projects")
+        async def get_projects(request):
+            return web.json_response(session.query(Project).all())
+
         @routes.post("/projects")
-        async def create_project(request):
-            project_id = str(uuid.uuid4())
-            response = {"project_id": project_id}
+        async def post_projects(request):
+            data = await request.json()
+            project = Project(name=data["name"], settings=data["settings"])
+            session.add(project)
+            session.flush()
+
+            folder_paths.create_project_tree(project.id)
+            response = {"id": project.id}
             return web.json_response(response)
 
         @routes.get("/prompts")
-        async def get_queue(request):
+        async def get_prompts(request):
             queue_info = {}
             current_queue = self.prompt_queue.get_current_queue()
             queue_info['queue_running'] = current_queue[0]
@@ -225,7 +235,7 @@ class PromptServer():
             return web.json_response(queue_info)
 
         @routes.post("/prompts")
-        async def post_prompt(request):
+        async def post_prompts(request):
             prompt = await request.json()
 
             prompt_id = str(uuid.uuid4())
@@ -234,7 +244,7 @@ class PromptServer():
             return web.json_response(response)
 
         @routes.get("/downloads")
-        async def get_queue(request):
+        async def get_downloads(request):
             queue_info = {}
             current_queue = self.download_queue.get_current_queue()
             queue_info['queue_running'] = current_queue[0]
@@ -242,7 +252,7 @@ class PromptServer():
             return web.json_response(queue_info)
 
         @routes.post("/downloads")
-        async def post_download(request):
+        async def post_downloads(request):
             settings = await request.json()
 
             download_id = str(uuid.uuid4())
@@ -251,7 +261,7 @@ class PromptServer():
             return web.json_response(response)
 
         @routes.delete("/downloads/{download_id}")
-        async def delete_download(request):
+        async def delete_downloads(request):
             download_id = request.match_info.get('download_id', None)
             delete_func = lambda a: a[0] == download_id
             self.download_queue.delete_queue_item(delete_func)

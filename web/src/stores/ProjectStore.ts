@@ -1,10 +1,11 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { Project } from './project';
-import { arrayMove } from '../helpers';
+import { arrayMove, defaultProjectSettings } from '../helpers';
+import { getUrl } from '../config';
 
 export class ProjectStore {
-  projects = [new Project('test_project'), new Project('test_project2')];
-  currentId: string | undefined = 'test_project';
+  projects: Project[] = [];
+  currentId: number | undefined = undefined;
 
   constructor() {
     makeAutoObservable(this);
@@ -14,11 +15,33 @@ export class ProjectStore {
     return this.projects.find(project => project.id === this.currentId);
   }
 
-  select(id?: string) {
+  async create(name: string) {
+    const settings = defaultProjectSettings();
+    const project = {
+      name,
+      settings: JSON.stringify(settings),
+    };
+
+    const res = await fetch(getUrl('/projects'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(project),
+    });
+    const json = await res.json();
+
+    runInAction(() => {
+      this.projects.push(new Project(json.id, name, settings));
+      this.select(json.id);
+    });
+  }
+
+  select(id?: number) {
     this.currentId = id;
   }
 
-  move(fromId: string, toId?: string) {
+  move(fromId: number, toId?: number) {
     const from = this.projects.findIndex(p => p.id === fromId);
     const to = toId ? this.projects.findIndex(p => p.id === toId) : undefined;
     if (from !== -1 && to !== -1) {
@@ -26,7 +49,7 @@ export class ProjectStore {
     }
   }
 
-  close(id: string) {
+  close(id: number) {
     this.projects = this.projects.filter(project => project.id !== id);
 
     if (id === this.currentId) {

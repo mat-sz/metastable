@@ -18,7 +18,7 @@ export const Sampler: React.FC = observer(() => {
       <VarNumber
         label="Seed"
         path="sampler.seed"
-        readOnly={project.prompt.sampler.seed_randomize}
+        readOnly={project.settings.sampler.seed_randomize}
       />
       <VarToggle label="Randomize seed" path="sampler.seed_randomize" />
       <VarSlider

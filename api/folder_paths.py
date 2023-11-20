@@ -46,6 +46,8 @@ def create_if_not_found(path):
 
 def create_project_tree(project_id):
     global projects_directory
+
+    project_id = str(project_id)
     create_if_not_found(os.path.join(projects_directory, project_id))
 
     create_if_not_found(get_output_directory(project_id))
@@ -53,6 +55,8 @@ def create_project_tree(project_id):
 
 def get_output_directory(project_id):
     global projects_directory
+
+    project_id = str(project_id)
     return os.path.join(projects_directory, project_id, "output")
 
 def get_temp_directory():
@@ -61,22 +65,28 @@ def get_temp_directory():
 
 def get_input_directory(project_id):
     global projects_directory
+
+    project_id = str(project_id)
     return os.path.join(projects_directory, project_id, "input")
 
 #NOTE: used in http server so don't put folders that should not be accessed remotely
 def get_directory_by_type(project_id, type_name):
-        if type_name == "output":
-            return get_output_directory(project_id)
-        if type_name == "temp":
-            return get_temp_directory()
-        if type_name == "input":
-            return get_input_directory(project_id)
-        return None
+    project_id = str(project_id)
+
+    if type_name == "output":
+        return get_output_directory(project_id)
+    if type_name == "temp":
+        return get_temp_directory()
+    if type_name == "input":
+        return get_input_directory(project_id)
+    return None
 
 
 # determine base_dir rely on annotation if name is 'filename.ext [annotation]' format
 # otherwise use default_path as base_dir
 def annotated_filepath(project_id, name):
+    project_id = str(project_id)
+
     if name.endswith("[output]"):
         base_dir = get_output_directory(project_id)
         name = name[:-9]
@@ -92,91 +102,91 @@ def annotated_filepath(project_id, name):
     return name, base_dir
 
 def add_model_folder_path(folder_name, full_folder_path):
-        global folder_names_and_paths
-        if folder_name in folder_names_and_paths:
-                folder_names_and_paths[folder_name][0].append(full_folder_path)
-        else:
-                folder_names_and_paths[folder_name] = ([full_folder_path], set())
+    global folder_names_and_paths
+    if folder_name in folder_names_and_paths:
+        folder_names_and_paths[folder_name][0].append(full_folder_path)
+    else:
+        folder_names_and_paths[folder_name] = ([full_folder_path], set())
 
 def get_folder_paths(folder_name):
-        return folder_names_and_paths[folder_name][0][:]
+    return folder_names_and_paths[folder_name][0][:]
 
 def recursive_search(directory, excluded_dir_names=None):
-        if not os.path.isdir(directory):
-                return [], {}
+    if not os.path.isdir(directory):
+        return [], {}
 
-        if excluded_dir_names is None:
-                excluded_dir_names = []
+    if excluded_dir_names is None:
+        excluded_dir_names = []
 
-        result = []
-        dirs = {directory: os.path.getmtime(directory)}
-        for dirpath, subdirs, filenames in os.walk(directory, followlinks=True, topdown=True):
-                subdirs[:] = [d for d in subdirs if d not in excluded_dir_names]
-                for file_name in filenames:
-                        relative_path = os.path.relpath(os.path.join(dirpath, file_name), directory)
-                        result.append(relative_path)
-                for d in subdirs:
-                        path = os.path.join(dirpath, d)
-                        dirs[path] = os.path.getmtime(path)
-        return result, dirs
+    result = []
+    dirs = {directory: os.path.getmtime(directory)}
+    for dirpath, subdirs, filenames in os.walk(directory, followlinks=True, topdown=True):
+        subdirs[:] = [d for d in subdirs if d not in excluded_dir_names]
+        for file_name in filenames:
+            relative_path = os.path.relpath(os.path.join(dirpath, file_name), directory)
+            result.append(relative_path)
+        for d in subdirs:
+            path = os.path.join(dirpath, d)
+            dirs[path] = os.path.getmtime(path)
+    return result, dirs
 
 def filter_files_extensions(files, extensions):
         return sorted(list(filter(lambda a: os.path.splitext(a)[-1].lower() in extensions or len(extensions) == 0, files)))
 
 def get_full_path(folder_name, filename, check_exists=True):
-        global folder_names_and_paths
-        if folder_name not in folder_names_and_paths:
-                return None
-        folders = folder_names_and_paths[folder_name]
-        filename = os.path.relpath(os.path.join("/", filename), "/")
-        for x in folders[0]:
-                full_path = os.path.join(x, filename)
-                if not check_exists or os.path.isfile(full_path):
-                        return full_path
-
+    global folder_names_and_paths
+    if folder_name not in folder_names_and_paths:
         return None
+    folders = folder_names_and_paths[folder_name]
+    filename = os.path.relpath(os.path.join("/", filename), "/")
+    for x in folders[0]:
+        full_path = os.path.join(x, filename)
+        if not check_exists or os.path.isfile(full_path):
+            return full_path
+
+    return None
 
 def get_filename_list_(folder_name):
-        global folder_names_and_paths
-        output_list = set()
-        folders = folder_names_and_paths[folder_name]
-        output_folders = {}
-        for x in folders[0]:
-                files, folders_all = recursive_search(x, excluded_dir_names=[".git"])
-                output_list.update(filter_files_extensions(files, folders[1]))
-                output_folders = {**output_folders, **folders_all}
+    global folder_names_and_paths
+    output_list = set()
+    folders = folder_names_and_paths[folder_name]
+    output_folders = {}
+    for x in folders[0]:
+        files, folders_all = recursive_search(x, excluded_dir_names=[".git"])
+        output_list.update(filter_files_extensions(files, folders[1]))
+        output_folders = {**output_folders, **folders_all}
 
-        return (sorted(list(output_list)), output_folders, time.perf_counter())
+    return (sorted(list(output_list)), output_folders, time.perf_counter())
 
 def cached_filename_list_(folder_name):
-        global filename_list_cache
-        global folder_names_and_paths
-        if folder_name not in filename_list_cache:
-                return None
-        out = filename_list_cache[folder_name]
-        if time.perf_counter() < (out[2] + 0.5):
-                return out
-        for x in out[1]:
-                time_modified = out[1][x]
-                folder = x
-                if os.path.getmtime(folder) != time_modified:
-                        return None
-
-        folders = folder_names_and_paths[folder_name]
-        for x in folders[0]:
-                if os.path.isdir(x):
-                        if x not in out[1]:
-                                return None
-
+    global filename_list_cache
+    global folder_names_and_paths
+    if folder_name not in filename_list_cache:
+        return None
+    out = filename_list_cache[folder_name]
+    if time.perf_counter() < (out[2] + 0.5):
         return out
+    for x in out[1]:
+        time_modified = out[1][x]
+        folder = x
+        if os.path.getmtime(folder) != time_modified:
+            return None
+
+    folders = folder_names_and_paths[folder_name]
+    for x in folders[0]:
+        if os.path.isdir(x):
+            if x not in out[1]:
+                return None
+
+    return out
 
 def get_filename_list(folder_name):
-        out = cached_filename_list_(folder_name)
-        if out is None:
-                out = get_filename_list_(folder_name)
-                global filename_list_cache
-                filename_list_cache[folder_name] = out
-        return list(out[0])
+    out = cached_filename_list_(folder_name)
+    if out is None:
+        out = get_filename_list_(folder_name)
+        global filename_list_cache
+        filename_list_cache[folder_name] = out
+    return list(out[0])
 
 def get_save_image_path(filename_prefix, output_dir, image_width=0, image_height=0):
     def map_filename(filename):
