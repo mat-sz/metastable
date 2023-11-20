@@ -12,10 +12,22 @@ import { Toggle } from '../../../components/Toggle';
 import { IconButton } from '../../../components/IconButton';
 import { BsSearch } from 'react-icons/bs';
 
+const CivitAISort = [
+  'Highest Rated',
+  'Most Downloaded',
+  'Most Liked',
+  'Most Buzz',
+  'Most Discussed',
+  'Most Collected',
+  'Most Images',
+  'Newest',
+];
+
 interface CivitAIArgs {
   query: string;
   type: string;
   nsfw: boolean;
+  sort?: string;
   limit?: number;
   page?: number;
 }
@@ -24,6 +36,7 @@ async function fetchCivitAI({
   query,
   type,
   nsfw,
+  sort = 'Highest Rated',
   limit = 48,
   page = 1,
 }: CivitAIArgs): Promise<CivitAIResponse> {
@@ -33,6 +46,7 @@ async function fetchCivitAI({
     url.searchParams.append('types', type);
   }
   url.searchParams.append('nsfw', `${nsfw}`);
+  url.searchParams.append('sort', sort);
   url.searchParams.append('limit', `${limit}`);
   url.searchParams.append('page', `${page}`);
 
@@ -91,6 +105,16 @@ export const CivitAI: React.FC = observer(() => {
           {Object.entries(CivitAICategories).map(([key, name]) => (
             <option key={key} value={key}>
               {name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={args.sort}
+          onChange={e => setArgs(args => ({ ...args, sort: e.target.value }))}
+        >
+          {CivitAISort.map(value => (
+            <option key={value} value={value}>
+              {value}
             </option>
           ))}
         </select>
