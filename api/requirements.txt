@@ -10,3 +10,4 @@ scipy
 tqdm
 psutil
 watchdog
+sqlalchemy
