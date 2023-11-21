@@ -1,29 +1,29 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import lsrx from 'lsrx';
 
 import { Project } from './project';
 import { arrayMove, defaultProjectSettings } from '../helpers';
 import { getUrl } from '../config';
 
-const ls = lsrx();
-const lsRecentProjects = ls.use<{ id: number; name: string }[]>(
-  'mt_recent',
-  [],
-);
 export class ProjectStore {
   projects: Project[] = [];
   currentId: number | undefined = undefined;
-  recent = lsRecentProjects.current;
+  recent: { id: number; name: string }[] = [];
 
   constructor() {
     makeAutoObservable(this);
-    lsRecentProjects.subscribe((_, newValue) => {
-      this.recent = newValue;
-    });
+    this.init();
   }
 
   get current() {
     return this.projects.find(project => project.id === this.currentId);
+  }
+
+  async init() {
+    const res = await fetch(getUrl('/projects'));
+    const json = await res.json();
+    runInAction(() => {
+      this.recent = json;
+    });
   }
 
   async create(name: string) {
@@ -45,7 +45,6 @@ export class ProjectStore {
     runInAction(() => {
       this.projects.push(new Project(json.id, name, settings));
       this.select(json.id);
-      this.addToRecent(json.id, name);
     });
   }
 
@@ -59,15 +58,7 @@ export class ProjectStore {
         project,
       ];
       this.select(json.id);
-      this.addToRecent(json.id, project.name);
     });
-  }
-
-  private addToRecent(id: number, name: string) {
-    lsRecentProjects.current = [
-      { id, name },
-      ...this.recent.filter(recent => recent.id !== id),
-    ];
   }
 
   select(id?: number) {

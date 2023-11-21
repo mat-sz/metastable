@@ -213,8 +213,9 @@ class PromptServer():
 
         @routes.get("/projects")
         async def get_projects(request):
-            projects = session.query(Project).all()
-            return web.json_response({ "id": project.id, "name": project.name, "updated_at": project.updated_at.timestamp() * 1000, "created_at": project.created_at.timestamp() * 1000 } for project in projects)
+            projects = session.query(Project).order_by(Project.updated_at.desc()).all()
+            data = ({ "id": project.id, "name": project.name, "updated_at": project.updated_at.timestamp() * 1000, "created_at": project.created_at.timestamp() * 1000 } for project in projects)
+            return web.json_response(list(data))
 
         @routes.post("/projects")
         async def post_projects(request):
