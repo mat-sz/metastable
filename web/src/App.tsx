@@ -10,6 +10,10 @@ import { DownloadManager } from './views/download';
 import { Welcome } from './views/system/Welcome';
 
 export const App: React.FC = observer(() => {
+  if (!mainStore.ready) {
+    return <div className="app">Loading...</div>;
+  }
+
   return (
     <div className="app">
       <Header />

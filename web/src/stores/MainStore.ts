@@ -36,6 +36,7 @@ class MainStore {
   projects = new ProjectStore();
   downloads = new DownloadStore();
   connected = false;
+  ready = false;
   private socket = new TypeSocket<Message>(getUrl('/ws', 'ws'), {
     maxRetries: 0,
     retryOnClose: true,
@@ -89,6 +90,7 @@ class MainStore {
     const data = await res.json();
     runInAction(() => {
       this.info = data;
+      this.ready = true;
     });
   }
 
