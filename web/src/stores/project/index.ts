@@ -19,6 +19,7 @@ export class Project {
       this.settings.sampler.seed = randomSeed();
     }
 
+    this.save();
     await fetch(getUrl('/prompts'), {
       method: 'POST',
       headers: {
@@ -26,6 +27,33 @@ export class Project {
       },
       body: JSON.stringify({ project_id: this.id, ...toJS(this.settings) }),
     });
+  }
+
+  async rename(name: string) {
+    this.name = name;
+    await fetch(getUrl(`/projects/${this.id}`), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+  }
+
+  async save() {
+    await fetch(getUrl(`/projects/${this.id}`), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ settings: toJS(this.settings) }),
+    });
+  }
+
+  private _autosaveTimeout: number | undefined = undefined;
+  triggerAutosave() {
+    clearTimeout(this._autosaveTimeout);
+    this._autosaveTimeout = setTimeout(() => this.save(), 5000);
   }
 
   view(type: string, filename: string) {
