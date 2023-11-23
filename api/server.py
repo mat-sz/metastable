@@ -248,6 +248,29 @@ class PromptServer():
             else:
                 return web.json_response(None)
 
+        @routes.post("/projects/{project_id}")
+        async def post_project(request):
+            data = await request.json()
+            project_id = request.match_info.get('project_id', None)
+            project = session.query(Project).get(int(project_id))
+
+            if project:
+                if 'name' in data:
+                    project.name = data['name']
+
+                if 'settings' in data:
+                    project.settings = data['settings']
+
+                session.commit()
+                
+                return web.json_response({
+                    "id": project.id,
+                    "name": project.name,
+                    "settings": project.settings
+                })
+            else:
+                return web.json_response(None)
+
         @routes.get("/prompts")
         async def get_prompts(request):
             queue_info = {}
