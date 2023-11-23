@@ -46,7 +46,7 @@ export class Project {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ settings: toJS(this.settings) }),
+      body: JSON.stringify({ settings: JSON.stringify(toJS(this.settings)) }),
     });
   }
 

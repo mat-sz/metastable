@@ -4,6 +4,10 @@
 
   .menu {
     flex: 1;
+
+    button {
+      margin-right: 1rem;
+    }
   }
 
   & > div {

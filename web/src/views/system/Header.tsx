@@ -9,8 +9,15 @@ import { ProgressButton } from '../../components/ProgressButton';
 export const Header: React.FC = observer(() => {
   return (
     <div className={styles.header}>
-      <div className={styles.menu}>
+      <div className={styles.logo}>
         <h1>Metastable UI</h1>
+      </div>
+      <div className={styles.menu}>
+        {!!mainStore.project && (
+          <>
+            <button onClick={() => mainStore.project?.save()}>Save</button>
+          </>
+        )}
       </div>
       <div>
         <ProgressButton value={mainStore.promptValue} max={mainStore.promptMax}>
