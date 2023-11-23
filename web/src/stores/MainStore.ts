@@ -102,6 +102,14 @@ class MainStore {
     this.connected = false;
   }
 
+  view(project_id: number, type: string, filename: string) {
+    const url = new URL(getUrl('/view'));
+    url.searchParams.append('project_id', `${project_id}`);
+    url.searchParams.append('type', type);
+    url.searchParams.append('filename', filename);
+    return url.toString();
+  }
+
   onMessage(message: Message) {
     switch (message.type) {
       case 'prompt.queue':

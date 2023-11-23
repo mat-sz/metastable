@@ -40,6 +40,10 @@
   border: 3px solid transparent;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-fg);

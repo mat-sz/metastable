@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 
 import styles from './Welcome.module.scss';
 import { mainStore } from '../../stores/MainStore';
+import { List } from '../projects/List';
 
 export const Welcome: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');
@@ -18,18 +19,8 @@ export const Welcome: React.FC = observer(() => {
         <button onClick={() => mainStore.projects.create(projectName)}>
           Create a new project
         </button>
-        <div>
-          <ul>
-            {mainStore.projects.recent.map(({ id, name }) => (
-              <li key={id}>
-                <button onClick={() => mainStore.projects.open(id)}>
-                  {name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
+      <List data={mainStore.projects.recent} />
     </div>
   );
 });

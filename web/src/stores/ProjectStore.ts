@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 
+import { APIProject } from '../types/project';
 import { Project } from './project';
 import { arrayMove, defaultProjectSettings } from '../helpers';
 import { getUrl } from '../config';
@@ -7,7 +8,7 @@ import { getUrl } from '../config';
 export class ProjectStore {
   projects: Project[] = [];
   currentId: number | undefined = undefined;
-  recent: { id: number; name: string }[] = [];
+  recent: APIProject[] = [];
 
   constructor() {
     makeAutoObservable(this);

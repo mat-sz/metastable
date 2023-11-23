@@ -25,7 +25,7 @@ export const Item: React.FC<ItemProps> = ({ model, onSelect }) => {
           <img
             crossOrigin="anonymous"
             className={styles.background}
-            src={model.modelVersions[0].images[0]?.url}
+            src={imageUrl}
           />
         ) : (
           <div className={styles.noPhotos}>

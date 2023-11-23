@@ -10,7 +10,8 @@
     flex-direction: column;
     background: var(--color-bg-panel);
     padding: 1rem;
-    min-width: 500px;
+    width: 100%;
+    max-width: 900px;
 
     input {
       margin-bottom: 0.5rem;
