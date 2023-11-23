@@ -214,7 +214,13 @@ class PromptServer():
         @routes.get("/projects")
         async def get_projects(request):
             projects = session.query(Project).order_by(Project.updated_at.desc()).all()
-            data = ({ "id": project.id, "name": project.name, "updated_at": project.updated_at.timestamp() * 1000, "created_at": project.created_at.timestamp() * 1000 } for project in projects)
+            data = ({
+                "id": project.id,
+                "name": project.name,
+                "updated_at": project.updated_at.timestamp() * 1000,
+                "created_at": project.created_at.timestamp() * 1000,
+                "last_output": project.last_output
+            } for project in projects)
             return web.json_response(list(data))
 
         @routes.post("/projects")
@@ -222,19 +228,23 @@ class PromptServer():
             data = await request.json()
             project = Project(name=data["name"], settings=data["settings"])
             session.add(project)
-            session.flush()
+            session.commit()
 
             folder_paths.create_project_tree(project.id)
             response = {"id": project.id}
             return web.json_response(response)
 
         @routes.get("/projects/{project_id}")
-        async def get_projects(request):
+        async def get_project(request):
             project_id = request.match_info.get('project_id', None)
             project = session.query(Project).get(int(project_id))
 
             if project:
-                return web.json_response({ "id": project.id, "name": project.name, "settings": project.settings })
+                return web.json_response({
+                    "id": project.id,
+                    "name": project.name,
+                    "settings": project.settings
+                })
             else:
                 return web.json_response(None)
 
@@ -333,6 +343,13 @@ class PromptServer():
 
     async def send_json(self, event, data, sid=None):
         message = {"type": event, "data": data}
+
+        if event == "prompt.end":
+            project = session.query(Project).get(int(data["project_id"]))
+
+            if project:
+                project.last_output = data["output_filenames"][0]
+                session.commit()
 
         if sid is None:
             for ws in self.sockets.values():
