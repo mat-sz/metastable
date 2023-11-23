@@ -14,6 +14,7 @@ export const Header: React.FC = observer(() => {
       </div>
       <div className={styles.menu}>
         <button onClick={() => (mainStore.modal = 'new_project')}>New</button>
+        <button onClick={() => (mainStore.modal = 'open_project')}>Open</button>
         {!!mainStore.project && (
           <>
             <button onClick={() => mainStore.project?.save()}>Save</button>

@@ -61,7 +61,7 @@ class MainStore {
       vae_approx: [],
     },
   };
-  modal: 'new_project' | undefined = undefined;
+  modal: 'new_project' | 'open_project' | undefined = undefined;
 
   promptRemaining = 0;
   promptValue = 0;

@@ -9,6 +9,7 @@ import { Projects } from './views/system/Projects';
 import { DownloadManager } from './views/download';
 import { Welcome } from './views/system/Welcome';
 import { NewProject } from './views/projects/NewProject';
+import { OpenProject } from './views/projects/OpenProject';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
@@ -27,6 +28,7 @@ export const App: React.FC = observer(() => {
       )}
       <DownloadManager />
       <NewProject />
+      <OpenProject />
     </div>
   );
 });
