@@ -13,6 +13,7 @@ export const Header: React.FC = observer(() => {
         <h1>Metastable UI</h1>
       </div>
       <div className={styles.menu}>
+        <button onClick={() => (mainStore.modal = 'new_project')}>New</button>
         {!!mainStore.project && (
           <>
             <button onClick={() => mainStore.project?.save()}>Save</button>
