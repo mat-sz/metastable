@@ -2,11 +2,16 @@
   margin: 0 -0.5rem;
   margin-top: 0.5rem;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   font-size: 0;
 
   @media screen and (min-width: 960px) {
     height: 600px;
+  }
+
+  .empty {
+    font-size: 1rem;
+    text-align: center;
   }
 }
 

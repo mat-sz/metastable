@@ -45,6 +45,14 @@ interface ListProps {
 }
 
 export const List: React.FC<ListProps> = ({ data }) => {
+  if (!data.length) {
+    return (
+      <div className={styles.list}>
+        <span className={styles.empty}>No recent projects...</span>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.list}>
       {data.map(project => (
