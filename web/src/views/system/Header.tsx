@@ -20,6 +20,9 @@ export const Header: React.FC = observer(() => {
             <button onClick={() => mainStore.project?.save()}>Save</button>
           </>
         )}
+        <button onClick={() => (mainStore.modal = 'models')}>
+          Model manager
+        </button>
       </div>
       <div>
         <ProgressButton value={mainStore.promptValue} max={mainStore.promptMax}>

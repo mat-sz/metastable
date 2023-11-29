@@ -33,7 +33,7 @@ class MainStore {
     schedulers: [],
     models: {},
   };
-  modal: 'new_project' | 'open_project' | undefined = undefined;
+  modal: 'new_project' | 'open_project' | 'models' | undefined = undefined;
 
   promptRemaining = 0;
   promptValue = 0;
