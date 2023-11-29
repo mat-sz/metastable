@@ -16,4 +16,34 @@
   & > *:not(.progress) {
     z-index: 1;
   }
+
+  &.marquee:after {
+    content: ' ';
+    position: absolute;
+    display: block;
+    width: 200%;
+    top: 0;
+    height: 100%;
+    animation: marquee 1s linear infinite;
+    z-index: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      #77f,
+      #77f 10%,
+      #465298 10%,
+      #465298 20%
+    );
+    transform: skewX(45deg);
+    transform-origin: bottom left;
+    opacity: 0.33;
+  }
+}
+
+@keyframes marquee {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 0%;
+  }
 }

@@ -10,6 +10,7 @@ export interface ProgressButtonProps
   > {
   value?: number;
   max?: number;
+  marquee?: boolean;
 }
 
 export const ProgressButton: React.FC<ProgressButtonProps> = ({
@@ -17,10 +18,18 @@ export const ProgressButton: React.FC<ProgressButtonProps> = ({
   className,
   value = 0,
   max = 0,
+  marquee = false,
   ...props
 }) => {
   return (
-    <button className={clsx(styles.progressButton, className)} {...props}>
+    <button
+      className={clsx(
+        styles.progressButton,
+        { [styles.marquee]: marquee && value >= max },
+        className,
+      )}
+      {...props}
+    >
       {value < max && (
         <div
           className={styles.progress}

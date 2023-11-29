@@ -25,7 +25,11 @@ export const Header: React.FC = observer(() => {
         </button>
       </div>
       <div>
-        <ProgressButton value={mainStore.promptValue} max={mainStore.promptMax}>
+        <ProgressButton
+          value={mainStore.promptValue}
+          max={mainStore.promptMax}
+          marquee={mainStore.promptRemaining > 0}
+        >
           <BsImage />
           <span>Queued images: {mainStore.promptRemaining}</span>
         </ProgressButton>
