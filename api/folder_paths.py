@@ -25,8 +25,6 @@ folder_names_and_paths["gligen"] = ([os.path.join(models_dir, "gligen")], suppor
 
 folder_names_and_paths["upscale_models"] = ([os.path.join(models_dir, "upscale_models")], supported_pt_extensions)
 
-folder_names_and_paths["custom_nodes"] = ([os.path.join(base_path, "custom_nodes")], [])
-
 folder_names_and_paths["hypernetworks"] = ([os.path.join(models_dir, "hypernetworks")], supported_pt_extensions)
 
 folder_names_and_paths["classifiers"] = ([os.path.join(models_dir, "classifiers")], {""})
@@ -188,6 +186,30 @@ def get_filename_list(folder_name):
         filename_list_cache[folder_name] = out
     return list(out[0])
 
+def get_files(folder_name):
+    global folder_names_and_paths
+
+    folder = folder_names_and_paths[folder_name]
+    filenames = get_filename_list(folder_name)
+    out = []
+
+    for filename in filenames:
+        out.append({
+            "name": filename,
+            "size": os.path.getsize(os.path.join(folder[0][0], filename))
+        })
+    
+    return out
+
+def get_all_files():
+    global folder_names_and_paths
+
+    out = {}
+    for key in folder_names_and_paths:
+        out[key] = get_files(key)
+
+    return out
+        
 def get_save_image_path(filename_prefix, output_dir, image_width=0, image_height=0):
     def map_filename(filename):
         prefix_len = len(os.path.basename(filename_prefix))

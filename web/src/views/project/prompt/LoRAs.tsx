@@ -19,10 +19,13 @@ export const LoRAs: React.FC = observer(() => {
           <VarSelect
             label="Model"
             path="name"
-            options={mainStore.info.models.loras.map(name => ({
-              key: name,
-              label: name,
-            }))}
+            options={mainStore.info.models.loras?.map(
+              ({ name }) =>
+                ({
+                  key: name,
+                  label: name,
+                }) || [],
+            )}
           />
           <VarSlider
             label="Strength"
@@ -38,7 +41,7 @@ export const LoRAs: React.FC = observer(() => {
       <VarButton
         buttonLabel="Add LoRA"
         onClick={() => {
-          project.addLora(mainStore.info.models.loras[0]);
+          project.addLora(mainStore.info.models.loras?.[0].name);
         }}
       />
     </>

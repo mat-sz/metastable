@@ -15,21 +15,7 @@ declare global {
 interface Info {
   samplers: string[];
   schedulers: string[];
-  models: {
-    checkpoints: string[];
-    clip: string[];
-    clip_vision: string[];
-    controlnet: string[];
-    diffusers: string[];
-    embeddings: string[];
-    gligen: string[];
-    hypernetworks: string[];
-    loras: string[];
-    style_models: string[];
-    upscale_models: string[];
-    vae: string[];
-    vae_approx: string[];
-  };
+  models: Record<string, { name: string; size: number }[]>;
 }
 
 class MainStore {
@@ -45,21 +31,7 @@ class MainStore {
   info: Info = {
     samplers: [],
     schedulers: [],
-    models: {
-      checkpoints: [],
-      clip: [],
-      clip_vision: [],
-      controlnet: [],
-      diffusers: [],
-      embeddings: [],
-      gligen: [],
-      hypernetworks: [],
-      loras: [],
-      style_models: [],
-      upscale_models: [],
-      vae: [],
-      vae_approx: [],
-    },
+    models: {},
   };
   modal: 'new_project' | 'open_project' | undefined = undefined;
 
@@ -156,7 +128,7 @@ class MainStore {
   }
 
   hasFile(type: ModelType, filename: string) {
-    if (this.info.models[type].includes(filename)) {
+    if (this.info.models[type]?.find(file => file.name === filename)) {
       return 'downloaded';
     }
 
