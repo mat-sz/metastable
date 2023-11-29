@@ -82,7 +82,7 @@ def watcher_worker(w):
     w.run()
 
 
-async def run(server, address='', port=8188, verbose=True):
+async def run(server, address='', port=5000, verbose=True):
     await asyncio.gather(server.start(address, port, verbose), server.publish_loop())
 
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     threading.Thread(target=watcher_worker, daemon=True, args=(w,)).start()
 
     try:
-        loop.run_until_complete(run(server, address=args.listen, port=args.port, verbose=not args.dont_print_server))
+        loop.run_until_complete(run(server, address=args.listen, verbose=not args.dont_print_server))
     except KeyboardInterrupt:
         print("\nStopped server")
 
