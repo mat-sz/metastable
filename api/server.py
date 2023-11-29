@@ -257,6 +257,64 @@ class PromptServer():
             else:
                 return web.json_response(None)
 
+        @routes.get("/models")
+        async def get_models(request):
+            models = session.query(Model).order_by(Model.updated_at.desc()).all()
+            data = ({
+                "id": model.id,
+                "name": model.name,
+                "description": model.description,
+                "type": model.model_type,
+                "filename": model.filename,
+                "source": model.source,
+                "source_id": model.source_id,
+                "updated_at": model.updated_at.timestamp() * 1000,
+                "created_at": model.created_at.timestamp() * 1000
+            } for model in models)
+            return web.json_response(list(data))
+
+        @routes.post("/models")
+        async def post_models(request):
+            data = await request.json()
+            model = Model(name=data["name"], filename=data["filename"])
+            session.add(model)
+            session.commit()
+
+            response = {"id": model.id}
+            return web.json_response(response)
+
+        @routes.get("/models/{model_id}")
+        async def get_model(request):
+            model_id = request.match_info.get('model_id', None)
+            model = session.query(Model).get(int(model_id))
+
+            if model:
+                return web.json_response({
+                    "id": model.id,
+                    "name": model.name
+                })
+            else:
+                return web.json_response(None)
+
+        @routes.post("/models/{model_id}")
+        async def post_model(request):
+            data = await request.json()
+            model_id = request.match_info.get('model_id', None)
+            model = session.query(Model).get(int(model_id))
+
+            if model:
+                if 'name' in data:
+                    model.name = data['name']
+
+                session.commit()
+                
+                return web.json_response({
+                    "id": model.id,
+                    "name": model.name
+                })
+            else:
+                return web.json_response(None)
+
         @routes.get("/prompts")
         async def get_prompts(request):
             queue_info = {}
