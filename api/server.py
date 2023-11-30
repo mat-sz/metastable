@@ -200,13 +200,7 @@ class PromptServer():
         @routes.get("/projects")
         async def get_projects(request):
             projects = session.query(Project).order_by(Project.updated_at.desc()).all()
-            data = ({
-                "id": project.id,
-                "name": project.name,
-                "updated_at": project.updated_at.timestamp() * 1000,
-                "created_at": project.created_at.timestamp() * 1000,
-                "last_output": project.last_output
-            } for project in projects)
+            data = (project.as_small_dict() for project in projects)
             return web.json_response(list(data))
 
         @routes.post("/projects")
@@ -217,8 +211,7 @@ class PromptServer():
             session.commit()
 
             folder_paths.create_project_tree(project.id)
-            response = {"id": project.id}
-            return web.json_response(response)
+            return web.json_response(project.as_dict())
 
         @routes.get("/projects/{project_id}")
         async def get_project(request):
@@ -226,11 +219,7 @@ class PromptServer():
             project = session.query(Project).get(int(project_id))
 
             if project:
-                return web.json_response({
-                    "id": project.id,
-                    "name": project.name,
-                    "settings": project.settings
-                })
+                return web.json_response(project.as_dict())
             else:
                 return web.json_response(None)
 
@@ -248,29 +237,14 @@ class PromptServer():
                     project.settings = data['settings']
 
                 session.commit()
-                
-                return web.json_response({
-                    "id": project.id,
-                    "name": project.name,
-                    "settings": project.settings
-                })
+                return web.json_response(project.as_dict())
             else:
                 return web.json_response(None)
 
         @routes.get("/models")
         async def get_models(request):
             models = session.query(Model).order_by(Model.updated_at.desc()).all()
-            data = ({
-                "id": model.id,
-                "name": model.name,
-                "description": model.description,
-                "type": model.model_type,
-                "filename": model.filename,
-                "source": model.source,
-                "source_id": model.source_id,
-                "updated_at": model.updated_at.timestamp() * 1000,
-                "created_at": model.created_at.timestamp() * 1000
-            } for model in models)
+            data = (model.as_small_dict() for model in models)
             return web.json_response(list(data))
 
         @routes.post("/models")
@@ -279,9 +253,7 @@ class PromptServer():
             model = Model(name=data["name"], filename=data["filename"])
             session.add(model)
             session.commit()
-
-            response = {"id": model.id}
-            return web.json_response(response)
+            return web.json_response(model.as_dict())
 
         @routes.get("/models/{model_id}")
         async def get_model(request):
@@ -289,10 +261,7 @@ class PromptServer():
             model = session.query(Model).get(int(model_id))
 
             if model:
-                return web.json_response({
-                    "id": model.id,
-                    "name": model.name
-                })
+                return web.json_response(model.as_dict())
             else:
                 return web.json_response(None)
 
@@ -307,11 +276,7 @@ class PromptServer():
                     model.name = data['name']
 
                 session.commit()
-                
-                return web.json_response({
-                    "id": model.id,
-                    "name": model.name
-                })
+                return web.json_response(model.as_dict())
             else:
                 return web.json_response(None)
 
