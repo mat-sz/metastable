@@ -20,6 +20,8 @@ class Project(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+    allowed_properties = ["name", "settings"]
+
     def __repr__(self):
         return f'Project {self.name}'
 
@@ -55,6 +57,8 @@ class Model(Base):
     source_id = Column(String)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    allowed_properties = ["name", "description", "image_url", "model_type", "filename", "source", "source_id"]
 
     def __repr__(self):
         return f'Model {self.name}'

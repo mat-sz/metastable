@@ -206,7 +206,12 @@ class PromptServer():
         @routes.post("/projects")
         async def post_projects(request):
             data = await request.json()
-            project = Project(name=data["name"], settings=data["settings"])
+            project = Project()
+
+            for key, value in data.items():
+                if key in project.allowed_properties:
+                    setattr(project, key, value)
+            
             session.add(project)
             session.commit()
 
@@ -230,11 +235,9 @@ class PromptServer():
             project = session.query(Project).get(int(project_id))
 
             if project:
-                if 'name' in data:
-                    project.name = data['name']
-
-                if 'settings' in data:
-                    project.settings = data['settings']
+                for key, value in data.items():
+                    if key in project.allowed_properties:
+                        setattr(project, key, value)
 
                 session.commit()
                 return web.json_response(project.as_dict())
@@ -250,7 +253,12 @@ class PromptServer():
         @routes.post("/models")
         async def post_models(request):
             data = await request.json()
-            model = Model(name=data["name"], filename=data["filename"])
+            model = Model()
+
+            for key, value in data.items():
+                if key in model.allowed_properties:
+                    setattr(model, key, value)
+            
             session.add(model)
             session.commit()
             return web.json_response(model.as_dict())
@@ -272,8 +280,9 @@ class PromptServer():
             model = session.query(Model).get(int(model_id))
 
             if model:
-                if 'name' in data:
-                    model.name = data['name']
+                for key, value in data.items():
+                    if key in model.allowed_properties:
+                        setattr(model, key, value)
 
                 session.commit()
                 return web.json_response(model.as_dict())
