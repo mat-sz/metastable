@@ -209,7 +209,11 @@ def get_all_files():
         out[key] = get_files(key)
 
     return out
-        
+
+def list_files(path):
+    files, folders_all = recursive_search(path, excluded_dir_names=[".git"])
+    return sorted(list(files))
+
 def get_save_image_path(filename_prefix, output_dir, image_width=0, image_height=0):
     def map_filename(filename):
         prefix_len = len(os.path.basename(filename_prefix))

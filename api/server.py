@@ -244,6 +244,16 @@ class PromptServer():
             else:
                 return web.json_response(None)
 
+        @routes.get("/projects/{project_id}/outputs")
+        async def get_project_outputs(request):
+            project_id = request.match_info.get('project_id', None)
+            project = session.query(Project).get(int(project_id))
+
+            if project:
+                return web.json_response(folder_paths.list_files(folder_paths.get_output_directory(project_id)))
+            else:
+                return web.json_response(None)
+
         @routes.get("/models")
         async def get_models(request):
             models = session.query(Model).order_by(Model.updated_at.desc()).all()
