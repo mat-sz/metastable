@@ -96,6 +96,7 @@ class MainStore {
         for (const project of this.projects.projects) {
           if (project.id === message.data.project_id) {
             project.outputFilenames = message.data.output_filenames;
+            project.allOutputs.push(...message.data.output_filenames);
           }
         }
         break;

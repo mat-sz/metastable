@@ -1,7 +1,9 @@
-.settings {
+.output {
   display: grid;
   grid-template-columns: 100px 1fr;
+  height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .categories {
@@ -24,15 +26,5 @@
     &:hover {
       background: var(--color-bg-interactive);
     }
-  }
-}
-
-.prompt {
-  display: flex;
-  flex-direction: column;
-  background: var(--color-bg-panel);
-
-  & > * {
-    margin-bottom: 0.5rem;
   }
 }

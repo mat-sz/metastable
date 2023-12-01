@@ -24,7 +24,8 @@ export const App: React.FC = observer(() => {
         <Welcome />
       ) : (
         <>
-          <Projects /> <Project />
+          <Projects />
+          <Project />
         </>
       )}
       <DownloadManager />

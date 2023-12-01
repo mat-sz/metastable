@@ -5,6 +5,7 @@ import { ProjectSettings } from '../../types/project';
 
 export class Project {
   outputFilenames: string[] = [];
+  allOutputs: string[] = [];
 
   constructor(
     public id: number,
@@ -12,6 +13,7 @@ export class Project {
     public settings: ProjectSettings,
   ) {
     makeAutoObservable(this);
+    this.refreshOutputs();
   }
 
   async request() {
@@ -48,6 +50,15 @@ export class Project {
       },
       body: JSON.stringify({ settings: JSON.stringify(toJS(this.settings)) }),
     });
+  }
+
+  async refreshOutputs() {
+    const res = await fetch(getUrl(`/projects/${this.id}/outputs`));
+    const outputs = await res.json();
+
+    if (outputs) {
+      this.allOutputs = outputs;
+    }
   }
 
   private _autosaveTimeout: number | undefined = undefined;
