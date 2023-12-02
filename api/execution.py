@@ -84,7 +84,7 @@ def txt2img(server, prompt, prompt_id):
     project_id = prompt["project_id"]
     folder_paths.create_project_tree(project_id)
     output_dir = folder_paths.get_output_directory(project_id)
-    full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("testui", output_dir, images[0].shape[1], images[0].shape[0])
+    counter = folder_paths.get_save_image_counter(output_dir)
 
     output_filenames = []
 
@@ -95,8 +95,8 @@ def txt2img(server, prompt, prompt_id):
         if prompt is not None:
             metadata.add_text("prompt", json.dumps(prompt))
         
-        file = f"{filename}_{counter:05}_.png"
-        img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=4)
+        file = f"{counter:05}.png"
+        img.save(os.path.join(output_dir, file), pnginfo=metadata, compress_level=4)
         output_filenames.append(file)
         counter += 1
 
