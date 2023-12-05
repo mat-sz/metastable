@@ -1,6 +1,11 @@
 import path from 'path';
 import fs from 'fs/promises';
 
+import { dataRoot } from './config.js';
+
+export const modelsPath = path.join(dataRoot, 'models');
+export const projectsPath = path.join(dataRoot, 'projects');
+
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
 
 interface FileInfo {
@@ -10,8 +15,7 @@ interface FileInfo {
 
 export class FileSystem {
   async models() {
-    const modelsDir = path.resolve('../models');
-    const subdirs = await fs.readdir(modelsDir, {
+    const subdirs = await fs.readdir(modelsPath, {
       withFileTypes: true,
     });
 
@@ -26,7 +30,7 @@ export class FileSystem {
         continue;
       }
 
-      models[dir.name] = await this.walk(path.join(modelsDir, dir.name), '');
+      models[dir.name] = await this.walk(path.join(modelsPath, dir.name), '');
     }
 
     return models;

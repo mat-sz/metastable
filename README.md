@@ -90,7 +90,9 @@ yarn setup:pip
 
 ## Usage
 
-Place your models in `./models/`.
+Place your models in `./data/models/` or use the built-in download manager.
+
+Run:
 
 ```
 yarn start

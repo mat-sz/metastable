@@ -2,12 +2,12 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "setup:amd:rocm5.6": "pip3 install --target=./.pip torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6",
-    "setup:amd:rocm5.7": "pip3 install --target=./.pip --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm5.7",
-    "setup:nvidia": "pip3 install --target=./.pip torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121",
+    "setup:amd:rocm5.6": "pip3 install --target=./python/.pip torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6",
+    "setup:amd:rocm5.7": "pip3 install --target=./python/.pip --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm5.7",
+    "setup:nvidia": "pip3 install --target=./python/.pip torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121",
     "setup:other": "pip3 install torch torchvision torchaudio",
     "setup:amd": "yarn setup:amd:rocm5.6",
-    "setup:pip": "pip3 install --target=./.pip -r requirements.txt",
+    "setup:pip": "pip3 install --target=./python/.pip -r ./python/requirements.txt",
     "start": "tsx src/index.ts",
     "start:prod": "node build/index.js",
     "build": "tsc"

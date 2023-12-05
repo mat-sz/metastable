@@ -10,7 +10,7 @@ import createHttpError from 'http-errors';
 
 import { host, port, useProxy, staticRoot } from './config.js';
 import { Comfy, ComfyEvent } from './comfy.js';
-import { FileSystem } from './filesystem.js';
+import { FileSystem, projectsPath } from './filesystem.js';
 import { isPathIn } from './helpers.js';
 import { Downloader } from './downloader.js';
 
@@ -26,7 +26,7 @@ const maxAge = 30 * 24 * 60 * 60 * 1000;
 const filesystem = new FileSystem();
 
 app.register(fastifyStatic, {
-  root: path.resolve('../projects'),
+  root: projectsPath,
   serve: false,
   cacheControl: false,
   decorateReply: true,
@@ -80,6 +80,8 @@ if (useProxy) {
 }
 
 comfy.on('event', async event => {
+  console.log('[Comfy]', event);
+
   if (event.event === 'prompt.end') {
     const filename = event.data.output_filenames[0];
 
@@ -98,7 +100,6 @@ app.register(async function (fastify) {
   fastify.get('/ws', { websocket: true }, (connection, req) => {
     const ws = connection.socket;
 
-    ws.send(JSON.stringify({ event: 'test' }));
     const onEvent = (event: ComfyEvent) => {
       ws.send(JSON.stringify(event));
     };
@@ -255,7 +256,7 @@ app.register(
       const projectId = parseInt((request.params as any)?.id);
       try {
         const files = await fs.readdir(
-          path.resolve(`../projects/${projectId}/output`),
+          path.join(projectsPath, `${projectId}`, 'output'),
         );
         return files;
       } catch {
@@ -266,7 +267,7 @@ app.register(
     fastify.get('/:id/outputs/:filename', async (request, reply) => {
       const projectId = parseInt((request.params as any)?.id);
       const fileName = (request.params as any)?.filename;
-      const projectPath = path.resolve(`../projects/${projectId}/output`);
+      const projectPath = path.join(projectsPath, `${projectId}`, 'output');
       const filePath = path.join(projectPath, fileName);
       if (!isPathIn(projectPath, filePath)) {
         return createHttpError(404);

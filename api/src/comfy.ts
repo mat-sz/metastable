@@ -15,7 +15,7 @@ export class Comfy extends EventEmitter {
   constructor() {
     super();
 
-    this.comfy = spawn('python3', ['-u', 'main.py'], {
+    this.comfy = spawn('python3', ['-u', './python/main.py'], {
       cwd: process.cwd(),
       stdio: 'overlapped',
       detached: true,

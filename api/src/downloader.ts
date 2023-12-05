@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import EventEmitter from 'events';
 
 import { exists } from './helpers.js';
+import { modelsPath } from './filesystem.js';
 
 interface DownloadTask {
   id: string;
@@ -58,16 +59,10 @@ export class Downloader extends EventEmitter {
     const filename = current.filename;
     const partFilename = `${filename}.part`;
 
-    const filePath = path.join(
-      path.resolve('../models'),
-      current.type,
-      filename,
-    );
-    const partPath = path.join(
-      path.resolve('../models'),
-      current.type,
-      partFilename,
-    );
+    const dirPath = path.join(modelsPath, current.type);
+
+    const filePath = path.join(dirPath, filename);
+    const partPath = path.join(dirPath, partFilename);
 
     if (await exists(partPath)) {
       // TODO: Continue download?
