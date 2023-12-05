@@ -18,7 +18,10 @@ export const Item: React.FC<ItemProps> = ({ project }) => {
     <div
       key={project.id}
       className={styles.project}
-      onClick={() => mainStore.projects.open(project.id)}
+      onClick={() => {
+        mainStore.modal = undefined;
+        mainStore.projects.open(project.id);
+      }}
     >
       <div className={styles.preview}>
         {imageUrl ? (

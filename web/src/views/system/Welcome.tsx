@@ -9,7 +9,7 @@ export const Welcome: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');
   return (
     <div className={styles.welcome}>
-      <div>
+      <div className={styles.actions}>
         <h2>Welcome</h2>
         <input
           type="text"

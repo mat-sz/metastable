@@ -6,12 +6,16 @@
   flex-direction: column;
 
   & > div {
-    display: flex;
-    flex-direction: column;
-    background: var(--color-bg-panel);
-    padding: 1rem;
     width: 100%;
     max-width: 900px;
+    background: var(--color-bg-panel);
+    padding: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
 
     input {
       margin-bottom: 0.5rem;
