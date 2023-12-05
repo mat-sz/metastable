@@ -9,13 +9,7 @@ interface FileInfo {
 }
 
 export class FileSystem {
-  models: Record<string, FileInfo[]> = {};
-
-  constructor() {
-    this.refresh();
-  }
-
-  async refresh() {
+  async models() {
     const modelsDir = path.resolve('../models');
     const subdirs = await fs.readdir(modelsDir, {
       withFileTypes: true,
@@ -35,7 +29,7 @@ export class FileSystem {
       models[dir.name] = await this.walk(path.join(modelsDir, dir.name), '');
     }
 
-    this.models = models;
+    return models;
   }
 
   private async walk(currentPath: string, relative: string) {

@@ -184,7 +184,7 @@ app.get('/info', async () => {
   return {
     samplers: comfy.samplers,
     schedulers: comfy.schedulers,
-    models: filesystem.models,
+    models: await filesystem.models(),
   };
 });
 

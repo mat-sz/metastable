@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs/promises';
 
 export function select(object: any, fields: Record<string, boolean>): any {
   const temp: any = {};
@@ -15,4 +16,12 @@ export function isPathIn(parent: string, filePath: string) {
   return (
     typeof rel === 'string' && !rel.startsWith('..') && !path.isAbsolute(rel)
   );
+}
+
+export async function exists(path: string) {
+  try {
+    return !!(await fs.lstat(path));
+  } catch {
+    return false;
+  }
 }
