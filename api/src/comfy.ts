@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import EventEmitter from 'events';
+import os from 'os';
 
 export interface ComfyEvent {
   event: string;
@@ -15,7 +16,14 @@ export class Comfy extends EventEmitter {
   constructor() {
     super();
 
-    this.comfy = spawn('python3', ['-u', './python/main.py'], {
+    const args: string[] = [];
+
+    if (os.arch() === 'arm64' && os.platform() === 'darwin') {
+      // We're running on an M1 Mac.
+      args.push('--force-fp16');
+    }
+
+    this.comfy = spawn('python3', ['-u', './python/main.py', ...args], {
       cwd: process.cwd(),
       stdio: 'overlapped',
       detached: true,

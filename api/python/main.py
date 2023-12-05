@@ -29,7 +29,7 @@ if os.name == "nt":
 if __name__ == "__main__":
     if args.cuda_device is not None:
         os.environ['CUDA_VISIBLE_DEVICES'] = str(args.cuda_device)
-        # print("Set cuda device to:", args.cuda_device)
+        print("Set cuda device to:", args.cuda_device)
 
     import cuda_malloc
 
@@ -48,8 +48,8 @@ def cuda_malloc_warning():
         for b in cuda_malloc.blacklist:
             if b in device_name:
                 cuda_malloc_warning = True
-        # if cuda_malloc_warning:
-            # print("\nWARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc\n")
+        if cuda_malloc_warning:
+            print("\nWARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc\n")
 
 def prompt_worker(q):
     e = execution.PromptExecutor()

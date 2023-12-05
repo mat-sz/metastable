@@ -53,7 +53,7 @@ export class Project {
   private _autosaveTimeout: number | undefined = undefined;
   triggerAutosave() {
     clearTimeout(this._autosaveTimeout);
-    this._autosaveTimeout = setTimeout(() => this.save(), 5000);
+    this._autosaveTimeout = setTimeout(() => this.save(), 5000) as any;
   }
 
   view(type: string, filename: string) {

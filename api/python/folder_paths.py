@@ -34,10 +34,6 @@ projects_directory = os.path.join(base_path, "projects")
 
 filename_list_cache = {}
 
-def get_models_dir():
-    global models_dir
-    return models_dir
-
 def create_if_not_found(path):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -66,48 +62,6 @@ def get_input_directory(project_id):
 
     project_id = str(project_id)
     return os.path.join(projects_directory, project_id, "input")
-
-#NOTE: used in http server so don't put folders that should not be accessed remotely
-def get_directory_by_type(project_id, type_name):
-    project_id = str(project_id)
-
-    if type_name == "output":
-        return get_output_directory(project_id)
-    if type_name == "temp":
-        return get_temp_directory()
-    if type_name == "input":
-        return get_input_directory(project_id)
-    return None
-
-
-# determine base_dir rely on annotation if name is 'filename.ext [annotation]' format
-# otherwise use default_path as base_dir
-def annotated_filepath(project_id, name):
-    project_id = str(project_id)
-
-    if name.endswith("[output]"):
-        base_dir = get_output_directory(project_id)
-        name = name[:-9]
-    elif name.endswith("[input]"):
-        base_dir = get_input_directory(project_id)
-        name = name[:-8]
-    elif name.endswith("[temp]"):
-        base_dir = get_temp_directory()
-        name = name[:-7]
-    else:
-        return name, None
-
-    return name, base_dir
-
-def add_model_folder_path(folder_name, full_folder_path):
-    global folder_names_and_paths
-    if folder_name in folder_names_and_paths:
-        folder_names_and_paths[folder_name][0].append(full_folder_path)
-    else:
-        folder_names_and_paths[folder_name] = ([full_folder_path], set())
-
-def get_folder_paths(folder_name):
-    return folder_names_and_paths[folder_name][0][:]
 
 def recursive_search(directory, excluded_dir_names=None):
     if not os.path.isdir(directory):
@@ -185,34 +139,6 @@ def get_filename_list(folder_name):
         global filename_list_cache
         filename_list_cache[folder_name] = out
     return list(out[0])
-
-def get_files(folder_name):
-    global folder_names_and_paths
-
-    folder = folder_names_and_paths[folder_name]
-    filenames = get_filename_list(folder_name)
-    out = []
-
-    for filename in filenames:
-        out.append({
-            "name": filename,
-            "size": os.path.getsize(os.path.join(folder[0][0], filename))
-        })
-    
-    return out
-
-def get_all_files():
-    global folder_names_and_paths
-
-    out = {}
-    for key in folder_names_and_paths:
-        out[key] = get_files(key)
-
-    return out
-
-def list_files(path):
-    files, folders_all = recursive_search(path, excluded_dir_names=[".git"])
-    return sorted(list(files))
 
 def get_save_image_counter(output_dir):
     def map_filename(filename):

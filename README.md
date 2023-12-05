@@ -58,13 +58,6 @@ Installation is performed similarly to ComfyUI, with some extra requirements.
 - `yarn`
 - Continue with the instructions below depending on your GPU
 
-#### AMD GPUs (Linux only)
-
-```
-yarn setup:amd # or `yarn setup:amd:rocm5.7` for nightly builds of pytorch that might perform faster
-yarn setup:pip
-```
-
 #### NVIDIA
 
 ```
@@ -72,16 +65,14 @@ yarn setup:nvidia
 yarn setup:pip
 ```
 
-#### Apple Silicon Macs
+#### AMD GPUs (Linux only)
 
 ```
-yarn setup:other
+yarn setup:amd # or `yarn setup:amd:rocm5.7` for nightly builds of pytorch that might perform faster
 yarn setup:pip
 ```
 
-You'll need to edit api/package.json to include ` --force-fp16` after `python main.py`.
-
-#### Others/CPU
+#### Apple Silicon Macs, Other/CPU
 
 ```
 yarn setup:other
