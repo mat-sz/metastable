@@ -10,8 +10,8 @@ interface ItemProps {
 }
 
 export const Item: React.FC<ItemProps> = ({ project }) => {
-  const imageUrl = project.last_output
-    ? mainStore.view(project.id, 'output', project.last_output)
+  const imageUrl = project.lastOutput
+    ? mainStore.view(project.id, 'output', project.lastOutput)
     : undefined;
 
   return (

@@ -1,13 +1,12 @@
 export interface PromptQueueMessageModel {
-  type: 'prompt.queue';
+  event: 'prompt.queue';
   data: {
     queue_remaining: number;
-    sid?: string;
   };
 }
 
 export interface PromptProgressMessageModel {
-  type: 'prompt.progress';
+  event: 'prompt.progress';
   data: {
     max: number;
     value: number;
@@ -15,7 +14,7 @@ export interface PromptProgressMessageModel {
 }
 
 export interface PromptEndMessageModel {
-  type: 'prompt.end';
+  event: 'prompt.end';
   data: {
     prompt_id: string;
     output_filenames: string[];
@@ -24,22 +23,21 @@ export interface PromptEndMessageModel {
 }
 
 export interface DownloadStartMessageModel {
-  type: 'download.start';
+  event: 'download.start';
   data: {
     download_id: string;
   };
 }
 
 export interface DownloadQueueMessageModel {
-  type: 'download.queue';
+  event: 'download.queue';
   data: {
     queue_remaining: number;
-    sid?: string;
   };
 }
 
 export interface DownloadProgressMessageModel {
-  type: 'download.progress';
+  event: 'download.progress';
   data: {
     download_id: string;
     size: number;
@@ -49,14 +47,14 @@ export interface DownloadProgressMessageModel {
 }
 
 export interface DownloadEndMessageModel {
-  type: 'download.end';
+  event: 'download.end';
   data: {
     download_id: string;
   };
 }
 
 export interface ModelsChangedMessageModel {
-  type: 'models.changed';
+  event: 'models.changed';
   data: Record<string, never>;
 }
 

@@ -76,15 +76,11 @@ class MainStore {
   }
 
   view(project_id: number, type: string, filename: string) {
-    const url = new URL(getUrl('/view'));
-    url.searchParams.append('project_id', `${project_id}`);
-    url.searchParams.append('type', type);
-    url.searchParams.append('filename', filename);
-    return url.toString();
+    return getUrl(`/projects/${project_id}/${type}s/${filename}`);
   }
 
   onMessage(message: Message) {
-    switch (message.type) {
+    switch (message.event) {
       case 'prompt.queue':
         this.promptRemaining = message.data.queue_remaining;
         break;

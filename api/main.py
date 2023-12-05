@@ -15,7 +15,11 @@ import itertools
 import shutil
 import threading
 import gc
+import json
+import uuid
 
+import comfy.samplers
+from jsonout import jsonout
 from comfy.cli_args import args
 
 if os.name == "nt":
@@ -25,7 +29,7 @@ if os.name == "nt":
 if __name__ == "__main__":
     if args.cuda_device is not None:
         os.environ['CUDA_VISIBLE_DEVICES'] = str(args.cuda_device)
-        print("Set cuda device to:", args.cuda_device)
+        # print("Set cuda device to:", args.cuda_device)
 
     import cuda_malloc
 
@@ -33,10 +37,6 @@ import comfy.utils
 import yaml
 
 import execution
-import downloader
-import watcher
-import server
-from server import BinaryEventTypes
 import comfy.model_management
 
 
@@ -48,50 +48,50 @@ def cuda_malloc_warning():
         for b in cuda_malloc.blacklist:
             if b in device_name:
                 cuda_malloc_warning = True
-        if cuda_malloc_warning:
-            print("\nWARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc\n")
+        # if cuda_malloc_warning:
+            # print("\nWARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc\n")
 
-def prompt_worker(q, server):
-    e = execution.PromptExecutor(server)
+def prompt_worker(q):
+    e = execution.PromptExecutor()
     while True:
         item, item_id = q.get()
         execution_start_time = time.perf_counter()
         prompt_id = item[0]
         e.execute(item[1], prompt_id)
         q.task_done(item_id, e.outputs_ui)
-        if server.client_id is not None:
-            server.send_sync("prompt.progress", { "value": 0, "max": 0 }, server.client_id)
-
-        print("Prompt executed in {:.2f} seconds".format(time.perf_counter() - execution_start_time))
+        jsonout("prompt.progress", { "value": 0, "max": 0 })
         gc.collect()
         comfy.model_management.soft_empty_cache()
 
-def download_worker(q, server):
-    e = downloader.Downloader(server)
+async def run(prompt_queue):
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)
+    writer = asyncio.StreamWriter(w_transport, w_protocol, reader, loop)
+    
     while True:
-        item, item_id = q.get()
-        execution_start_time = time.perf_counter()
-        download_id = item[0]
-        e.execute(item[1], download_id)
-        q.task_done(item_id)
+        res = await reader.readline()
+        if not res:
+            break
+        
+        try:
+            ev = json.loads(res)
+            if ev["event"] == "prompt":
+                prompt_id = str(uuid.uuid4())
+                prompt_queue.put((prompt_id, ev["data"]))
+        except:
+            pass
 
-        print("Download executed in {:.2f} seconds".format(time.perf_counter() - execution_start_time))
-        gc.collect()
+        await writer.drain()
 
-def watcher_worker(w):
-    w.run()
-
-
-async def run(server, address='', port=5000, verbose=True):
-    await asyncio.gather(server.start(address, port, verbose), server.publish_loop())
-
-
-def hijack_progress(server):
+def hijack_progress():
     def hook(value, total, preview_image):
         comfy.model_management.throw_exception_if_processing_interrupted()
-        server.send_sync("prompt.progress", { "value": value, "max": total }, server.client_id)
-        if preview_image is not None:
-            server.send_sync(BinaryEventTypes.UNENCODED_PREVIEW_IMAGE, preview_image, server.client_id)
+        jsonout("prompt.progress", { "value": value, "max": total })
+        # if preview_image is not None:
+        #    server.send_sync(BinaryEventTypes.UNENCODED_PREVIEW_IMAGE, preview_image, server.client_id)
     comfy.utils.set_progress_bar_global_hook(hook)
 
 def cleanup_temp():
@@ -104,22 +104,20 @@ if __name__ == "__main__":
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    server = server.PromptServer(loop)
-    prompt_queue = execution.PromptQueue(server)
-    download_queue = downloader.DownloadQueue(server)
-    w = watcher.Watcher(server);
+    prompt_queue = execution.PromptQueue()
 
     cuda_malloc_warning()
 
-    server.add_routes()
-    hijack_progress(server)
+    hijack_progress()
 
-    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue, server,)).start()
-    threading.Thread(target=download_worker, daemon=True, args=(download_queue, server,)).start()
-    threading.Thread(target=watcher_worker, daemon=True, args=(w,)).start()
+    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue,)).start()
+
+    jsonout("info.samplers", comfy.samplers.KSampler.SAMPLERS)
+    jsonout("info.schedulers", comfy.samplers.KSampler.SCHEDULERS)
 
     try:
-        loop.run_until_complete(run(server, address=args.listen, verbose=not args.dont_print_server))
+        jsonout("ready")
+        loop.run_until_complete(run(prompt_queue))
     except KeyboardInterrupt:
         print("\nStopped server")
 

@@ -30,6 +30,7 @@ import comfy.model_management
 
 import folder_paths
 import latent_preview
+from jsonout import jsonout
 
 def clip_encode(clip, text):
     tokens = clip.tokenize(text)
@@ -48,14 +49,13 @@ def ksampler(model, latent, conditioning, settings):
     seed = settings["seed"]
     noise = comfy.sample.prepare_noise(latent, seed, None)
 
-    disable_pbar = not comfy.utils.PROGRESS_BAR_ENABLED
     steps = settings["steps"]
     callback = latent_preview.prepare_callback(model, steps)
 
     denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
     return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent,
                                                                 denoise=denoise, disable_noise=False, start_step=None, last_step=None,
-                                                                force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=disable_pbar, seed=seed)
+                                                                force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=True, seed=seed)
 
 def load_checkpoint(settings):
     ckpt_path = folder_paths.get_full_path("checkpoints", settings["name"])
@@ -69,7 +69,7 @@ def load_lora(model, clip, settings):
     strength = settings["strength"]
     return comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
 
-def txt2img(server, prompt, prompt_id):
+def txt2img(prompt, prompt_id):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint(models_settings["base"])
 
@@ -99,16 +99,15 @@ def txt2img(server, prompt, prompt_id):
         img.save(os.path.join(output_dir, file), pnginfo=metadata, compress_level=4)
         output_filenames.append(file)
         counter += 1
-
-    server.send_sync("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": project_id }, server.client_id)
+    
+    jsonout("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": project_id })
 
 class PromptExecutor:
-    def __init__(self, server):
+    def __init__(self):
         self.outputs = {}
         self.object_storage = {}
         self.outputs_ui = {}
         self.old_prompt = {}
-        self.server = server
 
         # Next, remove the subsequent outputs since they will not be executed
         to_delete = []
@@ -123,33 +122,25 @@ class PromptExecutor:
             del d
 
     def execute(self, prompt, prompt_id, extra_data={}):
-        if "client_id" in extra_data:
-            self.server.client_id = extra_data["client_id"]
-        else:
-            self.server.client_id = None
-
-        if self.server.client_id is not None:
-            self.server.send_sync("prompt.start", { "prompt_id": prompt_id }, self.server.client_id)
+        jsonout("prompt.start", { "prompt_id": prompt_id })
 
         with torch.inference_mode():
-            txt2img(self.server, prompt, prompt_id)
+            txt2img(prompt, prompt_id)
                         
 
 class PromptQueue:
-    def __init__(self, server):
-        self.server = server
+    def __init__(self):
         self.mutex = threading.RLock()
         self.not_empty = threading.Condition(self.mutex)
         self.task_counter = 0
         self.queue = []
         self.currently_running = {}
         self.history = {}
-        server.prompt_queue = self
 
     def put(self, item):
         with self.mutex:
             heapq.heappush(self.queue, item)
-            self.server.prompt_queue_updated()
+            self.queue_updated()
             self.not_empty.notify()
 
     def get(self):
@@ -160,7 +151,7 @@ class PromptQueue:
             i = self.task_counter
             self.currently_running[i] = copy.deepcopy(item)
             self.task_counter += 1
-            self.server.prompt_queue_updated()
+            self.queue_updated()
             return (item, i)
 
     def task_done(self, item_id, outputs):
@@ -169,7 +160,7 @@ class PromptQueue:
             self.history[prompt[0]] = { "prompt": prompt, "outputs": {} }
             for o in outputs:
                 self.history[prompt[0]]["outputs"][o] = outputs[o]
-            self.server.prompt_queue_updated()
+            self.queue_updated()
 
     def get_current_queue(self):
         with self.mutex:
@@ -185,7 +176,7 @@ class PromptQueue:
     def wipe_queue(self):
         with self.mutex:
             self.queue = []
-            self.server.prompt_queue_updated()
+            self.queue_updated()
 
     def delete_queue_item(self, function):
         with self.mutex:
@@ -196,7 +187,7 @@ class PromptQueue:
                     else:
                         self.queue.pop(x)
                         heapq.heapify(self.queue)
-                    self.server.prompt_queue_updated()
+                        self.queue_updated()
                     return True
         return False
 
@@ -216,3 +207,11 @@ class PromptQueue:
     def delete_history_item(self, id_to_delete):
         with self.mutex:
             self.history.pop(id_to_delete, None)
+
+    def queue_updated(self):
+        jsonout("prompt.queue", self.queue_info())
+
+    def queue_info(self):
+        return {
+            "queue_remaining": self.get_tasks_remaining()
+        }

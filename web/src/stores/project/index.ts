@@ -68,11 +68,7 @@ export class Project {
   }
 
   view(type: string, filename: string) {
-    const url = new URL(getUrl('/view'));
-    url.searchParams.append('project_id', `${this.id}`);
-    url.searchParams.append('type', type);
-    url.searchParams.append('filename', filename);
-    return url.toString();
+    return getUrl(`/projects/${this.id}/${type}s/${filename}`);
   }
 
   addLora(name: string, strength = 1) {

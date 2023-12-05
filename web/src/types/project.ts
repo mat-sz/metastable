@@ -23,5 +23,5 @@ export interface APIProject {
   id: number;
   name: string;
   settings: string;
-  last_output?: string;
+  lastOutput?: string;
 }
