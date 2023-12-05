@@ -83,7 +83,7 @@ comfy.on('event', async event => {
   console.log('[Comfy]', event);
 
   if (event.event === 'prompt.end') {
-    const filename = event.data.output_filenames[0];
+    const filename = event.data?.output_filenames?.[0];
 
     if (filename) {
       const projectId = parseInt(event.data.project_id);
@@ -135,6 +135,7 @@ const projectBodyCreate = {
 const projectSelect = {
   id: true,
   name: true,
+  lastOutput: true,
   settings: true,
   createdAt: true,
   updatedAt: true,
@@ -196,6 +197,7 @@ app.register(
         select: {
           id: true,
           name: true,
+          lastOutput: true,
           createdAt: true,
           updatedAt: true,
         },

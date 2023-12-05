@@ -5,6 +5,7 @@ from comfy.ldm.modules.diffusionmodules.openaimodel import Timestep
 import comfy.model_management
 import comfy.conds
 from enum import Enum
+import contextlib
 from . import utils
 
 class ModelType(Enum):
@@ -61,6 +62,13 @@ class BaseModel(torch.nn.Module):
 
         context = c_crossattn
         dtype = self.get_dtype()
+
+        if comfy.model_management.supports_dtype(xc.device, dtype):
+            precision_scope = lambda a: contextlib.nullcontext(a)
+        else:
+            precision_scope = torch.autocast
+            dtype = torch.float32
+
         xc = xc.to(dtype)
         t = self.model_sampling.timestep(t).float()
         context = context.to(dtype)
@@ -70,7 +78,10 @@ class BaseModel(torch.nn.Module):
             if hasattr(extra, "to"):
                 extra = extra.to(dtype)
             extra_conds[o] = extra
-        model_output = self.diffusion_model(xc, t, context=context, control=control, transformer_options=transformer_options, **extra_conds).float()
+
+        with precision_scope(comfy.model_management.get_autocast_device(xc.device)):
+            model_output = self.diffusion_model(xc, t, context=context, control=control, transformer_options=transformer_options, **extra_conds).float()
+
         return self.model_sampling.calculate_denoised(sigma, model_output, x)
 
     def get_dtype(self):
@@ -164,12 +175,13 @@ class BaseModel(torch.nn.Module):
         self.inpaint_model = True
 
     def memory_required(self, input_shape):
-        area = input_shape[0] * input_shape[2] * input_shape[3]
         if comfy.model_management.xformers_enabled() or comfy.model_management.pytorch_attention_flash_attention():
             #TODO: this needs to be tweaked
-            return (area / (comfy.model_management.dtype_size(self.get_dtype()) * 10)) * (1024 * 1024)
+            area = input_shape[0] * input_shape[2] * input_shape[3]
+            return (area * comfy.model_management.dtype_size(self.get_dtype()) / 50) * (1024 * 1024)
         else:
             #TODO: this formula might be too aggressive since I tweaked the sub-quad and split algorithms to use less memory.
+            area = input_shape[0] * input_shape[2] * input_shape[3]
             return (((area * 0.6) / 0.9) + 1024) * (1024 * 1024)
 
 
@@ -302,7 +314,7 @@ class SVD_img2vid(BaseModel):
         if latent_image.shape[1:] != noise.shape[1:]:
             latent_image = utils.common_upscale(latent_image, noise.shape[-1], noise.shape[-2], "bilinear", "center")
 
-        latent_image = utils.repeat_to_batch_size(latent_image, noise.shape[0])
+        latent_image = utils.resize_to_batch_size(latent_image, noise.shape[0])
 
         out['c_concat'] = comfy.conds.CONDNoiseShape(latent_image)
 

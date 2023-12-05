@@ -21,7 +21,6 @@ export class Comfy extends EventEmitter {
       detached: true,
       env: {
         ...process.env,
-        PYTORCH_MPS_HIGH_WATERMARK_RATIO: '0.0',
       },
     });
 
