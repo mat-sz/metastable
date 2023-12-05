@@ -3,7 +3,7 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { APIProject } from '../types/project';
 import { Project } from './project';
 import { arrayMove, defaultProjectSettings } from '../helpers';
-import { getUrl } from '../config';
+import { httpGet, httpPost } from '../http';
 
 export class ProjectStore {
   projects: Project[] = [];
@@ -20,8 +20,7 @@ export class ProjectStore {
   }
 
   async init() {
-    const res = await fetch(getUrl('/projects'));
-    const json = await res.json();
+    const json = await httpGet('/projects');
     runInAction(() => {
       this.recent = json;
     });
@@ -34,14 +33,7 @@ export class ProjectStore {
       settings: JSON.stringify(settings),
     };
 
-    const res = await fetch(getUrl('/projects'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(project),
-    });
-    const json = await res.json();
+    const json = await httpPost('/projects', project);
 
     runInAction(() => {
       this.projects.push(new Project(json.id, name, settings));
@@ -50,8 +42,7 @@ export class ProjectStore {
   }
 
   async open(id: number) {
-    const res = await fetch(getUrl(`/projects/${id}`));
-    const json = await res.json();
+    const json = await httpGet(`/projects/${id}`);
     const project = new Project(json.id, json.name, JSON.parse(json.settings));
     runInAction(() => {
       this.projects = [

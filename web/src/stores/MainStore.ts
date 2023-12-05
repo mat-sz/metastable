@@ -6,6 +6,7 @@ import { ProjectStore } from './ProjectStore';
 import { Message } from '../types/websocket';
 import { DownloadStore } from './DownloadStore';
 import { ModelType } from '../types/model';
+import { httpGet } from '../http';
 
 declare global {
   // eslint-disable-next-line
@@ -59,8 +60,7 @@ class MainStore {
   }
 
   async refresh() {
-    const res = await fetch(getUrl('/info'));
-    const data = await res.json();
+    const data = await httpGet('/info');
     runInAction(() => {
       this.info = data;
       this.ready = true;

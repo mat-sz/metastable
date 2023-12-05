@@ -95,3 +95,5 @@ Place your models in `./models/`.
 ```
 yarn start
 ```
+
+The web app will be available at: http://127.0.0.1:5001/

@@ -2,6 +2,7 @@ import { makeAutoObservable, toJS } from 'mobx';
 import { getUrl } from '../../config';
 import { randomSeed } from '../../helpers';
 import { ProjectSettings } from '../../types/project';
+import { httpGet, httpPost } from '../../http';
 
 export class Project {
   outputFilenames: string[] = [];
@@ -22,39 +23,27 @@ export class Project {
     }
 
     this.save();
-    await fetch(getUrl('/prompts'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ project_id: this.id, ...toJS(this.settings) }),
+    await httpPost(`/prompts`, {
+      project_id: this.id,
+      ...toJS(this.settings),
     });
   }
 
   async rename(name: string) {
     this.name = name;
-    await fetch(getUrl(`/projects/${this.id}`), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name }),
+    await httpPost(`/projects/${this.id}`, {
+      name,
     });
   }
 
   async save() {
-    await fetch(getUrl(`/projects/${this.id}`), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ settings: JSON.stringify(toJS(this.settings)) }),
+    await httpPost(`/projects/${this.id}`, {
+      settings: JSON.stringify(toJS(this.settings)),
     });
   }
 
   async refreshOutputs() {
-    const res = await fetch(getUrl(`/projects/${this.id}/outputs`));
-    const outputs = await res.json();
+    const outputs = await httpGet(`/projects/${this.id}/outputs`);
 
     if (outputs) {
       this.allOutputs = outputs;

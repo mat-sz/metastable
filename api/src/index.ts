@@ -25,6 +25,13 @@ const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 const filesystem = new FileSystem();
 
+app.register(fastifyStatic, {
+  root: path.resolve('../projects'),
+  serve: false,
+  cacheControl: false,
+  decorateReply: true,
+});
+
 if (useProxy) {
   const fastifyHttpProxy = (await import('@fastify/http-proxy')).default;
   app.register(fastifyHttpProxy, {
@@ -52,6 +59,7 @@ if (useProxy) {
     prefix: '/',
     index: 'index.html',
     cacheControl: false,
+    decorateReply: false,
   });
   app.register(fastifyStatic, {
     root: path.join(STATIC_ROOT, 'assets'),
