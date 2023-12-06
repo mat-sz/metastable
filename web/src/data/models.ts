@@ -18,6 +18,18 @@ export const downloadable: DownloadableModelGroup[] = [
         recommended: true,
       },
       {
+        name: 'SD 1.5 Inpainting',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        downloads: [
+          {
+            type: ModelType.CHECKPOINT,
+            filename: 'sd_v1-5-inpainting.ckpt',
+            url: 'https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt',
+          },
+        ],
+      },
+      {
         name: 'SD 2.1 512x',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,

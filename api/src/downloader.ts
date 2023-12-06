@@ -52,6 +52,9 @@ export class Downloader extends EventEmitter {
       url: current.url,
       method: 'GET',
       responseType: 'stream',
+      headers: {
+        'User-Agent': 'Metastable/0.0.0',
+      },
     });
     const totalLength = headers['content-length'];
     current.size = parseInt(totalLength);
