@@ -7,6 +7,8 @@ import threading
 import heapq
 import traceback
 import gc
+from io import BytesIO
+import base64
 
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
@@ -32,6 +34,63 @@ import folder_paths
 import latent_preview
 from jsonout import jsonout
 
+def load_image(img):
+    i = Image.open(BytesIO(base64.b64decode(img)))
+    i = ImageOps.exif_transpose(i)
+    image = i.convert("RGB")
+    image = np.array(image).astype(np.float32) / 255.0
+    image = torch.from_numpy(image)[None,]
+    if 'A' in i.getbands():
+        mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+        mask = 1. - torch.from_numpy(mask)
+    else:
+        mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+    return (image, mask.unsqueeze(0))
+
+def vae_encode_crop_pixels(pixels):
+    x = (pixels.shape[1] // 8) * 8
+    y = (pixels.shape[2] // 8) * 8
+    if pixels.shape[1] != x or pixels.shape[2] != y:
+        x_offset = (pixels.shape[1] % 8) // 2
+        y_offset = (pixels.shape[2] % 8) // 2
+        pixels = pixels[:, x_offset:x + x_offset, y_offset:y + y_offset, :]
+    return pixels
+
+def vae_encode(vae, pixels):
+    pixels = vae_encode_crop_pixels(pixels)
+    t = vae.encode(pixels[:,:,:,:3])
+    return {"samples":t}
+
+def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
+    x = (pixels.shape[1] // 8) * 8
+    y = (pixels.shape[2] // 8) * 8
+    mask = torch.nn.functional.interpolate(mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])), size=(pixels.shape[1], pixels.shape[2]), mode="bilinear")
+
+    pixels = pixels.clone()
+    if pixels.shape[1] != x or pixels.shape[2] != y:
+        x_offset = (pixels.shape[1] % 8) // 2
+        y_offset = (pixels.shape[2] % 8) // 2
+        pixels = pixels[:,x_offset:x + x_offset, y_offset:y + y_offset,:]
+        mask = mask[:,:,x_offset:x + x_offset, y_offset:y + y_offset]
+
+    #grow mask by a few pixels to keep things seamless in latent space
+    if grow_mask_by == 0:
+        mask_erosion = mask
+    else:
+        kernel_tensor = torch.ones((1, 1, grow_mask_by, grow_mask_by))
+        padding = math.ceil((grow_mask_by - 1) / 2)
+
+        mask_erosion = torch.clamp(torch.nn.functional.conv2d(mask.round(), kernel_tensor, padding=padding), 0, 1)
+
+    m = (1.0 - mask.round()).squeeze(1)
+    for i in range(3):
+        pixels[:,:,:,i] -= 0.5
+        pixels[:,:,:,i] *= m
+        pixels[:,:,:,i] += 0.5
+    t = vae.encode(pixels)
+
+    return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
+
 def clip_encode(clip, text):
     tokens = clip.tokenize(text)
     cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
@@ -39,21 +98,22 @@ def clip_encode(clip, text):
 
 def empty_latent_image(settings):
     batch_size, height, width = settings["batch_size"], settings["height"], settings["width"]
-    return torch.zeros([batch_size, 4, height // 8, width // 8])
+    return {"samples":torch.zeros([batch_size, 4, height // 8, width // 8])}
 
 def create_conditioning(clip, settings):
     return (clip_encode(clip, settings["positive"]), clip_encode(clip, settings["negative"]))
 
 def ksampler(model, latent, conditioning, settings):
+    latent_image = latent["samples"]
     positive, negative = conditioning
     seed = settings["seed"]
-    noise = comfy.sample.prepare_noise(latent, seed, None)
+    noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
     steps = settings["steps"]
     callback = latent_preview.prepare_callback(model, steps)
 
     denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
-    return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent,
+    return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent_image,
                                                                 denoise=denoise, disable_noise=False, start_step=None, last_step=None,
                                                                 force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=True, seed=seed)
 
@@ -69,18 +129,7 @@ def load_lora(model, clip, settings):
     strength = settings["strength"]
     return comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
 
-def txt2img(prompt, prompt_id):
-    models_settings = prompt["models"]
-    (model, clip, vae, _) = load_checkpoint(models_settings["base"])
-
-    for lora_settings in models_settings["loras"]:
-        (model, clip) = load_lora(model, clip, lora_settings)
-
-    conditioning = create_conditioning(clip, prompt["conditioning"])
-    latent = empty_latent_image(prompt["input"])
-    samples = ksampler(model, latent, conditioning, prompt["sampler"])
-    images = vae.decode(samples)
-
+def save_images(prompt, images):
     project_id = prompt["project_id"]
     folder_paths.create_project_tree(project_id)
     output_dir = folder_paths.get_output_directory(project_id)
@@ -99,8 +148,30 @@ def txt2img(prompt, prompt_id):
         img.save(os.path.join(output_dir, file), pnginfo=metadata, compress_level=4)
         output_filenames.append(file)
         counter += 1
+
+    return output_filenames
+
+def execute_prompt(prompt, prompt_id):
+    models_settings = prompt["models"]
+    (model, clip, vae, _) = load_checkpoint(models_settings["base"])
+
+    for lora_settings in models_settings["loras"]:
+        (model, clip) = load_lora(model, clip, lora_settings)
+
+    conditioning = create_conditioning(clip, prompt["conditioning"])
+    latent = None
+
+    if prompt["input"]["image"]:
+        (image, mask) = load_image(prompt["input"]["image"])
+        latent = vae_encode(vae, image)
+    else:
+        latent = empty_latent_image(prompt["input"])
+
+    samples = ksampler(model, latent, conditioning, prompt["sampler"])
+    images = vae.decode(samples)
+    output_filenames = save_images(prompt, images)
     
-    jsonout("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": project_id })
+    jsonout("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": prompt["project_id"] })
 
 class PromptExecutor:
     def __init__(self):
@@ -125,7 +196,7 @@ class PromptExecutor:
         jsonout("prompt.start", { "prompt_id": prompt_id })
 
         with torch.inference_mode():
-            txt2img(prompt, prompt_id)
+            execute_prompt(prompt, prompt_id)
                         
 
 class PromptQueue:

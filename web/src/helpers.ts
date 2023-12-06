@@ -42,3 +42,19 @@ export function defaultProjectSettings(): ProjectSettings {
     },
   };
 }
+
+export async function imageUrlToBase64(url: string): Promise<string> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((onSuccess, onError) => {
+    try {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onSuccess((reader.result as string).split(',')[1]);
+      };
+      reader.readAsDataURL(blob);
+    } catch (e) {
+      onError(e);
+    }
+  });
+}

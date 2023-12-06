@@ -1,6 +1,6 @@
 import { makeAutoObservable, toJS } from 'mobx';
 import { getUrl } from '../../config';
-import { randomSeed } from '../../helpers';
+import { imageUrlToBase64, randomSeed } from '../../helpers';
 import { ProjectSettings } from '../../types/project';
 import { httpGet, httpPost } from '../../http';
 
@@ -22,10 +22,15 @@ export class Project {
       this.settings.sampler.seed = randomSeed();
     }
 
+    const settings = toJS(this.settings);
+    if (settings.input.image) {
+      settings.input.image = await imageUrlToBase64(settings.input.image);
+    }
+
     this.save();
     await httpPost(`/prompts`, {
       project_id: this.id,
-      ...toJS(this.settings),
+      ...settings,
     });
   }
 
@@ -37,8 +42,11 @@ export class Project {
   }
 
   async save() {
+    const settings = toJS(this.settings);
+    settings.input.image = undefined;
+
     await httpPost(`/projects/${this.id}`, {
-      settings: JSON.stringify(toJS(this.settings)),
+      settings: JSON.stringify(settings),
     });
   }
 

@@ -8,7 +8,7 @@ export interface ComfyEvent {
 }
 
 export class Comfy extends EventEmitter {
-  comfy: ChildProcessWithoutNullStreams;
+  process: ChildProcessWithoutNullStreams;
 
   samplers: string[] = [];
   schedulers: string[] = [];
@@ -23,23 +23,22 @@ export class Comfy extends EventEmitter {
       args.push('--force-fp16');
     }
 
-    this.comfy = spawn('python3', ['-u', './python/main.py', ...args], {
+    const proc = spawn('python3', ['-u', './python/main.py', ...args], {
       cwd: process.cwd(),
-      stdio: 'overlapped',
       detached: true,
       env: {
         ...process.env,
       },
     });
 
-    this.comfy.stdin.setDefaultEncoding('utf-8');
-    this.comfy.stdout.setEncoding('utf-8');
-    this.comfy.stderr.setEncoding('utf-8');
-    this.comfy.on('spawn', () => console.log('spawn'));
-    this.comfy.on('close', () => console.log('close'));
-    this.comfy.on('exit', () => console.log('exit'));
+    proc.stdin.setDefaultEncoding('utf-8');
+    proc.stdout.setEncoding('utf-8');
+    proc.stderr.setEncoding('utf-8');
+    proc.on('spawn', () => console.log('spawn'));
+    proc.on('close', () => console.log('close'));
+    proc.on('exit', () => console.log('exit'));
 
-    this.comfy.stdout.on('data', data => {
+    proc.stdout.on('data', data => {
       const split = data.split('\n');
       for (const item of split) {
         if (!item) {
@@ -54,7 +53,7 @@ export class Comfy extends EventEmitter {
       }
     });
 
-    this.comfy.stderr.on('data', data => {
+    proc.stderr.on('data', data => {
       this.emit('event', { event: 'stderr', data: data.trim() });
     });
 
@@ -65,9 +64,11 @@ export class Comfy extends EventEmitter {
         this.schedulers = e.data;
       }
     });
+
+    this.process = proc;
   }
 
   send(eventName: string, data: any) {
-    this.comfy.stdin.write(JSON.stringify({ event: eventName, data }) + '\n');
+    this.process.stdin.write(JSON.stringify({ event: eventName, data }) + '\n');
   }
 }

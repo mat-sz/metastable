@@ -1,5 +1,5 @@
 export interface ProjectSettings {
-  input: { batch_size: number; width: number; height: number };
+  input: { batch_size: number; width: number; height: number; image?: string };
   models: {
     base: { name: string };
     loras: { name: string; strength: number }[];

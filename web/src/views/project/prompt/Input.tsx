@@ -1,10 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { VarCategory, VarSlider } from 'react-var-ui';
+import { VarCategory, VarImage, VarSlider } from 'react-var-ui';
 
 export const Input: React.FC = observer(() => {
   return (
     <VarCategory label="Latent">
+      <VarImage label="Image" path="input.image" />
       <VarSlider
         label="Width"
         path="input.width"
