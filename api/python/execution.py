@@ -161,7 +161,7 @@ def execute_prompt(prompt, prompt_id):
     conditioning = create_conditioning(clip, prompt["conditioning"])
     latent = None
 
-    if prompt["input"]["image"]:
+    if "image" in prompt["input"]:
         (image, mask) = load_image(prompt["input"]["image"])
         latent = vae_encode(vae, image)
     else:
