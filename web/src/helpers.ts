@@ -22,7 +22,7 @@ export function filesize(value: number) {
 
 export function defaultProjectSettings(): ProjectSettings {
   return {
-    input: { batch_size: 1, width: 512, height: 512 },
+    input: { mode: 'empty', batch_size: 1, width: 512, height: 512 },
     models: {
       base: { name: mainStore.info.models.checkpoints?.[0]?.name },
       loras: [],

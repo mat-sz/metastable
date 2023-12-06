@@ -23,7 +23,10 @@ export class Project {
     }
 
     const settings = toJS(this.settings);
-    if (settings.input.image) {
+    if (
+      settings.input.mode === 'image' ||
+      settings.input.mode === 'image_masked'
+    ) {
       settings.input.image = await imageUrlToBase64(settings.input.image);
     }
 
@@ -43,7 +46,6 @@ export class Project {
 
   async save() {
     const settings = toJS(this.settings);
-    settings.input.image = undefined;
 
     await httpPost(`/projects/${this.id}`, {
       settings: JSON.stringify(settings),

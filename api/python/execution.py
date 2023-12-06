@@ -161,11 +161,15 @@ def execute_prompt(prompt, prompt_id):
     conditioning = create_conditioning(clip, prompt["conditioning"])
     latent = None
 
-    if "image" in prompt["input"]:
+    input_mode = prompt["input"]["mode"]
+    if input_mode == "empty":
+        latent = empty_latent_image(prompt["input"])
+    elif input_mode == "image":
         (image, mask) = load_image(prompt["input"]["image"])
         latent = vae_encode(vae, image)
-    else:
-        latent = empty_latent_image(prompt["input"])
+    elif input_mode == "image_masked":
+        (image, mask) = load_image(prompt["input"]["image"])
+        latent = vae_encode_inpaint(vae, image, mask)
 
     samples = ksampler(model, latent, conditioning, prompt["sampler"])
     images = vae.decode(samples)
