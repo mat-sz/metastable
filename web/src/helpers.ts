@@ -3,10 +3,10 @@ import { ProjectSettings } from './types/project';
 import { mainStore } from './stores/MainStore';
 
 export function randomSeed() {
-  const min = -1125899906842624;
+  const min = 0;
   const max = 1125899906842624;
   const range = max - min;
-  return Math.random() * range + min;
+  return Math.floor(Math.random() * range + min);
 }
 
 export function arrayMove<T>(array: T[], from: number, to?: number): T[] {
