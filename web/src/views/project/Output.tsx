@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styles from './Output.module.scss';
 import { Preview } from './Preview';
 import { Grid } from './Grid';
+import { ImageEditor } from './editor';
 
 export const Output: React.FC = () => {
   const [tab, setTab] = useState('preview');
@@ -14,6 +15,10 @@ export const Output: React.FC = () => {
     grid: {
       title: 'Grid',
       children: <Grid />,
+    },
+    editor: {
+      title: 'Editor',
+      children: <ImageEditor />,
     },
   };
 

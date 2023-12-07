@@ -2412,6 +2412,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fxglue@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "fxglue@npm:0.2.0"
+  checksum: ce30ee78f687656bd69d6910a15779b97d87cbc24f4f7621422e20e61e806e87c1a2d2db7ce6e0a30154a6b6768f6019bb78afe924bbe291a4b457baa4553d83
+  languageName: node
+  linkType: hard
+
 "gensync@npm:^1.0.0-beta.2":
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
@@ -4723,11 +4730,13 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.3"
     filesize: "npm:^10.1.0"
+    fxglue: "npm:^0.2.0"
     husky: "npm:^8.0.3"
     lint-staged: "npm:^14.0.1"
     lsrx: "npm:^0.0.2"
     mobx: "npm:^6.10.2"
     mobx-react-lite: "npm:^4.0.4"
+    nanoid: "npm:^5.0.4"
     prettier: "npm:^3.0.3"
     react: "npm:^18.2.0"
     react-dnd: "npm:^16.0.1"

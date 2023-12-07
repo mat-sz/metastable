@@ -25,9 +25,11 @@
   "dependencies": {
     "clsx": "^2.0.0",
     "filesize": "^10.1.0",
+    "fxglue": "^0.2.0",
     "lsrx": "^0.0.2",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.4",
+    "nanoid": "^5.0.4",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
