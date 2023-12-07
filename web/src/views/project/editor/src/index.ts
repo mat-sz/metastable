@@ -89,6 +89,30 @@ void main() {
 }
 `;
 
+const layerBoundsFragment = `
+@use wrap
+
+uniform vec2 iOffset;
+uniform vec2 iSize;
+
+void main() {
+  vec2 p = gl_FragCoord.xy / iResolution;
+  vec2 uv = gl_FragCoord.xy / iResolution;
+
+  uv.x -= iOffset.x;
+  uv.y += iOffset.y - 1.0 + iSize.y / iResolution.y;
+  uv *= iResolution / iSize;
+
+  vec4 src = texture2D(iTexture, p);
+
+  if (uv.x > 0.0 && uv.y > 0.0 && uv.x < 1.0 && uv.y < 1.0 && (uv.x < 0.002 || uv.y < 0.002 || 1.0 - uv.x < 0.002 || 1.0 - uv.y < 0.002)) {
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  } else {
+    gl_FragColor = src;
+  }
+}
+`;
+
 export class Editor extends BasicEventEmitter<{
   toolChanged: () => void;
   toolSettingsChanged: () => void;
@@ -152,7 +176,9 @@ export class Editor extends BasicEventEmitter<{
     });
 
     this.glue.registerTexture('~selection', this.state.selection);
+
     this.glue.registerProgram('~selectionEdge', selectionEdgeFragment);
+    this.glue.registerProgram('~layerBounds', layerBoundsFragment);
   }
 
   private pointerEventToPoint(e: PointerEvent): Point {
@@ -246,6 +272,14 @@ export class Editor extends BasicEventEmitter<{
       iImage: 1,
       iSize: [this.state.selection.width, this.state.selection.height],
     });
+
+    const layer = this.currentLayer;
+    if (layer) {
+      glue.program('~layerBounds')?.apply({
+        iOffset: [0, 0],
+        iSize: [layer.canvas.width, layer.canvas.height],
+      });
+    }
 
     glue.render();
     setTimeout(() => {
