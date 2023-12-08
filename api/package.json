@@ -8,8 +8,8 @@
     "setup:other": "pip3 install torch torchvision torchaudio",
     "setup:amd": "yarn setup:amd:rocm5.6",
     "setup:pip": "pip3 install --target=./python/.pip -r ./python/requirements.txt",
-    "start": "tsx src/index.ts",
-    "start:prod": "node build/index.js",
+    "start": "prisma db push && tsx src/index.ts",
+    "start:prod": "prisma db push && node build/index.js",
     "build": "tsc"
   },
   "devDependencies": {
