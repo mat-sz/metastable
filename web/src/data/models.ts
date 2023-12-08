@@ -11,8 +11,8 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v1.5-pruned-emaonly.ckpt',
-            url: 'https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt',
+            filename: 'sd_v1.5-pruned-emaonly.safetensors',
+            url: 'https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
           },
         ],
         recommended: true,
@@ -24,8 +24,20 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v1-5-inpainting.ckpt',
+            filename: 'sd_v1.5-inpainting.ckpt',
             url: 'https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt',
+          },
+        ],
+      },
+      {
+        name: 'SD 2.0 Inpainting',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        downloads: [
+          {
+            type: ModelType.CHECKPOINT,
+            filename: 'sd_v2.0-inpainting.safetensors',
+            url: 'https://huggingface.co/stabilityai/stable-diffusion-2-inpainting/resolve/main/512-inpainting-ema.safetensors',
           },
         ],
       },

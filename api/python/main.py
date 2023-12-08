@@ -65,7 +65,7 @@ def prompt_worker(q):
 
 async def run(prompt_queue):
     loop = asyncio.get_event_loop()
-    reader = asyncio.StreamReader()
+    reader = asyncio.StreamReader(limit=50*1024*1024)
     protocol = asyncio.StreamReaderProtocol(reader)
     await loop.connect_read_pipe(lambda: protocol, sys.stdin)
     w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)

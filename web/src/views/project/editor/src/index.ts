@@ -3,11 +3,15 @@
 // TODO: load image layer
 // TODO: fill tool
 
-import { GlueCanvas } from 'fxglue';
+import {
+  GlueCanvas,
+  glueGetSourceDimensions,
+  glueIsSourceLoaded,
+} from 'fxglue';
 import { nanoid } from 'nanoid';
 import { MoveTool } from './tools/move';
 import { BrushTool } from './tools/brush';
-import { EditorState, Layer, Point, Tool } from './types';
+import { EditorSelection, EditorState, Layer, Point, Tool } from './types';
 import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
 
@@ -44,6 +48,7 @@ const selectionEdgeFragment = `
 
 uniform sampler2D iImage;
 uniform vec2 iSize;
+uniform vec2 iOffset;
 
 float clipped(vec2 uv) {
   float val = texture2D(iImage, uv).a;
@@ -54,7 +59,8 @@ void main() {
   vec2 p = gl_FragCoord.xy / iResolution;
   vec2 uv = gl_FragCoord.xy / iResolution;
 
-  uv.y += iSize.y / iResolution.y - 1.0;
+  uv.x -= iOffset.x/iResolution.x;
+  uv.y += iOffset.y/iResolution.y - 1.0 + iSize.y / iResolution.y;
   uv *= iResolution / iSize;
 
   vec4 src = texture2D(iTexture, p);
@@ -122,7 +128,10 @@ export class Editor extends BasicEventEmitter<{
 }> {
   state: EditorState = {
     layers: [],
-    selection: document.createElement('canvas'),
+  };
+  selection: EditorSelection = {
+    canvas: document.createElement('canvas'),
+    offset: { x: 0, y: 0 },
   };
 
   glueCanvas = new GlueCanvas();
@@ -175,7 +184,7 @@ export class Editor extends BasicEventEmitter<{
       this.currentTool.up(this.pointerEventToPoint(e));
     });
 
-    this.glue.registerTexture('~selection', this.state.selection);
+    this.glue.registerTexture('~selection', this.selection.canvas);
 
     this.glue.registerProgram('~selectionEdge', selectionEdgeFragment);
     this.glue.registerProgram('~layerBounds', layerBoundsFragment);
@@ -203,7 +212,7 @@ export class Editor extends BasicEventEmitter<{
     this.emit('toolChanged');
   }
 
-  private newLayer(width = 500, height = 500) {
+  private newLayer(width = 512, height = 512) {
     const id = nanoid();
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -229,8 +238,13 @@ export class Editor extends BasicEventEmitter<{
     this.emit('state');
   }
 
-  imageLayer(image: HTMLImageElement) {
-    const layer = this.newLayer(image.naturalWidth, image.naturalHeight);
+  imageLayer(image: HTMLImageElement, name?: string) {
+    const [width, height] = glueGetSourceDimensions(image);
+    const layer = this.newLayer(width, height);
+    if (name) {
+      layer.name = name;
+    }
+
     const ctx = layer.canvas.getContext('2d')!;
     ctx.drawImage(image, 0, 0);
     this.state.currentLayerId = layer.id;
@@ -253,6 +267,15 @@ export class Editor extends BasicEventEmitter<{
     this.emit('state');
   }
 
+  renderLayers() {
+    const glue = this.glue;
+    const layers = [...this.state.layers].reverse();
+    for (const layer of layers) {
+      glue.texture(layer.id)?.update();
+      glue.texture(layer.id)?.draw();
+    }
+  }
+
   render() {
     const glue = this.glue;
     this.glueCanvas.setSize(
@@ -260,17 +283,14 @@ export class Editor extends BasicEventEmitter<{
       this.glueCanvas.canvas.clientHeight,
     );
 
-    const layers = [...this.state.layers].reverse();
-    for (const layer of layers) {
-      glue.texture(layer.id)?.update();
-      glue.texture(layer.id)?.draw();
-    }
+    this.renderLayers();
 
-    glue.texture('~selection')?.update(this.state.selection);
+    glue.texture('~selection')?.update(this.selection.canvas);
     glue.texture('~selection')?.use();
     glue.program('~selectionEdge')?.apply({
       iImage: 1,
-      iSize: [this.state.selection.width, this.state.selection.height],
+      iOffset: [this.selection.offset.x, this.selection.offset.y],
+      iSize: [this.selection.canvas.width, this.selection.canvas.height],
     });
 
     const layer = this.currentLayer;
@@ -285,5 +305,41 @@ export class Editor extends BasicEventEmitter<{
     setTimeout(() => {
       requestAnimationFrame(() => this.render());
     }, 50);
+  }
+
+  addImage(url: string, name?: string): Promise<void> {
+    const source = new Image();
+    source.src = url;
+
+    return new Promise(resolve => {
+      const onload = () => {
+        this.imageLayer(source, name);
+        resolve();
+      };
+
+      if (glueIsSourceLoaded(source)) {
+        onload();
+      } else {
+        source.onload = onload;
+      }
+    });
+  }
+
+  renderSelection() {
+    this.renderLayers();
+    this.glue.render();
+    this.glueCanvas.gl.flush();
+
+    const canvas = document.createElement('canvas');
+    canvas.width = this.selection.canvas.width;
+    canvas.height = this.selection.canvas.height;
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(
+      this.glueCanvas.canvas,
+      -this.selection.offset.x,
+      -this.selection.offset.y,
+    );
+    return canvas.toDataURL('image/png');
   }
 }

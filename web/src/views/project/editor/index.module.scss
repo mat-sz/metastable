@@ -2,10 +2,16 @@
   background: red;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  grid-column: 1 / 4;
+}
+
 .editor {
   display: grid;
   grid-template-columns: 200px 1fr 200px;
-  grid-template-rows: 100%;
+  grid-template-rows: 50px calc(100% - 50px);
 }
 
 .wrapper {

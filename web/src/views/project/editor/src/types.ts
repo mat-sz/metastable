@@ -26,7 +26,6 @@ export interface Tool {
   // TODO: return new editor state
   // TODO: pass mouse state
 
-  // pointerdown/up/move???
   down(point: Point): void;
   move(point: Point): void;
   up(point: Point): void;
@@ -55,5 +54,9 @@ export interface EditorState {
   // TODO: history
   layers: Layer[];
   currentLayerId?: string;
-  selection: HTMLCanvasElement;
+}
+
+export interface EditorSelection {
+  offset: Point;
+  canvas: HTMLCanvasElement;
 }

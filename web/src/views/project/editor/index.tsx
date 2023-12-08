@@ -4,6 +4,7 @@ import styles from './index.module.scss';
 import { Editor } from './src';
 import { Tools } from './Tools';
 import { Layers } from './Layers';
+import { Actions } from './Actions';
 
 export const ImageEditor: React.FC = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -26,6 +27,7 @@ export const ImageEditor: React.FC = () => {
 
   return (
     <div className={styles.editor}>
+      <Actions editor={editorRef.current} />
       <Tools editor={editorRef.current} />
       <div className={styles.wrapper} ref={wrapperRef}></div>
       <Layers editor={editorRef.current} />

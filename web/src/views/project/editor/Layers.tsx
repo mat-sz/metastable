@@ -64,6 +64,18 @@ export const Layers: React.FC<LayersProps> = ({ editor }) => {
         <LayerItem key={layer.id} layer={layer} editor={editor} />
       ))}
       <button onClick={() => editor.emptyLayer()}>Add layer</button>
+      <input
+        type="file"
+        accept="*.jpg, *.jpeg, *.png"
+        className={styles.fileInput}
+        onChange={e => {
+          const file = e.target.files?.[0];
+          if (file) {
+            e.target.value = '';
+            editor.addImage(URL.createObjectURL(file), file.name);
+          }
+        }}
+      />
     </div>
   );
 };

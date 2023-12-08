@@ -27,7 +27,11 @@ export class Project {
       settings.input.mode === 'image' ||
       settings.input.mode === 'image_masked'
     ) {
-      settings.input.image = await imageUrlToBase64(settings.input.image);
+      if (settings.input.image.startsWith('blob:')) {
+        settings.input.image = await imageUrlToBase64(settings.input.image);
+      } else if (settings.input.image.startsWith('data:')) {
+        settings.input.image = settings.input.image.split(',')[1];
+      }
     }
 
     this.save();

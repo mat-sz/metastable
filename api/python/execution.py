@@ -9,6 +9,7 @@ import traceback
 import gc
 from io import BytesIO
 import base64
+import math
 
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
@@ -109,13 +110,17 @@ def ksampler(model, latent, conditioning, settings):
     seed = settings["seed"]
     noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
+    noise_mask = None
+    if "noise_mask" in latent:
+        noise_mask = latent["noise_mask"]
+
     steps = settings["steps"]
     callback = latent_preview.prepare_callback(model, steps)
 
     denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
     return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent_image,
                                                                 denoise=denoise, disable_noise=False, start_step=None, last_step=None,
-                                                                force_full_denoise=False, noise_mask=None, callback=callback, disable_pbar=True, seed=seed)
+                                                                force_full_denoise=False, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
 
 def load_checkpoint(settings):
     ckpt_path = folder_paths.get_full_path("checkpoints", settings["name"])
