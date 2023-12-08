@@ -14,6 +14,7 @@ export const Actions: React.FC<ActionsProps> = ({ editor }) => {
       <button
         onClick={() => {
           const url = editor.renderSelection();
+          mainStore.project!.addOutputToEditor = editor.selection.offset;
           mainStore.project!.settings.input = {
             mode: 'image',
             image: url,
@@ -26,6 +27,7 @@ export const Actions: React.FC<ActionsProps> = ({ editor }) => {
       <button
         onClick={() => {
           const url = editor.renderSelection();
+          mainStore.project!.addOutputToEditor = editor.selection.offset;
           mainStore.project!.settings.input = {
             mode: 'image_masked',
             image: url,

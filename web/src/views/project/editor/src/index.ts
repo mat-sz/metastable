@@ -131,7 +131,7 @@ export class Editor extends BasicEventEmitter<{
   };
   selection: EditorSelection = {
     canvas: document.createElement('canvas'),
-    offset: { x: 0, y: 0 },
+    offset: { x: 1, y: 1 },
   };
 
   glueCanvas = new GlueCanvas();
@@ -212,7 +212,7 @@ export class Editor extends BasicEventEmitter<{
     this.emit('toolChanged');
   }
 
-  private newLayer(width = 512, height = 512) {
+  private newLayer(width = 512, height = 512, options: Partial<Layer> = {}) {
     const id = nanoid();
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -227,27 +227,26 @@ export class Editor extends BasicEventEmitter<{
       name: `Layer ${max + 1}`,
       texture,
       canvas,
+      offset: { x: 0, y: 0 },
+      ...options,
     };
     this.state.layers.unshift(layer);
+    this.state.currentLayerId = layer.id;
     return layer;
   }
 
-  emptyLayer() {
-    const layer = this.newLayer();
-    this.state.currentLayerId = layer.id;
+  emptyLayer(options: Partial<Layer> = {}) {
+    this.newLayer(512, 512, options);
+
     this.emit('state');
   }
 
-  imageLayer(image: HTMLImageElement, name?: string) {
+  imageLayer(image: HTMLImageElement, options: Partial<Layer> = {}) {
     const [width, height] = glueGetSourceDimensions(image);
-    const layer = this.newLayer(width, height);
-    if (name) {
-      layer.name = name;
-    }
+    const layer = this.newLayer(width, height, options);
 
     const ctx = layer.canvas.getContext('2d')!;
     ctx.drawImage(image, 0, 0);
-    this.state.currentLayerId = layer.id;
     this.emit('state');
   }
 
@@ -272,7 +271,12 @@ export class Editor extends BasicEventEmitter<{
     const layers = [...this.state.layers].reverse();
     for (const layer of layers) {
       glue.texture(layer.id)?.update();
-      glue.texture(layer.id)?.draw();
+      glue.texture(layer.id)?.draw({
+        x: (layer.offset.x * layer.canvas.width) / this.glueCanvas.canvas.width,
+        y:
+          (layer.offset.y * layer.canvas.height) /
+          this.glueCanvas.canvas.height,
+      });
     }
   }
 
@@ -296,7 +300,10 @@ export class Editor extends BasicEventEmitter<{
     const layer = this.currentLayer;
     if (layer) {
       glue.program('~layerBounds')?.apply({
-        iOffset: [0, 0],
+        iOffset: [
+          layer.offset.x / this.glueCanvas.canvas.width,
+          layer.offset.y / this.glueCanvas.canvas.height,
+        ],
         iSize: [layer.canvas.width, layer.canvas.height],
       });
     }
@@ -307,13 +314,13 @@ export class Editor extends BasicEventEmitter<{
     }, 50);
   }
 
-  addImage(url: string, name?: string): Promise<void> {
+  addImage(url: string, options: Partial<Layer> = {}): Promise<void> {
     const source = new Image();
     source.src = url;
 
     return new Promise(resolve => {
       const onload = () => {
-        this.imageLayer(source, name);
+        this.imageLayer(source, options);
         resolve();
       };
 

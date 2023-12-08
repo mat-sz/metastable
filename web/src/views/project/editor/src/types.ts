@@ -38,6 +38,7 @@ export interface Layer {
   name: string;
   canvas: HTMLCanvasElement;
   texture: GlueTexture;
+  offset: Point;
 }
 
 export interface Point {

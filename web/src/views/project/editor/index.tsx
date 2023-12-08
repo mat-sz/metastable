@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
-import { Editor } from './src';
 import { Tools } from './Tools';
 import { Layers } from './Layers';
 import { Actions } from './Actions';
+import { mainStore } from '../../../stores/MainStore';
 
-export const ImageEditor: React.FC = () => {
+export const ImageEditor: React.FC = observer(() => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef(new Editor());
+  const editor = mainStore.project!.editor;
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
-    const editor = editorRef.current;
     const canvas = editor.glueCanvas.canvas;
     if (!wrapper) {
       return;
@@ -23,14 +23,14 @@ export const ImageEditor: React.FC = () => {
     return () => {
       wrapper.removeChild(canvas);
     };
-  }, []);
+  }, [editor]);
 
   return (
     <div className={styles.editor}>
-      <Actions editor={editorRef.current} />
-      <Tools editor={editorRef.current} />
+      <Actions editor={editor} />
+      <Tools editor={editor} />
       <div className={styles.wrapper} ref={wrapperRef}></div>
-      <Layers editor={editorRef.current} />
+      <Layers editor={editor} />
     </div>
   );
-};
+});

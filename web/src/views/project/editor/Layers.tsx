@@ -72,7 +72,7 @@ export const Layers: React.FC<LayersProps> = ({ editor }) => {
           const file = e.target.files?.[0];
           if (file) {
             e.target.value = '';
-            editor.addImage(URL.createObjectURL(file), file.name);
+            editor.addImage(URL.createObjectURL(file), { name: file.name });
           }
         }}
       />

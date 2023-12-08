@@ -3,10 +3,14 @@ import { getUrl } from '../../config';
 import { imageUrlToBase64, randomSeed } from '../../helpers';
 import { ProjectSettings } from '../../types/project';
 import { httpGet, httpPost } from '../../http';
+import { Editor } from '../../views/project/editor/src';
+import { Point } from '../../views/project/editor/src/types';
 
 export class Project {
   outputFilenames: string[] = [];
   allOutputs: string[] = [];
+  editor = new Editor();
+  addOutputToEditor: Point | undefined = undefined;
 
   constructor(
     public id: number,
@@ -81,5 +85,18 @@ export class Project {
       strength,
     });
     this.settings = settings;
+  }
+
+  onPromptDone(outputFilenames: string[]) {
+    this.outputFilenames = outputFilenames;
+    this.allOutputs.push(...outputFilenames);
+
+    if (this.addOutputToEditor) {
+      this.editor.addImage(this.view('output', outputFilenames[0]), {
+        name: `Output (${outputFilenames[0]})`,
+        offset: toJS(this.addOutputToEditor),
+      });
+      this.addOutputToEditor = undefined;
+    }
   }
 }
