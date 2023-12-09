@@ -8,7 +8,10 @@ import {
   VarSelect,
   VarSlider,
 } from 'react-var-ui';
+import { BsX } from 'react-icons/bs';
+
 import { mainStore } from '../../../stores/MainStore';
+import { IconButton } from '../../../components/IconButton';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -16,29 +19,45 @@ export const Controlnets: React.FC = observer(() => {
   return (
     <>
       <VarArray path="models.controlnets">
-        <VarCategory label="Controlnet">
-          <VarSelect
-            label="Model"
-            path="name"
-            options={mainStore.info.models.controlnet?.map(
-              ({ name }) =>
-                ({
-                  key: name,
-                  label: name,
-                }) || [],
-            )}
-          />
-          <VarSlider
-            label="Strength"
-            path="strength"
-            min={0}
-            max={2}
-            step={0.01}
-            defaultValue={1}
-            showInput
-          />
-          <VarImage label="Image" path="image" />
-        </VarCategory>
+        {(_, i) => (
+          <VarCategory
+            label={
+              <>
+                <span>Controlnet</span>
+                <IconButton
+                  title="Delete"
+                  onClick={() => {
+                    project.removeControlnet(i);
+                  }}
+                >
+                  <BsX />
+                </IconButton>
+              </>
+            }
+          >
+            <VarSelect
+              label="Model"
+              path="name"
+              options={mainStore.info.models.controlnet?.map(
+                ({ name }) =>
+                  ({
+                    key: name,
+                    label: name,
+                  }) || [],
+              )}
+            />
+            <VarSlider
+              label="Strength"
+              path="strength"
+              min={0}
+              max={2}
+              step={0.01}
+              defaultValue={1}
+              showInput
+            />
+            <VarImage label="Image" path="image" />
+          </VarCategory>
+        )}
       </VarArray>
       <VarButton
         buttonLabel="Add Controlnet"

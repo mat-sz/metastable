@@ -100,6 +100,12 @@ export class Project {
     this.settings = settings;
   }
 
+  removeLora(index: number) {
+    const settings = { ...this.settings };
+    settings.models.loras.splice(index, 1);
+    this.settings = settings;
+  }
+
   addControlnet(name: string, strength = 1) {
     const settings = { ...this.settings };
 
@@ -108,6 +114,12 @@ export class Project {
       strength,
       image: '',
     });
+    this.settings = settings;
+  }
+
+  removeControlnet(index: number) {
+    const settings = { ...this.settings };
+    settings.models.controlnets.splice(index, 1);
     this.settings = settings;
   }
 

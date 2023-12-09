@@ -59,3 +59,14 @@ export async function imageUrlToBase64(url: string): Promise<string> {
     }
   });
 }
+
+export function validateSettings(settings: ProjectSettings) {
+  if (settings.input.mode === 'empty') {
+    settings.input.height ||= 512;
+    settings.input.width ||= 512;
+    settings.input.batch_size ||= 1;
+  }
+
+  settings.models.base.name ||= mainStore.info.models.checkpoints?.[0]?.name;
+  return settings;
+}

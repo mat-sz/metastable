@@ -11,6 +11,7 @@ import { LoRAs } from './prompt/LoRAs';
 import { Input } from './prompt/Input';
 import { Sampler } from './prompt/Sampler';
 import { Controlnets } from './prompt/Controlnets';
+import { validateSettings } from '../../helpers';
 
 export const Prompt: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -60,7 +61,7 @@ export const Prompt: React.FC = observer(() => {
         <VarUI
           onChange={values => {
             runInAction(() => {
-              project.settings = values;
+              project.settings = validateSettings(values);
             });
           }}
           values={toJS(project.settings)}
