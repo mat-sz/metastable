@@ -6,6 +6,16 @@ import { httpGet, httpPost } from '../../http';
 import { Editor } from '../../views/project/editor/src';
 import { Point } from '../../views/project/editor/src/types';
 
+async function base64ify(image: string) {
+  if (image.startsWith('blob:')) {
+    return await imageUrlToBase64(image);
+  } else if (image.startsWith('data:')) {
+    return image.split(',')[1];
+  }
+
+  return image;
+}
+
 export class Project {
   outputFilenames: string[] = [];
   allOutputs: string[] = [];
@@ -31,10 +41,12 @@ export class Project {
       settings.input.mode === 'image' ||
       settings.input.mode === 'image_masked'
     ) {
-      if (settings.input.image.startsWith('blob:')) {
-        settings.input.image = await imageUrlToBase64(settings.input.image);
-      } else if (settings.input.image.startsWith('data:')) {
-        settings.input.image = settings.input.image.split(',')[1];
+      settings.input.image = await base64ify(settings.input.image);
+    }
+
+    if (settings.models.controlnets) {
+      for (const controlnet of settings.models.controlnets) {
+        controlnet.image = await base64ify(controlnet.image);
       }
     }
 
@@ -80,9 +92,21 @@ export class Project {
 
   addLora(name: string, strength = 1) {
     const settings = { ...this.settings };
+
     settings.models.loras.push({
       name,
       strength,
+    });
+    this.settings = settings;
+  }
+
+  addControlnet(name: string, strength = 1) {
+    const settings = { ...this.settings };
+
+    settings.models.controlnets.push({
+      name,
+      strength,
+      image: '',
     });
     this.settings = settings;
   }

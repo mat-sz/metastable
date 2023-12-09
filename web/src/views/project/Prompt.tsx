@@ -10,6 +10,7 @@ import { Checkpoint } from './prompt/Checkpoint';
 import { LoRAs } from './prompt/LoRAs';
 import { Input } from './prompt/Input';
 import { Sampler } from './prompt/Sampler';
+import { Controlnets } from './prompt/Controlnets';
 
 export const Prompt: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -27,6 +28,10 @@ export const Prompt: React.FC = observer(() => {
     loras: {
       title: 'LoRAs',
       children: <LoRAs />,
+    },
+    controlnets: {
+      title: 'Controlnets',
+      children: <Controlnets />,
     },
     input: {
       title: 'Input',

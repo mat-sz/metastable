@@ -92,6 +92,42 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
 
     return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
 
+def apply_controlnet(conditioning, settings):
+    strength, controlnet_name, image_data = settings["strength"], settings["name"], settings["image"]
+
+    (image, mask) = load_image(image_data)
+    controlnet = load_controlnet(controlnet_name)
+
+    start_percent = 0.0
+    end_percent = 1.0
+
+    if strength == 0:
+        return (positive, negative)
+
+    control_hint = image.movedim(-1,1)
+    cnets = {}
+
+    out = []
+    for cond in conditioning:
+        c = []
+        for t in cond:
+            d = t[1].copy()
+
+            prev_cnet = d.get('control', None)
+            if prev_cnet in cnets:
+                c_net = cnets[prev_cnet]
+            else:
+                c_net = controlnet.copy().set_cond_hint(control_hint, strength, (start_percent, end_percent))
+                c_net.set_previous_controlnet(prev_cnet)
+                cnets[prev_cnet] = c_net
+
+            d['control'] = c_net
+            d['control_apply_to_uncond'] = False
+            n = [t[0], d]
+            c.append(n)
+        out.append(c)
+    return (out[0], out[1])
+
 def clip_encode(clip, text):
     tokens = clip.tokenize(text)
     cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
@@ -125,7 +161,6 @@ def ksampler(model, latent, conditioning, settings):
 def load_checkpoint(settings):
     ckpt_path = folder_paths.get_full_path("checkpoints", settings["name"])
     return comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=None)
-    
 
 def load_lora(model, clip, settings):
     lora_path = folder_paths.get_full_path("loras", settings["name"])
@@ -133,6 +168,11 @@ def load_lora(model, clip, settings):
 
     strength = settings["strength"]
     return comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
+
+def load_controlnet(controlnet_name):
+    controlnet_path = folder_paths.get_full_path("controlnet", controlnet_name)
+    controlnet = comfy.controlnet.load_controlnet(controlnet_path)
+    return controlnet
 
 def save_images(prompt, images):
     project_id = prompt["project_id"]
@@ -160,11 +200,16 @@ def execute_prompt(prompt, prompt_id):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint(models_settings["base"])
 
-    for lora_settings in models_settings["loras"]:
-        (model, clip) = load_lora(model, clip, lora_settings)
+    if "loras" in models_settings:
+        for lora_settings in models_settings["loras"]:
+            (model, clip) = load_lora(model, clip, lora_settings)
 
     conditioning = create_conditioning(clip, prompt["conditioning"])
     latent = None
+
+    if "controlnets" in models_settings:
+        for controlnet_settings in models_settings["controlnets"]:
+            conditioning = apply_controlnet(conditioning, controlnet_settings)
 
     input_mode = prompt["input"]["mode"]
     if input_mode == "empty":

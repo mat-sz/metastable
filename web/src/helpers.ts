@@ -26,6 +26,7 @@ export function defaultProjectSettings(): ProjectSettings {
     models: {
       base: { name: mainStore.info.models.checkpoints?.[0]?.name },
       loras: [],
+      controlnets: [],
     },
     conditioning: {
       positive: 'an image of a banana',

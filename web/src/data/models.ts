@@ -193,4 +193,33 @@ export const downloadable: DownloadableModelGroup[] = [
       },
     ],
   },
+  {
+    name: 'QRCode ControlNet',
+    models: [
+      {
+        name: 'QRCode ControlNet - SD 1.5',
+        source: 'github',
+        type: ModelType.CONTROLNET,
+        downloads: [
+          {
+            type: ModelType.CONTROLNET,
+            filename: 'sd1.5_qrcode_controlnet.safetensors',
+            url: 'https://huggingface.co/DionTimmer/controlnet_qrcode/resolve/main/control_v1p_sd15_qrcode.safetensors',
+          },
+        ],
+      },
+      {
+        name: 'QRCode ControlNet - SD 2.1',
+        source: 'github',
+        type: ModelType.CONTROLNET,
+        downloads: [
+          {
+            type: ModelType.CONTROLNET,
+            filename: 'sd2.1_qrcode_controlnet.safetensors',
+            url: 'https://huggingface.co/DionTimmer/controlnet_qrcode/resolve/main/control_v11p_sd21_qrcode.safetensors',
+          },
+        ],
+      },
+    ],
+  },
 ];

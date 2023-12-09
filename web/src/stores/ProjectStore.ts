@@ -43,7 +43,15 @@ export class ProjectStore {
 
   async open(id: number) {
     const json = await httpGet(`/projects/${id}`);
-    const project = new Project(json.id, json.name, JSON.parse(json.settings));
+    const settings = JSON.parse(json.settings);
+    if (!settings.models.loras) {
+      settings.models.loras = [];
+    }
+    if (!settings.models.controlnets) {
+      settings.models.controlnets = [];
+    }
+
+    const project = new Project(json.id, json.name, settings);
     runInAction(() => {
       this.projects = [
         ...this.projects.filter(project => project.id !== id),
