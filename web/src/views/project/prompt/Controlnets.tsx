@@ -56,6 +56,16 @@ export const Controlnets: React.FC = observer(() => {
               showInput
             />
             <VarImage label="Image" path="image" />
+            <VarSelect
+              label="Image mode"
+              path="image_mode"
+              options={[
+                { key: 'stretch', label: 'Stretch' },
+                { key: 'center', label: 'Center' },
+                { key: 'cover', label: 'Cover' },
+                { key: 'contain', label: 'Contain' },
+              ]}
+            />
           </VarCategory>
         )}
       </VarArray>

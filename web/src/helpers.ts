@@ -1,6 +1,7 @@
 import * as fsize from 'filesize';
 import { ProjectSettings } from './types/project';
 import { mainStore } from './stores/MainStore';
+import { glueIsSourceLoaded } from 'fxglue';
 
 export function randomSeed() {
   const min = 0;
@@ -69,4 +70,21 @@ export function validateSettings(settings: ProjectSettings) {
 
   settings.models.base.name ||= mainStore.info.models.checkpoints?.[0]?.name;
   return settings;
+}
+
+export function loadImage(url: string): Promise<HTMLImageElement> {
+  const source = new Image();
+  source.src = url;
+
+  return new Promise(resolve => {
+    const onload = () => {
+      resolve(source);
+    };
+
+    if (glueIsSourceLoaded(source)) {
+      onload();
+    } else {
+      source.onload = onload;
+    }
+  });
 }

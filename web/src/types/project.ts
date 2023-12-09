@@ -17,7 +17,12 @@ export interface ProjectSettings {
   models: {
     base: { name: string };
     loras: { name: string; strength: number }[];
-    controlnets: { name: string; strength: number; image: string }[];
+    controlnets: {
+      name: string;
+      strength: number;
+      image: string;
+      image_mode?: string;
+    }[];
   };
   conditioning: {
     positive: string;

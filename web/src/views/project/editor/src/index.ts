@@ -3,17 +3,14 @@
 // TODO: load image layer
 // TODO: fill tool
 
-import {
-  GlueCanvas,
-  glueGetSourceDimensions,
-  glueIsSourceLoaded,
-} from 'fxglue';
+import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 import { MoveTool } from './tools/move';
 import { BrushTool } from './tools/brush';
 import { EditorSelection, EditorState, Layer, Point, Tool } from './types';
 import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
+import { loadImage } from '../../../../helpers';
 
 export class BasicEventEmitter<
   TEvents extends { [key: string]: (...args: any[]) => void },
@@ -314,22 +311,9 @@ export class Editor extends BasicEventEmitter<{
     }, 50);
   }
 
-  addImage(url: string, options: Partial<Layer> = {}): Promise<void> {
-    const source = new Image();
-    source.src = url;
-
-    return new Promise(resolve => {
-      const onload = () => {
-        this.imageLayer(source, options);
-        resolve();
-      };
-
-      if (glueIsSourceLoaded(source)) {
-        onload();
-      } else {
-        source.onload = onload;
-      }
-    });
+  async addImage(url: string, options: Partial<Layer> = {}): Promise<void> {
+    const source = await loadImage(url);
+    this.imageLayer(source, options);
   }
 
   renderSelection() {
