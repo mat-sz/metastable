@@ -7,6 +7,7 @@ import fastifyCompress from '@fastify/compress';
 import { FromSchema, JSONSchema } from 'json-schema-to-ts';
 import { PrismaClient } from '@prisma/client';
 import createHttpError from 'http-errors';
+import { nanoid } from 'nanoid';
 
 import { host, port, useProxy, staticRoot } from './config.js';
 import { Comfy, ComfyEvent } from './comfy.js';
@@ -21,7 +22,6 @@ import {
 } from './filesystem.js';
 import { isPathIn } from './helpers.js';
 import { Downloader } from './downloader.js';
-import { nanoid } from 'nanoid';
 
 const comfy = new Comfy();
 const downloader = new Downloader();

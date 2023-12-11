@@ -2,12 +2,11 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "setup:amd:rocm5.6": "pip3 install --target=./python/.pip torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6",
-    "setup:amd:rocm5.7": "pip3 install --target=./python/.pip --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm5.7",
-    "setup:nvidia": "pip3 install --target=./python/.pip torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121",
-    "setup:other": "pip3 install torch torchvision torchaudio",
+    "setup:amd:rocm5.6": "pip3 install --target=./python/.pip --extra-index-url https://download.pytorch.org/whl/rocm5.6 -r ./python/requirements.txt",
+    "setup:amd:rocm5.7": "pip3 install --target=./python/.pip --pre --extra-index-url https://download.pytorch.org/whl/nightly/rocm5.7 -r ./python/requirements.txt",
+    "setup:nvidia": "pip3 install --target=./python/.pip --extra-index-url https://download.pytorch.org/whl/cu121 -r ./python/requirements.txt",
+    "setup:other": "pip3 install --target=./python/.pip -r ./python/requirements.txt",
     "setup:amd": "yarn setup:amd:rocm5.6",
-    "setup:pip": "pip3 install --target=./python/.pip -r ./python/requirements.txt",
     "start": "prisma db push && tsx src/index.ts",
     "start:prod": "prisma db push && node build/index.js",
     "build": "tsc"
@@ -16,6 +15,7 @@
     "@fastify/http-proxy": "^9.3.0",
     "@types/http-errors": "^2.0.4",
     "@types/node": "^20.10.3",
+    "@types/which": "^3.0.3",
     "@types/ws": "^8.5.10",
     "prisma": "^5.6.0",
     "tsx": "^4.6.2",
@@ -34,6 +34,7 @@
     "joi": "^17.11.0",
     "json-schema-to-ts": "^2.9.2",
     "nanoid": "^5.0.4",
+    "which": "^4.0.0",
     "ws": "^8.14.2"
   }
 }

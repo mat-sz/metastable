@@ -974,6 +974,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/which@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "@types/which@npm:3.0.3"
+  checksum: 553ff9ae9757ff1f99097b2b40e7ed3a317b1ca8507a9daaa5a429d63670f5d4b69a9b96afe00dfb3bdefa8b274441c93f978b7dd98b9af48daf9f07494689a5
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.10":
   version: 8.5.10
   resolution: "@types/ws@npm:8.5.10"
@@ -1295,6 +1302,7 @@ __metadata:
     "@prisma/client": "npm:^5.6.0"
     "@types/http-errors": "npm:^2.0.4"
     "@types/node": "npm:^20.10.3"
+    "@types/which": "npm:^3.0.3"
     "@types/ws": "npm:^8.5.10"
     axios: "npm:^1.6.2"
     dotenv-flow: "npm:^4.0.1"
@@ -1306,6 +1314,7 @@ __metadata:
     prisma: "npm:^5.6.0"
     tsx: "npm:^4.6.2"
     typescript: "npm:^5.3.2"
+    which: "npm:^4.0.0"
     ws: "npm:^8.14.2"
   languageName: unknown
   linkType: soft

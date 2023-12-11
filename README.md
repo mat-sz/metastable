@@ -44,8 +44,8 @@ Installation is performed similarly to ComfyUI, with some extra requirements.
 
 #### Windows
 
-- Install Python 3: https://www.python.org/downloads/windows/
-- Install node.js: https://nodejs.org/en/download
+- Install Python 3.11: https://www.python.org/ftp/python/3.11.7/python-3.11.7-amd64.exe
+- Install node.js 18 or newer: https://nodejs.org/en/download
 - Install git: https://git-scm.com/download/win
 - Open Command Prompt (or Powershell)
 - Run `npm install -g yarn`
@@ -62,21 +62,18 @@ Installation is performed similarly to ComfyUI, with some extra requirements.
 
 ```
 yarn setup:nvidia
-yarn setup:pip
 ```
 
 #### AMD GPUs (Linux only)
 
 ```
 yarn setup:amd # or `yarn setup:amd:rocm5.7` for nightly builds of pytorch that might perform faster
-yarn setup:pip
 ```
 
 #### Apple Silicon Macs, Other/CPU
 
 ```
 yarn setup:other
-yarn setup:pip
 ```
 
 ## Usage

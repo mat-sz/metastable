@@ -2,6 +2,8 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import EventEmitter from 'events';
 import os from 'os';
 
+import { getPythonCommand } from './helpers.js';
+
 export interface ComfyEvent {
   event: string;
   data: any;
@@ -9,7 +11,7 @@ export interface ComfyEvent {
 
 type BackendStatus = 'ready' | 'starting' | 'error';
 export class Comfy extends EventEmitter {
-  process: ChildProcessWithoutNullStreams;
+  process?: ChildProcessWithoutNullStreams;
 
   samplers: string[] = [];
   schedulers: string[] = [];
@@ -20,6 +22,27 @@ export class Comfy extends EventEmitter {
   constructor() {
     super();
 
+    this.on('event', e => {
+      switch (e.event) {
+        case 'info.samplers':
+          this.samplers = e.data;
+          break;
+        case 'info.schedulers':
+          this.schedulers = e.data;
+          break;
+        case 'ready':
+          this.setStatus('ready');
+          break;
+        case 'prompt.queue':
+          this.queue_remaining = e.data.queue_remaining;
+          break;
+      }
+    });
+
+    this.start();
+  }
+
+  async start() {
     const args: string[] = [];
 
     if (os.arch() === 'arm64' && os.platform() === 'darwin') {
@@ -27,13 +50,17 @@ export class Comfy extends EventEmitter {
       args.push('--force-fp16');
     }
 
-    const proc = spawn('python3', ['-u', './python/main.py', ...args], {
-      cwd: process.cwd(),
-      detached: true,
-      env: {
-        ...process.env,
+    const proc = spawn(
+      await getPythonCommand(),
+      ['-u', './python/main.py', ...args],
+      {
+        cwd: process.cwd(),
+        detached: true,
+        env: {
+          ...process.env,
+        },
       },
-    });
+    );
 
     proc.stdin.setDefaultEncoding('utf-8');
     proc.stdout.setEncoding('utf-8');
@@ -61,23 +88,6 @@ export class Comfy extends EventEmitter {
       this.log('stderr', data);
     });
 
-    this.on('event', e => {
-      switch (e.event) {
-        case 'info.samplers':
-          this.samplers = e.data;
-          break;
-        case 'info.schedulers':
-          this.schedulers = e.data;
-          break;
-        case 'ready':
-          this.setStatus('ready');
-          break;
-        case 'prompt.queue':
-          this.queue_remaining = e.data.queue_remaining;
-          break;
-      }
-    });
-
     this.process = proc;
   }
 
@@ -99,6 +109,9 @@ export class Comfy extends EventEmitter {
   }
 
   send(eventName: string, data: any) {
-    this.process.stdin.write(JSON.stringify({ event: eventName, data }) + '\n');
+    console.log('will send', this.process);
+    this.process?.stdin.write(
+      JSON.stringify({ event: eventName, data }) + '\n',
+    );
   }
 }
