@@ -6,10 +6,11 @@ import { mainStore } from '../../stores/MainStore';
 
 export const Grid: React.FC = observer(() => {
   const project = mainStore.project!;
+  const outputs = [...project.allOutputs].reverse();
 
   return (
     <div className={styles.grid}>
-      {project.allOutputs.map((filename, i) => (
+      {outputs.map((filename, i) => (
         <a
           href={project.view('output', filename)}
           target="_blank"
