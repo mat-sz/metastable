@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import styles from './index.module.scss';
-import type { Editor } from './src';
+import { useEditor } from './context';
 
-export interface ColorsProps {
-  editor: Editor;
-}
+export const Colors: React.FC = () => {
+  const editor = useEditor();
 
-export const Colors: React.FC<ColorsProps> = ({ editor }) => {
   const [foregroundColor, setForegroundColor] = useState(
     editor.foregroundColor,
   );

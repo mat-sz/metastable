@@ -8,6 +8,7 @@ import { Tools } from './Tools';
 import { Layers } from './Layers';
 import { Actions } from './Actions';
 import { ToolSettings } from './ToolSettings';
+import { EditorContext } from './context';
 
 export const ImageEditor: React.FC = observer(() => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -28,14 +29,16 @@ export const ImageEditor: React.FC = observer(() => {
   }, [editor]);
 
   return (
-    <div className={styles.main}>
-      <div className={styles.editor}>
-        <ToolSettings editor={editor} />
-        <Tools editor={editor} />
-        <div className={styles.wrapper} ref={wrapperRef}></div>
-        <Layers editor={editor} />
+    <EditorContext.Provider value={editor}>
+      <div className={styles.main}>
+        <div className={styles.editor}>
+          <ToolSettings />
+          <Tools />
+          <div className={styles.wrapper} ref={wrapperRef}></div>
+          <Layers />
+        </div>
+        <Settings actions={<Actions />} />
       </div>
-      <Settings actions={<Actions editor={editor} />} />
-    </div>
+    </EditorContext.Provider>
   );
 });

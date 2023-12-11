@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
-
-import styles from './index.module.scss';
-import type { Editor } from './src';
-import { Colors } from './Colors';
 import { BsBrush, BsCursor, BsEraser } from 'react-icons/bs';
 import { PiSelectionLight } from 'react-icons/pi';
 
-export interface ToolsProps {
-  editor: Editor;
-}
+import styles from './index.module.scss';
+import { Colors } from './Colors';
+import { useEditor } from './context';
 
 const toolIcons: Record<string, JSX.Element> = {
   move: <BsCursor />,
@@ -18,7 +14,8 @@ const toolIcons: Record<string, JSX.Element> = {
   select: <PiSelectionLight />,
 };
 
-export const Tools: React.FC<ToolsProps> = ({ editor }) => {
+export const Tools: React.FC = () => {
+  const editor = useEditor();
   const [currentToolId, setCurrentToolId] = useState(editor.currentToolId);
 
   useEffect(() => {
@@ -48,7 +45,7 @@ export const Tools: React.FC<ToolsProps> = ({ editor }) => {
           {toolIcons[tool.id]}
         </button>
       ))}
-      <Colors editor={editor} />
+      <Colors />
     </div>
   );
 };

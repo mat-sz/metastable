@@ -1,14 +1,12 @@
 import React from 'react';
-
-import type { Editor } from './src';
-import { mainStore } from '../../../stores/MainStore';
 import { VarButton } from 'react-var-ui';
 
-export interface ActionsProps {
-  editor: Editor;
-}
+import { mainStore } from '../../../stores/MainStore';
+import { useEditor } from './context';
 
-export const Actions: React.FC<ActionsProps> = ({ editor }) => {
+export const Actions: React.FC = () => {
+  const editor = useEditor();
+
   return (
     <>
       <VarButton

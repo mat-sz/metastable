@@ -3,20 +3,16 @@ import clsx from 'clsx';
 import { BsImage, BsPlus } from 'react-icons/bs';
 
 import styles from './index.module.scss';
-import type { Editor } from './src';
 import type { Layer } from './src/types';
 import { IconButton } from '../../../components/IconButton';
-
-export interface LayersProps {
-  editor: Editor;
-}
+import { useEditor } from './context';
 
 export interface LayerProps {
-  editor: Editor;
   layer: Layer;
 }
 
-export const LayerItem: React.FC<LayerProps> = ({ editor, layer }) => {
+export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
+  const editor = useEditor();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,7 +42,8 @@ export const LayerItem: React.FC<LayerProps> = ({ editor, layer }) => {
   );
 };
 
-export const Layers: React.FC<LayersProps> = ({ editor }) => {
+export const Layers: React.FC = () => {
+  const editor = useEditor();
   const [editorState, setEditorState] = useState(editor.state);
 
   useEffect(() => {
@@ -83,7 +80,7 @@ export const Layers: React.FC<LayersProps> = ({ editor }) => {
         </label>
       </div>
       {editorState.layers.map(layer => (
-        <LayerItem key={layer.id} layer={layer} editor={editor} />
+        <LayerItem key={layer.id} layer={layer} />
       ))}
     </div>
   );
