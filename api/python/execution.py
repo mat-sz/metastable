@@ -10,6 +10,7 @@ import gc
 from io import BytesIO
 import base64
 import math
+from comfy.cli_args import LatentPreviewMethod
 
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
@@ -33,7 +34,7 @@ import comfy.model_management
 
 import folder_paths
 import latent_preview
-from jsonout import jsonout
+from helpers import jsonout, get_save_image_counter
 
 def load_image(img):
     i = Image.open(BytesIO(base64.b64decode(img)))
@@ -93,10 +94,10 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
     return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
 
 def apply_controlnet(conditioning, settings):
-    strength, controlnet_name, image_data = settings["strength"], settings["name"], settings["image"]
+    strength, controlnet_path, image_data = settings["strength"], settings["path"], settings["image"]
 
     (image, mask) = load_image(image_data)
-    controlnet = load_controlnet(controlnet_name)
+    controlnet = load_controlnet(controlnet_path)
 
     start_percent = 0.0
     end_percent = 1.0
@@ -151,7 +152,18 @@ def ksampler(model, latent, conditioning, settings):
         noise_mask = latent["noise_mask"]
 
     steps = settings["steps"]
-    callback = latent_preview.prepare_callback(model, steps)
+
+    callback = None
+    if "preview" in settings:
+        taesd_decoder_path = None
+        if settings["preview"]["method"] == LatentPreviewMethod.TAESD:
+            taesd_decoder_name = model.model.latent_format.taesd_decoder_name
+            if taesd in settings["preview"] and taesd_decoder_name in settings["preview"]["taesd"]:
+                taesd_decoder_path = settings["preview"]["taesd"][taesd_decoder_name]
+
+        callback = latent_preview.prepare_callback(model, settings["preview"]["method"], steps)
+    else:
+        callback = latent_preview.prepare_callback(model, "none", steps)
 
     denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
     return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent_image,
@@ -159,26 +171,21 @@ def ksampler(model, latent, conditioning, settings):
                                                                 force_full_denoise=False, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
 
 def load_checkpoint(settings):
-    ckpt_path = folder_paths.get_full_path("checkpoints", settings["name"])
-    return comfy.sd.load_checkpoint_guess_config(ckpt_path, output_vae=True, output_clip=True, embedding_directory=None)
+    return comfy.sd.load_checkpoint_guess_config(settings["path"], output_vae=True, output_clip=True, embedding_directory=None)
 
 def load_lora(model, clip, settings):
-    lora_path = folder_paths.get_full_path("loras", settings["name"])
-    lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
+    lora = comfy.utils.load_torch_file(settings["path"], safe_load=True)
 
     strength = settings["strength"]
     return comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
 
-def load_controlnet(controlnet_name):
-    controlnet_path = folder_paths.get_full_path("controlnet", controlnet_name)
+def load_controlnet(controlnet_path):
     controlnet = comfy.controlnet.load_controlnet(controlnet_path)
     return controlnet
 
 def save_images(prompt, images):
-    project_id = prompt["project_id"]
-    folder_paths.create_project_tree(project_id)
-    output_dir = folder_paths.get_output_directory(project_id)
-    counter = folder_paths.get_save_image_counter(output_dir)
+    output_dir = prompt["output_path"]
+    counter = get_save_image_counter(output_dir)
 
     output_filenames = []
 

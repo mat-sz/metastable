@@ -10,7 +10,15 @@ import createHttpError from 'http-errors';
 
 import { host, port, useProxy, staticRoot } from './config.js';
 import { Comfy, ComfyEvent } from './comfy.js';
-import { FileSystem, projectsPath } from './filesystem.js';
+import {
+  createProjectTree,
+  findModelByType,
+  getModelPath,
+  getModels,
+  getModelsByType,
+  getProjectDataPath,
+  projectsPath,
+} from './filesystem.js';
 import { isPathIn } from './helpers.js';
 import { Downloader } from './downloader.js';
 
@@ -22,8 +30,6 @@ const app = Fastify();
 app.register(fastifyCompress);
 
 const maxAge = 30 * 24 * 60 * 60 * 1000;
-
-const filesystem = new FileSystem();
 
 app.register(fastifyStatic, {
   root: projectsPath,
@@ -239,6 +245,13 @@ const promptBody = {
         denoise: { type: 'number' },
         sampler: { type: 'string' },
         scheduler: { type: 'string' },
+        preview: {
+          type: 'object',
+          properties: {
+            method: { type: 'string' },
+          },
+          required: ['method'],
+        },
       },
       required: ['seed', 'steps', 'cfg', 'denoise', 'sampler', 'scheduler'],
     },
@@ -250,7 +263,7 @@ app.get('/info', async () => {
   return {
     samplers: comfy.samplers,
     schedulers: comfy.schedulers,
-    models: await filesystem.models(),
+    models: await getModels(),
   };
 });
 
@@ -441,8 +454,37 @@ app.register(
         },
       },
       async request => {
+        await createProjectTree(request.body.project_id);
+
+        const settings = request.body;
+        settings.models.base.path = getModelPath(
+          'checkpoints',
+          settings.models.base.name,
+        );
+
+        if (settings.models.loras) {
+          for (const lora of settings.models.loras) {
+            lora.path = getModelPath('loras', lora.name);
+          }
+        }
+
+        if (settings.models.controlnets) {
+          for (const controlnet of settings.models.controlnets) {
+            controlnet.path = getModelPath('controlnet', controlnet.name);
+          }
+        }
+
+        if (settings.sampler.preview?.method === 'taesd') {
+          const list = await getModelsByType('vae_approx');
+          settings.sampler.preview.taesd = {
+            taesd_decoder: await findModelByType(list, 'taesd_decoder'),
+            taesdxl_decoder: await findModelByType(list, 'taesdxl_decoder'),
+          };
+        }
+
         comfy.send('prompt', {
           ...request.body,
+          output_path: getProjectDataPath(request.body.project_id, 'output'),
         });
       },
     );

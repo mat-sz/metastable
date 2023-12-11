@@ -2,9 +2,8 @@ import torch
 from PIL import Image
 import struct
 import numpy as np
-from comfy.cli_args import args, LatentPreviewMethod
+from comfy.cli_args import LatentPreviewMethod
 from comfy.taesd.taesd import TAESD
-import folder_paths
 import comfy.utils
 
 MAX_PREVIEW_RESOLUTION = 512
@@ -49,19 +48,10 @@ class Latent2RGBPreviewer(LatentPreviewer):
         return Image.fromarray(latents_ubyte.numpy())
 
 
-def get_previewer(device, latent_format):
+def get_previewer(device, method, latent_format, taesd_decoder_path):
     previewer = None
-    method = args.preview_method
     if method != LatentPreviewMethod.NoPreviews:
         # TODO previewer methods
-        taesd_decoder_path = None
-        if latent_format.taesd_decoder_name is not None:
-            taesd_decoder_path = next(
-                (fn for fn in folder_paths.get_filename_list("vae_approx")
-                    if fn.startswith(latent_format.taesd_decoder_name)),
-                ""
-            )
-            taesd_decoder_path = folder_paths.get_full_path("vae_approx", taesd_decoder_path)
 
         if method == LatentPreviewMethod.Auto:
             method = LatentPreviewMethod.Latent2RGB
@@ -80,12 +70,12 @@ def get_previewer(device, latent_format):
                 previewer = Latent2RGBPreviewer(latent_format.latent_rgb_factors)
     return previewer
 
-def prepare_callback(model, steps, x0_output_dict=None):
+def prepare_callback(model, steps, method, x0_output_dict=None, taesd_decoder_path=None):
     preview_format = "JPEG"
     if preview_format not in ["JPEG", "PNG"]:
         preview_format = "JPEG"
 
-    previewer = get_previewer(model.load_device, model.model.latent_format)
+    previewer = get_previewer(model.load_device, method, model.model.latent_format, taesd_decoder_path)
 
     pbar = comfy.utils.ProgressBar(steps)
     def callback(step, x0, x, total_steps):
