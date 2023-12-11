@@ -1,3 +1,11 @@
+export interface PromptStartMessageModel {
+  event: 'prompt.start';
+  data: {
+    project_id: string;
+    prompt_id: string;
+  };
+}
+
 export interface PromptQueueMessageModel {
   event: 'prompt.queue';
   data: {
@@ -10,6 +18,16 @@ export interface PromptProgressMessageModel {
   data: {
     max: number;
     value: number;
+  };
+}
+
+export interface PromptErrorMessageModel {
+  event: 'prompt.error';
+  data: {
+    project_id: string;
+    prompt_id: string;
+    name: string;
+    description: string;
   };
 }
 
@@ -59,7 +77,9 @@ export interface ModelsChangedMessageModel {
 }
 
 export type Message =
+  | PromptStartMessageModel
   | PromptQueueMessageModel
+  | PromptErrorMessageModel
   | PromptProgressMessageModel
   | PromptEndMessageModel
   | DownloadQueueMessageModel

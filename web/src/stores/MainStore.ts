@@ -81,6 +81,10 @@ class MainStore {
 
   onMessage(message: Message) {
     switch (message.event) {
+      case 'prompt.start':
+        this.promptValue = 0;
+        this.promptMax = 0;
+        break;
       case 'prompt.queue':
         this.promptRemaining = message.data.queue_remaining;
         break;

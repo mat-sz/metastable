@@ -32,7 +32,6 @@ import comfy.clip_vision
 
 import comfy.model_management
 
-import folder_paths
 import latent_preview
 from helpers import jsonout, get_save_image_counter
 
@@ -203,7 +202,7 @@ def save_images(prompt, images):
 
     return output_filenames
 
-def execute_prompt(prompt, prompt_id):
+def execute_prompt(prompt):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint(models_settings["base"])
 
@@ -230,9 +229,7 @@ def execute_prompt(prompt, prompt_id):
 
     samples = ksampler(model, latent, conditioning, prompt["sampler"])
     images = vae.decode(samples)
-    output_filenames = save_images(prompt, images)
-    
-    jsonout("prompt.end", { "prompt_id": prompt_id, "output_filenames": output_filenames, "project_id": prompt["project_id"] })
+    return save_images(prompt, images)
 
 class PromptExecutor:
     def __init__(self):
@@ -254,10 +251,28 @@ class PromptExecutor:
             del d
 
     def execute(self, prompt, prompt_id, extra_data={}):
-        jsonout("prompt.start", { "prompt_id": prompt_id })
+        jsonout("prompt.start", {
+            "project_id": prompt["project_id"],
+            "prompt_id": prompt_id
+        })
 
-        with torch.inference_mode():
-            execute_prompt(prompt, prompt_id)
+        try:
+            output_filenames = []
+            with torch.inference_mode():
+                output_filenames = execute_prompt(prompt)
+            
+            jsonout("prompt.end", {
+                "project_id": prompt["project_id"],
+                "prompt_id": prompt_id,
+                "output_filenames": output_filenames,
+            })
+        except Exception as error:
+            jsonout("prompt.error", {
+                "project_id": prompt["project_id"],
+                "prompt_id": prompt_id,
+                "name": type(error).__name__,
+                "description": str(error)
+            })
                         
 
 class PromptQueue:

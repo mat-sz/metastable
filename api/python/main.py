@@ -18,7 +18,7 @@ import json
 import uuid
 
 import comfy.samplers
-from helpers import jsonout
+from helpers import jsonout, get_torch_info
 from comfy.cli_args import args
 
 if os.name == "nt":
@@ -58,7 +58,6 @@ def prompt_worker(q):
         prompt_id = item[0]
         e.execute(item[1], prompt_id)
         q.task_done(item_id, e.outputs_ui)
-        jsonout("prompt.progress", { "value": 0, "max": 0 })
         gc.collect()
         comfy.model_management.soft_empty_cache()
 
@@ -104,6 +103,7 @@ if __name__ == "__main__":
 
     threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue,)).start()
 
+    jsonout("info.torch", get_torch_info())
     jsonout("info.samplers", comfy.samplers.KSampler.SAMPLERS)
     jsonout("info.schedulers", comfy.samplers.KSampler.SCHEDULERS)
 
