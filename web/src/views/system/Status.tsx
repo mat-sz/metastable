@@ -1,5 +1,11 @@
 import React from 'react';
-import { BsDownload, BsImage } from 'react-icons/bs';
+import {
+  BsDownload,
+  BsFillCheckCircleFill,
+  BsFillExclamationCircleFill,
+  BsFillQuestionCircleFill,
+  BsImage,
+} from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 
 import styles from './Status.module.scss';
@@ -10,6 +16,16 @@ export const Status: React.FC = observer(() => {
   return (
     <div className={styles.status}>
       <div className={styles.progress}>
+        <button>
+          {mainStore.backendStatus === 'error' && (
+            <BsFillExclamationCircleFill />
+          )}
+          {mainStore.backendStatus === 'starting' && (
+            <BsFillQuestionCircleFill />
+          )}
+          {mainStore.backendStatus === 'ready' && <BsFillCheckCircleFill />}
+          <span>Backend status: {mainStore.backendStatus}</span>
+        </button>
         <ProgressButton
           value={mainStore.promptValue}
           max={mainStore.promptMax}

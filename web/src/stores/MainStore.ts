@@ -3,7 +3,7 @@ import { TypeSocket } from 'typesocket';
 
 import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
-import { Message } from '../types/websocket';
+import { BackendStatus, Message } from '../types/websocket';
 import { DownloadStore } from './DownloadStore';
 import { ModelType } from '../types/model';
 import { httpGet } from '../http';
@@ -39,6 +39,8 @@ class MainStore {
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
+
+  backendStatus: BackendStatus = 'starting';
 
   constructor() {
     makeAutoObservable(this);
@@ -123,6 +125,9 @@ class MainStore {
         break;
       case 'models.changed':
         this.refresh();
+        break;
+      case 'backend.status':
+        this.backendStatus = message.data;
         break;
     }
   }

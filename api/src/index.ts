@@ -107,6 +107,22 @@ app.register(async function (fastify) {
   fastify.get('/ws', { websocket: true }, (connection, req) => {
     const ws = connection.socket;
 
+    ws.send(
+      JSON.stringify({
+        event: 'prompt.queue',
+        data: {
+          queue_remaining: comfy.queue_remaining,
+        },
+      }),
+    );
+
+    ws.send(
+      JSON.stringify({
+        event: 'backend.status',
+        data: comfy.status,
+      }),
+    );
+
     const onEvent = (event: ComfyEvent) => {
       ws.send(JSON.stringify(event));
     };

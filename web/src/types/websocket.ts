@@ -76,6 +76,12 @@ export interface ModelsChangedMessageModel {
   data: Record<string, never>;
 }
 
+export type BackendStatus = 'ready' | 'starting' | 'error';
+export interface BackendStatusMessageModel {
+  event: 'backend.status';
+  data: BackendStatus;
+}
+
 export type Message =
   | PromptStartMessageModel
   | PromptQueueMessageModel
@@ -86,4 +92,5 @@ export type Message =
   | DownloadProgressMessageModel
   | DownloadStartMessageModel
   | DownloadEndMessageModel
-  | ModelsChangedMessageModel;
+  | ModelsChangedMessageModel
+  | BackendStatusMessageModel;

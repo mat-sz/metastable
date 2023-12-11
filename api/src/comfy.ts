@@ -7,11 +7,15 @@ export interface ComfyEvent {
   data: any;
 }
 
+type BackendStatus = 'ready' | 'starting' | 'error';
 export class Comfy extends EventEmitter {
   process: ChildProcessWithoutNullStreams;
 
   samplers: string[] = [];
   schedulers: string[] = [];
+
+  status: BackendStatus = 'starting';
+  queue_remaining = 0;
 
   constructor() {
     super();
@@ -34,9 +38,9 @@ export class Comfy extends EventEmitter {
     proc.stdin.setDefaultEncoding('utf-8');
     proc.stdout.setEncoding('utf-8');
     proc.stderr.setEncoding('utf-8');
-    proc.on('spawn', () => console.log('spawn'));
-    proc.on('close', () => console.log('close'));
-    proc.on('exit', () => console.log('exit'));
+    proc.on('spawn', () => this.setStatus('starting'));
+    proc.on('close', () => this.setStatus('error'));
+    proc.on('exit', () => this.setStatus('error'));
 
     proc.stdout.on('data', data => {
       const split = data.split('\n');
@@ -58,14 +62,29 @@ export class Comfy extends EventEmitter {
     });
 
     this.on('event', e => {
-      if (e.event === 'info.samplers') {
-        this.samplers = e.data;
-      } else if (e.event === 'info.schedulers') {
-        this.schedulers = e.data;
+      switch (e.event) {
+        case 'info.samplers':
+          this.samplers = e.data;
+          break;
+        case 'info.schedulers':
+          this.schedulers = e.data;
+          break;
+        case 'ready':
+          this.setStatus('ready');
+          break;
+        case 'prompt.queue':
+          this.queue_remaining = e.data.queue_remaining;
+          break;
       }
     });
 
     this.process = proc;
+  }
+
+  setStatus(status: BackendStatus) {
+    this.status = status;
+    this.queue_remaining = 0;
+    this.emit('event', { event: 'backend.status', data: status });
   }
 
   send(eventName: string, data: any) {
