@@ -12,7 +12,7 @@ interface ItemProps {
 }
 
 export const Item: React.FC<ItemProps> = ({ model, onSelect }) => {
-  const imageUrl = model.modelVersions[0].images[0]?.url;
+  const imageUrl = model.modelVersions?.[0]?.images[0]?.url;
 
   return (
     <div
