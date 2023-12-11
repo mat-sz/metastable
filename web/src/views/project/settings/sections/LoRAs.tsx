@@ -7,9 +7,10 @@ import {
   VarSelect,
   VarSlider,
 } from 'react-var-ui';
-import { mainStore } from '../../../stores/MainStore';
-import { IconButton } from '../../../components/IconButton';
 import { BsX } from 'react-icons/bs';
+
+import { mainStore } from '../../../../stores/MainStore';
+import { IconButton } from '../../../../components/IconButton';
 
 export const LoRAs: React.FC = observer(() => {
   const project = mainStore.project!;

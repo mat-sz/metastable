@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { BsImage, BsPlus } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import type { Editor } from './src';
 import type { Layer } from './src/types';
+import { IconButton } from '../../../components/IconButton';
 
 export interface LayersProps {
   editor: Editor;
@@ -60,22 +62,29 @@ export const Layers: React.FC<LayersProps> = ({ editor }) => {
 
   return (
     <div className={styles.layers}>
+      <div className={styles.actions}>
+        <IconButton title="Add" onClick={() => editor.emptyLayer()}>
+          <BsPlus />
+        </IconButton>
+        <label className={styles.file}>
+          <BsImage />
+          <input
+            type="file"
+            accept="*.jpg, *.jpeg, *.png"
+            className={styles.fileInput}
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (file) {
+                e.target.value = '';
+                editor.addImage(URL.createObjectURL(file), { name: file.name });
+              }
+            }}
+          />
+        </label>
+      </div>
       {editorState.layers.map(layer => (
         <LayerItem key={layer.id} layer={layer} editor={editor} />
       ))}
-      <button onClick={() => editor.emptyLayer()}>Add layer</button>
-      <input
-        type="file"
-        accept="*.jpg, *.jpeg, *.png"
-        className={styles.fileInput}
-        onChange={e => {
-          const file = e.target.files?.[0];
-          if (file) {
-            e.target.value = '';
-            editor.addImage(URL.createObjectURL(file), { name: file.name });
-          }
-        }}
-      />
     </div>
   );
 };

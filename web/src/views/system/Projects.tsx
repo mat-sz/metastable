@@ -47,7 +47,7 @@ export const Tab: React.FC<TabProps> = observer(({ project }) => {
         opacity: isDragging ? 0.5 : 1,
       }}
     >
-      {project.name}
+      <span>{project.name}</span>
       <button
         onClick={e => {
           e.stopPropagation();

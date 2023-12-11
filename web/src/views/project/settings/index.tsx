@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { runInAction, toJS } from 'mobx';
-import { VarButton, VarCategory, VarUI } from 'react-var-ui';
+import { VarCategory, VarUI } from 'react-var-ui';
 
-import styles from './Prompt.module.scss';
-import { mainStore } from '../../stores/MainStore';
-import { Conditioning } from './prompt/Conditioning';
-import { Checkpoint } from './prompt/Checkpoint';
-import { LoRAs } from './prompt/LoRAs';
-import { Input } from './prompt/Input';
-import { Sampler } from './prompt/Sampler';
-import { Controlnets } from './prompt/Controlnets';
-import { validateSettings } from '../../helpers';
+import styles from './index.module.scss';
+import { mainStore } from '../../../stores/MainStore';
+import { validateSettings } from '../../../helpers';
+import { General } from './sections/General';
+import { LoRAs } from './sections/LoRAs';
+import { Controlnets } from './sections/Controlnets';
 
-export const Prompt: React.FC = observer(() => {
+interface SettingsProps {
+  actions?: JSX.Element;
+}
+
+export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
   const project = mainStore.project!;
 
   const [tab, setTab] = useState('conditioning');
   const tabs: Record<string, { title: string; children: JSX.Element }> = {
     conditioning: {
-      title: 'Conditioning',
-      children: <Conditioning />,
-    },
-    checkpoint: {
-      title: 'Checkpoint',
-      children: <Checkpoint />,
+      title: 'General',
+      children: <General />,
     },
     loras: {
       title: 'LoRAs',
@@ -33,14 +30,6 @@ export const Prompt: React.FC = observer(() => {
     controlnets: {
       title: 'Controlnets',
       children: <Controlnets />,
-    },
-    input: {
-      title: 'Input',
-      children: <Input />,
-    },
-    sampler: {
-      title: 'Sampler',
-      children: <Sampler />,
     },
   };
 
@@ -66,12 +55,7 @@ export const Prompt: React.FC = observer(() => {
           }}
           values={toJS(project.settings)}
         >
-          <VarCategory label="Actions">
-            <VarButton
-              buttonLabel="Request image"
-              onClick={() => project.request()}
-            />
-          </VarCategory>
+          {actions && <VarCategory label="Actions">{actions}</VarCategory>}
           {tabs[tab].children}
         </VarUI>
       </div>

@@ -1,31 +1,21 @@
-.header {
+.status {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   background: var(--color-bg-panel-dark);
+  padding: 0.25rem 0;
 
-  .title {
-    justify-self: center;
-  }
+  .progress {
+    justify-self: start;
+    padding: 0 0.2rem;
 
-  .menu {
-    flex: 1;
-    padding: 0.25rem 0.2rem;
-
-    button {
+    & > *:not(:last-child) {
       margin-right: 2px;
-      padding: 0.2rem 0.6rem;
     }
   }
 
   & > div {
     display: flex;
     align-items: center;
-  }
-
-  h1 {
-    font-size: 0.8rem;
-    font-weight: normal;
-    color: var(--color-fg-soft);
   }
 
   button {

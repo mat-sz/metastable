@@ -1,3 +1,11 @@
+.main {
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  grid-template-rows: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
 .preview {
   display: flex;
   flex-direction: column;

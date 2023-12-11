@@ -8,6 +8,7 @@ import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
 import { DownloadManager } from './views/download';
 import { Welcome } from './views/system/Welcome';
+import { Status } from './views/system/Status';
 import { NewProject } from './views/projects/NewProject';
 import { OpenProject } from './views/projects/OpenProject';
 import { ModelManager } from './views/models';
@@ -28,6 +29,7 @@ export const App: React.FC = observer(() => {
           <Project />
         </>
       )}
+      <Status />
       <DownloadManager />
       <ModelManager />
       <NewProject />

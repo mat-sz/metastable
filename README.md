@@ -1,4 +1,4 @@
-# Metastable UI
+# Metastable
 
 A project-based Stable Diffusion Web UI, for easier organization of generated images. Work in progress.
 

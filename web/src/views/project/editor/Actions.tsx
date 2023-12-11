@@ -1,8 +1,8 @@
 import React from 'react';
 
-import styles from './index.module.scss';
 import type { Editor } from './src';
 import { mainStore } from '../../../stores/MainStore';
+import { VarButton } from 'react-var-ui';
 
 export interface ActionsProps {
   editor: Editor;
@@ -10,8 +10,9 @@ export interface ActionsProps {
 
 export const Actions: React.FC<ActionsProps> = ({ editor }) => {
   return (
-    <div className={styles.actions}>
-      <button
+    <>
+      <VarButton
+        buttonLabel="Run img2img"
         onClick={() => {
           const url = editor.renderSelection();
           mainStore.project!.addOutputToEditor = editor.selection.offset;
@@ -21,10 +22,9 @@ export const Actions: React.FC<ActionsProps> = ({ editor }) => {
           };
           mainStore.project!.request();
         }}
-      >
-        img2img
-      </button>
-      <button
+      />
+      <VarButton
+        buttonLabel="Run inpainting"
         onClick={() => {
           const url = editor.renderSelection();
           mainStore.project!.addOutputToEditor = editor.selection.offset;
@@ -34,9 +34,7 @@ export const Actions: React.FC<ActionsProps> = ({ editor }) => {
           };
           mainStore.project!.request();
         }}
-      >
-        inpainting
-      </button>
-    </div>
+      />
+    </>
   );
 };

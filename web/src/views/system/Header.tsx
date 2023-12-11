@@ -1,17 +1,11 @@
 import React from 'react';
-import { BsDownload, BsImage } from 'react-icons/bs';
-import { observer } from 'mobx-react-lite';
 
 import styles from './Header.module.scss';
 import { mainStore } from '../../stores/MainStore';
-import { ProgressButton } from '../../components/ProgressButton';
 
-export const Header: React.FC = observer(() => {
+export const Header: React.FC = () => {
   return (
     <div className={styles.header}>
-      <div className={styles.logo}>
-        <h1>Metastable UI</h1>
-      </div>
       <div className={styles.menu}>
         <button onClick={() => (mainStore.modal = 'new_project')}>New</button>
         <button onClick={() => (mainStore.modal = 'open_project')}>Open</button>
@@ -24,28 +18,9 @@ export const Header: React.FC = observer(() => {
           Model manager
         </button>
       </div>
-      <div>
-        <ProgressButton
-          value={mainStore.promptValue}
-          max={mainStore.promptMax}
-          marquee={mainStore.promptRemaining > 0}
-        >
-          <BsImage />
-          <span>Queued images: {mainStore.promptRemaining}</span>
-        </ProgressButton>
-      </div>
-      <div>
-        <ProgressButton
-          value={
-            mainStore.downloads.queue.length - mainStore.downloads.remaining
-          }
-          max={mainStore.downloads.queue.length}
-          onClick={() => mainStore.downloads.open()}
-        >
-          <BsDownload />
-          <span>Queued downloads: {mainStore.downloads.remaining}</span>
-        </ProgressButton>
+      <div className={styles.title}>
+        <h1>Metastable</h1>
       </div>
     </div>
   );
-});
+};

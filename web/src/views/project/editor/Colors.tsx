@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import styles from './index.module.scss';
 import type { Editor } from './src';
 
 export interface ColorsProps {
@@ -31,16 +32,18 @@ export const Colors: React.FC<ColorsProps> = ({ editor }) => {
   }, [editor, setForegroundColor, setBackgroundColor]);
 
   return (
-    <div>
+    <div className={styles.colors}>
       <input
         type="color"
         value={foregroundColor}
         onChange={e => (editor.foregroundColor = e.target.value)}
+        className={styles.foreground}
       />
       <input
         type="color"
         value={backgroundColor}
         onChange={e => (editor.backgroundColor = e.target.value)}
+        className={styles.background}
       />
     </div>
   );

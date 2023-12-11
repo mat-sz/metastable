@@ -10,8 +10,8 @@ import {
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
 
-import { mainStore } from '../../../stores/MainStore';
-import { IconButton } from '../../../components/IconButton';
+import { mainStore } from '../../../../stores/MainStore';
+import { IconButton } from '../../../../components/IconButton';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;

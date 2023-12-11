@@ -1,8 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import styles from './Grid.module.scss';
-import { mainStore } from '../../stores/MainStore';
+import styles from './index.module.scss';
+import { mainStore } from '../../../stores/MainStore';
 
 export const Grid: React.FC = observer(() => {
   const project = mainStore.project!;
