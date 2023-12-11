@@ -20,6 +20,10 @@ export class ProjectStore {
   }
 
   async init() {
+    this.refresh();
+  }
+
+  async refresh() {
     const json = await httpGet('/projects');
     runInAction(() => {
       this.recent = json;
@@ -39,6 +43,8 @@ export class ProjectStore {
       this.projects.push(new Project(json.id, name, settings));
       this.select(json.id);
     });
+
+    this.refresh();
   }
 
   async open(id: number) {
@@ -59,6 +65,8 @@ export class ProjectStore {
       ];
       this.select(json.id);
     });
+
+    this.refresh();
   }
 
   select(id?: number) {
