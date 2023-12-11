@@ -21,6 +21,7 @@ import {
 } from './filesystem.js';
 import { isPathIn } from './helpers.js';
 import { Downloader } from './downloader.js';
+import { nanoid } from 'nanoid';
 
 const comfy = new Comfy();
 const downloader = new Downloader();
@@ -482,10 +483,15 @@ app.register(
           };
         }
 
+        const id = nanoid();
+
         comfy.send('prompt', {
           ...request.body,
+          prompt_id: id,
           output_path: getProjectDataPath(request.body.project_id, 'output'),
         });
+
+        return { id };
       },
     );
   },

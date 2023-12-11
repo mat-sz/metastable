@@ -15,7 +15,6 @@ import shutil
 import threading
 import gc
 import json
-import uuid
 
 import comfy.samplers
 from helpers import jsonout, get_torch_info
@@ -54,9 +53,7 @@ def prompt_worker(q):
     e = execution.PromptExecutor()
     while True:
         item, item_id = q.get()
-        execution_start_time = time.perf_counter()
-        prompt_id = item[0]
-        e.execute(item[1], prompt_id)
+        e.execute(item)
         q.task_done(item_id, e.outputs_ui)
         gc.collect()
         comfy.model_management.soft_empty_cache()
@@ -77,8 +74,7 @@ async def run(prompt_queue):
         try:
             ev = json.loads(res)
             if ev["event"] == "prompt":
-                prompt_id = str(uuid.uuid4())
-                prompt_queue.put((prompt_id, ev["data"]))
+                prompt_queue.put(ev["data"])
         except:
             pass
 
@@ -111,4 +107,4 @@ if __name__ == "__main__":
         jsonout("ready")
         loop.run_until_complete(run(prompt_queue))
     except KeyboardInterrupt:
-        print("\nStopped server")
+        print("Stopped server")

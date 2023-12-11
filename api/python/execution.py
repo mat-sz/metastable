@@ -2,6 +2,7 @@ import os
 import sys
 import copy
 import json
+import time
 import logging
 import threading
 import heapq
@@ -250,9 +251,12 @@ class PromptExecutor:
             d = self.outputs.pop(o)
             del d
 
-    def execute(self, prompt, prompt_id, extra_data={}):
+    def execute(self, prompt, extra_data={}):
+        project_id, prompt_id = prompt["project_id"], prompt["prompt_id"]
+
+        execution_start_time = time.perf_counter()
         jsonout("prompt.start", {
-            "project_id": prompt["project_id"],
+            "project_id": project_id,
             "prompt_id": prompt_id
         })
 
@@ -262,13 +266,14 @@ class PromptExecutor:
                 output_filenames = execute_prompt(prompt)
             
             jsonout("prompt.end", {
-                "project_id": prompt["project_id"],
+                "project_id": project_id,
                 "prompt_id": prompt_id,
                 "output_filenames": output_filenames,
+                "time": (time.perf_counter() - execution_start_time) * 1000
             })
         except Exception as error:
             jsonout("prompt.error", {
-                "project_id": prompt["project_id"],
+                "project_id": project_id,
                 "prompt_id": prompt_id,
                 "name": type(error).__name__,
                 "description": str(error)
@@ -282,7 +287,6 @@ class PromptQueue:
         self.task_counter = 0
         self.queue = []
         self.currently_running = {}
-        self.history = {}
 
     def put(self, item):
         with self.mutex:
@@ -304,9 +308,6 @@ class PromptQueue:
     def task_done(self, item_id, outputs):
         with self.mutex:
             prompt = self.currently_running.pop(item_id)
-            self.history[prompt[0]] = { "prompt": prompt, "outputs": {} }
-            for o in outputs:
-                self.history[prompt[0]]["outputs"][o] = outputs[o]
             self.queue_updated()
 
     def get_current_queue(self):
@@ -337,23 +338,6 @@ class PromptQueue:
                         self.queue_updated()
                     return True
         return False
-
-    def get_history(self, prompt_id=None):
-        with self.mutex:
-            if prompt_id is None:
-                return copy.deepcopy(self.history)
-            elif prompt_id in self.history:
-                return {prompt_id: copy.deepcopy(self.history[prompt_id])}
-            else:
-                return {}
-
-    def wipe_history(self):
-        with self.mutex:
-            self.history = {}
-
-    def delete_history_item(self, id_to_delete):
-        with self.mutex:
-            self.history.pop(id_to_delete, None)
 
     def queue_updated(self):
         jsonout("prompt.queue", self.queue_info())
