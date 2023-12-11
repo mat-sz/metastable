@@ -1,0 +1,13 @@
+.log {
+  max-height: 300px;
+  overflow-y: auto;
+  user-select: text;
+
+  .text {
+    margin-left: 0.5rem;
+  }
+
+  .error {
+    color: red;
+  }
+}

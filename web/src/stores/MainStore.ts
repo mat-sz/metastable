@@ -3,7 +3,11 @@ import { TypeSocket } from 'typesocket';
 
 import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
-import { BackendStatus, Message } from '../types/websocket';
+import {
+  BackendLogMessageModel,
+  BackendStatus,
+  Message,
+} from '../types/websocket';
 import { DownloadStore } from './DownloadStore';
 import { ModelType } from '../types/model';
 import { httpGet } from '../http';
@@ -34,13 +38,15 @@ class MainStore {
     schedulers: [],
     models: {},
   };
-  modal: 'new_project' | 'open_project' | 'models' | undefined = undefined;
+  modal: 'new_project' | 'open_project' | 'models' | 'backend' | undefined =
+    undefined;
 
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
 
   backendStatus: BackendStatus = 'starting';
+  backendLog: BackendLogMessageModel['data'][] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -128,6 +134,9 @@ class MainStore {
         break;
       case 'backend.status':
         this.backendStatus = message.data;
+        break;
+      case 'backend.log':
+        this.backendLog.push(message.data);
         break;
     }
   }

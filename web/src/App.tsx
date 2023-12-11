@@ -12,6 +12,7 @@ import { Status } from './views/system/Status';
 import { NewProject } from './views/projects/NewProject';
 import { OpenProject } from './views/projects/OpenProject';
 import { ModelManager } from './views/models';
+import { Backend } from './views/backend';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
@@ -34,6 +35,7 @@ export const App: React.FC = observer(() => {
       <ModelManager />
       <NewProject />
       <OpenProject />
+      <Backend />
     </div>
   );
 });

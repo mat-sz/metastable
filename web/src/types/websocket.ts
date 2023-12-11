@@ -82,6 +82,15 @@ export interface BackendStatusMessageModel {
   data: BackendStatus;
 }
 
+export interface BackendLogMessageModel {
+  event: 'backend.log';
+  data: {
+    timestamp: number;
+    type: string;
+    text: string;
+  };
+}
+
 export type Message =
   | PromptStartMessageModel
   | PromptQueueMessageModel
@@ -93,4 +102,5 @@ export type Message =
   | DownloadStartMessageModel
   | DownloadEndMessageModel
   | ModelsChangedMessageModel
-  | BackendStatusMessageModel;
+  | BackendStatusMessageModel
+  | BackendLogMessageModel;

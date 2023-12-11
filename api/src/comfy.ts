@@ -52,13 +52,13 @@ export class Comfy extends EventEmitter {
         try {
           this.emit('event', JSON.parse(item));
         } catch {
-          this.emit('event', { event: 'stdout', data: item.trim() });
+          this.log('stdout', item);
         }
       }
     });
 
     proc.stderr.on('data', data => {
-      this.emit('event', { event: 'stderr', data: data.trim() });
+      this.log('stderr', data);
     });
 
     this.on('event', e => {
@@ -79,6 +79,17 @@ export class Comfy extends EventEmitter {
     });
 
     this.process = proc;
+  }
+
+  private log(type: string, text: string) {
+    this.emit('event', {
+      event: 'backend.log',
+      data: {
+        type,
+        timestamp: Date.now(),
+        text: text.trimEnd(),
+      },
+    });
   }
 
   setStatus(status: BackendStatus) {

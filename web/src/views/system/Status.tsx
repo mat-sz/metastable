@@ -16,7 +16,7 @@ export const Status: React.FC = observer(() => {
   return (
     <div className={styles.status}>
       <div className={styles.progress}>
-        <button>
+        <button onClick={() => (mainStore.modal = 'backend')}>
           {mainStore.backendStatus === 'error' && (
             <BsFillExclamationCircleFill />
           )}
