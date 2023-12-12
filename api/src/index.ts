@@ -446,13 +446,11 @@ app.register(
         },
       },
       async request => {
-        return {
-          download_id: downloader.add(
-            request.body.type,
-            request.body.url,
-            request.body.filename,
-          ),
-        };
+        return await downloader.add(
+          request.body.type,
+          request.body.url,
+          request.body.filename,
+        );
       },
     );
   },

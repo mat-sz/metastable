@@ -25,16 +25,34 @@ export class Downloader extends EventEmitter {
     super();
   }
 
-  add(type: string, url: string, filename: string) {
+  async add(type: string, url: string, filename: string) {
     const id = nanoid();
+    const { data, headers, request } = await axios({
+      url: url,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Metastable/0.0.0',
+      },
+      responseType: 'stream',
+    });
+
+    data.destroy();
+    const responseUrl = request?.res?.responseUrl;
+    if (responseUrl?.includes('/login')) {
+      return { error: 'Login required' };
+    }
+
+    const size = parseInt(headers['content-length']);
+
     this.queue.push({
       id,
       type,
       url,
       filename,
+      size,
     });
     this.run();
-    return id;
+    return { id, size };
   }
 
   async run() {
@@ -56,8 +74,7 @@ export class Downloader extends EventEmitter {
         'User-Agent': 'Metastable/0.0.0',
       },
     });
-    const totalLength = headers['content-length'];
-    current.size = parseInt(totalLength);
+    current.size = parseInt(headers['content-length']);
 
     const filename = current.filename;
     const partFilename = `${filename}.part`;

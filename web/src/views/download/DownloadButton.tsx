@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsDownload } from 'react-icons/bs';
+import { BsDownload, BsHourglass, BsXCircle } from 'react-icons/bs';
 
 import { mainStore } from '../../stores/MainStore';
 import { DownloadFile } from '../../types/model';
@@ -22,8 +22,28 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
     const remaining = files.filter(
       (_, i) => typeof fileState[i] === 'undefined',
     );
+    const isWaiting = files.some(file =>
+      mainStore.downloads.waiting.has(file.filename),
+    );
+    const error = files
+      .map(file => mainStore.downloads.errors[file.filename])
+      .find(error => !!error);
 
-    if (allDownloaded) {
+    if (error) {
+      return (
+        <button disabled>
+          <BsXCircle />
+          <span>{error}</span>
+        </button>
+      );
+    } else if (isWaiting) {
+      return (
+        <button disabled>
+          <BsHourglass />
+          <span>Retrieving metadata</span>
+        </button>
+      );
+    } else if (allDownloaded) {
       return (
         <button disabled>
           <BsDownload />

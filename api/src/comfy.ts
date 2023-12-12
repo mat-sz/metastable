@@ -109,7 +109,6 @@ export class Comfy extends EventEmitter {
   }
 
   send(eventName: string, data: any) {
-    console.log('will send', this.process);
     this.process?.stdin.write(
       JSON.stringify({ event: eventName, data }) + '\n',
     );

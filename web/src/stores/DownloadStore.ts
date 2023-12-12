@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { ModelType } from '../types/model';
 import { getUrl } from '../config';
 
@@ -19,6 +19,9 @@ export class DownloadStore {
   isOpen = false;
 
   remaining = 0;
+
+  waiting = new Set<string>();
+  errors: Record<string, string> = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -57,6 +60,8 @@ export class DownloadStore {
   }
 
   async download(type: ModelType, url: string, filename: string) {
+    this.waiting.add(filename);
+
     const res = await fetch(getUrl('/downloads'), {
       method: 'POST',
       headers: {
@@ -64,15 +69,26 @@ export class DownloadStore {
       },
       body: JSON.stringify({ type, url, filename }),
     });
-    const json = (await res.json()) as { download_id: string };
-    this.queue.push({
-      download_id: json.download_id,
-      type,
-      url,
-      filename,
-      state: 'queued',
-      progress: 0,
-      size: 0,
+    const json = (await res.json()) as
+      | { id: string; size: number }
+      | { error: string };
+    runInAction(() => {
+      this.waiting.delete(filename);
+
+      if ('error' in json) {
+        this.errors[filename] = json.error;
+        return;
+      }
+
+      this.queue.push({
+        download_id: json.id,
+        size: json.size,
+        type,
+        url,
+        filename,
+        state: 'queued',
+        progress: 0,
+      });
     });
   }
 }
