@@ -12,7 +12,7 @@ export const Queue: React.FC = observer(() => {
   return (
     <div>
       {downloads.queue.map(download => (
-        <div key={download.download_id} className={styles.item}>
+        <div key={download.id} className={styles.item}>
           <div>
             <div>{download.filename}</div>
             <div>
@@ -36,7 +36,7 @@ export const Queue: React.FC = observer(() => {
           <div>{download.state}</div>
           <div>
             <IconButton
-              onClick={() => downloads.cancel(download.download_id)}
+              onClick={() => downloads.cancel(download.id)}
               title="Cancel"
             >
               <BsX />

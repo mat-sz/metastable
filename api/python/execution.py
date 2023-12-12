@@ -252,12 +252,12 @@ class PromptExecutor:
             del d
 
     def execute(self, prompt, extra_data={}):
-        project_id, prompt_id = prompt["project_id"], prompt["prompt_id"]
+        project_id, prompt_id = prompt["project_id"], prompt["id"]
 
         execution_start_time = time.perf_counter()
         jsonout("prompt.start", {
-            "project_id": project_id,
-            "prompt_id": prompt_id
+            "id": prompt_id,
+            "project_id": project_id
         })
 
         try:
@@ -266,15 +266,15 @@ class PromptExecutor:
                 output_filenames = execute_prompt(prompt)
             
             jsonout("prompt.end", {
+                "id": prompt_id,
                 "project_id": project_id,
-                "prompt_id": prompt_id,
                 "output_filenames": output_filenames,
                 "time": (time.perf_counter() - execution_start_time) * 1000
             })
         except Exception as error:
             jsonout("prompt.error", {
+                "id": prompt_id,
                 "project_id": project_id,
-                "prompt_id": prompt_id,
                 "name": type(error).__name__,
                 "description": str(error)
             })

@@ -94,7 +94,7 @@ export class Downloader extends EventEmitter {
     this.emit('event', {
       event: 'download.start',
       data: {
-        download_id: current.id,
+        id: current.id,
       },
     });
 
@@ -103,7 +103,7 @@ export class Downloader extends EventEmitter {
       this.emit('event', {
         event: 'download.progress',
         data: {
-          download_id: current.id,
+          id: current.id,
           size: current.size,
           progress: current.progress,
           started_at,
@@ -116,7 +116,7 @@ export class Downloader extends EventEmitter {
       this.emit('event', {
         event: 'download.end',
         data: {
-          download_id: current.id,
+          id: current.id,
         },
       });
       this.current = undefined;

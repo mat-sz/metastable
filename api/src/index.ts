@@ -501,7 +501,7 @@ app.register(
 
         comfy.send('prompt', {
           ...request.body,
-          prompt_id: id,
+          id: id,
           output_path: getProjectDataPath(request.body.project_id, 'output'),
         });
 

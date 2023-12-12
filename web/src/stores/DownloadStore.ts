@@ -3,7 +3,7 @@ import { ModelType } from '../types/model';
 import { getUrl } from '../config';
 
 interface Download {
-  download_id: string;
+  id: string;
   url: string;
   filename: string;
   type: ModelType;
@@ -37,26 +37,24 @@ export class DownloadStore {
 
   async refresh() {
     // const res = await fetch(getUrl('/downloads'));
-    // const json = (await res.json()) as Pick<Download, 'download_id' | 'filename' | 'url' | 'type'>[];
+    // const json = (await res.json()) as Pick<Download, 'id' | 'filename' | 'url' | 'type'>[];
   }
 
-  updateDownload(download_id: string, update: Partial<Download>) {
+  updateDownload(id: string, update: Partial<Download>) {
     this.queue = this.queue.map(download =>
-      download.download_id === download_id
-        ? { ...download, ...update }
-        : download,
+      download.id === id ? { ...download, ...update } : download,
     );
   }
 
-  async cancel(download_id: string) {
-    await fetch(getUrl(`/downloads/${download_id}`), {
+  async cancel(id: string) {
+    await fetch(getUrl(`/downloads/${id}`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ download_id }),
+      body: JSON.stringify({ id }),
     });
-    this.updateDownload(download_id, { state: 'cancelled' });
+    this.updateDownload(id, { state: 'cancelled' });
   }
 
   async download(type: ModelType, url: string, filename: string) {
@@ -81,7 +79,7 @@ export class DownloadStore {
       }
 
       this.queue.push({
-        download_id: json.id,
+        id: json.id,
         size: json.size,
         type,
         url,

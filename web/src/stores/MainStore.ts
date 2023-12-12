@@ -111,12 +111,12 @@ class MainStore {
         this.downloads.remaining = message.data.queue_remaining;
         break;
       case 'download.start':
-        this.downloads.updateDownload(message.data.download_id, {
+        this.downloads.updateDownload(message.data.id, {
           state: 'in_progress',
         });
         break;
       case 'download.progress':
-        this.downloads.updateDownload(message.data.download_id, {
+        this.downloads.updateDownload(message.data.id, {
           state: 'in_progress',
           progress: message.data.progress,
           size: message.data.size,
@@ -124,7 +124,7 @@ class MainStore {
         });
         break;
       case 'download.end':
-        this.downloads.updateDownload(message.data.download_id, {
+        this.downloads.updateDownload(message.data.id, {
           state: 'done',
         });
         this.refresh();

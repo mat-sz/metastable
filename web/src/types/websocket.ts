@@ -1,8 +1,8 @@
 export interface PromptStartMessageModel {
   event: 'prompt.start';
   data: {
+    id: string;
     project_id: string;
-    prompt_id: string;
   };
 }
 
@@ -24,8 +24,8 @@ export interface PromptProgressMessageModel {
 export interface PromptErrorMessageModel {
   event: 'prompt.error';
   data: {
+    id: string;
     project_id: string;
-    prompt_id: string;
     name: string;
     description: string;
   };
@@ -34,7 +34,7 @@ export interface PromptErrorMessageModel {
 export interface PromptEndMessageModel {
   event: 'prompt.end';
   data: {
-    prompt_id: string;
+    id: string;
     output_filenames: string[];
     project_id: number;
   };
@@ -43,7 +43,7 @@ export interface PromptEndMessageModel {
 export interface DownloadStartMessageModel {
   event: 'download.start';
   data: {
-    download_id: string;
+    id: string;
   };
 }
 
@@ -57,7 +57,7 @@ export interface DownloadQueueMessageModel {
 export interface DownloadProgressMessageModel {
   event: 'download.progress';
   data: {
-    download_id: string;
+    id: string;
     size: number;
     progress: number;
     started_at: number;
@@ -67,7 +67,7 @@ export interface DownloadProgressMessageModel {
 export interface DownloadEndMessageModel {
   event: 'download.end';
   data: {
-    download_id: string;
+    id: string;
   };
 }
 
