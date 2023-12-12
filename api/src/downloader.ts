@@ -66,6 +66,7 @@ export class Downloader extends EventEmitter {
       return;
     }
 
+    this.emitQueue();
     const { data, headers } = await axios({
       url: current.url,
       method: 'GET',
@@ -120,6 +121,7 @@ export class Downloader extends EventEmitter {
         },
       });
       this.current = undefined;
+      this.emitQueue();
       this.run();
     });
     data.pipe(writer);
