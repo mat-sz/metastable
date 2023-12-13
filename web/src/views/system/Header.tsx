@@ -7,7 +7,12 @@ export const Header: React.FC = () => {
   return (
     <div className={styles.header}>
       <div className={styles.menu}>
-        <button onClick={() => (mainStore.modal = 'new_project')}>New</button>
+        <button
+          onClick={() => (mainStore.modal = 'new_project')}
+          disabled={!mainStore.info.models.checkpoints?.[0]}
+        >
+          New
+        </button>
         <button onClick={() => (mainStore.modal = 'open_project')}>Open</button>
         {!!mainStore.project && (
           <>
