@@ -17,6 +17,8 @@ interface DownloadTask {
   size?: number;
 }
 
+const USER_AGENT = 'Metastable/0.0.0';
+
 export class Downloader extends EventEmitter {
   queue: DownloadTask[] = [];
   current: DownloadTask | undefined = undefined;
@@ -31,7 +33,7 @@ export class Downloader extends EventEmitter {
       url: url,
       method: 'GET',
       headers: {
-        'User-Agent': 'Metastable/0.0.0',
+        'User-Agent': USER_AGENT,
       },
       responseType: 'stream',
     });
@@ -72,7 +74,7 @@ export class Downloader extends EventEmitter {
       method: 'GET',
       responseType: 'stream',
       headers: {
-        'User-Agent': 'Metastable/0.0.0',
+        'User-Agent': USER_AGENT,
       },
     });
     current.size = parseInt(headers['content-length']);

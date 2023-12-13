@@ -9,6 +9,7 @@ import { validateSettings } from '../../../helpers';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
+import { ModelType } from '../../../types/model';
 
 interface SettingsProps {
   actions?: JSX.Element;
@@ -33,6 +34,48 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
     },
   };
 
+  let error: string | undefined = undefined;
+
+  const checkpointName = project.settings.models.base.name;
+  const inputMode = project.settings.input.mode;
+  if (!checkpointName) {
+    error = 'No checkpoint selected.';
+  } else if (
+    mainStore.hasFile(ModelType.CHECKPOINT, checkpointName) !== 'downloaded'
+  ) {
+    error = 'Selected checkpoint does not exist.';
+  } else if (project.settings.models.loras.length) {
+    for (const lora of project.settings.models.loras) {
+      if (!lora.name) {
+        error = 'No LoRA selected.';
+      } else if (
+        mainStore.hasFile(ModelType.LORA, lora.name) !== 'downloaded'
+      ) {
+        error = 'Selected LoRA does not exist.';
+      }
+    }
+  } else if (project.settings.models.controlnets.length) {
+    for (const controlnet of project.settings.models.controlnets) {
+      if (!controlnet.name) {
+        error = 'No ControlNet selected.';
+      } else if (
+        mainStore.hasFile(ModelType.CHECKPOINT, controlnet.name) !==
+        'downloaded'
+      ) {
+        error = 'Selected ControlNet does not exist.';
+      } else if (!controlnet.image) {
+        error = 'No image input for ControlNet selected.';
+      }
+    }
+  } else if (
+    (inputMode === 'image' || inputMode === 'image_masked') &&
+    !project.settings.input.image
+  ) {
+    error = 'No input image selected.';
+  } else if (mainStore.backendStatus !== 'ready') {
+    error = 'Backend is not ready.';
+  }
+
   return (
     <div className={styles.settings}>
       <ul className={styles.categories}>
@@ -55,7 +98,10 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
           }}
           values={toJS(project.settings)}
         >
-          {actions && <VarCategory label="Actions">{actions}</VarCategory>}
+          {!!error && <div className={styles.error}>{error}</div>}
+          {!error && actions && (
+            <VarCategory label="Actions">{actions}</VarCategory>
+          )}
           {tabs[tab].children}
         </VarUI>
       </div>
