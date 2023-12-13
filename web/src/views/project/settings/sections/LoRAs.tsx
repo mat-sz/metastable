@@ -14,6 +14,7 @@ import { IconButton } from '../../../../components/IconButton';
 
 export const LoRAs: React.FC = observer(() => {
   const project = mainStore.project!;
+  const loras = mainStore.info.models.loras;
 
   return (
     <>
@@ -37,7 +38,7 @@ export const LoRAs: React.FC = observer(() => {
             <VarSelect
               label="Model"
               path="name"
-              options={mainStore.info.models.loras?.map(
+              options={loras?.map(
                 ({ name }) =>
                   ({
                     key: name,
@@ -57,12 +58,21 @@ export const LoRAs: React.FC = observer(() => {
           </VarCategory>
         )}
       </VarArray>
-      <VarButton
-        buttonLabel="Add LoRA"
-        onClick={() => {
-          project.addLora(mainStore.info.models.loras?.[0].name);
-        }}
-      />
+      {loras?.[0] ? (
+        <VarButton
+          buttonLabel="Add LoRA"
+          onClick={() => {
+            project.addLora(loras?.[0].name);
+          }}
+        />
+      ) : (
+        <VarButton
+          buttonLabel="Download manager"
+          onClick={() => {
+            mainStore.downloads.open();
+          }}
+        />
+      )}
     </>
   );
 });

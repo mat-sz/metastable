@@ -15,6 +15,7 @@ import { IconButton } from '../../../../components/IconButton';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;
+  const controlnets = mainStore.info.models.controlnet;
 
   return (
     <>
@@ -38,7 +39,7 @@ export const Controlnets: React.FC = observer(() => {
             <VarSelect
               label="Model"
               path="name"
-              options={mainStore.info.models.controlnet?.map(
+              options={controlnets?.map(
                 ({ name }) =>
                   ({
                     key: name,
@@ -69,12 +70,21 @@ export const Controlnets: React.FC = observer(() => {
           </VarCategory>
         )}
       </VarArray>
-      <VarButton
-        buttonLabel="Add Controlnet"
-        onClick={() => {
-          project.addControlnet(mainStore.info.models.controlnet?.[0].name);
-        }}
-      />
+      {controlnets?.[0] ? (
+        <VarButton
+          buttonLabel="Add Controlnet"
+          onClick={() => {
+            project.addControlnet(controlnets?.[0].name);
+          }}
+        />
+      ) : (
+        <VarButton
+          buttonLabel="Download manager"
+          onClick={() => {
+            mainStore.downloads.open();
+          }}
+        />
+      )}
     </>
   );
 });
