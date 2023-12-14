@@ -1,35 +1,5 @@
 import { ComfyEvent, ComfyLogItem, ComfyStatus } from './comfy.js';
-
-export interface DownloadStartEvent {
-  event: 'download.start';
-  data: {
-    id: string;
-  };
-}
-
-export interface DownloadQueueEvent {
-  event: 'download.queue';
-  data: {
-    queue_remaining: number;
-  };
-}
-
-export interface DownloadProgressEvent {
-  event: 'download.progress';
-  data: {
-    id: string;
-    size: number;
-    progress: number;
-    started_at: number;
-  };
-}
-
-export interface DownloadEndEvent {
-  event: 'download.end';
-  data: {
-    id: string;
-  };
-}
+import { DownloadEvent } from './download.js';
 
 export interface ModelsChangedEvent {
   event: 'models.changed';
@@ -58,10 +28,7 @@ export interface PingEvent {
 
 export type AnyEvent =
   | ComfyEvent
-  | DownloadQueueEvent
-  | DownloadProgressEvent
-  | DownloadStartEvent
-  | DownloadEndEvent
+  | DownloadEvent
   | ModelsChangedEvent
   | BackendStatusEvent
   | BackendLogEvent

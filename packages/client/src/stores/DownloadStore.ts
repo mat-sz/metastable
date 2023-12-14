@@ -1,21 +1,20 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { ModelType } from '@metastable/types';
+import { ModelType, Download } from '@metastable/types';
 
 import { getUrl } from '../config';
 
-interface Download {
-  id: string;
-  url: string;
-  filename: string;
-  type: ModelType;
-  state: 'queued' | 'failed' | 'in_progress' | 'done' | 'cancelled';
-  progress: number;
-  size: number;
-  started_at?: number;
+interface DownloadItem extends Download {
+  state:
+    | 'queued'
+    | 'failed'
+    | 'in_progress'
+    | 'done'
+    | 'cancelling'
+    | 'cancelled';
 }
 
 export class DownloadStore {
-  queue: Download[] = [];
+  queue: DownloadItem[] = [];
 
   remaining = 0;
 
@@ -31,7 +30,7 @@ export class DownloadStore {
     // const json = (await res.json()) as Pick<Download, 'id' | 'filename' | 'url' | 'type'>[];
   }
 
-  updateDownload(id: string, update: Partial<Download>) {
+  updateDownload(id: string, update: Partial<DownloadItem>) {
     this.queue = this.queue.map(download =>
       download.id === id ? { ...download, ...update } : download,
     );
@@ -45,7 +44,6 @@ export class DownloadStore {
       },
       body: JSON.stringify({ id }),
     });
-    this.updateDownload(id, { state: 'cancelled' });
   }
 
   async download(type: ModelType, url: string, filename: string) {

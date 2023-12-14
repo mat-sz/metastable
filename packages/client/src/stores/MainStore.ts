@@ -6,6 +6,7 @@ import {
   ComfyStatus,
   AnyEvent,
   ComfyTorchInfo,
+  FileInfo,
 } from '@metastable/types';
 
 import { getUrl } from '../config';
@@ -21,7 +22,7 @@ declare global {
 interface Info {
   samplers: string[];
   schedulers: string[];
-  models: Record<string, { name: string; size: number }[]>;
+  models: Record<string, FileInfo[]>;
 }
 
 class MainStore {
@@ -118,24 +119,19 @@ class MainStore {
       case 'download.queue':
         this.downloads.remaining = message.data.queue_remaining;
         break;
-      case 'download.start':
+      case 'download.state':
         this.downloads.updateDownload(message.data.id, {
-          state: 'in_progress',
+          state: message.data.state,
+          startedAt: message.data.startedAt,
         });
+        this.refresh();
         break;
       case 'download.progress':
         this.downloads.updateDownload(message.data.id, {
           state: 'in_progress',
           progress: message.data.progress,
-          size: message.data.size,
-          started_at: message.data.started_at,
+          startedAt: message.data.startedAt,
         });
-        break;
-      case 'download.end':
-        this.downloads.updateDownload(message.data.id, {
-          state: 'done',
-        });
-        this.refresh();
         break;
       case 'models.changed':
         this.refresh();

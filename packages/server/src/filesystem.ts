@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
+import { FileInfo } from '@metastable/types';
 import { isPathIn } from '@metastable/fs-helpers';
 
 import { dataRoot } from './config.js';
@@ -8,11 +9,6 @@ export const modelsPath = path.join(dataRoot, 'models');
 export const projectsPath = path.join(dataRoot, 'projects');
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
-
-interface FileInfo {
-  name: string;
-  size: number;
-}
 
 export async function tryMkdir(dirPath: string) {
   try {

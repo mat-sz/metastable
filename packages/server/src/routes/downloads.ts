@@ -33,5 +33,10 @@ export function routesDownloads(downloader: Downloader) {
         }
       },
     );
+
+    fastify.delete('/:id', async request => {
+      const downloadId = (request.params as any)?.id;
+      downloader.cancel(downloadId);
+    });
   };
 }

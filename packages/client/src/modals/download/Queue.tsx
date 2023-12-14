@@ -23,11 +23,11 @@ export const Queue: React.FC = observer(() => {
             <div>
               {filesize(download.progress)} / {filesize(download.size)}
             </div>
-            {download.started_at && download.state === 'in_progress' && (
+            {download.startedAt && download.state === 'in_progress' && (
               <div>
                 {filesize(
                   download.progress /
-                    ((new Date().getTime() - download.started_at) / 1000),
+                    ((new Date().getTime() - download.startedAt) / 1000),
                 )}
                 /s
               </div>
