@@ -5,6 +5,7 @@ import { VarButton } from 'react-var-ui';
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { Settings } from '../settings';
+import { ImagePreview } from '../../../components/ImagePreview';
 
 export const Images: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -21,7 +22,7 @@ export const Images: React.FC = observer(() => {
   return (
     <div className={styles.main}>
       <div className={styles.preview}>
-        <div className={styles.image}>{path && <img src={path} />}</div>
+        <ImagePreview url={path} />
         {project.outputFilenames.length > 1 && (
           <div className={styles.thumbnails}>
             {project.outputFilenames.map((filename, i) => (

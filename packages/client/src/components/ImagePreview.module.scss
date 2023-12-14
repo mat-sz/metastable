@@ -1,0 +1,27 @@
+.preview {
+  border-radius: 5px;
+  overflow: hidden;
+  font-size: 0;
+  flex: 1;
+  position: relative;
+  user-select: none !important;
+  background: var(--color-bg-dark);
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    transform-origin: top left;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+.flex {
+  flex: 1;
+}
