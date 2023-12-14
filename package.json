@@ -2,11 +2,11 @@
   "name": "metastable",
   "private": true,
   "workspaces": [
-    "api",
-    "web"
+    "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspaces foreach -Api run start"
+    "build:deps": "yarn workspaces foreach -Api --exclude @metastable/client --exclude @metastable/server run build",
+    "start": "yarn build:deps && yarn workspaces foreach -Api run start"
   },
   "packageManager": "yarn@4.0.2"
 }
