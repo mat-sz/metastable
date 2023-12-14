@@ -2,6 +2,8 @@ import * as fsize from 'filesize';
 import { ProjectSettings } from './types/project';
 import { mainStore } from './stores/MainStore';
 import { glueIsSourceLoaded } from 'fxglue';
+import type { Project } from './stores/project';
+import { ModelType } from './types/model';
 
 export function randomSeed() {
   const min = 0;
@@ -61,7 +63,7 @@ export async function imageUrlToBase64(url: string): Promise<string> {
   });
 }
 
-export function validateSettings(settings: ProjectSettings) {
+export function fixSettings(settings: ProjectSettings) {
   if (settings.input.mode === 'empty') {
     settings.input.height ||= 512;
     settings.input.width ||= 512;
@@ -87,4 +89,56 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
       source.onload = onload;
     }
   });
+}
+
+export function validateProject(project: Project): string | undefined {
+  const checkpointName = project.settings.models.base.name;
+  const inputMode = project.settings.input.mode;
+  if (!checkpointName) {
+    return 'No checkpoint selected.';
+  } else if (
+    mainStore.hasFile(ModelType.CHECKPOINT, checkpointName) !== 'downloaded'
+  ) {
+    return 'Selected checkpoint does not exist.';
+  }
+
+  if (project.settings.models.loras.length) {
+    for (const lora of project.settings.models.loras) {
+      if (!lora.name) {
+        return 'No LoRA selected.';
+      } else if (
+        mainStore.hasFile(ModelType.LORA, lora.name) !== 'downloaded'
+      ) {
+        return 'Selected LoRA does not exist.';
+      }
+    }
+  }
+
+  if (project.settings.models.controlnets.length) {
+    for (const controlnet of project.settings.models.controlnets) {
+      if (!controlnet.name) {
+        return 'No ControlNet selected.';
+      } else if (
+        mainStore.hasFile(ModelType.CONTROLNET, controlnet.name) !==
+        'downloaded'
+      ) {
+        return 'Selected ControlNet does not exist.';
+      } else if (!controlnet.image) {
+        return 'No image input for ControlNet selected.';
+      }
+    }
+  }
+
+  if (
+    (inputMode === 'image' || inputMode === 'image_masked') &&
+    !project.settings.input.image
+  ) {
+    return 'No input image selected.';
+  }
+
+  if (mainStore.backendStatus !== 'ready') {
+    return 'Backend is not ready.';
+  }
+
+  return undefined;
 }

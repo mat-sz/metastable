@@ -5,11 +5,10 @@ import { VarCategory, VarUI } from 'react-var-ui';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
-import { validateSettings } from '../../../helpers';
+import { fixSettings, validateProject } from '../../../helpers';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
-import { ModelType } from '../../../types/model';
 
 interface SettingsProps {
   actions?: JSX.Element;
@@ -34,47 +33,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
     },
   };
 
-  let error: string | undefined = undefined;
-
-  const checkpointName = project.settings.models.base.name;
-  const inputMode = project.settings.input.mode;
-  if (!checkpointName) {
-    error = 'No checkpoint selected.';
-  } else if (
-    mainStore.hasFile(ModelType.CHECKPOINT, checkpointName) !== 'downloaded'
-  ) {
-    error = 'Selected checkpoint does not exist.';
-  } else if (project.settings.models.loras.length) {
-    for (const lora of project.settings.models.loras) {
-      if (!lora.name) {
-        error = 'No LoRA selected.';
-      } else if (
-        mainStore.hasFile(ModelType.LORA, lora.name) !== 'downloaded'
-      ) {
-        error = 'Selected LoRA does not exist.';
-      }
-    }
-  } else if (project.settings.models.controlnets.length) {
-    for (const controlnet of project.settings.models.controlnets) {
-      if (!controlnet.name) {
-        error = 'No ControlNet selected.';
-      } else if (
-        mainStore.hasFile(ModelType.CHECKPOINT, controlnet.name) !==
-        'downloaded'
-      ) {
-        error = 'Selected ControlNet does not exist.';
-      } else if (!controlnet.image) {
-        error = 'No image input for ControlNet selected.';
-      }
-    }
-  } else if (
-    (inputMode === 'image' || inputMode === 'image_masked') &&
-    !project.settings.input.image
-  ) {
-    error = 'No input image selected.';
-  } else if (mainStore.backendStatus !== 'ready') {
-    error = 'Backend is not ready.';
-  }
+  const error = validateProject(project);
 
   return (
     <div className={styles.settings}>
@@ -93,7 +52,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         <VarUI
           onChange={values => {
             runInAction(() => {
-              project.settings = validateSettings(values);
+              project.settings = fixSettings(values);
             });
           }}
           values={toJS(project.settings)}
