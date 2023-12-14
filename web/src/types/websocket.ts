@@ -103,6 +103,25 @@ export interface PingMessageModel {
   data: number;
 }
 
+export interface TorchInfoMessageModel {
+  event: 'info.torch';
+  data: {
+    memory: {
+      vram: number;
+      ram: number;
+    };
+    device: {
+      type: string;
+      name: string;
+      index?: number;
+      allocator_backend?: string;
+    };
+    vae: {
+      dtype: string;
+    };
+  };
+}
+
 export type Message =
   | PromptStartMessageModel
   | PromptQueueMessageModel
@@ -117,4 +136,5 @@ export type Message =
   | BackendStatusMessageModel
   | BackendLogMessageModel
   | BackendLogBufferMessageModel
+  | TorchInfoMessageModel
   | PingMessageModel;

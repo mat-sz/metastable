@@ -83,6 +83,15 @@ comfy.on('event', async event => {
   }
 });
 
+comfy.on('reset', () => {
+  clientManager.broadcast({
+    event: 'prompt.queue',
+    data: {
+      queue_remaining: comfy.queue_remaining,
+    },
+  });
+});
+
 downloader.on('event', event => {
   clientManager.broadcast(event);
 });

@@ -157,6 +157,7 @@ export class Comfy extends EventEmitter {
   reset() {
     this.queue_remaining = 0;
     this.torchInfo = undefined;
+    this.emit('reset');
   }
 
   setStatus(status: BackendStatus) {

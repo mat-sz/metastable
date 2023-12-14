@@ -4,6 +4,7 @@ import {
   BsFillCheckCircleFill,
   BsFillExclamationCircleFill,
   BsFillQuestionCircleFill,
+  BsGpuCard,
   BsImage,
 } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
@@ -44,6 +45,16 @@ export const Status: React.FC = observer(() => {
           <BsDownload />
           <span>Queued downloads: {mainStore.downloads.remaining}</span>
         </ProgressButton>
+      </div>
+      <div className={styles.info}>
+        <div>
+          <BsGpuCard />
+          {mainStore.backendStatus === 'ready' ? (
+            <span>{mainStore.torchInfo?.device?.name}</span>
+          ) : (
+            <span>(Unknown)</span>
+          )}
+        </div>
       </div>
     </div>
   );

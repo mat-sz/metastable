@@ -134,7 +134,7 @@ button {
   background-color: var(--color-bg-interactive);
   color: var(--color-fg);
   padding: 0.6rem 1.2rem;
-  font-size: 14px;
+  font-size: 0.8rem;
   border-radius: 5px;
   transition: 0.1s ease-in-out all;
   border: none;
@@ -151,5 +151,11 @@ button {
 
   span {
     margin-left: 0.5rem;
+  }
+}
+
+table {
+  th {
+    text-align: left;
   }
 }

@@ -7,6 +7,7 @@ import {
   BackendLogMessageModel,
   BackendStatus,
   Message,
+  TorchInfoMessageModel,
 } from '../types/websocket';
 import { DownloadStore } from './DownloadStore';
 import { ModelType } from '../types/model';
@@ -40,6 +41,7 @@ class MainStore {
   };
   modal: 'new_project' | 'open_project' | 'models' | 'backend' | undefined =
     undefined;
+  torchInfo?: TorchInfoMessageModel['data'] = undefined;
 
   promptRemaining = 0;
   promptValue = 0;
@@ -143,6 +145,9 @@ class MainStore {
         break;
       case 'ping':
         this.socket.send({ event: 'ping', data: Date.now() });
+        break;
+      case 'info.torch':
+        this.torchInfo = message.data;
         break;
     }
   }

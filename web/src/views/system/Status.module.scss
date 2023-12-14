@@ -1,6 +1,6 @@
 .status {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   background: var(--color-bg-panel-dark);
   padding: 0.25rem 0;
 
@@ -10,6 +10,21 @@
 
     & > *:not(:last-child) {
       margin-right: 2px;
+    }
+  }
+
+  .info {
+    justify-self: end;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+
+    & > div {
+      padding: 0.2rem 0.6rem;
+
+      span {
+        margin-left: 0.5rem;
+      }
     }
   }
 
