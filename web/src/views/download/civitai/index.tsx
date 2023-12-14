@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { BsSearch } from 'react-icons/bs';
 import useSWR from 'swr';
 
 import styles from './index.module.scss';
@@ -10,7 +11,6 @@ import { Model } from './Model';
 import { Loading } from '../../../components/Loading';
 import { Toggle } from '../../../components/Toggle';
 import { IconButton } from '../../../components/IconButton';
-import { BsSearch } from 'react-icons/bs';
 
 const CivitAISort = [
   'Highest Rated',
@@ -79,7 +79,7 @@ export const CivitAI: React.FC = observer(() => {
   }
 
   return (
-    <div>
+    <>
       <div className={styles.search}>
         <form
           className={styles.searchInput}
@@ -142,6 +142,6 @@ export const CivitAI: React.FC = observer(() => {
           />
         </>
       )}
-    </div>
+    </>
   );
 });

@@ -16,6 +16,8 @@
     'Open Sans',
     'Helvetica Neue',
     sans-serif;
+  display: flex;
+  flex-direction: column;
 
   @media screen and (min-width: 960px) {
     width: 900px;
@@ -47,4 +49,8 @@
 
 .body {
   padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }

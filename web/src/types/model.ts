@@ -33,9 +33,13 @@ export interface DownloadFile {
 export interface DownloadableModel extends Omit<Model, 'id'> {
   downloads: DownloadFile[];
   recommended?: boolean;
+  description?: string;
 }
 
 export interface DownloadableModelGroup {
   name: string;
   models: DownloadableModel[];
+  type: ModelType;
+  recommended?: boolean;
+  description?: string;
 }
