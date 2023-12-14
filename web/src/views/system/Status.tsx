@@ -8,20 +8,24 @@ import {
   BsImage,
 } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
+import clsx from 'clsx';
 
 import styles from './Status.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { ProgressButton } from '../../components/ProgressButton';
-import clsx from 'clsx';
+import { useUI } from '../../contexts/ui';
+import { Backend } from '../../modals/backend';
+import { DownloadManager } from '../../modals/download';
 
 export const Status: React.FC = observer(() => {
   const status = mainStore.status;
+  const { showModal } = useUI();
 
   return (
     <div className={styles.status}>
       <div className={styles.progress}>
         <button
-          onClick={() => (mainStore.modal = 'backend')}
+          onClick={() => showModal(<Backend />)}
           className={clsx({
             [styles.error]: status === 'error',
             [styles.waiting]: status === 'starting' || status === 'connecting',
@@ -48,7 +52,7 @@ export const Status: React.FC = observer(() => {
             mainStore.downloads.queue.length - mainStore.downloads.remaining
           }
           max={mainStore.downloads.queue.length}
-          onClick={() => mainStore.downloads.open()}
+          onClick={() => showModal(<DownloadManager />)}
         >
           <BsDownload />
           <span>Queued downloads: {mainStore.downloads.remaining}</span>

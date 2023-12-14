@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BsGrid, BsImage, BsPencil } from 'react-icons/bs';
+import { runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
 import { Images } from './images';
 import { Grid } from './grid';
 import { ImageEditor } from './editor';
+import { mainStore } from '../../stores/MainStore';
 
-export const Project: React.FC = () => {
-  const [tab, setTab] = useState('images');
+export const Project: React.FC = observer(() => {
+  const project = mainStore.project!;
   const tabs: Record<
     string,
     { title: string; icon: JSX.Element; children: JSX.Element }
@@ -35,15 +38,19 @@ export const Project: React.FC = () => {
         {Object.entries(tabs).map(([key, { icon, title }]) => (
           <li
             key={key}
-            onClick={() => setTab(key)}
-            className={tab === key ? styles.active : undefined}
+            onClick={() =>
+              runInAction(() => {
+                project.mode = key;
+              })
+            }
+            className={project.mode === key ? styles.active : undefined}
             title={title}
           >
             {icon}
           </li>
         ))}
       </ul>
-      {tabs[tab].children}
+      {tabs[project.mode].children}
     </div>
   );
-};
+});

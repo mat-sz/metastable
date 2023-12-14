@@ -16,8 +16,6 @@ interface Download {
 export class DownloadStore {
   queue: Download[] = [];
 
-  isOpen = false;
-
   remaining = 0;
 
   waiting = new Set<string>();
@@ -25,14 +23,6 @@ export class DownloadStore {
 
   constructor() {
     makeAutoObservable(this);
-  }
-
-  open() {
-    this.isOpen = true;
-  }
-
-  close() {
-    this.isOpen = false;
   }
 
   async refresh() {

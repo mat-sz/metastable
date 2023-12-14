@@ -7,11 +7,7 @@ import { Modal } from '../../components/Modal';
 export const NewProject: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');
   return (
-    <Modal
-      title="New project"
-      isOpen={mainStore.modal === 'new_project'}
-      onClose={() => (mainStore.modal = undefined)}
-    >
+    <Modal title="New project">
       <div>
         <label>
           <span>Name:</span>

@@ -12,10 +12,13 @@ import { BsX } from 'react-icons/bs';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components/IconButton';
+import { useUI } from '../../../../contexts/ui';
+import { DownloadManager } from '../../../../modals/download';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;
   const controlnets = mainStore.info.models.controlnet;
+  const { showModal } = useUI();
 
   return (
     <>
@@ -80,9 +83,7 @@ export const Controlnets: React.FC = observer(() => {
       ) : (
         <VarButton
           buttonLabel="Download manager"
-          onClick={() => {
-            mainStore.downloads.open();
-          }}
+          onClick={() => showModal(<DownloadManager />)}
         />
       )}
     </>

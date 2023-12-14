@@ -12,11 +12,7 @@ export const ModelManager: React.FC = observer(() => {
   );
 
   return (
-    <Modal
-      title="Model manager"
-      isOpen={mainStore.modal === 'models'}
-      onClose={() => (mainStore.modal = undefined)}
-    >
+    <Modal title="Model manager">
       <TabView defaultTab="queue">
         <Tabs>
           {available.map(([key]) => (

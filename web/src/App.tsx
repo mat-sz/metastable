@@ -6,13 +6,9 @@ import { mainStore } from './stores/MainStore';
 import { Project } from './views/project';
 import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
-import { DownloadManager } from './views/download';
 import { Welcome } from './views/system/Welcome';
 import { Status } from './views/system/Status';
-import { NewProject } from './views/projects/NewProject';
-import { OpenProject } from './views/projects/OpenProject';
-import { ModelManager } from './views/models';
-import { Backend } from './views/backend';
+import { UI } from './components/UI';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
@@ -20,22 +16,19 @@ export const App: React.FC = observer(() => {
   }
 
   return (
-    <div className="app">
-      <Header />
-      {mainStore.projects.projects.length === 0 ? (
-        <Welcome />
-      ) : (
-        <>
-          <Projects />
-          <Project />
-        </>
-      )}
-      <Status />
-      <DownloadManager />
-      <ModelManager />
-      <NewProject />
-      <OpenProject />
-      <Backend />
-    </div>
+    <UI>
+      <div className="app">
+        <Header />
+        {mainStore.projects.projects.length === 0 ? (
+          <Welcome />
+        ) : (
+          <>
+            <Projects />
+            <Project />
+          </>
+        )}
+        <Status />
+      </div>
+    </UI>
   );
 });

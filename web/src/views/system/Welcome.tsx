@@ -3,10 +3,14 @@ import { observer } from 'mobx-react-lite';
 
 import styles from './Welcome.module.scss';
 import { mainStore } from '../../stores/MainStore';
-import { List } from '../projects/List';
+import { List } from '../../modals/openProject/List';
+import { DownloadManager } from '../../modals/download';
+import { useUI } from '../../contexts/ui';
 
 export const Welcome: React.FC = observer(() => {
+  const { showModal } = useUI();
   const [projectName, setProjectName] = useState('');
+
   return (
     <div className={styles.welcome}>
       <div className={styles.actions}>
@@ -27,7 +31,7 @@ export const Welcome: React.FC = observer(() => {
             <div>
               Please install a checkpoint model before creating a new project.
             </div>
-            <button onClick={() => mainStore.downloads.open()}>
+            <button onClick={() => showModal(<DownloadManager />)}>
               Download manager
             </button>
           </>

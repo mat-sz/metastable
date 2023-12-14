@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
+import { BsClipboard } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components/Modal';
 import { copy, filesize } from '../../helpers';
-import { BsClipboard } from 'react-icons/bs';
 import { IconButton } from '../../components/IconButton';
 
 export const Backend: React.FC = observer(() => {
@@ -24,11 +24,7 @@ export const Backend: React.FC = observer(() => {
   }, []);
 
   return (
-    <Modal
-      title="Backend status"
-      isOpen={mainStore.modal === 'backend'}
-      onClose={() => (mainStore.modal = undefined)}
-    >
+    <Modal title="Backend status">
       {torchInfo && (
         <table>
           <tbody>

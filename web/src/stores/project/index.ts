@@ -80,6 +80,7 @@ export class Project {
   allOutputs: string[] = [];
   editor = new Editor();
   addOutputToEditor: Point | undefined = undefined;
+  mode: string = 'images';
 
   constructor(
     public id: number,

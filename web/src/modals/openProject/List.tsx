@@ -19,7 +19,7 @@ export const Item: React.FC<ItemProps> = ({ project }) => {
       key={project.id}
       className={styles.project}
       onClick={() => {
-        mainStore.modal = undefined;
+        // TODO: Close modal.
         mainStore.projects.open(project.id);
       }}
     >

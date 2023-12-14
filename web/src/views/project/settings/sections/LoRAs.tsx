@@ -11,8 +11,11 @@ import { BsX } from 'react-icons/bs';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components/IconButton';
+import { DownloadManager } from '../../../../modals/download';
+import { useUI } from '../../../../contexts/ui';
 
 export const LoRAs: React.FC = observer(() => {
+  const { showModal } = useUI();
   const project = mainStore.project!;
   const loras = mainStore.info.models.loras;
 
@@ -68,9 +71,7 @@ export const LoRAs: React.FC = observer(() => {
       ) : (
         <VarButton
           buttonLabel="Download manager"
-          onClick={() => {
-            mainStore.downloads.open();
-          }}
+          onClick={() => showModal(<DownloadManager />)}
         />
       )}
     </>

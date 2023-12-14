@@ -1,22 +1,14 @@
 import React from 'react';
-import { observer } from 'mobx-react-lite';
 
-import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components/Modal';
 import { Tab, TabPanel, TabView, Tabs } from '../../components/Tabs';
 import { Queue } from './Queue';
 import { Recommended } from './Recommended';
 import { CivitAI } from './civitai';
 
-export const DownloadManager: React.FC = observer(() => {
-  const downloads = mainStore.downloads;
-
+export const DownloadManager: React.FC = () => {
   return (
-    <Modal
-      title="Download manager"
-      isOpen={downloads.isOpen}
-      onClose={() => downloads.close()}
-    >
+    <Modal title="Download manager">
       <TabView defaultTab="queue">
         <Tabs>
           <Tab id="queue" title="Queue" />
@@ -35,4 +27,4 @@ export const DownloadManager: React.FC = observer(() => {
       </TabView>
     </Modal>
   );
-});
+};

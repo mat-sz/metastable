@@ -39,8 +39,6 @@ class MainStore {
     schedulers: [],
     models: {},
   };
-  modal: 'new_project' | 'open_project' | 'models' | 'backend' | undefined =
-    undefined;
   torchInfo?: TorchInfoMessageModel['data'] = undefined;
 
   promptRemaining = 0;
