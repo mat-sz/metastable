@@ -12,20 +12,28 @@ import { observer } from 'mobx-react-lite';
 import styles from './Status.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { ProgressButton } from '../../components/ProgressButton';
+import clsx from 'clsx';
 
 export const Status: React.FC = observer(() => {
+  const status = mainStore.status;
+
   return (
     <div className={styles.status}>
       <div className={styles.progress}>
-        <button onClick={() => (mainStore.modal = 'backend')}>
-          {mainStore.backendStatus === 'error' && (
-            <BsFillExclamationCircleFill />
-          )}
-          {mainStore.backendStatus === 'starting' && (
+        <button
+          onClick={() => (mainStore.modal = 'backend')}
+          className={clsx({
+            [styles.error]: status === 'error',
+            [styles.waiting]: status === 'starting' || status === 'connecting',
+            [styles.ready]: status === 'ready',
+          })}
+        >
+          {status === 'error' && <BsFillExclamationCircleFill />}
+          {(status === 'starting' || status === 'connecting') && (
             <BsFillQuestionCircleFill />
           )}
-          {mainStore.backendStatus === 'ready' && <BsFillCheckCircleFill />}
-          <span>Backend status: {mainStore.backendStatus}</span>
+          {status === 'ready' && <BsFillCheckCircleFill />}
+          <span>Status: {status}</span>
         </button>
         <ProgressButton
           value={mainStore.promptValue}
@@ -49,7 +57,7 @@ export const Status: React.FC = observer(() => {
       <div className={styles.info}>
         <div>
           <BsGpuCard />
-          {mainStore.backendStatus === 'ready' ? (
+          {status === 'ready' ? (
             <span>{mainStore.torchInfo?.device?.name}</span>
           ) : (
             <span>(Unknown)</span>

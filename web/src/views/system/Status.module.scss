@@ -4,6 +4,18 @@
   background: var(--color-bg-panel-dark);
   padding: 0.25rem 0;
 
+  .ready {
+    color: green;
+  }
+
+  .waiting {
+    color: yellow;
+  }
+
+  .error {
+    color: red;
+  }
+
   .progress {
     justify-self: start;
     padding: 0 0.2rem;

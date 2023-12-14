@@ -4,7 +4,7 @@ import { TypeSocket } from 'typesocket';
 import { getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
 import {
-  BackendLogMessageModel,
+  BackendLogItem,
   BackendStatus,
   Message,
   TorchInfoMessageModel,
@@ -48,7 +48,7 @@ class MainStore {
   promptMax = 0;
 
   backendStatus: BackendStatus = 'starting';
-  backendLog: BackendLogMessageModel['data'][] = [];
+  backendLog: BackendLogItem[] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -83,6 +83,14 @@ class MainStore {
 
   onDisconnected() {
     this.connected = false;
+  }
+
+  get status() {
+    if (!this.connected) {
+      return 'connecting';
+    }
+
+    return this.backendStatus;
   }
 
   view(project_id: number, type: string, filename: string) {
