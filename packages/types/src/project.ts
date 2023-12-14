@@ -37,6 +37,7 @@ export interface ProjectSettings {
     denoise: number;
     sampler: string;
     scheduler: string;
+    tiling?: boolean;
   };
 }
 

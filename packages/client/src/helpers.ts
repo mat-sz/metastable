@@ -43,6 +43,7 @@ export function defaultProjectSettings(): ProjectSettings {
       denoise: 1,
       sampler: 'dpm_2',
       scheduler: 'karras',
+      tiling: false,
     },
   };
 }

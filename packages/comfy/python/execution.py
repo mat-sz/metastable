@@ -94,6 +94,30 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
 
     return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
 
+def vae_decode_circular(vae, samples):
+    for layer in [
+        layer
+        for layer in vae.first_stage_model.modules()
+        if isinstance(layer, torch.nn.Conv2d)
+    ]:
+        layer.padding_mode = "circular"
+    result = vae.decode(samples)
+    for layer in [
+        layer
+        for layer in vae.first_stage_model.modules()
+        if isinstance(layer, torch.nn.Conv2d)
+    ]:
+        layer.padding_mode = "zeros"
+    return result
+
+def model_make_circular(m):
+    if isinstance(m, torch.nn.Conv2d):
+        m.padding_mode = "circular"
+
+def model_unmake_circular(m):
+    if isinstance(m, torch.nn.Conv2d):
+        m.padding_mode = "zeros"
+
 def apply_controlnet(conditioning, settings):
     strength, controlnet_path, image_data = settings["strength"], settings["path"], settings["image"]
 
@@ -244,10 +268,16 @@ def image_upscale(upscale_model, image):
 def execute_prompt(prompt):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint(models_settings["base"])
+    tiling = prompt["sampler"]["tiling"]
 
     if "loras" in models_settings:
         for lora_settings in models_settings["loras"]:
             (model, clip) = load_lora(model, clip, lora_settings)
+
+    if tiling:
+        model.model.apply(model_make_circular)
+    else:
+        model.model.apply(model_unmake_circular)
 
     conditioning = create_conditioning(clip, prompt["conditioning"])
     latent = None
@@ -267,7 +297,12 @@ def execute_prompt(prompt):
         latent = vae_encode_inpaint(vae, image, mask)
 
     samples = ksampler(model, latent, conditioning, prompt["sampler"])
-    images = vae.decode(samples)
+    images = None
+
+    if tiling:
+        images = vae_decode_circular(vae, samples)
+    else:
+        images = vae.decode(samples)
 
     if "upscale" in models_settings:
         upscale_model = load_upscale_model(models_settings["upscale"])

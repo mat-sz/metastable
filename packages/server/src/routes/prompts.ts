@@ -76,6 +76,7 @@ const promptBody = {
         denoise: { type: 'number' },
         sampler: { type: 'string' },
         scheduler: { type: 'string' },
+        tiling: { type: 'boolean' },
         preview: {
           type: 'object',
           properties: {
@@ -141,6 +142,8 @@ export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
             taesdxl_decoder: await findModelByType(list, 'taesdxl_decoder'),
           };
         }
+
+        settings.sampler.tiling = !!settings.sampler.tiling;
 
         const id = nanoid();
 

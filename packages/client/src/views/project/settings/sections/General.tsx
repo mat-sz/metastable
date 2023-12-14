@@ -129,6 +129,7 @@ export const General: React.FC = observer(() => {
             label: name,
           }))}
         />
+        <VarToggle label="Tiling" path="sampler.tiling" />
       </VarCategory>
     </>
   );
