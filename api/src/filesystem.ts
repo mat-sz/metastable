@@ -14,13 +14,15 @@ interface FileInfo {
   size: number;
 }
 
+export async function tryMkdir(dirPath: string) {
+  try {
+    await fs.mkdir(dirPath, { recursive: true });
+  } catch {}
+}
+
 export async function createProjectTree(id: number) {
-  try {
-    await fs.mkdir(getProjectDataPath(id, 'output'), { recursive: true });
-  } catch {}
-  try {
-    await fs.mkdir(getProjectDataPath(id, 'input'), { recursive: true });
-  } catch {}
+  await tryMkdir(getProjectDataPath(id, 'output'));
+  await tryMkdir(getProjectDataPath(id, 'input'));
 }
 
 export function getModelPath(type: string, name: string) {

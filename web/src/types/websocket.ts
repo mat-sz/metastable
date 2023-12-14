@@ -82,13 +82,25 @@ export interface BackendStatusMessageModel {
   data: BackendStatus;
 }
 
+export interface BackendLogItem {
+  timestamp: number;
+  type: string;
+  text: string;
+}
+
 export interface BackendLogMessageModel {
   event: 'backend.log';
-  data: {
-    timestamp: number;
-    type: string;
-    text: string;
-  };
+  data: BackendLogItem;
+}
+
+export interface BackendLogBufferMessageModel {
+  event: 'backend.logBuffer';
+  data: BackendLogItem[];
+}
+
+export interface PingMessageModel {
+  event: 'ping';
+  data: number;
 }
 
 export type Message =
@@ -103,4 +115,6 @@ export type Message =
   | DownloadEndMessageModel
   | ModelsChangedMessageModel
   | BackendStatusMessageModel
-  | BackendLogMessageModel;
+  | BackendLogMessageModel
+  | BackendLogBufferMessageModel
+  | PingMessageModel;

@@ -5,8 +5,8 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import EventEmitter from 'events';
 
-import { exists } from './helpers.js';
-import { modelsPath } from './filesystem.js';
+import { exists, isPathIn } from '../helpers.js';
+import { modelsPath, tryMkdir } from '../filesystem.js';
 
 interface DownloadTask {
   id: string;
@@ -19,6 +19,17 @@ interface DownloadTask {
 
 const USER_AGENT = 'Metastable/0.0.0';
 
+function getFilePaths(type: string, name: string) {
+  const filenameParts = name.split(/\\\//g);
+  const filename = filenameParts.pop()!;
+  const partFilename = `${filename}.part`;
+
+  const typePath = path.join(modelsPath, type);
+  const dirPath = path.join(typePath, ...filenameParts);
+
+  return { filename, partFilename, typePath, dirPath };
+}
+
 export class Downloader extends EventEmitter {
   queue: DownloadTask[] = [];
   current: DownloadTask | undefined = undefined;
@@ -27,7 +38,12 @@ export class Downloader extends EventEmitter {
     super();
   }
 
-  async add(type: string, url: string, filename: string) {
+  async add(type: string, url: string, name: string) {
+    const { typePath, dirPath } = getFilePaths(type, name);
+    if (!isPathIn(typePath, dirPath)) {
+      return { error: 'Attempted to save file outside of models directory.' };
+    }
+
     const id = nanoid();
     const { data, headers, request } = await axios({
       url: url,
@@ -50,7 +66,7 @@ export class Downloader extends EventEmitter {
       id,
       type,
       url,
-      filename,
+      filename: name,
       size,
     });
     this.run();
@@ -79,10 +95,11 @@ export class Downloader extends EventEmitter {
     });
     current.size = parseInt(headers['content-length']);
 
-    const filename = current.filename;
-    const partFilename = `${filename}.part`;
-
-    const dirPath = path.join(modelsPath, current.type);
+    const { filename, partFilename, dirPath } = getFilePaths(
+      current.type,
+      current.filename,
+    );
+    await tryMkdir(dirPath);
 
     const filePath = path.join(dirPath, filename);
     const partPath = path.join(dirPath, partFilename);

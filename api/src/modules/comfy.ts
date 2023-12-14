@@ -2,19 +2,66 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import EventEmitter from 'events';
 import os from 'os';
 
-import { getPythonCommand } from './helpers.js';
+import { getPythonCommand } from '../helpers.js';
 
 export interface ComfyEvent {
   event: string;
   data: any;
 }
 
+export interface ComfyLogItem {
+  timestamp: number;
+  type: string;
+  text: string;
+}
+
+export interface ComfyTorchInfo {
+  memory: {
+    vram: number;
+    ram: number;
+  };
+  device: {
+    type: string;
+    name: string;
+    index?: number;
+    allocator_backend?: string;
+  };
+  vae: {
+    dtype: string;
+  };
+}
+
 type BackendStatus = 'ready' | 'starting' | 'error';
+
+export class CircularBuffer<T> {
+  private array: T[] = [];
+
+  constructor(private maxLength: number) {}
+
+  get length() {
+    return this.array.length;
+  }
+
+  push(item: T) {
+    if (this.array.length === this.maxLength) {
+      this.array.shift();
+    }
+
+    this.array.push(item);
+  }
+
+  get items() {
+    return [...this.array];
+  }
+}
+
 export class Comfy extends EventEmitter {
   process?: ChildProcessWithoutNullStreams;
 
   samplers: string[] = [];
   schedulers: string[] = [];
+  torchInfo?: ComfyTorchInfo = undefined;
+  logBuffer = new CircularBuffer<ComfyLogItem>(25);
 
   status: BackendStatus = 'starting';
   queue_remaining = 0;
@@ -24,6 +71,9 @@ export class Comfy extends EventEmitter {
 
     this.on('event', e => {
       switch (e.event) {
+        case 'info.torch':
+          this.torchInfo = e.data;
+          break;
         case 'info.samplers':
           this.samplers = e.data;
           break;
@@ -92,19 +142,29 @@ export class Comfy extends EventEmitter {
   }
 
   private log(type: string, text: string) {
+    const item = {
+      type,
+      timestamp: Date.now(),
+      text: text.trimEnd(),
+    };
+    this.logBuffer.push(item);
     this.emit('event', {
       event: 'backend.log',
-      data: {
-        type,
-        timestamp: Date.now(),
-        text: text.trimEnd(),
-      },
+      data: item,
     });
+  }
+
+  reset() {
+    this.queue_remaining = 0;
+    this.torchInfo = undefined;
   }
 
   setStatus(status: BackendStatus) {
     this.status = status;
-    this.queue_remaining = 0;
+    if (status !== 'ready') {
+      this.reset();
+    }
+
     this.emit('event', { event: 'backend.status', data: status });
   }
 

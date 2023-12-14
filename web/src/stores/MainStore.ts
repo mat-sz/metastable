@@ -68,7 +68,7 @@ class MainStore {
   }
 
   async refresh() {
-    const data = await httpGet('/info');
+    const data = await httpGet('/instance/info');
     runInAction(() => {
       this.info = data;
       this.ready = true;
@@ -137,6 +137,12 @@ class MainStore {
         break;
       case 'backend.log':
         this.backendLog.push(message.data);
+        break;
+      case 'backend.logBuffer':
+        this.backendLog.push(...message.data);
+        break;
+      case 'ping':
+        this.socket.send({ event: 'ping', data: Date.now() });
         break;
     }
   }
