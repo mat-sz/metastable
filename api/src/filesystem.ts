@@ -25,6 +25,10 @@ export async function createProjectTree(id: number) {
   await tryMkdir(getProjectDataPath(id, 'input'));
 }
 
+export function getModelsDir(type: string) {
+  return path.join(modelsPath, type);
+}
+
 export function getModelPath(type: string, name: string) {
   const result = path.join(modelsPath, type, name);
   if (!isPathIn(modelsPath, result)) {

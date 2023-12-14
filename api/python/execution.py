@@ -171,7 +171,12 @@ def ksampler(model, latent, conditioning, settings):
                                                                 force_full_denoise=False, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
 
 def load_checkpoint(settings):
-    return comfy.sd.load_checkpoint_guess_config(settings["path"], output_vae=True, output_clip=True, embedding_directory=None)
+    embedding_directory = None
+
+    if "embedding_directory" in settings:
+        embedding_directory = settings["embedding_directory"]
+    
+    return comfy.sd.load_checkpoint_guess_config(settings["path"], output_vae=True, output_clip=True, embedding_directory=embedding_directory)
 
 def load_lora(model, clip, settings):
     lora = comfy.utils.load_torch_file(settings["path"], safe_load=True)

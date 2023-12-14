@@ -9,8 +9,10 @@ import {
   findModelByType,
   getModelPath,
   getModelsByType,
+  getModelsDir,
   getProjectDataPath,
 } from '../filesystem.js';
+import { exists } from '../helpers.js';
 
 const promptBody = {
   type: 'object',
@@ -102,6 +104,11 @@ export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
           'checkpoints',
           settings.models.base.name,
         );
+
+        const embeddingsDir = getModelsDir('embeddings');
+        if (await exists(embeddingsDir)) {
+          settings.models.base.embedding_directory = embeddingsDir;
+        }
 
         if (settings.models.loras) {
           for (const lora of settings.models.loras) {
