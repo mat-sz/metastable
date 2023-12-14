@@ -187,71 +187,71 @@ export const downloadable: DownloadableModelGroup[] = [
   //     },
   //   ],
   // },
-  // {
-  //   name: 'RealESRGAN',
-  //   type: ModelType.UPSCALE_MODEL,
-  //   description: 'Allows for upscaling of output images.',
-  //   models: [
-  //     {
-  //       name: 'RealESRGAN x4 plus',
-  //       source: 'github',
-  //       type: ModelType.UPSCALE_MODEL,
-  //       recommended: true,
-  //       description: 'A better universal 4x upscale model.',
-  //       downloads: [
-  //         {
-  //           type: ModelType.UPSCALE_MODEL,
-  //           filename: 'realesrgan_x4plus.pth',
-  //           url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth',
-  //           size: 67040989,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'RealESRGAN x4 plus - Anime',
-  //       source: 'github',
-  //       type: ModelType.UPSCALE_MODEL,
-  //       recommended: true,
-  //       description: 'A 4x upscale model tailored for anime/cartoon art.',
-  //       downloads: [
-  //         {
-  //           type: ModelType.UPSCALE_MODEL,
-  //           filename: 'realesrgan_x4plus_anime.pth',
-  //           url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth',
-  //           size: 17938799,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'RealESRGAN x4',
-  //       source: 'huggingface',
-  //       type: ModelType.UPSCALE_MODEL,
-  //       description: 'An universal 4x upscale model.',
-  //       downloads: [
-  //         {
-  //           type: ModelType.UPSCALE_MODEL,
-  //           filename: 'realesrgan_x4.pth',
-  //           url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x4.pth',
-  //           size: 67040989,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       name: 'RealESRGAN x2',
-  //       source: 'huggingface',
-  //       type: ModelType.UPSCALE_MODEL,
-  //       description: 'An universal 2x upscale model.',
-  //       downloads: [
-  //         {
-  //           type: ModelType.UPSCALE_MODEL,
-  //           filename: 'realesrgan_x2.pth',
-  //           url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth',
-  //           size: 67061725,
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
+  {
+    name: 'RealESRGAN',
+    type: ModelType.UPSCALE_MODEL,
+    description: 'Allows for upscaling of output images.',
+    models: [
+      {
+        name: 'RealESRGAN x4 plus',
+        source: 'github',
+        type: ModelType.UPSCALE_MODEL,
+        recommended: true,
+        description: 'A better universal 4x upscale model.',
+        downloads: [
+          {
+            type: ModelType.UPSCALE_MODEL,
+            filename: 'realesrgan_x4plus.pth',
+            url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth',
+            size: 67040989,
+          },
+        ],
+      },
+      {
+        name: 'RealESRGAN x4 plus - Anime',
+        source: 'github',
+        type: ModelType.UPSCALE_MODEL,
+        recommended: true,
+        description: 'A 4x upscale model tailored for anime/cartoon art.',
+        downloads: [
+          {
+            type: ModelType.UPSCALE_MODEL,
+            filename: 'realesrgan_x4plus_anime.pth',
+            url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth',
+            size: 17938799,
+          },
+        ],
+      },
+      {
+        name: 'RealESRGAN x4',
+        source: 'huggingface',
+        type: ModelType.UPSCALE_MODEL,
+        description: 'An universal 4x upscale model.',
+        downloads: [
+          {
+            type: ModelType.UPSCALE_MODEL,
+            filename: 'realesrgan_x4.pth',
+            url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x4.pth',
+            size: 67040989,
+          },
+        ],
+      },
+      {
+        name: 'RealESRGAN x2',
+        source: 'huggingface',
+        type: ModelType.UPSCALE_MODEL,
+        description: 'An universal 2x upscale model.',
+        downloads: [
+          {
+            type: ModelType.UPSCALE_MODEL,
+            filename: 'realesrgan_x2.pth',
+            url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth',
+            size: 67061725,
+          },
+        ],
+      },
+    ],
+  },
   {
     name: 'QRCode ControlNet',
     type: ModelType.CONTROLNET,

@@ -136,7 +136,7 @@ export function validateProject(project: Project): string | undefined {
     return 'No input image selected.';
   }
 
-  if (mainStore.backendStatus !== 'ready') {
+  if (mainStore.status !== 'ready') {
     return 'Backend is not ready.';
   }
 

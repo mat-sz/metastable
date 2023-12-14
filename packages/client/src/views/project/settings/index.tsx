@@ -9,6 +9,7 @@ import { fixSettings, validateProject } from '../../../helpers';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
+import { Upscale } from './sections/Upscale';
 
 interface SettingsProps {
   actions?: JSX.Element;
@@ -30,6 +31,10 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
     controlnets: {
       title: 'Controlnets',
       children: <Controlnets />,
+    },
+    upscale: {
+      title: 'Upscale',
+      children: <Upscale />,
     },
   };
 

@@ -51,6 +51,11 @@ const promptBody = {
             required: ['name', 'strength', 'image'],
           },
         },
+        upscale: {
+          type: 'object',
+          properties: { name: { type: 'string' } },
+          required: ['name'],
+        },
       },
       required: ['base'],
     },
@@ -120,6 +125,13 @@ export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
           for (const controlnet of settings.models.controlnets) {
             controlnet.path = getModelPath('controlnet', controlnet.name);
           }
+        }
+
+        if (settings.models.upscale) {
+          settings.models.upscale.path = getModelPath(
+            'upscale_models',
+            settings.models.upscale.name,
+          );
         }
 
         if (settings.sampler.preview?.method === 'taesd') {

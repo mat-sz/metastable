@@ -17,6 +17,7 @@ export interface ProjectSettings {
   models: {
     base: { name: string };
     loras: { name: string; strength: number }[];
+    upscale?: { name: string };
     controlnets: {
       name: string;
       strength: number;
