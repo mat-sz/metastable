@@ -1,0 +1,23 @@
+.table {
+  td:first-child {
+    font-size: 0;
+    text-align: center;
+
+    svg {
+      font-size: 1rem;
+    }
+  }
+
+  td:not(:first-child),
+  th:not(:first-child) {
+    width: 32%;
+  }
+
+  tr.error {
+    color: var(--color-error);
+  }
+
+  tr:not(.error) td:first-child {
+    color: var(--color-ok);
+  }
+}

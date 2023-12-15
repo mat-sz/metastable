@@ -1,13 +1,21 @@
-import which from 'which';
+export class CircularBuffer<T> {
+  private array: T[] = [];
 
-export async function hasCommand(name: string) {
-  return !!(await which(name, { nothrow: true }));
-}
+  constructor(private maxLength: number) {}
 
-export async function getPythonCommand() {
-  if (await hasCommand('python3')) {
-    return 'python3';
-  } else {
-    return 'python';
+  get length() {
+    return this.array.length;
+  }
+
+  push(item: T) {
+    if (this.array.length === this.maxLength) {
+      this.array.shift();
+    }
+
+    this.array.push(item);
+  }
+
+  get items() {
+    return [...this.array];
   }
 }

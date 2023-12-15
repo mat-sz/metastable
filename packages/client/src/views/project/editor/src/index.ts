@@ -280,8 +280,8 @@ export class Editor extends BasicEventEmitter<{
   render() {
     const glue = this.glue;
     this.glueCanvas.setSize(
-      this.glueCanvas.canvas.clientWidth,
-      this.glueCanvas.canvas.clientHeight,
+      this.glueCanvas.canvas.clientWidth || 1,
+      this.glueCanvas.canvas.clientHeight || 1,
     );
 
     this.renderLayers();

@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import type { Comfy } from '@metastable/comfy';
+import { validateRequirements, type Comfy } from '@metastable/comfy';
 
 import { getModels } from '../filesystem.js';
 
@@ -11,6 +11,10 @@ export function routesInstance(comfy: Comfy) {
         schedulers: comfy.schedulers,
         models: await getModels(),
       };
+    });
+
+    fastify.get('/compatibility', async () => {
+      return await validateRequirements(comfy.python);
     });
   };
 }

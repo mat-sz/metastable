@@ -4,7 +4,7 @@ import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
 import { PrismaClient } from '@prisma/client';
-import { Comfy } from '@metastable/comfy';
+import { Comfy, createPythonInstance } from '@metastable/comfy';
 import { Downloader } from '@metastable/downloader';
 
 import { host, port, useProxy, staticRoot } from './config.js';
@@ -17,7 +17,8 @@ import { routesInstance } from './routes/instance.js';
 import { ClientManager } from './ws.js';
 
 const prisma = new PrismaClient();
-const comfy = new Comfy();
+const python = await createPythonInstance();
+const comfy = new Comfy(python);
 const downloader = new Downloader(modelsPath);
 const clientManager = new ClientManager();
 

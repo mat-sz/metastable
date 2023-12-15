@@ -7,6 +7,7 @@ import {
   AnyEvent,
   ComfyTorchInfo,
   FileInfo,
+  Requirement,
 } from '@metastable/types';
 
 import { getUrl } from '../config';
@@ -41,6 +42,7 @@ class MainStore {
     models: {},
   };
   torchInfo?: ComfyTorchInfo = undefined;
+  compatibility: Requirement[] = [];
 
   promptRemaining = 0;
   promptValue = 0;
@@ -73,6 +75,11 @@ class MainStore {
     runInAction(() => {
       this.info = data;
       this.ready = true;
+    });
+
+    const compatibility = await httpGet('/instance/compatibility');
+    runInAction(() => {
+      this.compatibility = compatibility;
     });
   }
 

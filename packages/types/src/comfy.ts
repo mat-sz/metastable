@@ -1,3 +1,11 @@
+export interface Requirement {
+  name: string;
+  expected: string;
+  actual: string;
+  satisfied: boolean;
+  type: string;
+}
+
 export interface ComfyTorchInfo {
   memory: {
     vram: number;
