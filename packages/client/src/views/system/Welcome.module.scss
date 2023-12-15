@@ -1,21 +1,39 @@
-.welcome {
+.wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex: 1;
-  flex-direction: column;
+  align-items: flex-start;
+
+  @media screen and (min-width: 960px) {
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.welcome {
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+
+  @media screen and (min-width: 960px) {
+    display: grid;
+    grid-template-columns: 1fr 20rem;
+    width: 900px;
+  }
 
   & > div {
     width: 100%;
     max-width: 900px;
     background: var(--color-bg-panel);
-    padding: 0.5rem;
+    padding: 1rem;
+  }
+
+  .recent {
+    background: var(--color-bg-panel-dark);
   }
 
   .actions {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
 
     input {
       margin-bottom: 0.5rem;

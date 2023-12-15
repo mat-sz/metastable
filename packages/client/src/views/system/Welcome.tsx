@@ -12,32 +12,37 @@ export const Welcome: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');
 
   return (
-    <div className={styles.welcome}>
-      <div className={styles.actions}>
-        <h2>Welcome</h2>
-        {mainStore.info.models.checkpoints?.[0] ? (
-          <>
-            <input
-              type="text"
-              value={projectName}
-              onChange={e => setProjectName(e.target.value)}
-            />
-            <button onClick={() => mainStore.projects.create(projectName)}>
-              Create a new project
-            </button>
-          </>
-        ) : (
-          <>
-            <div>
-              Please install a checkpoint model before creating a new project.
-            </div>
-            <button onClick={() => showModal(<DownloadManager />)}>
-              Download manager
-            </button>
-          </>
-        )}
+    <div className={styles.wrapper}>
+      <div className={styles.welcome}>
+        <div className={styles.recent}>
+          <h2>Recent</h2>
+          <List data={mainStore.projects.recent} />
+        </div>
+        <div className={styles.actions}>
+          <h2>New</h2>
+          {mainStore.info.models.checkpoints?.[0] ? (
+            <>
+              <input
+                type="text"
+                value={projectName}
+                onChange={e => setProjectName(e.target.value)}
+              />
+              <button onClick={() => mainStore.projects.create(projectName)}>
+                Create a new project
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                Please install a checkpoint model before creating a new project.
+              </div>
+              <button onClick={() => showModal(<DownloadManager />)}>
+                Download manager
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <List data={mainStore.projects.recent} />
     </div>
   );
 });
