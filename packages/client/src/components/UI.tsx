@@ -21,6 +21,7 @@ export const UI: React.FC<React.PropsWithChildren> = ({ children }) => {
       {children}
       {modals.map(({ body, id }) => (
         <ModalContext.Provider
+          key={id}
           value={{
             close: () =>
               setModals(modals => modals.filter(modal => modal.id !== id)),

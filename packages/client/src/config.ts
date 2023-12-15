@@ -4,3 +4,5 @@ export const SERVER_HOST =
 export function getUrl(path: string, protocol = 'http') {
   return `${protocol}://${SERVER_HOST}${path}`;
 }
+
+export const IS_ELECTRON = import.meta.env.MODE.includes('electron');
