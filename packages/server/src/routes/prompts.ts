@@ -148,9 +148,9 @@ export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
         const id = nanoid();
 
         comfy.send('prompt', {
-          ...request.body,
+          ...settings,
           id: id,
-          output_path: getProjectDataPath(request.body.project_id, 'output'),
+          output_path: getProjectDataPath(settings.project_id, 'output'),
         });
 
         return { id };

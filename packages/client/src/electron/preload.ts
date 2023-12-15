@@ -1,3 +1,36 @@
+import { contextBridge, ipcRenderer } from 'electron';
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  onComfyEvent: (callback: (event: any) => void) =>
+    ipcRenderer.on('comfy:event', (_: any, value: any) => callback(value)),
+  onDownloaderEvent: (callback: (event: any) => void) =>
+    ipcRenderer.on('downloader:event', (_: any, value: any) => callback(value)),
+  ready: () => ipcRenderer.send('ready'),
+  instance: {
+    info: () => ipcRenderer.invoke('instance:info'),
+    compatibility: () => ipcRenderer.invoke('instance:compatibility'),
+  },
+  projects: {
+    all: () => ipcRenderer.invoke('projects:all'),
+    get: (id: number) => ipcRenderer.invoke('projects:get', id),
+    outputs: (id: number) => ipcRenderer.invoke('projects:outputs', id),
+    create: (data: any) => ipcRenderer.invoke('projects:create', data),
+    update: (id: number, data: any) =>
+      ipcRenderer.invoke('projects:update', id, data),
+  },
+  downloads: {
+    create: (data: any) => ipcRenderer.invoke('downloads:create', data),
+    cancel: (id: string) => ipcRenderer.invoke('downloads:cancel', id),
+  },
+  prompts: {
+    create: (projectId: number, settings: any) =>
+      ipcRenderer.invoke('prompts:create', {
+        project_id: projectId,
+        ...settings,
+      }),
+  },
+});
+
 function domReady(
   condition: DocumentReadyState[] = ['complete', 'interactive'],
 ) {

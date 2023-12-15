@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ModelType, Download } from '@metastable/types';
 
-import { getUrl } from '../config';
+import { API } from '../api';
 
 interface DownloadItem extends Download {
   state:
@@ -37,28 +37,13 @@ export class DownloadStore {
   }
 
   async cancel(id: string) {
-    await fetch(getUrl(`/downloads/${id}`), {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    });
+    await API.downloads.cancel(id);
   }
 
   async download(type: ModelType, url: string, filename: string) {
     this.waiting.add(filename);
 
-    const res = await fetch(getUrl('/downloads'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ type, url, filename }),
-    });
-    const json = (await res.json()) as
-      | { id: string; size: number }
-      | { error: string };
+    const json = await API.downloads.create({ type, url, filename });
     runInAction(() => {
       this.waiting.delete(filename);
 

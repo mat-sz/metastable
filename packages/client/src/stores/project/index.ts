@@ -1,11 +1,11 @@
 import { makeAutoObservable, toJS } from 'mobx';
 import { ProjectSettings } from '@metastable/types';
 
-import { getUrl } from '../../config';
+import { getStaticUrl } from '../../config';
 import { imageUrlToBase64, loadImage, randomSeed } from '../../helpers';
-import { httpGet, httpPost } from '../../http';
 import { Editor } from '../../views/project/editor/src';
 import { Point } from '../../views/project/editor/src/types';
+import { API } from '../../api';
 
 async function base64ify(image: string) {
   if (image.startsWith('blob:')) {
@@ -83,6 +83,8 @@ export class Project {
   addOutputToEditor: Point | undefined = undefined;
   mode: string = 'images';
 
+  blobUrls: Record<string, string> = {};
+
   constructor(
     public id: number,
     public name: string,
@@ -127,29 +129,24 @@ export class Project {
     }
 
     this.save();
-    await httpPost(`/prompts`, {
-      project_id: this.id,
-      ...settings,
-    });
+    await API.prompts.create(this.id, settings);
   }
 
   async rename(name: string) {
     this.name = name;
-    await httpPost(`/projects/${this.id}`, {
-      name,
-    });
+    await API.projects.update(this.id, { name });
   }
 
   async save() {
     const settings = toJS(this.settings);
 
-    await httpPost(`/projects/${this.id}`, {
+    await API.projects.update(this.id, {
       settings: JSON.stringify(settings),
     });
   }
 
   async refreshOutputs() {
-    const outputs = await httpGet(`/projects/${this.id}/outputs`);
+    const outputs = await API.projects.outputs(this.id);
 
     if (outputs) {
       this.allOutputs = outputs;
@@ -163,7 +160,7 @@ export class Project {
   }
 
   view(type: string, filename: string) {
-    return getUrl(`/projects/${this.id}/${type}s/${filename}`);
+    return getStaticUrl(`/projects/${this.id}/${type}s/${filename}`);
   }
 
   addLora(name: string, strength = 1) {

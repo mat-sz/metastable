@@ -21,7 +21,10 @@ export class Comfy extends EventEmitter {
   status: ComfyStatus = 'starting';
   queue_remaining = 0;
 
-  constructor(public python: PythonInstance) {
+  constructor(
+    public python: PythonInstance,
+    private mainPath = path.join(baseDir, 'python', 'main.py'),
+  ) {
     super();
 
     this.on('event', e => {
@@ -45,10 +48,6 @@ export class Comfy extends EventEmitter {
     });
 
     this.start();
-  }
-
-  get mainPath() {
-    return path.join(baseDir, 'python', 'main.py');
   }
 
   async start() {

@@ -3,7 +3,7 @@ import { Project as APIProject } from '@metastable/types';
 
 import { Project } from './project';
 import { arrayMove, defaultProjectSettings } from '../helpers';
-import { httpGet, httpPost } from '../http';
+import { API } from '../api';
 
 export class ProjectStore {
   projects: Project[] = [];
@@ -24,7 +24,7 @@ export class ProjectStore {
   }
 
   async refresh() {
-    const json = await httpGet('/projects');
+    const json = await API.projects.all();
     runInAction(() => {
       this.recent = json;
     });
@@ -37,7 +37,7 @@ export class ProjectStore {
       settings: JSON.stringify(settings),
     };
 
-    const json = await httpPost('/projects', project);
+    const json = await API.projects.create(project);
 
     runInAction(() => {
       this.projects.push(new Project(json.id, name, settings));
@@ -48,7 +48,7 @@ export class ProjectStore {
   }
 
   async open(id: number) {
-    const json = await httpGet(`/projects/${id}`);
+    const json = await API.projects.get(id);
     const settings = JSON.parse(json.settings);
     if (!settings.models.loras) {
       settings.models.loras = [];

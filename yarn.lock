@@ -833,6 +833,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/client@workspace:packages/client"
   dependencies:
+    "@metastable/comfy": "npm:*"
+    "@metastable/fs-helpers": "npm:*"
     "@metastable/types": "npm:*"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
@@ -904,6 +906,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/fs-helpers@workspace:packages/fs-helpers"
   dependencies:
+    "@metastable/types": "npm:*"
     "@types/node": "npm:^20.10.3"
     typescript: "npm:^5.3.2"
   languageName: unknown

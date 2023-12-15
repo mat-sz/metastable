@@ -6,24 +6,18 @@ import {
   ComfyStatus,
   AnyEvent,
   ComfyTorchInfo,
-  FileInfo,
   Requirement,
+  InstanceInfo,
 } from '@metastable/types';
 
-import { getUrl } from '../config';
+import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
 import { DownloadStore } from './DownloadStore';
-import { httpGet } from '../http';
+import { API } from '../api';
 
 declare global {
   // eslint-disable-next-line
   var _socket: TypeSocket<any> | undefined;
-}
-
-interface Info {
-  samplers: string[];
-  schedulers: string[];
-  models: Record<string, FileInfo[]>;
 }
 
 class MainStore {
@@ -31,12 +25,8 @@ class MainStore {
   downloads = new DownloadStore();
   connected = false;
   ready = false;
-  private socket = new TypeSocket<AnyEvent>(getUrl('/ws', 'ws'), {
-    maxRetries: 0,
-    retryOnClose: true,
-    retryTime: 1000,
-  });
-  info: Info = {
+  private socket;
+  info: InstanceInfo = {
     samplers: [],
     schedulers: [],
     models: {},
@@ -54,14 +44,29 @@ class MainStore {
   constructor() {
     makeAutoObservable(this);
 
-    // Make sure we don't have any lingering connections when the app reloads.
-    window._socket?.disconnect();
-    window._socket = this.socket;
+    if (IS_ELECTRON) {
+      window.electronAPI.ready();
+      window.electronAPI.onComfyEvent((event: any) => this.onMessage(event));
+      window.electronAPI.onDownloaderEvent((event: any) =>
+        this.onMessage(event),
+      );
+      this.connected = true;
+    } else {
+      this.socket = new TypeSocket<AnyEvent>(getUrl('/ws', 'ws'), {
+        maxRetries: 0,
+        retryOnClose: true,
+        retryTime: 1000,
+      });
 
-    this.socket.on('connected', () => this.onConnected());
-    this.socket.on('disconnected', () => this.onDisconnected());
-    this.socket.on('message', message => this.onMessage(message));
-    this.socket.connect();
+      // Make sure we don't have any lingering connections when the app reloads.
+      window._socket?.disconnect();
+      window._socket = this.socket;
+
+      this.socket.on('connected', () => this.onConnected());
+      this.socket.on('disconnected', () => this.onDisconnected());
+      this.socket.on('message', message => this.onMessage(message));
+      this.socket.connect();
+    }
 
     this.refresh();
   }
@@ -71,13 +76,18 @@ class MainStore {
   }
 
   async refresh() {
-    const data = await httpGet('/instance/info');
+    const data = await API.instance.info();
     runInAction(() => {
       this.info = data;
       this.ready = true;
     });
 
-    const compatibility = await httpGet('/instance/compatibility');
+    const dataDir = (data as any).dataDir;
+    if (dataDir) {
+      window.dataDir = dataDir;
+    }
+
+    const compatibility = await API.instance.compatibility();
     runInAction(() => {
       this.compatibility = compatibility;
     });
@@ -100,7 +110,7 @@ class MainStore {
   }
 
   view(project_id: number, type: string, filename: string) {
-    return getUrl(`/projects/${project_id}/${type}s/${filename}`);
+    return getStaticUrl(`/projects/${project_id}/${type}s/${filename}`);
   }
 
   onMessage(message: AnyEvent) {
@@ -153,7 +163,7 @@ class MainStore {
         this.backendLog.push(...message.data);
         break;
       case 'ping':
-        this.socket.send({ event: 'ping', data: Date.now() });
+        this.socket?.send({ event: 'ping', data: Date.now() });
         break;
       case 'info.torch':
         this.torchInfo = message.data;

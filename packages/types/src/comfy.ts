@@ -1,3 +1,5 @@
+import { FileInfo } from './file.js';
+
 export interface Requirement {
   name: string;
   expected: string;
@@ -84,3 +86,9 @@ export type ComfyEvent =
   | PromptProgressEvent
   | PromptEndEvent
   | TorchInfoEvent;
+
+export interface InstanceInfo {
+  samplers: string[];
+  schedulers: string[];
+  models: Record<string, FileInfo[]>;
+}
