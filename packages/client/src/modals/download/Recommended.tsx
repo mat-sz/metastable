@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { BsStarFill } from 'react-icons/bs';
+import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
 import styles from './Recommended.module.scss';
 import { downloadable } from '../../data/models';
 import { DownloadButton } from './DownloadButton';
+import { IconButton } from '../../components/IconButton';
 
 const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.CHECKPOINT]: 'Checkpoint',
@@ -50,6 +51,19 @@ export const Recommended: React.FC = () => {
                       <div className={styles.type}>
                         {TYPE_NAMES[model.type]}
                       </div>
+                      {!!model.homepage && (
+                        <IconButton
+                          onClick={() =>
+                            window.open(
+                              model.homepage,
+                              '_blank',
+                              'noopener noreferrer',
+                            )
+                          }
+                        >
+                          <BsArrowUpRightSquare />
+                        </IconButton>
+                      )}
                     </div>
                     {model.description && (
                       <div className={styles.description}>

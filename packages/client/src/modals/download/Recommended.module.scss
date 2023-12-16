@@ -50,8 +50,12 @@
         display: flex;
         align-items: center;
 
-        svg {
+        & > svg {
           margin-right: 0.5rem;
+        }
+
+        button {
+          margin-left: 0.5rem;
         }
       }
     }

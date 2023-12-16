@@ -25,6 +25,7 @@ export const downloadable: DownloadableModelGroup[] = [
         description:
           'The most commonly used checkpoint model. Most models on CivitAI are based on this.',
         recommended: true,
+        homepage: 'https://huggingface.co/runwayml/stable-diffusion-v1-5',
       },
       {
         name: 'SD 2.1 512x',
@@ -40,6 +41,8 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         description:
           'A newer version of Stable Diffusion with some censorship around artist names.',
+        homepage:
+          'https://huggingface.co/stabilityai/stable-diffusion-2-1-base',
       },
       {
         name: 'SD 2.1 768x',
@@ -54,6 +57,7 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         description: 'A version of SD 2.1 made for 768x768 image generation.',
+        homepage: 'https://huggingface.co/stabilityai/stable-diffusion-2-1',
       },
     ],
   },
@@ -77,6 +81,8 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 6938078334,
           },
         ],
+        homepage:
+          'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0',
       },
       {
         name: 'SDXL 1.0 - Refiner',
@@ -92,6 +98,8 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         description:
           'A model designed for improving the output from base SDXL.',
+        homepage:
+          'https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0',
       },
     ],
   },
@@ -112,6 +120,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 4265437280,
           },
         ],
+        homepage: 'https://huggingface.co/runwayml/stable-diffusion-inpainting',
       },
       {
         name: 'SD 2.0 Inpainting',
@@ -125,6 +134,8 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 5214662094,
           },
         ],
+        homepage:
+          'https://huggingface.co/stabilityai/stable-diffusion-2-inpainting',
       },
     ],
   },
@@ -206,6 +217,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 67040989,
           },
         ],
+        homepage: 'https://github.com/xinntao/Real-ESRGAN',
       },
       {
         name: 'RealESRGAN x4 plus - Anime',
@@ -221,6 +233,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 17938799,
           },
         ],
+        homepage: 'https://github.com/xinntao/Real-ESRGAN',
       },
       {
         name: 'RealESRGAN x4',
@@ -235,6 +248,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 67040989,
           },
         ],
+        homepage: 'https://huggingface.co/sberbank-ai/Real-ESRGAN',
       },
       {
         name: 'RealESRGAN x2',
@@ -249,6 +263,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 67061725,
           },
         ],
+        homepage: 'https://huggingface.co/sberbank-ai/Real-ESRGAN',
       },
     ],
   },
@@ -268,6 +283,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 1445154814,
           },
         ],
+        homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
       },
       {
         name: 'QRCode ControlNet - SD 2.1',
@@ -281,6 +297,7 @@ export const downloadable: DownloadableModelGroup[] = [
             size: 1456951266,
           },
         ],
+        homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
       },
     ],
   },

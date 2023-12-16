@@ -11,6 +11,7 @@ export interface DownloadableModel extends Omit<Model, 'id'> {
   downloads: DownloadFile[];
   recommended?: boolean;
   description?: string;
+  homepage?: string;
 }
 
 export interface DownloadableModelGroup {
