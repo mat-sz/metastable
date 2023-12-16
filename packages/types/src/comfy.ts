@@ -1,4 +1,5 @@
 import { FileInfo } from './file.js';
+import { Project } from './project.js';
 
 export interface Requirement {
   name: string;
@@ -70,7 +71,7 @@ export interface PromptEndEvent {
   data: {
     id: string;
     output_filenames: string[];
-    project_id: number;
+    project_id: Project['id'];
   };
 }
 

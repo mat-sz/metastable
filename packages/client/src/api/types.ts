@@ -13,10 +13,13 @@ export interface API {
   };
   projects: {
     all(): Promise<Project[]>;
-    get(id: number): Promise<Project>;
-    outputs(id: number): Promise<string[]>;
+    get(id: Project['id']): Promise<Project>;
+    outputs(id: Project['id']): Promise<string[]>;
     create(data: Pick<Project, 'name' | 'settings'>): Promise<Project>;
-    update(id: number, data: Partial<Omit<Project, 'id'>>): Promise<Project>;
+    update(
+      id: Project['id'],
+      data: Partial<Omit<Project, 'id'>>,
+    ): Promise<Project>;
   };
   downloads: {
     create(
@@ -26,7 +29,7 @@ export interface API {
   };
   prompts: {
     create(
-      projectId: number,
+      projectId: Project['id'],
       settings: ProjectSettings,
     ): Promise<{ id: string }>;
   };

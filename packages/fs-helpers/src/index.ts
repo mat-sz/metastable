@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { FileInfo } from '@metastable/types';
+import { FileInfo, Project } from '@metastable/types';
 
 export function select(object: any, fields: Record<string, boolean>): any {
   const temp: any = {};
@@ -111,11 +111,11 @@ export class FileSystem {
     return result;
   }
 
-  projectPath(id: number, type: 'output' | 'input') {
+  projectPath(id: Project['id'], type: 'output' | 'input') {
     return path.join(this.projectsDir, `${id}`, type);
   }
 
-  async createProjectTree(id: number) {
+  async createProjectTree(id: Project['id']) {
     await tryMkdir(this.projectPath(id, 'output'));
     await tryMkdir(this.projectPath(id, 'input'));
   }

@@ -7,7 +7,7 @@ import { API } from '../api';
 
 export class ProjectStore {
   projects: Project[] = [];
-  currentId: number | undefined = undefined;
+  currentId: APIProject['id'] | undefined = undefined;
   recent: APIProject[] = [];
 
   constructor() {
@@ -47,7 +47,7 @@ export class ProjectStore {
     this.refresh();
   }
 
-  async open(id: number) {
+  async open(id: APIProject['id']) {
     const json = await API.projects.get(id);
     const settings = JSON.parse(json.settings);
     if (!settings.models.loras) {
@@ -69,11 +69,11 @@ export class ProjectStore {
     this.refresh();
   }
 
-  select(id?: number) {
+  select(id?: APIProject['id']) {
     this.currentId = id;
   }
 
-  move(fromId: number, toId?: number) {
+  move(fromId: APIProject['id'], toId?: APIProject['id']) {
     const from = this.projects.findIndex(p => p.id === fromId);
     const to = toId ? this.projects.findIndex(p => p.id === toId) : undefined;
     if (from !== -1 && to !== -1) {
@@ -81,7 +81,7 @@ export class ProjectStore {
     }
   }
 
-  close(id: number) {
+  close(id: APIProject['id']) {
     this.projects = this.projects.filter(project => project.id !== id);
 
     if (id === this.currentId) {

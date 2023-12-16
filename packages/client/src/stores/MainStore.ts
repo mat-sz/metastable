@@ -8,6 +8,7 @@ import {
   ComfyTorchInfo,
   Requirement,
   InstanceInfo,
+  Project as APIProject,
 } from '@metastable/types';
 
 import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
@@ -109,7 +110,7 @@ class MainStore {
     return this.backendStatus;
   }
 
-  view(project_id: number, type: string, filename: string) {
+  view(project_id: APIProject['id'], type: string, filename: string) {
     return getStaticUrl(`/projects/${project_id}/${type}s/${filename}`);
   }
 

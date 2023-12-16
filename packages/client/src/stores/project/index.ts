@@ -1,5 +1,5 @@
 import { makeAutoObservable, toJS } from 'mobx';
-import { ProjectSettings } from '@metastable/types';
+import { ProjectSettings, Project as APIProject } from '@metastable/types';
 
 import { getStaticUrl } from '../../config';
 import { imageUrlToBase64, loadImage, randomSeed } from '../../helpers';
@@ -86,7 +86,7 @@ export class Project {
   blobUrls: Record<string, string> = {};
 
   constructor(
-    public id: number,
+    public id: APIProject['id'],
     public name: string,
     public settings: ProjectSettings,
   ) {

@@ -12,10 +12,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   projects: {
     all: () => ipcRenderer.invoke('projects:all'),
-    get: (id: number) => ipcRenderer.invoke('projects:get', id),
-    outputs: (id: number) => ipcRenderer.invoke('projects:outputs', id),
+    get: (id: number | string) => ipcRenderer.invoke('projects:get', id),
+    outputs: (id: number | string) =>
+      ipcRenderer.invoke('projects:outputs', id),
     create: (data: any) => ipcRenderer.invoke('projects:create', data),
-    update: (id: number, data: any) =>
+    update: (id: number | string, data: any) =>
       ipcRenderer.invoke('projects:update', id, data),
   },
   downloads: {
@@ -23,7 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     cancel: (id: string) => ipcRenderer.invoke('downloads:cancel', id),
   },
   prompts: {
-    create: (projectId: number, settings: any) =>
+    create: (projectId: number | string, settings: any) =>
       ipcRenderer.invoke('prompts:create', {
         project_id: projectId,
         ...settings,
