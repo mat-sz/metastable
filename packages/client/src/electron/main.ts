@@ -1,14 +1,12 @@
 import path from 'node:path';
 import url from 'node:url';
-import fs from 'node:fs/promises';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import {
   createPythonInstance,
   Comfy,
   validateRequirements,
 } from '@metastable/comfy';
-import { getFileList } from '@metastable/fs-helpers';
-import { nanoid } from 'nanoid/non-secure';
+import { filenames, FileSystem } from '@metastable/fs-helpers';
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -33,14 +31,6 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
-export async function tryMkdir(dirPath: string) {
-  try {
-    await fs.mkdir(dirPath, { recursive: true });
-  } catch {
-    //
-  }
-}
-
 async function createWindow() {
   const python = await createPythonInstance();
   const comfyMain = path.join(
@@ -50,6 +40,7 @@ async function createWindow() {
   );
   const dataDir = path.resolve('../../data');
   const comfy = new Comfy(python, comfyMain);
+  const fileSystem = new FileSystem(dataDir);
 
   const win = new BrowserWindow({
     title: 'Metastable',
@@ -83,7 +74,7 @@ async function createWindow() {
     return {
       samplers: comfy.samplers,
       schedulers: comfy.schedulers,
-      models: await getFileList(path.join(dataDir, 'models')),
+      models: await fileSystem.allModels(),
       dataDir: url.pathToFileURL(dataDir).toString(),
     };
   });
@@ -91,54 +82,7 @@ async function createWindow() {
     return await validateRequirements(python);
   });
   ipcMain.handle('prompts:create', async (_, settings: any) => {
-    const outputPath = path.join(
-      dataDir,
-      'projects',
-      `${settings.project_id}`,
-      'output',
-    );
-    await tryMkdir(outputPath);
-
-    function getModelPath(type: string, name: string) {
-      const result = path.join(dataDir, 'models', type, name);
-      return result;
-    }
-
-    settings.models.base.path = getModelPath(
-      'checkpoints',
-      settings.models.base.name,
-    );
-
-    if (settings.models.loras) {
-      for (const lora of settings.models.loras) {
-        lora.path = getModelPath('loras', lora.name);
-      }
-    }
-
-    if (settings.models.controlnets) {
-      for (const controlnet of settings.models.controlnets) {
-        controlnet.path = getModelPath('controlnet', controlnet.name);
-      }
-    }
-
-    if (settings.models.upscale) {
-      settings.models.upscale.path = getModelPath(
-        'upscale_models',
-        settings.models.upscale.name,
-      );
-    }
-
-    settings.sampler.tiling = !!settings.sampler.tiling;
-
-    const id = nanoid();
-
-    comfy.send('prompt', {
-      ...settings,
-      id: id,
-      output_path: outputPath,
-    });
-
-    return { id };
+    return await comfy.prompt(settings, fileSystem);
   });
 
   const projects: any[] = [];
@@ -158,7 +102,7 @@ async function createWindow() {
     return projects[id];
   });
   ipcMain.handle('projects:outputs', async (_, id: number) => {
-    return [];
+    return await filenames(fileSystem.projectPath(id, 'output'));
   });
 
   win.setMenu(null);

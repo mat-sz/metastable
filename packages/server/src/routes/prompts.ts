@@ -1,18 +1,8 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import { nanoid } from 'nanoid';
 import type { PrismaClient } from '@prisma/client';
 import type { Comfy } from '@metastable/comfy';
-import { exists } from '@metastable/fs-helpers';
-
-import {
-  createProjectTree,
-  findModelByType,
-  getModelPath,
-  getModelsByType,
-  getModelsDir,
-  getProjectDataPath,
-} from '../filesystem.js';
+import { FileSystem } from '@metastable/fs-helpers';
 
 const promptBody = {
   type: 'object',
@@ -91,7 +81,11 @@ const promptBody = {
   required: ['project_id', 'models', 'conditioning', 'sampler'],
 } as const satisfies JSONSchema;
 
-export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
+export function routesPrompts(
+  prisma: PrismaClient,
+  comfy: Comfy,
+  fileSystem: FileSystem,
+) {
   return async (fastify: FastifyInstance) => {
     fastify.post<{
       Body: FromSchema<typeof promptBody>;
@@ -103,57 +97,7 @@ export function routesPrompts(prisma: PrismaClient, comfy: Comfy) {
         },
       },
       async request => {
-        await createProjectTree(request.body.project_id);
-
-        const settings = request.body;
-        settings.models.base.path = getModelPath(
-          'checkpoints',
-          settings.models.base.name,
-        );
-
-        const embeddingsDir = getModelsDir('embeddings');
-        if (await exists(embeddingsDir)) {
-          settings.models.base.embedding_directory = embeddingsDir;
-        }
-
-        if (settings.models.loras) {
-          for (const lora of settings.models.loras) {
-            lora.path = getModelPath('loras', lora.name);
-          }
-        }
-
-        if (settings.models.controlnets) {
-          for (const controlnet of settings.models.controlnets) {
-            controlnet.path = getModelPath('controlnet', controlnet.name);
-          }
-        }
-
-        if (settings.models.upscale) {
-          settings.models.upscale.path = getModelPath(
-            'upscale_models',
-            settings.models.upscale.name,
-          );
-        }
-
-        if (settings.sampler.preview?.method === 'taesd') {
-          const list = await getModelsByType('vae_approx');
-          settings.sampler.preview.taesd = {
-            taesd_decoder: await findModelByType(list, 'taesd_decoder'),
-            taesdxl_decoder: await findModelByType(list, 'taesdxl_decoder'),
-          };
-        }
-
-        settings.sampler.tiling = !!settings.sampler.tiling;
-
-        const id = nanoid();
-
-        comfy.send('prompt', {
-          ...settings,
-          id: id,
-          output_path: getProjectDataPath(settings.project_id, 'output'),
-        });
-
-        return { id };
+        return await comfy.prompt(request.body, fileSystem);
       },
     );
   };

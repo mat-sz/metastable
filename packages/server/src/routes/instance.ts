@@ -1,15 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { validateRequirements, type Comfy } from '@metastable/comfy';
+import type { FileSystem } from '@metastable/fs-helpers';
 
-import { getModels } from '../filesystem.js';
-
-export function routesInstance(comfy: Comfy) {
+export function routesInstance(comfy: Comfy, fileSystem: FileSystem) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/info', async () => {
       return {
         samplers: comfy.samplers,
         schedulers: comfy.schedulers,
-        models: await getModels(),
+        models: await fileSystem.allModels(),
       };
     });
 

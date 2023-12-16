@@ -1,12 +1,9 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import createHttpError from 'http-errors';
 import { FastifyInstance } from 'fastify';
-import fs from 'fs/promises';
 import path from 'path';
 import type { PrismaClient } from '@prisma/client';
-import { isPathIn } from '@metastable/fs-helpers';
-
-import { projectsPath } from '../filesystem.js';
+import { type FileSystem, isPathIn, filenames } from '@metastable/fs-helpers';
 
 export const projectBody = {
   type: 'object',
@@ -30,7 +27,7 @@ export const projectSelect = {
   updatedAt: true,
 };
 
-export function routesProjects(prisma: PrismaClient) {
+export function routesProjects(prisma: PrismaClient, fileSystem: FileSystem) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/', async () => {
       return await prisma.project.findMany({
@@ -96,20 +93,13 @@ export function routesProjects(prisma: PrismaClient) {
 
     fastify.get('/:id/outputs', async request => {
       const projectId = parseInt((request.params as any)?.id);
-      try {
-        const files = await fs.readdir(
-          path.join(projectsPath, `${projectId}`, 'output'),
-        );
-        return files;
-      } catch {
-        return [];
-      }
+      return await filenames(fileSystem.projectPath(projectId, 'output'));
     });
 
     fastify.get('/:id/outputs/:filename', async (request, reply) => {
       const projectId = parseInt((request.params as any)?.id);
       const fileName = (request.params as any)?.filename;
-      const projectPath = path.join(projectsPath, `${projectId}`, 'output');
+      const projectPath = fileSystem.projectPath(projectId, 'output');
       const filePath = path.join(projectPath, fileName);
       if (!isPathIn(projectPath, filePath)) {
         return createHttpError(404);

@@ -2,8 +2,10 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 import EventEmitter from 'events';
 import os from 'os';
 import path from 'path';
-import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
 import { fileURLToPath } from 'url';
+import { nanoid } from 'nanoid/non-secure';
+import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
+import { exists, type FileSystem } from '@metastable/fs-helpers';
 
 import { CircularBuffer } from './helpers.js';
 import type { PythonInstance } from './python.js';
@@ -129,5 +131,58 @@ export class Comfy extends EventEmitter {
     this.process?.stdin.write(
       JSON.stringify({ event: eventName, data }) + '\n',
     );
+  }
+
+  async prompt(settings: any, fileSystem: FileSystem) {
+    await fileSystem.createProjectTree(settings.project_id);
+
+    settings.models.base.path = fileSystem.modelPath(
+      'checkpoints',
+      settings.models.base.name,
+    );
+
+    const embeddingsDir = fileSystem.modelsTypeDir('embeddings');
+    if (await exists(embeddingsDir)) {
+      settings.models.base.embedding_directory = embeddingsDir;
+    }
+
+    if (settings.models.loras) {
+      for (const lora of settings.models.loras) {
+        lora.path = fileSystem.modelPath('loras', lora.name);
+      }
+    }
+
+    if (settings.models.controlnets) {
+      for (const controlnet of settings.models.controlnets) {
+        controlnet.path = fileSystem.modelPath('controlnet', controlnet.name);
+      }
+    }
+
+    if (settings.models.upscale) {
+      settings.models.upscale.path = fileSystem.modelPath(
+        'upscale_models',
+        settings.models.upscale.name,
+      );
+    }
+
+    if (settings.sampler.preview?.method === 'taesd') {
+      const list = await fileSystem.models('vae_approx');
+      settings.sampler.preview.taesd = {
+        taesd_decoder: await fileSystem.findModel(list, 'taesd_decoder'),
+        taesdxl_decoder: await fileSystem.findModel(list, 'taesdxl_decoder'),
+      };
+    }
+
+    settings.sampler.tiling = !!settings.sampler.tiling;
+
+    const id = nanoid();
+
+    this.send('prompt', {
+      ...settings,
+      id: id,
+      output_path: fileSystem.projectPath(settings.project_id, 'output'),
+    });
+
+    return { id };
   }
 }
