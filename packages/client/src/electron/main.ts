@@ -1,12 +1,15 @@
 import path from 'node:path';
 import url from 'node:url';
+import fs from 'node:fs/promises';
 import { app, BrowserWindow, ipcMain } from 'electron';
+import { nanoid } from 'nanoid/non-secure';
 import {
   createPythonInstance,
   Comfy,
   validateRequirements,
 } from '@metastable/comfy';
 import { filenames, FileSystem } from '@metastable/fs-helpers';
+import { Project } from '@metastable/types';
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -31,6 +34,87 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
+export class JSONFile<T> {
+  constructor(
+    private path: string,
+    private fallback: T,
+  ) {}
+
+  async read(): Promise<T> {
+    try {
+      return JSON.parse(await fs.readFile(this.path, { encoding: 'utf-8' }));
+    } catch {
+      return this.fallback;
+    }
+  }
+
+  async write(data: T) {
+    await fs.writeFile(this.path, JSON.stringify(data));
+  }
+}
+
+export class Projects {
+  mainFile: JSONFile<
+    Record<Project['id'], Pick<Project, 'name' | 'lastOutput'>>
+  >;
+  constructor(private projectsDir: string) {
+    this.mainFile = new JSONFile(path.join(projectsDir, 'index.json'), {});
+  }
+
+  projectFile(id: Project['id']): JSONFile<Project | undefined> {
+    return new JSONFile(
+      path.join(this.projectsDir, `${id}`, 'project.json'),
+      undefined,
+    );
+  }
+
+  async all() {
+    return await this.mainFile.read();
+  }
+
+  async create(data: Pick<Project, 'name' | 'settings'>) {
+    const id = nanoid();
+    const project = { id, ...data };
+    await fs.mkdir(path.join(this.projectsDir, `${id}`), { recursive: true });
+    await this.save(project);
+    return project;
+  }
+
+  async get(id: Project['id']) {
+    const projectFile = this.projectFile(id);
+    return await projectFile.read();
+  }
+
+  async update(id: Project['id'], data: Partial<Omit<Project, 'id'>>) {
+    const projectFile = this.projectFile(id);
+    const project = await projectFile.read();
+    if (!project) {
+      return;
+    }
+
+    const newProject = {
+      ...project,
+      ...data,
+    };
+    await this.save(newProject);
+
+    return newProject;
+  }
+
+  private async save(project: Project) {
+    const all = await this.all();
+    all[project.id] = {
+      name: project.name,
+      lastOutput: project.lastOutput,
+    };
+
+    const projectFile = this.projectFile(project.id);
+    await projectFile.write(project);
+
+    await this.mainFile.write(all);
+  }
+}
+
 async function createWindow() {
   const python = await createPythonInstance();
   const comfyMain = path.join(
@@ -41,6 +125,7 @@ async function createWindow() {
   const dataDir = path.resolve('../../data');
   const comfy = new Comfy(python, comfyMain);
   const fileSystem = new FileSystem(dataDir);
+  const projects = new Projects(fileSystem.projectsDir);
 
   const win = new BrowserWindow({
     title: 'Metastable',
@@ -60,8 +145,17 @@ async function createWindow() {
     },
   });
 
-  comfy.on('event', event => {
+  comfy.on('event', async event => {
     win.webContents.send('comfy:event', event);
+
+    if (event.event === 'prompt.end') {
+      const filename = event.data?.output_filenames?.[0];
+
+      if (filename) {
+        const projectId = event.data.project_id;
+        await projects.update(projectId, { lastOutput: filename });
+      }
+    }
   });
 
   ipcMain.on('ready', () => {
@@ -85,23 +179,22 @@ async function createWindow() {
     return await comfy.prompt(settings, fileSystem);
   });
 
-  const projects: any[] = [];
   ipcMain.handle('projects:all', async () => {
-    return projects;
+    const all = await projects.all();
+    return Object.entries(all).map(([id, data]) => ({ id, ...data }));
   });
   ipcMain.handle('projects:create', async (_, data: any) => {
-    data['id'] = 8 + projects.length - 1;
-    projects.push(data);
-    return data;
+    const project = await projects.create(data);
+    await fileSystem.createProjectTree(project.id);
+    return project;
   });
-  ipcMain.handle('projects:get', async (_, id: number) => {
-    return projects[id];
+  ipcMain.handle('projects:get', async (_, id: Project['id']) => {
+    return await projects.get(id);
   });
-  ipcMain.handle('projects:update', async (_, id: number, data: any) => {
-    projects[id] = { ...projects[id], ...data };
-    return projects[id];
+  ipcMain.handle('projects:update', async (_, id: Project['id'], data: any) => {
+    return await projects.update(id, data);
   });
-  ipcMain.handle('projects:outputs', async (_, id: number) => {
+  ipcMain.handle('projects:outputs', async (_, id: Project['id']) => {
     return await filenames(fileSystem.projectPath(id, 'output'));
   });
 
