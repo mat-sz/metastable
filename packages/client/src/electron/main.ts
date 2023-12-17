@@ -1,7 +1,8 @@
 import path from 'node:path';
 import url from 'node:url';
 import fs from 'node:fs/promises';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import os from 'node:os';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import { nanoid } from 'nanoid/non-secure';
 import {
   createPythonInstance,
@@ -115,6 +116,65 @@ export class Projects {
   }
 }
 
+function createMenu() {
+  const menu = new Menu();
+
+  const menuMain = new MenuItem({
+    id: 'metastable',
+    label: 'Metastable',
+    type: 'submenu',
+    submenu: new Menu(),
+  });
+  menuMain.submenu?.append(
+    new MenuItem({
+      id: 'metastable:quit',
+      label: 'Quit Metastable',
+      type: 'normal',
+    }),
+  );
+  menu.append(menuMain);
+
+  const menuProject = new MenuItem({
+    id: 'project',
+    label: 'Project',
+    type: 'submenu',
+    submenu: new Menu(),
+  });
+
+  menuProject.submenu?.append(
+    new MenuItem({
+      id: 'project:new',
+      label: 'New',
+      type: 'normal',
+    }),
+  );
+  menuProject.submenu?.append(
+    new MenuItem({
+      id: 'project:open',
+      label: 'Open',
+      type: 'normal',
+    }),
+  );
+  menu.append(menuProject);
+
+  const menuView = new MenuItem({
+    id: 'view',
+    label: 'View',
+    type: 'submenu',
+    submenu: new Menu(),
+  });
+  menuView.submenu?.append(
+    new MenuItem({
+      id: 'view:modelManager',
+      label: 'Model manager',
+      type: 'normal',
+    }),
+  );
+  menu.append(menuView);
+
+  return menu;
+}
+
 async function createWindow() {
   const python = await createPythonInstance();
   const comfyMain = path.join(
@@ -199,6 +259,11 @@ async function createWindow() {
   });
 
   win.setMenu(null);
+
+  // macOS menu bar
+  if (os.platform() === 'darwin') {
+    app.applicationMenu = createMenu();
+  }
 
   win.on('closed', () => {
     app.quit();

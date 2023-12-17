@@ -14,3 +14,4 @@ export function getStaticUrl(path: string) {
 }
 
 export const IS_ELECTRON = import.meta.env.MODE.includes('electron');
+export const IS_MAC = !!window.electronAPI?.isMac;

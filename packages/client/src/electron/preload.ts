@@ -30,6 +30,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ...settings,
       }),
   },
+  isMac: process.platform === 'darwin',
 });
 
 function domReady(
