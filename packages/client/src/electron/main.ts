@@ -101,7 +101,9 @@ async function createWindow() {
   );
   const dataDir = path.resolve('../../data');
   const comfy = new Comfy(python, comfyMain);
+
   const storage = new Storage(dataDir);
+  await storage.init();
 
   const win = new BrowserWindow({
     title: 'Metastable',

@@ -9,6 +9,10 @@ import { rimraf } from 'rimraf';
 export class Projects {
   constructor(private projectsDir: string) {}
 
+  async init() {
+    await fs.mkdir(this.projectsDir, { recursive: true });
+  }
+
   projectFile(
     id: Project['id'],
   ): JSONFile<Omit<Project, 'id' | 'name' | 'settings'> | undefined> {

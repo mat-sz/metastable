@@ -10,7 +10,6 @@ coverage
 
 __pycache__
 *.py[cod]
-/temp/
 cache.json
 
 .yarn/*
@@ -22,3 +21,5 @@ cache.json
 !.yarn/versions
 
 .DS_Store
+data
+temp

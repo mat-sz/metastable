@@ -21,6 +21,8 @@ const downloader = new Downloader(dataRoot);
 const clientManager = new ClientManager();
 const storage = new Storage(dataRoot);
 
+await storage.init();
+
 const app = Fastify();
 app.register(fastifyCompress);
 

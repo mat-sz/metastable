@@ -6,6 +6,23 @@ import { JSONFile } from './helpers.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
 const IMAGE_EXTENSIONS = ['png', 'jpeg', 'jpg', 'gif', 'webp', 'heif', 'avif'];
+const MODEL_TYPES = [
+  'checkpoints',
+  'clip',
+  'clip_vision',
+  'configs',
+  'controlnet',
+  'diffusers',
+  'embeddings',
+  'gligen',
+  'hypernetworks',
+  'loras',
+  'style_models',
+  'unet',
+  'upscale_models',
+  'vae',
+  'vae_approx',
+];
 
 function isModel(name: string) {
   return MODEL_EXTENSIONS.includes(name.split('.').pop()!);
@@ -13,6 +30,12 @@ function isModel(name: string) {
 
 export class Models {
   constructor(private modelsDir: string) {}
+
+  async init() {
+    for (const type of MODEL_TYPES) {
+      await fs.mkdir(this.dir(type), { recursive: true });
+    }
+  }
 
   modelFile(
     type: string,

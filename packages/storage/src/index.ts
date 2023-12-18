@@ -15,6 +15,11 @@ export class Storage {
     this.config = new Config(this.configPath);
   }
 
+  async init() {
+    await this.models.init();
+    await this.projects.init();
+  }
+
   get configPath() {
     return path.join(this.dataRoot, 'config.json');
   }
