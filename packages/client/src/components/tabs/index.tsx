@@ -6,11 +6,13 @@ import styles from './index.module.scss';
 interface TabProps {
   id: string | number;
   title: string;
+  icon?: JSX.Element;
 }
 
 export const Tab: React.FC<React.PropsWithChildren<TabProps>> = ({
   id,
   title,
+  icon,
 }) => {
   const context = useContext(TabsContext);
 
@@ -20,8 +22,10 @@ export const Tab: React.FC<React.PropsWithChildren<TabProps>> = ({
         [styles.selected]: context.selected === id,
       })}
       onClick={() => context.select(id)}
+      title={title}
     >
-      {title}
+      {icon}
+      <span>{title}</span>
     </div>
   );
 };
@@ -36,25 +40,40 @@ const TabsContext = React.createContext<ITabsContext>({
   select: () => {},
 });
 
-export const Tabs: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <div className={styles.tabs}>{children}</div>;
+interface TabsProps {
+  buttonStyle?: 'normal' | 'icon';
+}
+
+export const Tabs: React.FC<React.PropsWithChildren<TabsProps>> = ({
+  children,
+  buttonStyle = 'normal',
+}) => {
+  return (
+    <div className={clsx(styles.tabs, styles[buttonStyle])}>{children}</div>
+  );
 };
 
 interface TabViewProps {
   defaultTab: string | number;
+  direction?: 'horizontal' | 'vertical';
+  className?: string;
 }
 
 export const TabView: React.FC<React.PropsWithChildren<TabViewProps>> = ({
   defaultTab,
   children,
+  direction = 'horizontal',
+  className,
 }) => {
   const [selectedTab, setSelectedTab] = useState(defaultTab);
   return (
-    <TabsContext.Provider
-      value={{ selected: selectedTab, select: setSelectedTab }}
-    >
-      {children}
-    </TabsContext.Provider>
+    <div className={clsx(styles.tabView, styles[direction], className)}>
+      <TabsContext.Provider
+        value={{ selected: selectedTab, select: setSelectedTab }}
+      >
+        {children}
+      </TabsContext.Provider>
+    </div>
   );
 };
 
@@ -69,8 +88,19 @@ export const TabPanel: React.FC<React.PropsWithChildren<TabPanelProps>> = ({
   const context = useContext(TabsContext);
 
   if (context.selected === id) {
-    return <div className={styles.panel}>{children}</div>;
+    return <>{children}</>;
   }
 
   return null;
+};
+
+interface TabContentProps {
+  className?: string;
+}
+
+export const TabContent: React.FC<React.PropsWithChildren<TabContentProps>> = ({
+  children,
+  className,
+}) => {
+  return <div className={clsx(styles.content, className)}>{children}</div>;
 };

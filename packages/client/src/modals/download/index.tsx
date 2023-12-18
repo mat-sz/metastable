@@ -1,6 +1,13 @@
 import React from 'react';
 
-import { Modal, Tab, TabPanel, TabView, Tabs } from '../../components';
+import {
+  Modal,
+  Tab,
+  TabContent,
+  TabPanel,
+  TabView,
+  Tabs,
+} from '../../components';
 import { Queue } from './queue';
 import { Recommended } from './recommended';
 import { CivitAI } from './civitai';
@@ -14,15 +21,17 @@ export const DownloadManager: React.FC = () => {
           <Tab id="recommended" title="Recommended" />
           <Tab id="civitai" title="CivitAI" />
         </Tabs>
-        <TabPanel id="queue">
-          <Queue />
-        </TabPanel>
-        <TabPanel id="recommended">
-          <Recommended />
-        </TabPanel>
-        <TabPanel id="civitai">
-          <CivitAI />
-        </TabPanel>
+        <TabContent>
+          <TabPanel id="queue">
+            <Queue />
+          </TabPanel>
+          <TabPanel id="recommended">
+            <Recommended />
+          </TabPanel>
+          <TabPanel id="civitai">
+            <CivitAI />
+          </TabPanel>
+        </TabContent>
       </TabView>
     </Modal>
   );

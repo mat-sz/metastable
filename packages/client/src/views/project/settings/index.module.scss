@@ -4,38 +4,11 @@
   min-height: 0;
 }
 
-.categories {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  background: var(--color-bg-panel-dark);
-
-  li {
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    padding: 0.4rem;
-    font-weight: bold;
-    cursor: pointer;
-
-    &.active {
-      background: var(--color-bg-panel);
-    }
-
-    &:hover {
-      background: var(--color-bg-interactive);
-    }
-  }
-}
-
 .prompt {
   display: flex;
   flex-direction: column;
   background: var(--color-bg-panel);
   overflow-y: auto;
-
-  & > * {
-    margin-bottom: 0.5rem;
-  }
 }
 
 .error {

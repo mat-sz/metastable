@@ -20,6 +20,7 @@ import {
   Tabs,
   Rating,
   Carousel,
+  TabContent,
 } from '../../../components';
 import { DownloadButton } from '../DownloadButton';
 
@@ -123,11 +124,13 @@ export const Model: React.FC<ModelProps> = ({ model, onClose }) => {
             <Tab key={index} id={index} title={version.name} />
           ))}
         </Tabs>
-        {model.modelVersions.map((version, index) => (
-          <TabPanel key={index} id={index}>
-            <ModelVersion model={model} version={version} />
-          </TabPanel>
-        ))}
+        <TabContent>
+          {model.modelVersions.map((version, index) => (
+            <TabPanel key={index} id={index}>
+              <ModelVersion model={model} version={version} />
+            </TabPanel>
+          ))}
+        </TabContent>
       </TabView>
     </div>
   );

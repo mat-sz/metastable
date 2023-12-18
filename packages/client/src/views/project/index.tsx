@@ -34,7 +34,7 @@ export const Project: React.FC = observer(() => {
 
   return (
     <div className={styles.project}>
-      <ul className={styles.categories}>
+      <ul className={styles.modes}>
         {Object.entries(tabs).map(([key, { icon, title }]) => (
           <li
             key={key}

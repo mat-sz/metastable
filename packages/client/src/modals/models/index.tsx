@@ -2,7 +2,14 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../stores/MainStore';
-import { Modal, Tab, TabPanel, TabView, Tabs } from '../../components';
+import {
+  Modal,
+  Tab,
+  TabContent,
+  TabPanel,
+  TabView,
+  Tabs,
+} from '../../components';
 import { filesize } from '../../helpers';
 
 export const ModelManager: React.FC = observer(() => {
@@ -18,15 +25,17 @@ export const ModelManager: React.FC = observer(() => {
             <Tab id={key} key={key} title={key} />
           ))}
         </Tabs>
-        {available.map(([key, models]) => (
-          <TabPanel id={key} key={key}>
-            {models.map(model => (
-              <li key={model.name}>
-                {model.name} - {filesize(model.size)}
-              </li>
-            ))}
-          </TabPanel>
-        ))}
+        <TabContent>
+          {available.map(([key, models]) => (
+            <TabPanel id={key} key={key}>
+              {models.map(model => (
+                <li key={model.name}>
+                  {model.name} - {filesize(model.size)}
+                </li>
+              ))}
+            </TabPanel>
+          ))}
+        </TabContent>
       </TabView>
     </Modal>
   );

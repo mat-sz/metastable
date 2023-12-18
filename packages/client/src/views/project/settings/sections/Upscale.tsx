@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { VarButton, VarSelect, VarToggle } from 'react-var-ui';
+import { VarButton, VarCategory, VarSelect, VarToggle } from 'react-var-ui';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { useUI } from '../../../../contexts/ui';
@@ -14,7 +14,7 @@ export const Upscale: React.FC = observer(() => {
   const enabled = !!project.settings.models.upscale?.name;
 
   return (
-    <>
+    <VarCategory label="Upscale">
       {upscale_models?.[0] ? (
         <VarToggle
           label="Enable"
@@ -48,6 +48,6 @@ export const Upscale: React.FC = observer(() => {
           )}
         />
       )}
-    </>
+    </VarCategory>
   );
 });
