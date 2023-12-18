@@ -14,7 +14,7 @@ export const Queue: React.FC = observer(() => {
       {downloads.queue.map(download => (
         <div key={download.id} className={styles.item}>
           <div>
-            <div>{download.filename}</div>
+            <div>{download.name}</div>
             <div>
               <progress value={download.progress} max={download.size} />
             </div>

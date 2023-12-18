@@ -17,7 +17,7 @@ import { ClientManager } from './ws.js';
 
 const python = await createPythonInstance();
 const comfy = new Comfy(python);
-const downloader = new Downloader(dataRoot);
+const downloader = new Downloader();
 const clientManager = new ClientManager();
 const storage = new Storage(dataRoot);
 
@@ -119,7 +119,7 @@ app.register(routesInstance(comfy, storage), { prefix: '/instance' });
 app.register(routesProjects(storage), { prefix: '/projects' });
 app.register(routesModels(storage), { prefix: '/models' });
 app.register(routesPrompts(comfy, storage), { prefix: '/prompts' });
-app.register(routesDownloads(downloader), { prefix: '/downloads' });
+app.register(routesDownloads(storage, downloader), { prefix: '/downloads' });
 
 app.listen({ host, port });
 

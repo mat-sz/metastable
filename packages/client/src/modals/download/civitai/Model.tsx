@@ -41,7 +41,7 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
             <DownloadButton
               files={[
                 {
-                  filename: `${version.id}_${primaryFile.name}`,
+                  name: `${version.id}_${primaryFile.name}`,
                   type,
                   url: primaryFile.downloadUrl,
                   size: primaryFile.sizeKB * 1024,

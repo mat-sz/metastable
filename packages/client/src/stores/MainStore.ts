@@ -172,14 +172,14 @@ class MainStore {
     }
   }
 
-  hasFile(type: ModelType, filename: string) {
-    if (this.info.models[type]?.find(file => file.name === filename)) {
+  hasFile(type: ModelType, name: string) {
+    if (this.info.models[type]?.find(file => file.name === name)) {
       return 'downloaded';
     }
 
     const item = this.downloads.queue.find(
       item =>
-        item.filename === filename &&
+        item.name === name &&
         ['done', 'queued', 'in_progress'].includes(item.state),
     );
 

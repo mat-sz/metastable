@@ -1,5 +1,4 @@
 import {
-  Download,
   InstanceInfo,
   Project,
   ProjectSettings,
@@ -22,9 +21,11 @@ export interface API {
     ): Promise<Project>;
   };
   downloads: {
-    create(
-      data: Pick<Download, 'filename' | 'url' | 'type'>,
-    ): Promise<{ id: string; size: number } | { error: string }>;
+    create(data: {
+      name: string;
+      type: string;
+      url: string;
+    }): Promise<{ id: string; size: number; name: string } | { error: string }>;
     cancel(id: string): Promise<void>;
   };
   prompts: {

@@ -40,24 +40,23 @@ export class DownloadStore {
     await API.downloads.cancel(id);
   }
 
-  async download(type: ModelType, url: string, filename: string) {
-    this.waiting.add(filename);
+  async download(type: ModelType, url: string, name: string) {
+    this.waiting.add(name);
 
-    const json = await API.downloads.create({ type, url, filename });
+    const json = await API.downloads.create({ type, url, name });
     runInAction(() => {
-      this.waiting.delete(filename);
+      this.waiting.delete(name);
 
       if ('error' in json) {
-        this.errors[filename] = json.error;
+        this.errors[name] = json.error;
         return;
       }
 
       this.queue.push({
         id: json.id,
         size: json.size,
-        type,
         url,
-        filename,
+        name: json.name,
         state: 'queued',
         progress: 0,
       });

@@ -1,7 +1,7 @@
 import { ModelType } from '@metastable/types';
 
 export interface DownloadFile {
-  filename: string;
+  name: string;
   type: ModelType;
   url: string;
   size?: number;

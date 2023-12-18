@@ -17,7 +17,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v1.5-pruned-emaonly.safetensors',
+            name: 'sd_v1.5-pruned-emaonly.safetensors',
             url: 'https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
             size: 4265146304,
           },
@@ -34,7 +34,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v2.1_512-ema-pruned.safetensors',
+            name: 'sd_v2.1_512-ema-pruned.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-2-1-base/resolve/main/v2-1_512-ema-pruned.safetensors',
             size: 5214604494,
           },
@@ -51,7 +51,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v2.1_768-ema-pruned.safetensors',
+            name: 'sd_v2.1_768-ema-pruned.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-2-1/resolve/main/v2-1_768-ema-pruned.safetensors',
             size: 5214604494,
           },
@@ -76,7 +76,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_xl_base_1.0.safetensors',
+            name: 'sd_xl_base_1.0.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors',
             size: 6938078334,
           },
@@ -91,7 +91,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_xl_refiner_1.0.safetensors',
+            name: 'sd_xl_refiner_1.0.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors',
             size: 6075981930,
           },
@@ -115,7 +115,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v1.5-inpainting.ckpt',
+            name: 'sd_v1.5-inpainting.ckpt',
             url: 'https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt',
             size: 4265437280,
           },
@@ -129,7 +129,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CHECKPOINT,
-            filename: 'sd_v2.0-inpainting.safetensors',
+            name: 'sd_v2.0-inpainting.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-2-inpainting/resolve/main/512-inpainting-ema.safetensors',
             size: 5214662094,
           },
@@ -151,7 +151,7 @@ export const downloadable: DownloadableModelGroup[] = [
   //       downloads: [
   //         {
   //           type: ModelType.CLIP_VISION,
-  //           filename: 'sd_xl_revision.safetensors',
+  //           name: 'sd_xl_revision.safetensors',
   //           url: 'https://huggingface.co/comfyanonymous/clip_vision_g/resolve/main/clip_vision_g.safetensors',
   //           size: 3689911098,
   //         },
@@ -172,25 +172,25 @@ export const downloadable: DownloadableModelGroup[] = [
   //       downloads: [
   //         {
   //           type: ModelType.VAE_APPROX,
-  //           filename: 'taesd_decoder.pth',
+  //           name: 'taesd_decoder.pth',
   //           url: 'https://github.com/madebyollin/taesd/raw/main/taesd_decoder.pth',
   //           size: 4915980,
   //         },
   //         {
   //           type: ModelType.VAE_APPROX,
-  //           filename: 'taesd_encoder.pth',
+  //           name: 'taesd_encoder.pth',
   //           url: 'https://github.com/madebyollin/taesd/raw/main/taesd_encoder.pth',
   //           size: 4915788,
   //         },
   //         {
   //           type: ModelType.VAE_APPROX,
-  //           filename: 'taesdxl_decoder.pth',
+  //           name: 'taesdxl_decoder.pth',
   //           url: 'https://github.com/madebyollin/taesd/raw/main/taesdxl_decoder.pth',
   //           size: 4915221,
   //         },
   //         {
   //           type: ModelType.VAE_APPROX,
-  //           filename: 'taesdxl_encoder.pth',
+  //           name: 'taesdxl_encoder.pth',
   //           url: 'https://github.com/madebyollin/taesd/raw/main/taesdxl_encoder.pth',
   //           size: 4915029,
   //         },
@@ -212,7 +212,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.UPSCALE_MODEL,
-            filename: 'realesrgan_x4plus.pth',
+            name: 'realesrgan_x4plus.pth',
             url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth',
             size: 67040989,
           },
@@ -228,7 +228,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.UPSCALE_MODEL,
-            filename: 'realesrgan_x4plus_anime.pth',
+            name: 'realesrgan_x4plus_anime.pth',
             url: 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth',
             size: 17938799,
           },
@@ -243,7 +243,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.UPSCALE_MODEL,
-            filename: 'realesrgan_x4.pth',
+            name: 'realesrgan_x4.pth',
             url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x4.pth',
             size: 67040989,
           },
@@ -258,7 +258,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.UPSCALE_MODEL,
-            filename: 'realesrgan_x2.pth',
+            name: 'realesrgan_x2.pth',
             url: 'https://huggingface.co/sberbank-ai/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth',
             size: 67061725,
           },
@@ -278,7 +278,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CONTROLNET,
-            filename: 'sd1.5_qrcode_controlnet.safetensors',
+            name: 'sd1.5_qrcode_controlnet.safetensors',
             url: 'https://huggingface.co/DionTimmer/controlnet_qrcode/resolve/main/control_v1p_sd15_qrcode.safetensors',
             size: 1445154814,
           },
@@ -292,7 +292,7 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.CONTROLNET,
-            filename: 'sd2.1_qrcode_controlnet.safetensors',
+            name: 'sd2.1_qrcode_controlnet.safetensors',
             url: 'https://huggingface.co/DionTimmer/controlnet_qrcode/resolve/main/control_v11p_sd21_qrcode.safetensors',
             size: 1456951266,
           },

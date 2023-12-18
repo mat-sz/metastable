@@ -5,21 +5,10 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import EventEmitter from 'events';
 import { Download, DownloadState } from '@metastable/types';
-import { exists, isPathIn } from '@metastable/fs-helpers';
+import { exists } from '@metastable/fs-helpers';
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;
-
-function getFilePaths(parent: string, type: string, name: string) {
-  const filenameParts = name.split(/\\\//g);
-  const filename = filenameParts.pop()!;
-  const partFilename = `${filename}.part`;
-
-  const typePath = path.join(parent, type);
-  const dirPath = path.join(typePath, ...filenameParts);
-
-  return { filename, partFilename, typePath, dirPath };
-}
 
 interface DownloadItem extends Download {
   cancelled?: boolean;
@@ -33,15 +22,14 @@ export class DownloadTask extends EventEmitter implements Download {
   cancelled?: boolean;
   state: DownloadState = 'queued';
   private downloadUrl?: string;
+  name;
 
   constructor(
     public url: string,
-    public type: string,
-    public filename: string,
-    private filePath: string,
-    private partPath: string,
+    public savePath: string,
   ) {
     super();
+    this.name = path.basename(savePath);
   }
 
   async prepare() {
@@ -73,14 +61,15 @@ export class DownloadTask extends EventEmitter implements Download {
   }
 
   async start() {
-    if (await exists(this.partPath)) {
+    const partPath = `${this.savePath}.part`;
+    if (await exists(partPath)) {
       // TODO: Continue download?
-      await fs.unlink(this.partPath);
+      await fs.unlink(partPath);
     } else {
-      await fs.mkdir(path.dirname(this.partPath), { recursive: true });
+      await fs.mkdir(path.dirname(partPath), { recursive: true });
     }
 
-    const writer = createWriteStream(this.partPath);
+    const writer = createWriteStream(partPath);
     const startedAt = Date.now();
     this.state = 'in_progress';
     this.startedAt = startedAt;
@@ -89,10 +78,10 @@ export class DownloadTask extends EventEmitter implements Download {
     const onClose = async () => {
       writer.close();
       if (this.cancelled) {
-        await fs.unlink(this.partPath);
+        await fs.unlink(partPath);
         this.state = 'cancelled';
       } else {
-        await fs.rename(this.partPath, this.filePath);
+        await fs.rename(partPath, this.savePath);
         this.state = 'done';
       }
       this.emit('state');
@@ -159,25 +148,12 @@ export class Downloader extends EventEmitter {
   queue: DownloadTask[] = [];
   current: DownloadItem | undefined = undefined;
 
-  constructor(public parent: string) {
+  constructor() {
     super();
   }
 
-  async add(type: string, url: string, name: string) {
-    const { typePath, dirPath, partFilename, filename } = getFilePaths(
-      this.parent,
-      type,
-      name,
-    );
-    if (!isPathIn(typePath, dirPath)) {
-      throw new Error(
-        'Attempted to save file outside of the parent directory.',
-      );
-    }
-
-    const filePath = path.join(dirPath, filename);
-    const partPath = path.join(dirPath, partFilename);
-    const task = new DownloadTask(url, type, name, filePath, partPath);
+  async add(url: string, savePath: string) {
+    const task = new DownloadTask(url, savePath);
     await task.prepare();
 
     task.on('progress', () => {
@@ -207,7 +183,7 @@ export class Downloader extends EventEmitter {
 
     this.queue.push(task);
     this.run();
-    return { id: task.id, size: task.size };
+    return { id: task.id, size: task.size, name: task.name };
   }
 
   async run() {

@@ -9,8 +9,7 @@ export type DownloadState =
 export interface Download {
   id: string;
   url: string;
-  type: string;
-  filename: string;
+  name: string;
   progress: number;
   size: number;
   startedAt?: number;

@@ -13,7 +13,7 @@ interface DownloadButtonProps {
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
   ({ files }) => {
     const fileState = files.map(file =>
-      mainStore.hasFile(file.type, file.filename),
+      mainStore.hasFile(file.type, file.name),
     );
     const allDownloaded = fileState.every(state => state === 'downloaded');
     const allQueued = fileState.every(
@@ -23,10 +23,10 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       (_, i) => typeof fileState[i] === 'undefined',
     );
     const isWaiting = files.some(file =>
-      mainStore.downloads.waiting.has(file.filename),
+      mainStore.downloads.waiting.has(file.name),
     );
     const error = files
-      .map(file => mainStore.downloads.errors[file.filename])
+      .map(file => mainStore.downloads.errors[file.name])
       .find(error => !!error);
 
     if (error) {
@@ -53,7 +53,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
     } else if (allQueued) {
       const items = mainStore.downloads.queue.filter(
         item =>
-          !!files.find(file => file.filename === item.filename) &&
+          !!files.find(file => file.name === item.name) &&
           ['done', 'queued', 'in_progress'].includes(item.state),
       );
 
@@ -87,7 +87,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       <button
         onClick={() => {
           for (const file of remaining) {
-            mainStore.downloads.download(file.type, file.url, file.filename);
+            mainStore.downloads.download(file.type, file.url, file.name);
           }
         }}
       >
