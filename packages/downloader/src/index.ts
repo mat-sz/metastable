@@ -5,7 +5,7 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import EventEmitter from 'events';
 import { Download, DownloadState } from '@metastable/types';
-import { exists, isPathIn, tryMkdir } from '@metastable/fs-helpers';
+import { exists, isPathIn } from '@metastable/fs-helpers';
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;
@@ -77,7 +77,7 @@ export class DownloadTask extends EventEmitter implements Download {
       // TODO: Continue download?
       await fs.unlink(this.partPath);
     } else {
-      await tryMkdir(path.dirname(this.partPath));
+      await fs.mkdir(path.dirname(this.partPath), { recursive: true });
     }
 
     const writer = createWriteStream(this.partPath);

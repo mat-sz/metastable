@@ -835,6 +835,7 @@ __metadata:
   dependencies:
     "@metastable/comfy": "npm:*"
     "@metastable/fs-helpers": "npm:*"
+    "@metastable/storage": "npm:*"
     "@metastable/types": "npm:*"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
@@ -878,6 +879,7 @@ __metadata:
   resolution: "@metastable/comfy@workspace:packages/comfy"
   dependencies:
     "@metastable/fs-helpers": "npm:*"
+    "@metastable/storage": "npm:*"
     "@metastable/types": "npm:*"
     "@types/node": "npm:^20.10.3"
     "@types/semver": "npm:^7.5.6"
@@ -925,6 +927,7 @@ __metadata:
     "@metastable/comfy": "npm:*"
     "@metastable/downloader": "npm:*"
     "@metastable/fs-helpers": "npm:*"
+    "@metastable/storage": "npm:*"
     "@metastable/types": "npm:*"
     "@prisma/client": "npm:^5.6.0"
     "@types/http-errors": "npm:^2.0.4"
@@ -939,6 +942,18 @@ __metadata:
     tsx: "npm:^4.6.2"
     typescript: "npm:^5.3.2"
     ws: "npm:^8.14.2"
+  languageName: unknown
+  linkType: soft
+
+"@metastable/storage@npm:*, @metastable/storage@workspace:packages/storage":
+  version: 0.0.0-use.local
+  resolution: "@metastable/storage@workspace:packages/storage"
+  dependencies:
+    "@metastable/fs-helpers": "npm:*"
+    "@metastable/types": "npm:*"
+    "@types/node": "npm:^20.10.3"
+    rimraf: "npm:^5.0.5"
+    typescript: "npm:^5.3.2"
   languageName: unknown
   linkType: soft
 
@@ -3350,7 +3365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.2.2, glob@npm:^10.3.10":
+"glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.3.7":
   version: 10.3.10
   resolution: "glob@npm:10.3.10"
   dependencies:
@@ -5301,6 +5316,17 @@ __metadata:
   bin:
     rimraf: bin.js
   checksum: 9cb7757acb489bd83757ba1a274ab545eafd75598a9d817e0c3f8b164238dd90eba50d6b848bd4dcc5f3040912e882dc7ba71653e35af660d77b25c381d402e8
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:^5.0.5":
+  version: 5.0.5
+  resolution: "rimraf@npm:5.0.5"
+  dependencies:
+    glob: "npm:^10.3.7"
+  bin:
+    rimraf: dist/esm/bin.mjs
+  checksum: d50dbe724f33835decd88395b25ed35995077c60a50ae78ded06e0185418914e555817aad1b4243edbff2254548c2f6ad6f70cc850040bebb4da9e8cc016f586
   languageName: node
   linkType: hard
 

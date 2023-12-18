@@ -2,8 +2,8 @@ import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import createHttpError from 'http-errors';
 import { FastifyInstance } from 'fastify';
 import path from 'path';
-import type { PrismaClient } from '@prisma/client';
-import { type FileSystem, isPathIn, filenames } from '@metastable/fs-helpers';
+import { isPathIn } from '@metastable/fs-helpers';
+import type { Storage } from '@metastable/storage';
 
 export const projectBody = {
   type: 'object',
@@ -15,7 +15,7 @@ export const projectBody = {
 
 export const projectBodyCreate = {
   ...projectBody,
-  required: ['name'],
+  required: ['name', 'settings'],
 } as const satisfies JSONSchema;
 
 export const projectSelect = {
@@ -27,18 +27,10 @@ export const projectSelect = {
   updatedAt: true,
 };
 
-export function routesProjects(prisma: PrismaClient, fileSystem: FileSystem) {
+export function routesProjects(storage: Storage) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/', async () => {
-      return await prisma.project.findMany({
-        select: {
-          id: true,
-          name: true,
-          lastOutput: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+      return await storage.projects.all();
     });
 
     fastify.post<{
@@ -51,19 +43,13 @@ export function routesProjects(prisma: PrismaClient, fileSystem: FileSystem) {
         },
       },
       async request => {
-        return await prisma.project.create({
-          data: request.body,
-          select: projectSelect,
-        });
+        return await storage.projects.create(request.body);
       },
     );
 
     fastify.get('/:id', async request => {
-      const projectId = parseInt((request.params as any)?.id);
-      return prisma.project.findFirst({
-        select: projectSelect,
-        where: { id: projectId },
-      });
+      const projectId = (request.params as any)?.id;
+      return storage.projects.get(projectId);
     });
 
     fastify.post<{ Body: FromSchema<typeof projectBody> }>(
@@ -74,32 +60,26 @@ export function routesProjects(prisma: PrismaClient, fileSystem: FileSystem) {
         },
       },
       async request => {
-        const projectId = parseInt((request.params as any)?.id);
-        return await prisma.project.update({
-          where: { id: projectId },
-          data: request.body,
-          select: projectSelect,
-        });
+        const projectId = (request.params as any)?.id;
+        return await storage.projects.update(projectId, request.body);
       },
     );
 
     fastify.delete('/:id', async request => {
-      const projectId = parseInt((request.params as any)?.id);
-      await prisma.project.delete({
-        where: { id: projectId },
-      });
+      const projectId = (request.params as any)?.id;
+      await storage.projects.delete(projectId);
       return { ok: true };
     });
 
     fastify.get('/:id/outputs', async request => {
-      const projectId = parseInt((request.params as any)?.id);
-      return await filenames(fileSystem.projectPath(projectId, 'output'));
+      const projectId = (request.params as any)?.id;
+      return await storage.projects.filenames(projectId, 'output');
     });
 
     fastify.get('/:id/outputs/:filename', async (request, reply) => {
-      const projectId = parseInt((request.params as any)?.id);
+      const projectId = (request.params as any)?.id;
       const fileName = (request.params as any)?.filename;
-      const projectPath = fileSystem.projectPath(projectId, 'output');
+      const projectPath = storage.projects.path(projectId, 'output');
       const filePath = path.join(projectPath, fileName);
       if (!isPathIn(projectPath, filePath)) {
         return createHttpError(404);

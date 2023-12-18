@@ -133,8 +133,9 @@ export class Project {
   }
 
   async rename(name: string) {
-    this.name = name;
-    await API.projects.update(this.id, { name });
+    const json = await API.projects.update(this.id, { name });
+    this.id = json.id;
+    this.name = json.name;
   }
 
   async save() {

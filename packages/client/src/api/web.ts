@@ -15,16 +15,16 @@ export const WebAPI: API = {
       return await httpGet('/projects');
     },
     async get(id) {
-      return await httpGet(`/projects/${id}`);
+      return await httpGet(`/projects/${encodeURIComponent(id)}`);
     },
     async outputs(id) {
-      return await httpGet(`/projects/${id}/outputs`);
+      return await httpGet(`/projects/${encodeURIComponent(id)}/outputs`);
     },
     async create(data) {
       return await httpPost('/projects', data);
     },
     async update(id, data) {
-      return await httpPost(`/projects/${id}`, data);
+      return await httpPost(`/projects/${encodeURIComponent(id)}`, data);
     },
   },
   downloads: {
@@ -32,7 +32,7 @@ export const WebAPI: API = {
       return await httpPost('/downloads', data);
     },
     async cancel(id) {
-      return await httpDelete(`/downloads/${id}`);
+      return await httpDelete(`/downloads/${encodeURIComponent(id)}`);
     },
   },
   prompts: {

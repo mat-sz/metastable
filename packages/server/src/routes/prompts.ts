@@ -1,14 +1,13 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { PrismaClient } from '@prisma/client';
 import type { Comfy } from '@metastable/comfy';
-import { FileSystem } from '@metastable/fs-helpers';
+import type { Storage } from '@metastable/storage';
 
 const promptBody = {
   type: 'object',
   properties: {
     project_id: {
-      type: 'number',
+      type: 'string',
     },
     models: {
       type: 'object',
@@ -81,11 +80,7 @@ const promptBody = {
   required: ['project_id', 'models', 'conditioning', 'sampler'],
 } as const satisfies JSONSchema;
 
-export function routesPrompts(
-  prisma: PrismaClient,
-  comfy: Comfy,
-  fileSystem: FileSystem,
-) {
+export function routesPrompts(comfy: Comfy, storage: Storage) {
   return async (fastify: FastifyInstance) => {
     fastify.post<{
       Body: FromSchema<typeof promptBody>;
@@ -97,7 +92,7 @@ export function routesPrompts(
         },
       },
       async request => {
-        return await comfy.prompt(request.body, fileSystem);
+        return await comfy.prompt(request.body, storage);
       },
     );
   };

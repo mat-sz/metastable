@@ -12,6 +12,7 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "@metastable/storage": "*",
     "@metastable/types": "*",
     "@types/node": "^20.10.3",
     "@types/semver": "^7.5.6",

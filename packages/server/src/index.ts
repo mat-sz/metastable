@@ -6,7 +6,7 @@ import fastifyCompress from '@fastify/compress';
 import { PrismaClient } from '@prisma/client';
 import { Comfy, createPythonInstance } from '@metastable/comfy';
 import { Downloader } from '@metastable/downloader';
-import { FileSystem } from '@metastable/fs-helpers';
+import { Storage } from '@metastable/storage';
 
 import { host, port, useProxy, staticRoot, dataRoot } from './config.js';
 import { routesProjects } from './routes/projects.js';
@@ -21,7 +21,7 @@ const python = await createPythonInstance();
 const comfy = new Comfy(python);
 const downloader = new Downloader(dataRoot);
 const clientManager = new ClientManager();
-const fileSystem = new FileSystem(dataRoot);
+const storage = new Storage(dataRoot);
 
 const app = Fastify();
 app.register(fastifyCompress);
@@ -29,7 +29,7 @@ app.register(fastifyCompress);
 const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 app.register(fastifyStatic, {
-  root: fileSystem.modelsDir,
+  root: storage.modelsDir,
   serve: false,
   cacheControl: false,
   decorateReply: true,
@@ -71,18 +71,6 @@ if (useProxy) {
 comfy.on('event', async event => {
   console.log('[Comfy]', event);
   clientManager.broadcast(event);
-
-  if (event.event === 'prompt.end') {
-    const filename = event.data?.output_filenames?.[0];
-
-    if (filename) {
-      const projectId = parseInt(event.data.project_id);
-      await prisma.project.update({
-        data: { lastOutput: filename },
-        where: { id: projectId },
-      });
-    }
-  }
 });
 
 comfy.on('reset', () => {
@@ -127,10 +115,10 @@ app.register(async function (fastify) {
   });
 });
 
-app.register(routesInstance(comfy, fileSystem), { prefix: '/instance' });
-app.register(routesProjects(prisma, fileSystem), { prefix: '/projects' });
+app.register(routesInstance(comfy, storage), { prefix: '/instance' });
+app.register(routesProjects(storage), { prefix: '/projects' });
 app.register(routesModels(prisma), { prefix: '/models' });
-app.register(routesPrompts(prisma, comfy, fileSystem), { prefix: '/prompts' });
+app.register(routesPrompts(comfy, storage), { prefix: '/prompts' });
 app.register(routesDownloads(downloader), { prefix: '/downloads' });
 
 app.listen({ host, port });

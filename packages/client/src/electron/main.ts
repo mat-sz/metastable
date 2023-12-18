@@ -1,15 +1,13 @@
 import path from 'node:path';
 import url from 'node:url';
-import fs from 'node:fs/promises';
 import os from 'node:os';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
-import { nanoid } from 'nanoid/non-secure';
 import {
   createPythonInstance,
   Comfy,
   validateRequirements,
 } from '@metastable/comfy';
-import { filenames, FileSystem } from '@metastable/fs-helpers';
+import { Storage } from '@metastable/storage';
 import { Project } from '@metastable/types';
 
 process.env.DIST = path.join(__dirname, '../dist');
@@ -34,87 +32,6 @@ app.on('web-contents-created', (_, wc) => {
     }
   });
 });
-
-export class JSONFile<T> {
-  constructor(
-    private path: string,
-    private fallback: T,
-  ) {}
-
-  async read(): Promise<T> {
-    try {
-      return JSON.parse(await fs.readFile(this.path, { encoding: 'utf-8' }));
-    } catch {
-      return this.fallback;
-    }
-  }
-
-  async write(data: T) {
-    await fs.writeFile(this.path, JSON.stringify(data));
-  }
-}
-
-export class Projects {
-  mainFile: JSONFile<
-    Record<Project['id'], Pick<Project, 'name' | 'lastOutput'>>
-  >;
-  constructor(private projectsDir: string) {
-    this.mainFile = new JSONFile(path.join(projectsDir, 'index.json'), {});
-  }
-
-  projectFile(id: Project['id']): JSONFile<Project | undefined> {
-    return new JSONFile(
-      path.join(this.projectsDir, `${id}`, 'project.json'),
-      undefined,
-    );
-  }
-
-  async all() {
-    return await this.mainFile.read();
-  }
-
-  async create(data: Pick<Project, 'name' | 'settings'>) {
-    const id = nanoid();
-    const project = { id, ...data };
-    await fs.mkdir(path.join(this.projectsDir, `${id}`), { recursive: true });
-    await this.save(project);
-    return project;
-  }
-
-  async get(id: Project['id']) {
-    const projectFile = this.projectFile(id);
-    return await projectFile.read();
-  }
-
-  async update(id: Project['id'], data: Partial<Omit<Project, 'id'>>) {
-    const projectFile = this.projectFile(id);
-    const project = await projectFile.read();
-    if (!project) {
-      return;
-    }
-
-    const newProject = {
-      ...project,
-      ...data,
-    };
-    await this.save(newProject);
-
-    return newProject;
-  }
-
-  private async save(project: Project) {
-    const all = await this.all();
-    all[project.id] = {
-      name: project.name,
-      lastOutput: project.lastOutput,
-    };
-
-    const projectFile = this.projectFile(project.id);
-    await projectFile.write(project);
-
-    await this.mainFile.write(all);
-  }
-}
 
 function createMenu() {
   const menu = new Menu();
@@ -184,8 +101,7 @@ async function createWindow() {
   );
   const dataDir = path.resolve('../../data');
   const comfy = new Comfy(python, comfyMain);
-  const fileSystem = new FileSystem(dataDir);
-  const projects = new Projects(fileSystem.projectsDir);
+  const storage = new Storage(dataDir);
 
   const win = new BrowserWindow({
     title: 'Metastable',
@@ -208,14 +124,14 @@ async function createWindow() {
   comfy.on('event', async event => {
     win.webContents.send('comfy:event', event);
 
-    if (event.event === 'prompt.end') {
-      const filename = event.data?.output_filenames?.[0];
+    // if (event.event === 'prompt.end') {
+    //   const filename = event.data?.output_filenames?.[0];
 
-      if (filename) {
-        const projectId = event.data.project_id;
-        await projects.update(projectId, { lastOutput: filename });
-      }
-    }
+    //   if (filename) {
+    //     const projectId = event.data.project_id;
+    //     await storage.projects.update(projectId, { lastOutput: filename });
+    //   }
+    // }
   });
 
   ipcMain.on('ready', () => {
@@ -228,7 +144,7 @@ async function createWindow() {
     return {
       samplers: comfy.samplers,
       schedulers: comfy.schedulers,
-      models: await fileSystem.allModels(),
+      models: await storage.models.all(),
       dataDir: url.pathToFileURL(dataDir).toString(),
     };
   });
@@ -236,26 +152,23 @@ async function createWindow() {
     return await validateRequirements(python);
   });
   ipcMain.handle('prompts:create', async (_, settings: any) => {
-    return await comfy.prompt(settings, fileSystem);
+    return await comfy.prompt(settings, storage);
   });
 
   ipcMain.handle('projects:all', async () => {
-    const all = await projects.all();
-    return Object.entries(all).map(([id, data]) => ({ id, ...data }));
+    return await storage.projects.all();
   });
   ipcMain.handle('projects:create', async (_, data: any) => {
-    const project = await projects.create(data);
-    await fileSystem.createProjectTree(project.id);
-    return project;
+    return await storage.projects.create(data);
   });
   ipcMain.handle('projects:get', async (_, id: Project['id']) => {
-    return await projects.get(id);
+    return await storage.projects.get(id);
   });
   ipcMain.handle('projects:update', async (_, id: Project['id'], data: any) => {
-    return await projects.update(id, data);
+    return await storage.projects.update(id, data);
   });
   ipcMain.handle('projects:outputs', async (_, id: Project['id']) => {
-    return await filenames(fileSystem.projectPath(id, 'output'));
+    return await storage.projects.filenames(id, 'output');
   });
 
   win.setMenu(null);

@@ -31,6 +31,10 @@ export class ProjectStore {
   }
 
   async create(name: string) {
+    if (!name.trim()) {
+      return;
+    }
+
     const settings = defaultProjectSettings();
     const project = {
       name,
@@ -40,7 +44,7 @@ export class ProjectStore {
     const json = await API.projects.create(project);
 
     runInAction(() => {
-      this.projects.push(new Project(json.id, name, settings));
+      this.projects.push(new Project(json.id, json.name, settings));
       this.select(json.id);
     });
 

@@ -42,7 +42,7 @@ export interface ProjectSettings {
 }
 
 export interface Project {
-  id: number | string;
+  id: string;
   name: string;
   settings: string;
   lastOutput?: string;

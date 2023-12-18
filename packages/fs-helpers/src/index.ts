@@ -2,16 +2,6 @@ import path from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Project } from '@metastable/types';
 
-export function select(object: any, fields: Record<string, boolean>): any {
-  const temp: any = {};
-  for (const key of Object.keys(fields)) {
-    if (fields[key] && typeof object[key] !== 'undefined') {
-      temp[key] = object[key];
-    }
-  }
-  return temp;
-}
-
 export function isPathIn(parent: string, filePath: string) {
   const rel = path.relative(parent, filePath);
   return (
@@ -27,12 +17,6 @@ export async function exists(path: string) {
   }
 }
 
-export async function tryMkdir(dirPath: string) {
-  try {
-    await fs.mkdir(dirPath, { recursive: true });
-  } catch {}
-}
-
 export async function filenames(dirPath: string) {
   try {
     return await fs.readdir(dirPath);
@@ -41,87 +25,7 @@ export async function filenames(dirPath: string) {
   }
 }
 
-const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
-
-export class FileSystem {
-  constructor(private dataDir: string) {}
-
-  get modelsDir() {
-    return path.join(this.dataDir, 'models');
-  }
-
-  get projectsDir() {
-    return path.join(this.dataDir, 'projects');
-  }
-
-  async allModels() {
-    const modelsDir = this.modelsDir;
-    const subdirs = await fs.readdir(modelsDir, {
-      withFileTypes: true,
-    });
-
-    const models: Record<string, FileInfo[]> = {};
-
-    for (const dir of subdirs) {
-      if (!dir.isDirectory()) {
-        continue;
-      }
-
-      if (dir.name.startsWith('.')) {
-        continue;
-      }
-
-      models[dir.name] = await walk(
-        path.join(modelsDir, dir.name),
-        '',
-        MODEL_EXTENSIONS,
-      );
-    }
-
-    return models;
-  }
-
-  async models(type: string) {
-    return await walk(path.join(this.modelsDir, type), '', MODEL_EXTENSIONS);
-  }
-
-  async findModel(list: FileInfo[], startsWith: string) {
-    for (const model of list) {
-      if (
-        model.name.startsWith(startsWith) ||
-        model.name.includes(path.sep + startsWith)
-      ) {
-        return model.name;
-      }
-    }
-
-    return undefined;
-  }
-
-  modelsTypeDir(type: string) {
-    return path.join(this.modelsDir, type);
-  }
-
-  modelPath(type: string, name: string) {
-    const modelsDir = this.modelsDir;
-    const result = path.join(modelsDir, type, name);
-    if (!isPathIn(modelsDir, result)) {
-      return undefined;
-    }
-    return result;
-  }
-
-  projectPath(id: Project['id'], type: 'output' | 'input') {
-    return path.join(this.projectsDir, `${id}`, type);
-  }
-
-  async createProjectTree(id: Project['id']) {
-    await tryMkdir(this.projectPath(id, 'output'));
-    await tryMkdir(this.projectPath(id, 'input'));
-  }
-}
-
-async function walk(
+export async function walk(
   currentPath: string,
   relative: string,
   extensions?: string[],
@@ -158,4 +62,27 @@ async function walk(
   }
 
   return output;
+}
+
+const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
+const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+
+export async function freeDirName(parent: string, name: string) {
+  let dirName = name.replace(FILENAME_REPLACE, '_');
+  if (dirName.match(FILENAME_NEEDS_PREFIX)) {
+    dirName = `_${dirName}`;
+  }
+
+  let current = dirName;
+  let counter = 1;
+  while (true) {
+    if (!(await exists(path.join(parent, current)))) {
+      break;
+    }
+
+    counter++;
+    current = `${dirName} (${counter})`;
+  }
+
+  return current;
 }
