@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { Modal } from '../../components/Modal';
-import { Tab, TabPanel, TabView, Tabs } from '../../components/Tabs';
-import { Queue } from './Queue';
-import { Recommended } from './Recommended';
+import { Modal, Tab, TabPanel, TabView, Tabs } from '../../components';
+import { Queue } from './queue';
+import { Recommended } from './recommended';
 import { CivitAI } from './civitai';
 
 export const DownloadManager: React.FC = () => {

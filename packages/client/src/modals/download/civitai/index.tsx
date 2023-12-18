@@ -5,12 +5,9 @@ import useSWR from 'swr';
 
 import styles from './index.module.scss';
 import { CivitAIModel, CivitAIResponse } from '../../../types/civitai';
-import { Pagination } from '../../../components/Pagination';
+import { Pagination, Loading, Toggle, IconButton } from '../../../components';
 import { List } from './List';
 import { Model } from './Model';
-import { Loading } from '../../../components/Loading';
-import { Toggle } from '../../../components/Toggle';
-import { IconButton } from '../../../components/IconButton';
 
 const CivitAISort = [
   'Highest Rated',

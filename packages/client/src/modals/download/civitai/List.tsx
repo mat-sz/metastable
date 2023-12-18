@@ -4,7 +4,7 @@ import { MdNoPhotography } from 'react-icons/md';
 
 import styles from './List.module.scss';
 import { CivitAIModel, CivitAIResponse } from '../../../types/civitai';
-import { Rating } from '../../../components/Rating';
+import { Rating } from '../../../components';
 
 interface ItemProps {
   model: CivitAIModel;

@@ -6,7 +6,7 @@ import { BsClipboard } from 'react-icons/bs';
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { copy, filesize } from '../../../helpers';
-import { IconButton } from '../../../components/IconButton';
+import { IconButton } from '../../../components';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.torchInfo;

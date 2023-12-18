@@ -5,7 +5,7 @@ import { VarButton } from 'react-var-ui';
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { Settings } from '../settings';
-import { ImagePreview } from '../../../components/ImagePreview';
+import { ImagePreview } from '../../../components';
 
 export const Images: React.FC = observer(() => {
   const project = mainStore.project!;

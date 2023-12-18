@@ -12,7 +12,7 @@ import clsx from 'clsx';
 
 import styles from './Status.module.scss';
 import { mainStore } from '../../stores/MainStore';
-import { ProgressButton } from '../../components/ProgressButton';
+import { ProgressButton } from '../../components';
 import { useUI } from '../../contexts/ui';
 import { Backend } from '../../modals/backend';
 import { DownloadManager } from '../../modals/download';

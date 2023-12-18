@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Modal } from '../../components/Modal';
-import { Tab, TabPanel, TabView, Tabs } from '../../components/Tabs';
+import { Modal, Tab, TabPanel, TabView, Tabs } from '../../components';
 import { General } from './general';
 import { Compatibility } from './compatibility';
 

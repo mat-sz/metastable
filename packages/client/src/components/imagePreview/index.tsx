@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import styles from './ImagePreview.module.scss';
+import styles from './index.module.scss';
 
 interface ImagePreviewProps {
   url?: string;

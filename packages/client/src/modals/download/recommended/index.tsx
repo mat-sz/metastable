@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
-import styles from './Recommended.module.scss';
-import { downloadable } from '../../data/models';
-import { DownloadButton } from './DownloadButton';
-import { IconButton } from '../../components/IconButton';
+import styles from './index.module.scss';
+import { downloadable } from '../../../data/models';
+import { IconButton } from '../../../components';
+import { DownloadButton } from '../DownloadButton';
 
 const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.CHECKPOINT]: 'Checkpoint',

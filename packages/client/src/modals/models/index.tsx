@@ -2,8 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../stores/MainStore';
-import { Modal } from '../../components/Modal';
-import { Tab, TabPanel, TabView, Tabs } from '../../components/Tabs';
+import { Modal, Tab, TabPanel, TabView, Tabs } from '../../components';
 import { filesize } from '../../helpers';
 
 export const ModelManager: React.FC = observer(() => {

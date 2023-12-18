@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-import styles from './Carousel.module.scss';
+import styles from './index.module.scss';
 
 export const Carousel: React.FC<React.PropsWithChildren> = ({ children }) => {
   const ref = useRef<HTMLDivElement>(null);

@@ -12,10 +12,15 @@ import {
   CivitAIModelVersion,
   CivitAITypeMap,
 } from '../../../types/civitai';
-import { IconButton } from '../../../components/IconButton';
-import { Tab, TabPanel, TabView, Tabs } from '../../../components/Tabs';
-import { Rating } from '../../../components/Rating';
-import { Carousel } from '../../../components/Carousel';
+import {
+  IconButton,
+  Tab,
+  TabPanel,
+  TabView,
+  Tabs,
+  Rating,
+  Carousel,
+} from '../../../components';
 import { DownloadButton } from '../DownloadButton';
 
 interface ModelVersionProps {

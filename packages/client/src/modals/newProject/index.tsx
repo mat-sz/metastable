@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../stores/MainStore';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components';
 
 export const NewProject: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');

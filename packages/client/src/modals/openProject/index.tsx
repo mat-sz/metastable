@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
-import { Modal } from '../../components/Modal';
+import { Modal } from '../../components';
 import { List } from './List';
 
 export const OpenProject: React.FC = observer(() => {

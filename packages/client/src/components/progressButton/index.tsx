@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import styles from './ProgressButton.module.scss';
+import styles from './index.module.scss';
 
 export interface ProgressButtonProps
   extends Omit<

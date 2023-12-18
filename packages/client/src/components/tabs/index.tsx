@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import clsx from 'clsx';
 
-import styles from './Tabs.module.scss';
+import styles from './index.module.scss';
 
 interface TabProps {
   id: string | number;

@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import styles from './IconButton.module.scss';
+import styles from './index.module.scss';
 
 export interface IconButtonProps
   extends Omit<
@@ -27,7 +27,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         className={clsx(
           styles.iconButton,
           { [styles.round]: round },
-          className
+          className,
         )}
         href={href}
         download={download}

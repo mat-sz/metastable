@@ -10,7 +10,7 @@ import {
 import { BsX } from 'react-icons/bs';
 
 import { mainStore } from '../../../../stores/MainStore';
-import { IconButton } from '../../../../components/IconButton';
+import { IconButton } from '../../../../components';
 import { DownloadManager } from '../../../../modals/download';
 import { useUI } from '../../../../contexts/ui';
 

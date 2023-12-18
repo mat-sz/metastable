@@ -8,7 +8,7 @@ import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
 import { Welcome } from './views/system/Welcome';
 import { Status } from './views/system/Status';
-import { UI } from './components/UI';
+import { UI } from './components';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {

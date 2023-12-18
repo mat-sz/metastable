@@ -2,10 +2,10 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsX } from 'react-icons/bs';
 
-import styles from './Queue.module.scss';
-import { mainStore } from '../../stores/MainStore';
-import { IconButton } from '../../components/IconButton';
-import { filesize } from '../../helpers';
+import styles from './index.module.scss';
+import { mainStore } from '../../../stores/MainStore';
+import { IconButton } from '../../../components';
+import { filesize } from '../../../helpers';
 
 export const Queue: React.FC = observer(() => {
   const downloads = mainStore.downloads;

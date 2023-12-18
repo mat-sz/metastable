@@ -877,6 +877,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/comfy@workspace:packages/comfy"
   dependencies:
+    "@metastable/fs-helpers": "npm:*"
     "@metastable/types": "npm:*"
     "@types/node": "npm:^20.10.3"
     "@types/semver": "npm:^7.5.6"

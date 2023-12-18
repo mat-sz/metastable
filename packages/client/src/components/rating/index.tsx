@@ -2,7 +2,7 @@ import React from 'react';
 import { BsStarFill } from 'react-icons/bs';
 import clsx from 'clsx';
 
-import styles from './Rating.module.scss';
+import styles from './index.module.scss';
 
 interface RatingProps {
   value: number;
