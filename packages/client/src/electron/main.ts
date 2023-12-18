@@ -123,15 +123,6 @@ async function createWindow() {
 
   comfy.on('event', async event => {
     win.webContents.send('comfy:event', event);
-
-    // if (event.event === 'prompt.end') {
-    //   const filename = event.data?.output_filenames?.[0];
-
-    //   if (filename) {
-    //     const projectId = event.data.project_id;
-    //     await storage.projects.update(projectId, { lastOutput: filename });
-    //   }
-    // }
   });
 
   ipcMain.on('ready', () => {

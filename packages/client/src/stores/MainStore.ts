@@ -111,7 +111,7 @@ class MainStore {
   }
 
   view(project_id: APIProject['id'], type: string, filename: string) {
-    return getStaticUrl(`/projects/${project_id}/${type}s/${filename}`);
+    return getStaticUrl(`/projects/${project_id}/${type}/${filename}`);
   }
 
   onMessage(message: AnyEvent) {

@@ -1,4 +1,4 @@
-import { FileInfo } from './file.js';
+import { Model } from './model.js';
 import { Project } from './project.js';
 
 export interface Requirement {
@@ -91,5 +91,5 @@ export type ComfyEvent =
 export interface InstanceInfo {
   samplers: string[];
   schedulers: string[];
-  models: Record<string, FileInfo[]>;
+  models: Record<string, Model[]>;
 }

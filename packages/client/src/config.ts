@@ -7,10 +7,10 @@ export function getUrl(path: string, protocol = 'http') {
 
 export function getStaticUrl(path: string) {
   if (window.dataDir) {
-    return `${window.dataDir}/${path.replace('outputs', 'output')}`;
+    return `${window.dataDir}${path}`;
   }
 
-  return getUrl(path);
+  return getUrl(`/static${path}`);
 }
 
 export const IS_ELECTRON = import.meta.env.MODE.includes('electron');

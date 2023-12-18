@@ -1,4 +1,4 @@
-import { ModelType, Model } from '@metastable/types';
+import { ModelType } from '@metastable/types';
 
 export interface DownloadFile {
   filename: string;
@@ -7,7 +7,11 @@ export interface DownloadFile {
   size?: number;
 }
 
-export interface DownloadableModel extends Omit<Model, 'id'> {
+export interface DownloadableModel {
+  name: string;
+  source?: string;
+  sourceId?: string;
+  type: ModelType;
   downloads: DownloadFile[];
   recommended?: boolean;
   description?: string;

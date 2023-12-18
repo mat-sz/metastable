@@ -1,93 +1,42 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { PrismaClient } from '@prisma/client';
+import type { Storage } from '@metastable/storage';
 
 const modelBody = {
   type: 'object',
   properties: {
-    name: { type: 'string' },
+    longName: { type: 'string' },
     description: { type: 'string' },
-    imageUrl: { type: 'string' },
-    type: { type: 'string' },
-    filename: { type: 'string' },
     source: { type: 'string' },
     sourceId: { type: 'string' },
+    nsfw: { type: 'boolean' },
   },
 } as const satisfies JSONSchema;
 
-const modelBodyCreate = {
-  ...modelBody,
-  required: ['name', 'type', 'filename'],
-} as const satisfies JSONSchema;
-
-const modelSelect = {
-  id: true,
-  name: true,
-  description: true,
-  imageUrl: true,
-  type: true,
-  filename: true,
-  source: true,
-  sourceId: true,
-  createdAt: true,
-  updatedAt: true,
-};
-
-export function routesModels(prisma: PrismaClient) {
+export function routesModels(storage: Storage) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/', async () => {
-      return await prisma.model.findMany({
-        select: modelSelect,
-      });
-    });
-
-    fastify.post<{
-      Body: FromSchema<typeof modelBodyCreate>;
-    }>(
-      '/',
-      {
-        schema: {
-          body: modelBodyCreate,
-        },
-      },
-      async request => {
-        return await prisma.model.create({
-          data: request.body,
-          select: modelSelect,
-        });
-      },
-    );
-
-    fastify.get('/:id', async request => {
-      const modelId = parseInt((request.params as any)?.id);
-      return prisma.model.findFirst({
-        select: modelSelect,
-        where: { id: modelId },
-      });
+      return await storage.models.all();
     });
 
     fastify.post<{ Body: FromSchema<typeof modelBody> }>(
-      '/:id',
+      '/:type/:name',
       {
         schema: {
           body: modelBody,
         },
       },
       async request => {
-        const modelId = parseInt((request.params as any)?.id);
-        return await prisma.model.update({
-          where: { id: modelId },
-          data: request.body,
-          select: modelSelect,
-        });
+        const modelName = (request.params as any)?.name;
+        const modelType = (request.params as any)?.type;
+        return await storage.models.update(modelType, modelName, request.body);
       },
     );
 
-    fastify.delete('/:id', async request => {
-      const modelId = parseInt((request.params as any)?.id);
-      await prisma.model.delete({
-        where: { id: modelId },
-      });
+    fastify.delete('/:type/:name', async request => {
+      const modelName = (request.params as any)?.name;
+      const modelType = (request.params as any)?.type;
+      await storage.models.delete(modelType, modelName);
       return { ok: true };
     });
   };

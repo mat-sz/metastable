@@ -1,3 +1,5 @@
+import { FileInfo } from './file.js';
+
 export enum ModelType {
   CHECKPOINT = 'checkpoints',
   CLIP = 'clip',
@@ -14,11 +16,11 @@ export enum ModelType {
   VAE_APPROX = 'vae_approx',
 }
 
-export interface Model {
-  id: number;
-  source: string;
-  source_id?: string;
-  name: string;
+export interface Model extends FileInfo {
+  longName?: string;
+  description?: string;
+  source?: string;
+  sourceId?: string;
   nsfw?: boolean;
-  type: ModelType;
+  imageFile?: string;
 }

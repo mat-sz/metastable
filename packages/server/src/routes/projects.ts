@@ -1,8 +1,5 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
-import createHttpError from 'http-errors';
 import { FastifyInstance } from 'fastify';
-import path from 'path';
-import { isPathIn } from '@metastable/fs-helpers';
 import type { Storage } from '@metastable/storage';
 
 export const projectBody = {
@@ -74,18 +71,6 @@ export function routesProjects(storage: Storage) {
     fastify.get('/:id/outputs', async request => {
       const projectId = (request.params as any)?.id;
       return await storage.projects.filenames(projectId, 'output');
-    });
-
-    fastify.get('/:id/outputs/:filename', async (request, reply) => {
-      const projectId = (request.params as any)?.id;
-      const fileName = (request.params as any)?.filename;
-      const projectPath = storage.projects.path(projectId, 'output');
-      const filePath = path.join(projectPath, fileName);
-      if (!isPathIn(projectPath, filePath)) {
-        return createHttpError(404);
-      }
-
-      return reply.sendFile(fileName, projectPath);
     });
   };
 }

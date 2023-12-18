@@ -161,7 +161,7 @@ export class Project {
   }
 
   view(type: string, filename: string) {
-    return getStaticUrl(`/projects/${this.id}/${type}s/${filename}`);
+    return getStaticUrl(`/projects/${this.id}/${type}/${filename}`);
   }
 
   addLora(name: string, strength = 1) {

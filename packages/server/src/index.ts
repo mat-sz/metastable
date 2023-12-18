@@ -3,7 +3,6 @@ import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
-import { PrismaClient } from '@prisma/client';
 import { Comfy, createPythonInstance } from '@metastable/comfy';
 import { Downloader } from '@metastable/downloader';
 import { Storage } from '@metastable/storage';
@@ -16,7 +15,6 @@ import { routesDownloads } from './routes/downloads.js';
 import { routesInstance } from './routes/instance.js';
 import { ClientManager } from './ws.js';
 
-const prisma = new PrismaClient();
 const python = await createPythonInstance();
 const comfy = new Comfy(python);
 const downloader = new Downloader(dataRoot);
@@ -29,8 +27,8 @@ app.register(fastifyCompress);
 const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 app.register(fastifyStatic, {
-  root: storage.modelsDir,
-  serve: false,
+  root: storage.dataRoot,
+  prefix: '/static',
   cacheControl: false,
   decorateReply: true,
 });
@@ -117,7 +115,7 @@ app.register(async function (fastify) {
 
 app.register(routesInstance(comfy, storage), { prefix: '/instance' });
 app.register(routesProjects(storage), { prefix: '/projects' });
-app.register(routesModels(prisma), { prefix: '/models' });
+app.register(routesModels(storage), { prefix: '/models' });
 app.register(routesPrompts(comfy, storage), { prefix: '/prompts' });
 app.register(routesDownloads(downloader), { prefix: '/downloads' });
 

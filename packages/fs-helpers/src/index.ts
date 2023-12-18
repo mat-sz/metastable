@@ -25,11 +25,15 @@ export async function filenames(dirPath: string) {
   }
 }
 
-export async function walk(
-  currentPath: string,
-  relative: string,
-  extensions?: string[],
-) {
+export async function tryUnlink(filePath: string) {
+  try {
+    await fs.unlink(filePath);
+  } catch {
+    //
+  }
+}
+
+export async function walk(currentPath: string, relative: string) {
   const files = await fs.readdir(currentPath, {
     withFileTypes: true,
   });
@@ -38,12 +42,6 @@ export async function walk(
   for (const file of files) {
     if (file.isFile()) {
       if (file.name.startsWith('.')) {
-        continue;
-      }
-
-      const split = file.name.split('.');
-      const ext = split[split.length - 1];
-      if (extensions && !extensions.includes(ext)) {
         continue;
       }
 
