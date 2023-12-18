@@ -1,8 +1,6 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { Downloader } from '@metastable/downloader';
-import type { Storage } from '@metastable/storage';
-import { isPathIn } from '../../../fs-helpers/lib/index.js';
+import type { Metastable } from '@metastable/metastable';
 
 const downloadBody = {
   type: 'object',
@@ -14,7 +12,7 @@ const downloadBody = {
   required: ['url', 'name', 'type'],
 } as const satisfies JSONSchema;
 
-export function routesDownloads(storage: Storage, downloader: Downloader) {
+export function routesDownloads(metastable: Metastable) {
   return async (fastify: FastifyInstance) => {
     fastify.post<{ Body: FromSchema<typeof downloadBody> }>(
       '/',
@@ -25,17 +23,7 @@ export function routesDownloads(storage: Storage, downloader: Downloader) {
       },
       async request => {
         try {
-          const savePath = storage.models.path(
-            request.body.type,
-            request.body.name,
-          );
-          if (!isPathIn(storage.modelsDir, savePath)) {
-            throw new Error(
-              'Attempted to save file outside of the parent directory.',
-            );
-          }
-
-          return await downloader.add(request.body.url, savePath);
+          return await metastable.downloadModel(request.body);
         } catch (e) {
           return { error: (e as any).message };
         }
@@ -44,7 +32,7 @@ export function routesDownloads(storage: Storage, downloader: Downloader) {
 
     fastify.delete('/:id', async request => {
       const downloadId = (request.params as any)?.id;
-      downloader.cancel(downloadId);
+      metastable.downloader.cancel(downloadId);
     });
   };
 }

@@ -2,13 +2,9 @@ import path from 'node:path';
 import url from 'node:url';
 import os from 'node:os';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
-import {
-  createPythonInstance,
-  Comfy,
-  validateRequirements,
-} from '@metastable/comfy';
-import { Storage } from '@metastable/storage';
+import { validateRequirements } from '@metastable/comfy';
 import { Project } from '@metastable/types';
+import { Metastable } from '@metastable/metastable';
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -93,17 +89,14 @@ function createMenu() {
 }
 
 async function createWindow() {
-  const python = await createPythonInstance();
-  const comfyMain = path.join(
+  const dataRoot = path.resolve('../../data');
+  const comfyMainPath = path.join(
     app.isPackaged ? app.getAppPath() : path.resolve('../comfy'),
     'python',
     'main.py',
   );
-  const dataDir = path.resolve('../../data');
-  const comfy = new Comfy(python, comfyMain);
-
-  const storage = new Storage(dataDir);
-  await storage.init();
+  const metastable = new Metastable(dataRoot, { comfyMainPath });
+  await metastable.init();
 
   const win = new BrowserWindow({
     title: 'Metastable',
@@ -123,45 +116,40 @@ async function createWindow() {
     },
   });
 
-  comfy.on('event', async event => {
-    win.webContents.send('comfy:event', event);
+  metastable.on('event', async event => {
+    win.webContents.send('event', event);
   });
 
   ipcMain.on('ready', () => {
-    win.webContents.send('comfy:event', {
-      event: 'backend.status',
-      data: comfy.status,
-    });
+    metastable.replayEvents(event => win.webContents.send('event', event));
   });
   ipcMain.handle('instance:info', async () => {
     return {
-      samplers: comfy.samplers,
-      schedulers: comfy.schedulers,
-      models: await storage.models.all(),
-      dataDir: url.pathToFileURL(dataDir).toString(),
+      ...(await metastable.info()),
+      dataDir: url.pathToFileURL(dataRoot).toString(),
     };
   });
   ipcMain.handle('instance:compatibility', async () => {
-    return await validateRequirements(python);
+    return await validateRequirements(metastable.python);
   });
   ipcMain.handle('prompts:create', async (_, settings: any) => {
-    return await comfy.prompt(settings, storage);
+    return await metastable.prompt(settings);
   });
 
   ipcMain.handle('projects:all', async () => {
-    return await storage.projects.all();
+    return await metastable.storage.projects.all();
   });
   ipcMain.handle('projects:create', async (_, data: any) => {
-    return await storage.projects.create(data);
+    return await metastable.storage.projects.create(data);
   });
   ipcMain.handle('projects:get', async (_, id: Project['id']) => {
-    return await storage.projects.get(id);
+    return await metastable.storage.projects.get(id);
   });
   ipcMain.handle('projects:update', async (_, id: Project['id'], data: any) => {
-    return await storage.projects.update(id, data);
+    return await metastable.storage.projects.update(id, data);
   });
   ipcMain.handle('projects:outputs', async (_, id: Project['id']) => {
-    return await storage.projects.filenames(id, 'output');
+    return await metastable.storage.projects.filenames(id, 'output');
   });
 
   win.setMenu(null);

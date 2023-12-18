@@ -1,7 +1,6 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { Comfy } from '@metastable/comfy';
-import type { Storage } from '@metastable/storage';
+import type { Metastable } from '@metastable/metastable';
 
 const promptBody = {
   type: 'object',
@@ -80,7 +79,7 @@ const promptBody = {
   required: ['project_id', 'models', 'conditioning', 'sampler'],
 } as const satisfies JSONSchema;
 
-export function routesPrompts(comfy: Comfy, storage: Storage) {
+export function routesPrompts(metastable: Metastable) {
   return async (fastify: FastifyInstance) => {
     fastify.post<{
       Body: FromSchema<typeof promptBody>;
@@ -92,7 +91,7 @@ export function routesPrompts(comfy: Comfy, storage: Storage) {
         },
       },
       async request => {
-        return await comfy.prompt(request.body, storage);
+        return await metastable.prompt(request.body);
       },
     );
   };

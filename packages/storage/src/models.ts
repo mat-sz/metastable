@@ -31,17 +31,17 @@ function isModel(name: string) {
 export class Models {
   constructor(private modelsDir: string) {}
 
-  async init() {
-    for (const type of MODEL_TYPES) {
-      await fs.mkdir(this.dir(type), { recursive: true });
-    }
-  }
-
-  modelFile(
+  private modelFile(
     type: string,
     filename: string,
   ): JSONFile<Omit<Model, 'name' | 'size' | 'imageFile'>> {
     return new JSONFile(this.path(type, `${filename}.json`), {});
+  }
+
+  async init() {
+    for (const type of MODEL_TYPES) {
+      await fs.mkdir(this.dir(type), { recursive: true });
+    }
   }
 
   async all() {

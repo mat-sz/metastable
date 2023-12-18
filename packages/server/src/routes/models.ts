@@ -1,6 +1,6 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { Storage } from '@metastable/storage';
+import type { Metastable } from '@metastable/metastable';
 
 const modelBody = {
   type: 'object',
@@ -13,10 +13,10 @@ const modelBody = {
   },
 } as const satisfies JSONSchema;
 
-export function routesModels(storage: Storage) {
+export function routesModels(metastable: Metastable) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/', async () => {
-      return await storage.models.all();
+      return await metastable.storage.models.all();
     });
 
     fastify.post<{ Body: FromSchema<typeof modelBody> }>(
@@ -29,14 +29,18 @@ export function routesModels(storage: Storage) {
       async request => {
         const modelName = (request.params as any)?.name;
         const modelType = (request.params as any)?.type;
-        return await storage.models.update(modelType, modelName, request.body);
+        return await metastable.storage.models.update(
+          modelType,
+          modelName,
+          request.body,
+        );
       },
     );
 
     fastify.delete('/:type/:name', async request => {
       const modelName = (request.params as any)?.name;
       const modelType = (request.params as any)?.type;
-      await storage.models.delete(modelType, modelName);
+      await metastable.storage.models.delete(modelType, modelName);
       return { ok: true };
     });
   };

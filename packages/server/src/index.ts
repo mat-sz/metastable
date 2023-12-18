@@ -3,9 +3,7 @@ import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
-import { Comfy, createPythonInstance } from '@metastable/comfy';
-import { Downloader } from '@metastable/downloader';
-import { Storage } from '@metastable/storage';
+import { Metastable } from '@metastable/metastable';
 
 import { host, port, useProxy, staticRoot, dataRoot } from './config.js';
 import { routesProjects } from './routes/projects.js';
@@ -15,13 +13,10 @@ import { routesDownloads } from './routes/downloads.js';
 import { routesInstance } from './routes/instance.js';
 import { ClientManager } from './ws.js';
 
-const python = await createPythonInstance();
-const comfy = new Comfy(python);
-const downloader = new Downloader();
+const metastable = new Metastable(dataRoot);
 const clientManager = new ClientManager();
-const storage = new Storage(dataRoot);
 
-await storage.init();
+await metastable.init();
 
 const app = Fastify();
 app.register(fastifyCompress);
@@ -29,7 +24,7 @@ app.register(fastifyCompress);
 const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 app.register(fastifyStatic, {
-  root: storage.dataRoot,
+  root: metastable.storage.dataRoot,
   prefix: '/static',
   cacheControl: false,
   decorateReply: true,
@@ -68,21 +63,7 @@ if (useProxy) {
   });
 }
 
-comfy.on('event', async event => {
-  console.log('[Comfy]', event);
-  clientManager.broadcast(event);
-});
-
-comfy.on('reset', () => {
-  clientManager.broadcast({
-    event: 'prompt.queue',
-    data: {
-      queue_remaining: comfy.queue_remaining,
-    },
-  });
-});
-
-downloader.on('event', event => {
+metastable.on('event', event => {
   clientManager.broadcast(event);
 });
 
@@ -90,36 +71,15 @@ app.register(fastifyWebsocket);
 app.register(async function (fastify) {
   fastify.get('/ws', { websocket: true }, connection => {
     const client = clientManager.add(connection.socket);
-
-    client.send({
-      event: 'prompt.queue',
-      data: {
-        queue_remaining: comfy.queue_remaining,
-      },
-    });
-    client.send({
-      event: 'backend.status',
-      data: comfy.status,
-    });
-    client.send({
-      event: 'backend.logBuffer',
-      data: comfy.logBuffer.items,
-    });
-
-    if (comfy.torchInfo) {
-      client.send({
-        event: 'info.torch',
-        data: comfy.torchInfo,
-      });
-    }
+    metastable.replayEvents(event => client.send(event));
   });
 });
 
-app.register(routesInstance(comfy, storage), { prefix: '/instance' });
-app.register(routesProjects(storage), { prefix: '/projects' });
-app.register(routesModels(storage), { prefix: '/models' });
-app.register(routesPrompts(comfy, storage), { prefix: '/prompts' });
-app.register(routesDownloads(storage, downloader), { prefix: '/downloads' });
+app.register(routesInstance(metastable), { prefix: '/instance' });
+app.register(routesProjects(metastable), { prefix: '/projects' });
+app.register(routesModels(metastable), { prefix: '/models' });
+app.register(routesPrompts(metastable), { prefix: '/prompts' });
+app.register(routesDownloads(metastable), { prefix: '/downloads' });
 
 app.listen({ host, port });
 

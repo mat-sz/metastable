@@ -47,10 +47,7 @@ class MainStore {
 
     if (IS_ELECTRON) {
       window.electronAPI.ready();
-      window.electronAPI.onComfyEvent((event: any) => this.onMessage(event));
-      window.electronAPI.onDownloaderEvent((event: any) =>
-        this.onMessage(event),
-      );
+      window.electronAPI.onEvent((event: any) => this.onMessage(event));
       this.connected = true;
     } else {
       this.socket = new TypeSocket<AnyEvent>(getUrl('/ws', 'ws'), {

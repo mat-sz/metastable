@@ -9,11 +9,7 @@ import { rimraf } from 'rimraf';
 export class Projects {
   constructor(private projectsDir: string) {}
 
-  async init() {
-    await fs.mkdir(this.projectsDir, { recursive: true });
-  }
-
-  projectFile(
+  private projectFile(
     id: Project['id'],
   ): JSONFile<Omit<Project, 'id' | 'name' | 'settings'> | undefined> {
     return new JSONFile(
@@ -22,8 +18,12 @@ export class Projects {
     );
   }
 
-  settingsFile(id: Project['id']): TextFile {
+  private settingsFile(id: Project['id']): TextFile {
     return new TextFile(path.join(this.projectsDir, `${id}`, 'settings.json'));
+  }
+
+  async init() {
+    await fs.mkdir(this.projectsDir, { recursive: true });
   }
 
   async all() {

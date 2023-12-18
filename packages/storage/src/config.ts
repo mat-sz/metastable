@@ -1,24 +1,51 @@
 import { JSONFile } from './helpers.js';
 
-type ConfigType = Record<string, any>;
+interface ConfigType {
+  python: {
+    configured: boolean;
+    mode: 'system' | 'static';
+    executablePath?: string;
+    packagesPath?: string;
+  };
+  civitai?: {
+    apiKey?: string;
+  };
+}
+
+const CONFIG_DEFAULTS: ConfigType = {
+  python: {
+    configured: false,
+    mode: 'system',
+  },
+};
 
 export class Config {
-  configFile;
+  private configFile;
 
   constructor(configPath: string) {
-    this.configFile = new JSONFile<Record<string, any>>(configPath, {});
+    this.configFile = new JSONFile<ConfigType>(configPath, CONFIG_DEFAULTS);
   }
 
   async all(): Promise<ConfigType> {
-    return await this.configFile.readJson();
+    const data = await this.configFile.readJson();
+
+    return {
+      ...CONFIG_DEFAULTS,
+      ...data,
+    };
   }
 
-  async get(key: string, fallback?: any): Promise<any> {
+  async get<TKey extends keyof ConfigType>(
+    key: TKey,
+  ): Promise<ConfigType[TKey]> {
     const all = await this.all();
-    return all[key] ?? fallback;
+    return all[key];
   }
 
-  async set(key: string, value: any): Promise<void> {
+  async set<TKey extends keyof ConfigType>(
+    key: TKey,
+    value: ConfigType[TKey],
+  ): Promise<void> {
     const all = await this.all();
     await this.configFile.writeJson({ ...all, [key]: value });
   }

@@ -3,10 +3,7 @@ import EventEmitter from 'events';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { nanoid } from 'nanoid/non-secure';
 import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
-import { exists } from '@metastable/fs-helpers';
-import type { Storage } from '@metastable/storage';
 
 import { CircularBuffer } from './helpers.js';
 import type { PythonInstance } from './python.js';
@@ -132,56 +129,5 @@ export class Comfy extends EventEmitter {
     this.process?.stdin.write(
       JSON.stringify({ event: eventName, data }) + '\n',
     );
-  }
-
-  async prompt(settings: any, storage: Storage) {
-    settings.models.base.path = storage.models.path(
-      'checkpoints',
-      settings.models.base.name,
-    );
-
-    const embeddingsDir = storage.models.dir('embeddings');
-    if (await exists(embeddingsDir)) {
-      settings.models.base.embedding_directory = embeddingsDir;
-    }
-
-    if (settings.models.loras) {
-      for (const lora of settings.models.loras) {
-        lora.path = storage.models.path('loras', lora.name);
-      }
-    }
-
-    if (settings.models.controlnets) {
-      for (const controlnet of settings.models.controlnets) {
-        controlnet.path = storage.models.path('controlnet', controlnet.name);
-      }
-    }
-
-    if (settings.models.upscale) {
-      settings.models.upscale.path = storage.models.path(
-        'upscale_models',
-        settings.models.upscale.name,
-      );
-    }
-
-    if (settings.sampler.preview?.method === 'taesd') {
-      const list = await storage.models.type('vae_approx');
-      settings.sampler.preview.taesd = {
-        taesd_decoder: await storage.models.find(list, 'taesd_decoder'),
-        taesdxl_decoder: await storage.models.find(list, 'taesdxl_decoder'),
-      };
-    }
-
-    settings.sampler.tiling = !!settings.sampler.tiling;
-
-    const id = nanoid();
-
-    this.send('prompt', {
-      ...settings,
-      id: id,
-      output_path: storage.projects.path(settings.project_id, 'output'),
-    });
-
-    return { id };
   }
 }

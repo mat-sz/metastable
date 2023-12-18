@@ -1,10 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onComfyEvent: (callback: (event: any) => void) =>
-    ipcRenderer.on('comfy:event', (_: any, value: any) => callback(value)),
-  onDownloaderEvent: (callback: (event: any) => void) =>
-    ipcRenderer.on('downloader:event', (_: any, value: any) => callback(value)),
+  onEvent: (callback: (event: any) => void) =>
+    ipcRenderer.on('event', (_: any, value: any) => callback(value)),
   ready: () => ipcRenderer.send('ready'),
   instance: {
     info: () => ipcRenderer.invoke('instance:info'),

@@ -1,7 +1,7 @@
 import which from 'which';
+import { spawn } from 'child_process';
 
 import { stdout } from './spawn.js';
-import { spawn } from 'child_process';
 
 const PYTHON_COMMANDS = [
   'python3.11',

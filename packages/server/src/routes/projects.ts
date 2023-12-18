@@ -1,8 +1,8 @@
 import { JSONSchema, FromSchema } from 'json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
-import type { Storage } from '@metastable/storage';
+import type { Metastable } from '@metastable/metastable';
 
-export const projectBody = {
+const projectBody = {
   type: 'object',
   properties: {
     name: { type: 'string' },
@@ -10,24 +10,15 @@ export const projectBody = {
   },
 } as const satisfies JSONSchema;
 
-export const projectBodyCreate = {
+const projectBodyCreate = {
   ...projectBody,
   required: ['name', 'settings'],
 } as const satisfies JSONSchema;
 
-export const projectSelect = {
-  id: true,
-  name: true,
-  lastOutput: true,
-  settings: true,
-  createdAt: true,
-  updatedAt: true,
-};
-
-export function routesProjects(storage: Storage) {
+export function routesProjects(metastable: Metastable) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/', async () => {
-      return await storage.projects.all();
+      return await metastable.storage.projects.all();
     });
 
     fastify.post<{
@@ -40,13 +31,13 @@ export function routesProjects(storage: Storage) {
         },
       },
       async request => {
-        return await storage.projects.create(request.body);
+        return await metastable.storage.projects.create(request.body);
       },
     );
 
     fastify.get('/:id', async request => {
       const projectId = (request.params as any)?.id;
-      return storage.projects.get(projectId);
+      return metastable.storage.projects.get(projectId);
     });
 
     fastify.post<{ Body: FromSchema<typeof projectBody> }>(
@@ -58,19 +49,22 @@ export function routesProjects(storage: Storage) {
       },
       async request => {
         const projectId = (request.params as any)?.id;
-        return await storage.projects.update(projectId, request.body);
+        return await metastable.storage.projects.update(
+          projectId,
+          request.body,
+        );
       },
     );
 
     fastify.delete('/:id', async request => {
       const projectId = (request.params as any)?.id;
-      await storage.projects.delete(projectId);
+      await metastable.storage.projects.delete(projectId);
       return { ok: true };
     });
 
     fastify.get('/:id/outputs', async request => {
       const projectId = (request.params as any)?.id;
-      return await storage.projects.filenames(projectId, 'output');
+      return await metastable.storage.projects.filenames(projectId, 'output');
     });
   };
 }
