@@ -64,11 +64,22 @@
 
   &.vertical {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     min-height: 0;
+
+    @media screen and (min-width: 960px) {
+      grid-template-columns: auto 1fr;
+      grid-template-rows: 100%;
+    }
 
     .tabs {
       background: var(--color-bg-panel-dark);
+      display: flex;
+
+      @media screen and (min-width: 960px) {
+        display: block;
+      }
 
       &.normal {
         .tab {

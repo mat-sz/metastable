@@ -1,9 +1,14 @@
 .main {
-  display: grid;
-  grid-template-columns: 1fr 500px;
-  grid-template-rows: 100%;
   flex: 1;
   min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 2fr 1fr;
+
+  @media screen and (min-width: 960px) {
+    grid-template-columns: 1fr 500px;
+    grid-template-rows: 100%;
+  }
 }
 
 .preview {

@@ -1,9 +1,15 @@
 .main {
-  display: grid;
-  grid-template-columns: 1fr 500px;
-  grid-template-rows: 100%;
   flex: 1;
   min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 66.6% 33.3%;
+  max-height: 100%;
+
+  @media screen and (min-width: 960px) {
+    grid-template-columns: 1fr 500px;
+    grid-template-rows: 100%;
+  }
 }
 
 .toolSettings {
