@@ -233,7 +233,7 @@ export async function fetchZip(url: string) {
       cdOffset = Number(zip64Eocd.cdOffset);
     }
 
-    if (cdOffset === USE_ZIP64_FIELD) {
+    if (cdSize === USE_ZIP64_FIELD) {
       cdSize = Number(zip64Eocd.cdSize);
     }
   }

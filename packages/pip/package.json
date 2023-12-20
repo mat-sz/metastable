@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
   },
   "devDependencies": {
     "@types/decompress": "^4.2.7",
@@ -12,10 +13,12 @@
     "@types/pako": "^2.0.3",
     "@types/semver": "^7.5.6",
     "tsx": "^4.6.2",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "vitest": "^1.1.0"
   },
   "dependencies": {
     "axios": "^1.6.2",
+    "chevrotain": "^11.0.3",
     "decompress": "^4.2.1",
     "ebin": "^0.0.3",
     "node-html-parser": "^6.1.11",

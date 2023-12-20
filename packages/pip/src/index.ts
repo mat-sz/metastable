@@ -3,11 +3,9 @@ import { parse } from 'node-html-parser';
 import semver, { SemVer } from 'semver';
 import decompress from 'decompress';
 import { fetchZip } from './zip.js';
+import { compareEnv, parseDependency } from './parser.js';
 
 const DEFAULT_INDEX = 'https://pypi.org/simple';
-const PACKAGE_NAME_REGEX = /^([a-zA-Z0-9][a-zA-Z0-9\._\-]*[a-zA-Z0-9])/;
-const PACKAGE_REGEX =
-  /^([a-zA-Z0-9][a-zA-Z0-9\._\-]*[a-zA-Z0-9])\s*(\[\s*([a-zA-Z0-9][a-zA-Z0-9\._\-]+[a-zA-Z0-9],\s*)*([a-zA-Z0-9][a-zA-Z0-9\._\-]+[a-zA-Z0-9])\s*\])?\s*(\(?((>=|==|<=|<|>|~=|!=|===)[a-zA-Z0-9\._\-]+,)*((>=|==|<=|<|>|~=|!=|===)[a-zA-Z0-9\._\-]+)\)?)?\s*$/;
 
 interface IndexLink {
   label: string;
@@ -157,22 +155,14 @@ export class Pip {
       const requiresDist = metadata.filter(item => item[0] === 'requires-dist');
 
       for (const req of requiresDist) {
-        const depSplit = req[1].split(';');
-        const dep = PACKAGE_NAME_REGEX.exec(depSplit[0].trim());
-        if (!dep) {
-          throw new Error(`Unable to parse dependency: ${depSplit[0]}`);
-        }
+        const dep = parseDependency(req[1]);
 
-        const depName = dep[0];
-        // const depExtras = dep[2].replace('[', '').replace(']','').split(',').map(item => item.trim())
-        // const depVersion = dep[5].replace('(', '').replace(')','').split(',').map(item => item.trim())
-
-        if (depSplit[1]?.includes('extra')) {
+        if (dep.env && !compareEnv(dep.env, {})) {
           continue;
         }
 
-        if (!done.has(depName)) {
-          queue.add(depName);
+        if (!done.has(dep.name)) {
+          queue.add(dep.name);
         }
       }
     }
