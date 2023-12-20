@@ -120,7 +120,7 @@ const decoder = new TextDecoder();
 class RemoteZip {
   constructor(
     private url: string,
-    private records: (typeof cdRecord)['TYPE'][],
+    private records: any[],
   ) {}
 
   get files() {
@@ -161,11 +161,11 @@ class RemoteZip {
   }
 }
 
-function zip64Offset(record: (typeof cdRecord)['TYPE']) {
+function zip64Offset(record: any) {
   let offset = record.relativeOffset;
 
   if (offset === USE_ZIP64_FIELD) {
-    const field = record.extraField.find(field => field.id === 0x01);
+    const field = record.extraField.find((field: any) => field.id === 0x01);
     if (field) {
       const data = zip64ExtendedField.fromByteArray(field.data);
       offset = Number(data.data);

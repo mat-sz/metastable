@@ -11,7 +11,10 @@ export class Metastable extends EventEmitter {
   python?: PythonInstance;
   comfy?: Comfy;
 
-  onEvent = (event: any) => this.emit('event', event);
+  onEvent = (event: any) => {
+    console.log(event);
+    this.emit('event', event);
+  };
 
   constructor(
     dataRoot: string,
