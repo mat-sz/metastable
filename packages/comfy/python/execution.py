@@ -265,9 +265,22 @@ def image_upscale(upscale_model, image):
     s = torch.clamp(s.movedim(-3,-1), min=0, max=1.0)
     return s
 
+last_checkpoint_path = None
+last_checkpoint = None
+
+def load_checkpoint_cached(path):
+    global last_checkpoint, last_checkpoint_path
+
+    if last_checkpoint != None and last_checkpoint_path == path:
+        return last_checkpoint
+    
+    last_checkpoint_path = path
+    last_checkpoint = load_checkpoint(path)
+    return last_checkpoint
+
 def execute_prompt(prompt):
     models_settings = prompt["models"]
-    (model, clip, vae, _) = load_checkpoint(models_settings["base"])
+    (model, clip, vae, _) = load_checkpoint_cached(models_settings["base"])
     tiling = prompt["sampler"]["tiling"]
 
     if "loras" in models_settings:
