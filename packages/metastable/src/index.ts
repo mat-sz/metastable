@@ -12,7 +12,7 @@ export class Metastable extends EventEmitter {
   comfy?: Comfy;
 
   onEvent = (event: any) => {
-    console.log(event);
+    console.log(`[${new Date().toISOString()}]`, event);
     this.emit('event', event);
   };
 
