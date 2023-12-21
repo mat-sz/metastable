@@ -37,9 +37,9 @@ export class Metastable extends EventEmitter {
 
     const config = await this.storage.config.all();
     this.python =
-      config.python.mode === 'system' && config.python.executablePath
+      config.python.mode === 'system' || !config.python.executablePath
         ? await PythonInstance.fromSystem()
-        : await PythonInstance.fromDirectory(config.python.executablePath!);
+        : await PythonInstance.fromDirectory(config.python.executablePath);
     this.comfy = new Comfy(this.python, this.settings.comfyMainPath);
 
     const comfy = this.comfy;
