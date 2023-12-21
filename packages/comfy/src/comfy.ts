@@ -4,9 +4,9 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
+import type { PythonInstance } from '@metastable/python';
 
 import { CircularBuffer } from './helpers.js';
-import type { PythonInstance } from './python.js';
 
 const baseDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 

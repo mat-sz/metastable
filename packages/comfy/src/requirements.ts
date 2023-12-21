@@ -1,8 +1,7 @@
 import semver from 'semver';
 import os from 'os';
 import { Requirement } from '@metastable/types';
-
-import type { PythonInstance } from './python.js';
+import type { PythonInstance } from '@metastable/python';
 
 interface PipDependency {
   name: string;

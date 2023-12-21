@@ -1158,6 +1158,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@metastable/python@workspace:packages/python":
+  version: 0.0.0-use.local
+  resolution: "@metastable/python@workspace:packages/python"
+  dependencies:
+    "@types/decompress": "npm:^4.2.7"
+    "@types/node": "npm:^20.10.3"
+    "@types/semver": "npm:^7.5.6"
+    "@types/which": "npm:^3.0.3"
+    decompress: "npm:^4.2.1"
+    semver: "npm:^7.5.4"
+    tsx: "npm:^4.6.2"
+    typescript: "npm:^5.3.2"
+    which: "npm:^4.0.0"
+  languageName: unknown
+  linkType: soft
+
 "@metastable/server@workspace:packages/server":
   version: 0.0.0-use.local
   resolution: "@metastable/server@workspace:packages/server"

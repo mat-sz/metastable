@@ -1,7 +1,8 @@
 import EventEmitter from 'events';
 import { nanoid } from 'nanoid/non-secure';
 import { Storage } from '@metastable/storage';
-import { Comfy, PythonInstance, createPythonInstance } from '@metastable/comfy';
+import { Comfy } from '@metastable/comfy';
+import { PythonInstance } from '@metastable/python';
 import { Downloader } from '@metastable/downloader';
 import { exists, isPathIn } from '@metastable/fs-helpers';
 
@@ -35,11 +36,10 @@ export class Metastable extends EventEmitter {
     this.comfy?.stop(true);
 
     const config = await this.storage.config.all();
-    this.python = await createPythonInstance(
-      config.python.mode === 'system'
-        ? undefined
-        : config.python.executablePath,
-    );
+    this.python =
+      config.python.mode === 'system' && config.python.executablePath
+        ? await PythonInstance.fromSystem()
+        : await PythonInstance.fromDirectory(config.python.executablePath!);
     this.comfy = new Comfy(this.python, this.settings.comfyMainPath);
 
     const comfy = this.comfy;

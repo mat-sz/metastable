@@ -1,5 +1,6 @@
 import which from 'which';
 import { spawn } from 'child_process';
+import path from 'path';
 
 import { stdout } from './spawn.js';
 
@@ -30,15 +31,6 @@ interface PythonVersion {
   tag: { interpreter: string; abi: string; platform: string };
   version: string;
 }
-
-const PYTHON_TAGS = `
-from packaging.tags import sys_tags
-import json
-
-print(json.dumps(
-  ["{0}-{1}-{2}".format(tag.interpreter, tag.abi, tag.platform) for tag in sys_tags()]
-))
-`;
 
 const PYTHON_VERSION = `
 from packaging.tags import sys_tags
@@ -76,14 +68,19 @@ print(json.dumps(output))
 export class PythonInstance {
   constructor(
     private path: string,
-    private packagesPath?: string,
+    private pythonHome?: string,
+    private packagesDir?: string,
   ) {}
 
   private get env() {
     const env: Record<string, string> = {};
 
-    if (this.packagesPath) {
-      env.PYTHONPATH = this.packagesPath;
+    if (this.packagesDir) {
+      env.PYTHONPATH = this.packagesDir;
+    }
+
+    if (this.pythonHome) {
+      env.PYTHONHOME = this.pythonHome;
     }
 
     return env;
@@ -113,10 +110,6 @@ export class PythonInstance {
     return JSON.parse(await this.stdout(['-c', code]));
   }
 
-  async tags(): Promise<string[]> {
-    return await this.runPython(PYTHON_TAGS);
-  }
-
   async version(): Promise<PythonVersion> {
     return await this.runPython(PYTHON_VERSION);
   }
@@ -126,18 +119,27 @@ export class PythonInstance {
       PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
     );
   }
-}
 
-export async function createPythonInstance(path?: string) {
-  if (!path) {
-    path = await getPythonCommand();
+  static async fromDirectory(dir: string, packagesDir?: string) {
+    dir = path.resolve(dir);
+    const instance = new PythonInstance(
+      path.join(dir, 'bin', 'python3'),
+      dir,
+      packagesDir,
+    );
+
+    // Ensure everything works.
+    await instance.version();
+
+    return instance;
   }
 
-  if (!path) {
-    throw new Error('Unable to locate a compatible python instance.');
+  static async fromSystem(packagesDir?: string) {
+    const cmd = await getPythonCommand();
+    if (!cmd) {
+      throw new Error('Unable to locate a compatible Python instance.');
+    }
+
+    return new PythonInstance(cmd, undefined, packagesDir);
   }
-
-  const python = new PythonInstance(path);
-
-  return python;
 }
