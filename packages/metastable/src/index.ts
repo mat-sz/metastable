@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import path from 'path';
 import { nanoid } from 'nanoid/non-secure';
 import { Storage } from '@metastable/storage';
 import { Comfy } from '@metastable/comfy';
@@ -38,7 +39,7 @@ export class Metastable extends EventEmitter {
     const config = await this.storage.config.all();
     this.python =
       config.python.mode === 'system' || !config.python.executablePath
-        ? await PythonInstance.fromSystem()
+        ? await PythonInstance.fromSystem(path.resolve('../comfy/python/.pip'))
         : await PythonInstance.fromDirectory(config.python.executablePath);
     this.comfy = new Comfy(this.python, this.settings.comfyMainPath);
 
