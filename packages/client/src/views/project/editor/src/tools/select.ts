@@ -4,8 +4,10 @@ import { Point, Tool, ToolOption } from '../types';
 export class SelectTool implements Tool {
   readonly id: string = 'select';
   readonly name: string = 'Select';
-  readonly options: Record<string, ToolOption> = {};
+  readonly options: ToolOption[] = [];
   private lastPoint: Point | undefined = undefined;
+
+  settings = {};
 
   constructor(private editor: Editor) {}
 

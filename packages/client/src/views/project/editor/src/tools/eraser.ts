@@ -5,7 +5,7 @@ export class EraserTool extends BrushTool {
   readonly name: string = 'Eraser';
 
   prepareBrush(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#000000';
+    this.drawBrushCanvas('#000000');
     ctx.globalCompositeOperation = 'destination-out';
   }
 }

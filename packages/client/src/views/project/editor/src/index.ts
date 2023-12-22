@@ -220,6 +220,11 @@ export class Editor extends BasicEventEmitter<{
     this.emit('toolChanged');
   }
 
+  updateToolSettings(newSettings: any) {
+    this.currentTool.settings = newSettings;
+    this.emit('toolSettingsChanged');
+  }
+
   private newLayer(width = 512, height = 512, options: Partial<Layer> = {}) {
     const id = nanoid();
     const canvas = document.createElement('canvas');

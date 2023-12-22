@@ -8,9 +8,10 @@ export interface ToolOption {
   id: string;
   name: string;
   type: ToolOptionType;
-  defaultValue: any;
-  min?: number;
-  max?: number;
+  defaultValue: number;
+  min: number;
+  max: number;
+  step: number;
 }
 
 export interface Tool {
@@ -20,7 +21,9 @@ export interface Tool {
 
   readonly id: string;
   readonly name: string;
-  readonly options: Record<string, ToolOption>;
+  readonly options: ToolOption[];
+
+  settings: any;
 
   // TODO: pass editor state
   // TODO: return new editor state

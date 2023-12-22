@@ -17,6 +17,17 @@
   align-items: center;
   grid-column: 1 / 4;
   background: var(--color-bg-panel);
+
+  .settings {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    & > div {
+      min-width: 300px;
+      border: none;
+    }
+  }
 }
 
 .editor {
