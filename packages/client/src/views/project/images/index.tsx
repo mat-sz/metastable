@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { VarButton } from 'react-var-ui';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { Settings } from '../settings';
-import { ImagePreview } from '../../../components';
+import { IconButton, ImagePreview } from '../../../components';
+import { BsPlay } from 'react-icons/bs';
 
 export const Images: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -38,10 +38,9 @@ export const Images: React.FC = observer(() => {
       </div>
       <Settings
         actions={
-          <VarButton
-            buttonLabel="Request image"
-            onClick={() => project.request()}
-          />
+          <IconButton title="Request image" onClick={() => project.request()}>
+            <BsPlay />
+          </IconButton>
         }
       />
     </div>

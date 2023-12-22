@@ -1,7 +1,5 @@
 .settings {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  min-height: 0;
+  position: relative;
 }
 
 .prompt {
@@ -19,4 +17,31 @@
   border: 1px solid var(--color-error);
   background: var(--color-error-soft);
   font-weight: bold;
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999999;
+  display: block;
+  background: var(--color-bg-panel-dark);
+  display: flex;
+
+  @media screen and (min-width: 960px) {
+    top: -2.4rem;
+  }
+
+  button {
+    padding: 0.5rem;
+    border-radius: 0;
+
+    svg {
+      font-size: 1.4rem;
+    }
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { runInAction, toJS } from 'mobx';
-import { VarCategory, VarUI } from 'react-var-ui';
+import { VarUI } from 'react-var-ui';
 
 import styles from './index.module.scss';
 import { BsWrench, BsRecordCircle, BsGearWideConnected } from 'react-icons/bs';
@@ -25,7 +25,11 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
   const error = validateProject(project);
 
   return (
-    <TabView defaultTab="general" direction="vertical">
+    <TabView
+      defaultTab="general"
+      direction="vertical"
+      className={styles.settings}
+    >
       <Tabs buttonStyle="icon">
         <Tab id="general" title="General" icon={<BsWrench />} />
         <Tab id="loras" title="LoRAs" icon={<BsRecordCircle />} />
@@ -36,6 +40,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         />
         <Tab id="upscale" title="Upscale" icon={<GiResize />} />
       </Tabs>
+      <div className={styles.actions}>{!error && actions}</div>
       <VarUI
         className={styles.prompt}
         onChange={values => {
@@ -46,9 +51,6 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         values={toJS(project.settings)}
       >
         {!!error && <div className={styles.error}>{error}</div>}
-        {!error && actions && (
-          <VarCategory label="Actions">{actions}</VarCategory>
-        )}
         <TabPanel id="general">
           <General />
         </TabPanel>
