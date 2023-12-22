@@ -11,6 +11,7 @@ import { EditorSelection, EditorState, Layer, Point, Tool } from './types';
 import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
 import { loadImage } from '../../../../helpers';
+import { isVisible } from './helpers';
 
 export class BasicEventEmitter<
   TEvents extends { [key: string]: (...args: any[]) => void },
@@ -142,6 +143,8 @@ export class Editor extends BasicEventEmitter<{
   };
   currentToolId = 'move';
 
+  private _shouldRender = false;
+
   private _foregroundColor = '#000000';
   private _backgroundColor = '#ffffff';
 
@@ -185,6 +188,14 @@ export class Editor extends BasicEventEmitter<{
 
     this.glue.registerProgram('~selectionEdge', selectionEdgeFragment);
     this.glue.registerProgram('~layerBounds', layerBoundsFragment);
+
+    setInterval(() => {
+      this.checkVisibility();
+    }, 100);
+  }
+
+  private checkVisibility() {
+    this._shouldRender = isVisible(this.glueCanvas.canvas);
   }
 
   private pointerEventToPoint(e: PointerEvent): Point {
@@ -278,6 +289,13 @@ export class Editor extends BasicEventEmitter<{
   }
 
   render() {
+    if (!this._shouldRender) {
+      setTimeout(() => {
+        requestAnimationFrame(() => this.render());
+      }, 100);
+      return;
+    }
+
     const glue = this.glue;
     this.glueCanvas.setSize(
       this.glueCanvas.canvas.clientWidth || 1,

@@ -35,3 +35,39 @@ export function linePoints(
   }
   return points;
 }
+
+export function isVisible(el: HTMLElement) {
+  const style = getComputedStyle(el);
+  if (style.display === 'none') return false;
+  if (style.visibility !== 'visible') return false;
+  if (parseFloat(style.opacity) < 0.1) return false;
+
+  const rect = el.getBoundingClientRect();
+  if (el.offsetWidth + el.offsetHeight + rect.height + rect.width === 0) {
+    return false;
+  }
+
+  const center = {
+    x: rect.left + el.offsetWidth / 2,
+    y: rect.top + el.offsetHeight / 2,
+  };
+
+  if (
+    center.x < 0 ||
+    center.x > (document.documentElement.clientWidth || window.innerWidth) ||
+    center.y < 0 ||
+    center.y > (document.documentElement.clientHeight || window.innerHeight)
+  ) {
+    return false;
+  }
+
+  let pointContainer: ParentNode | null | undefined = document.elementFromPoint(
+    center.x,
+    center.y,
+  );
+  do {
+    if (pointContainer === el) return true;
+  } while ((pointContainer = pointContainer?.parentNode));
+
+  return false;
+}
