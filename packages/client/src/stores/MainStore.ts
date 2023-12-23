@@ -111,6 +111,19 @@ class MainStore {
     return getStaticUrl(`/projects/${project_id}/${type}/${filename}`);
   }
 
+  pushLog(item: ComfyLogItem) {
+    if (
+      this.backendLog.find(
+        logItem =>
+          logItem.timestamp === item.timestamp && logItem.text === item.text,
+      )
+    ) {
+      return;
+    }
+
+    this.backendLog.push(item);
+  }
+
   onMessage(message: AnyEvent) {
     switch (message.event) {
       case 'prompt.start':
@@ -155,10 +168,12 @@ class MainStore {
         this.backendStatus = message.data;
         break;
       case 'backend.log':
-        this.backendLog.push(message.data);
+        this.pushLog(message.data);
         break;
       case 'backend.logBuffer':
-        this.backendLog.push(...message.data);
+        for (const item of message.data) {
+          this.pushLog(item);
+        }
         break;
       case 'ping':
         this.socket?.send({ event: 'ping', data: Date.now() });
