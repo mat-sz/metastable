@@ -5,6 +5,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), ".p
 import comfy.options
 comfy.options.enable_args_parsing()
 
+import custom
+
 import importlib.util
 import time
 
@@ -95,7 +97,7 @@ if __name__ == "__main__":
 
     jsonout("info.torch", get_torch_info())
     jsonout("info.samplers", comfy.samplers.KSampler.SAMPLERS)
-    jsonout("info.schedulers", comfy.samplers.KSampler.SCHEDULERS)
+    jsonout("info.schedulers", comfy.samplers.KSampler.SCHEDULERS + list(custom.get_custom_schedulers().keys()))
 
     try:
         jsonout("ready")

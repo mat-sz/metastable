@@ -6,7 +6,8 @@
   ],
   "scripts": {
     "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server run build",
-    "start": "yarn build:deps && yarn workspaces foreach -Api run start"
+    "start": "yarn build:deps && yarn dev",
+    "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run start"
   },
   "packageManager": "yarn@4.0.2"
 }

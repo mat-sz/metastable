@@ -66,11 +66,20 @@ class MainStore {
       this.socket.connect();
     }
 
-    this.refresh();
+    this.init();
   }
 
   get project() {
     return this.projects.current;
+  }
+
+  async init() {
+    this.refresh();
+
+    const compatibility = await API.instance.compatibility();
+    runInAction(() => {
+      this.compatibility = compatibility;
+    });
   }
 
   async refresh() {
@@ -84,11 +93,6 @@ class MainStore {
     if (dataDir) {
       window.dataDir = dataDir;
     }
-
-    const compatibility = await API.instance.compatibility();
-    runInAction(() => {
-      this.compatibility = compatibility;
-    });
   }
 
   onConnected() {
@@ -166,6 +170,9 @@ class MainStore {
         break;
       case 'backend.status':
         this.backendStatus = message.data;
+        if (message.data === 'ready') {
+          this.refresh();
+        }
         break;
       case 'backend.log':
         this.pushLog(message.data);

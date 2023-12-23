@@ -33,6 +33,7 @@ import comfy.clip_vision
 
 import comfy.model_management
 from comfy_extras.chainner_models import model_loading
+import custom
 
 import latent_preview
 from helpers import jsonout, get_save_image_counter
@@ -166,6 +167,21 @@ def empty_latent_image(settings):
 def create_conditioning(clip, settings):
     return (clip_encode(clip, settings["positive"]), clip_encode(clip, settings["negative"]))
 
+def get_sigmas(model, scheduler, steps, denoise):
+    custom_schedulers = custom.get_custom_schedulers()
+    if scheduler in custom_schedulers:
+        scheduler = custom_schedulers[scheduler]
+        return scheduler(model, steps, denoise)
+
+    sigmas = comfy.samplers.calculate_sigmas_scheduler(model.model, scheduler, steps).cpu()
+
+    if denoise == 0 or denoise > 0.9999:
+        return sigmas.cpu()
+    else:
+        new_steps = int(steps/denoise)
+        sigmas = sigmas.cpu()
+        return sigmas[-(steps + 1):]
+
 def ksampler(model, latent, conditioning, settings):
     latent_image = latent["samples"]
     positive, negative = conditioning
@@ -176,7 +192,7 @@ def ksampler(model, latent, conditioning, settings):
     if "noise_mask" in latent:
         noise_mask = latent["noise_mask"]
 
-    steps = settings["steps"]
+    steps, denoise, cfg = settings["steps"], settings["denoise"], settings["cfg"]
 
     callback = None
     if "preview" in settings:
@@ -190,10 +206,10 @@ def ksampler(model, latent, conditioning, settings):
     else:
         callback = latent_preview.prepare_callback(model, "none", steps)
 
-    denoise, cfg, sampler, scheduler = settings["denoise"], settings["cfg"], settings["sampler"], settings["scheduler"]
-    return comfy.sample.sample(model, noise, steps, cfg, sampler, scheduler, positive, negative, latent_image,
-                                                                denoise=denoise, disable_noise=False, start_step=None, last_step=None,
-                                                                force_full_denoise=False, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
+    sampler = comfy.samplers.sampler_object(settings["sampler"])
+    sigmas = get_sigmas(model, settings["scheduler"], steps, denoise).cpu()
+
+    return comfy.sample.sample_custom(model, noise, cfg, sampler, sigmas, positive, negative, latent_image, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
 
 def load_checkpoint(settings):
     embedding_directory = None

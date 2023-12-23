@@ -62,6 +62,29 @@ export const downloadable: DownloadableModelGroup[] = [
     ],
   },
   {
+    name: 'Stable Diffusion XL Turbo',
+    type: ModelType.CHECKPOINT,
+    recommended: true,
+    description: 'A faster version of the SDXL checkpoint.',
+    models: [
+      {
+        name: 'SDXL Turbo 1.0',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        recommended: true,
+        downloads: [
+          {
+            type: ModelType.CHECKPOINT,
+            name: 'sd_xl_turbo_1.0_fp16.safetensors',
+            url: 'https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors',
+            size: 6938081905,
+          },
+        ],
+        homepage: 'https://huggingface.co/stabilityai/sdxl-turbo',
+      },
+    ],
+  },
+  {
     name: 'Stable Diffusion XL',
     type: ModelType.CHECKPOINT,
     recommended: true,
