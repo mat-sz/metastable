@@ -96,7 +96,7 @@ export class Metastable extends EventEmitter {
 
     const embeddingsDir = this.storage.models.dir('embeddings');
     if (await exists(embeddingsDir)) {
-      settings.models.base.embedding_directory = embeddingsDir;
+      settings.models.base.embeddings_path = embeddingsDir;
     }
 
     if (settings.models.loras) {

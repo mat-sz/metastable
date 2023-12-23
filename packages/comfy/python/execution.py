@@ -198,8 +198,8 @@ def ksampler(model, latent, conditioning, settings):
 def load_checkpoint(settings):
     embedding_directory = None
 
-    if "embedding_directory" in settings:
-        embedding_directory = settings["embedding_directory"]
+    if "embeddings_path" in settings:
+        embedding_directory = settings["embeddings_path"]
     
     return comfy.sd.load_checkpoint_guess_config(settings["path"], output_vae=True, output_clip=True, embedding_directory=embedding_directory)
 
@@ -213,8 +213,9 @@ def load_controlnet(controlnet_path):
     controlnet = comfy.controlnet.load_controlnet(controlnet_path)
     return controlnet
 
-def save_images(prompt, images):
-    output_dir = prompt["output_path"]
+def save_images(settings, images):
+    output_dir = settings["output_path"]
+    settings = sanitize_prompt(settings)
     counter = get_save_image_counter(output_dir)
 
     output_filenames = []
@@ -223,8 +224,8 @@ def save_images(prompt, images):
         i = 255. * image.cpu().detach().numpy()
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
         metadata = PngInfo()
-        if prompt is not None:
-            metadata.add_text("prompt", json.dumps(prompt))
+        if settings is not None:
+            metadata.add_text("metastable_settings", json.dumps(settings))
         
         file = f"{counter:05}.png"
         img.save(os.path.join(output_dir, file), pnginfo=metadata, compress_level=4)
@@ -277,6 +278,36 @@ def load_checkpoint_cached(path):
     last_checkpoint_path = path
     last_checkpoint = load_checkpoint(path)
     return last_checkpoint
+
+def sanitize_prompt(settings):
+    settings = copy.deepcopy(settings)
+
+    del settings["id"]
+    del settings["project_id"]
+    models_settings = settings["models"]
+
+    del models_settings["base"]["path"]
+    if "embeddings_path" in models_settings["base"]:
+        del models_settings["base"]["embeddings_path"]
+
+    if "loras" in models_settings:
+        for lora_settings in models_settings["loras"]:
+            del lora_settings["path"]
+
+    if "controlnets" in models_settings:
+        for controlnet_settings in models_settings["controlnets"]:
+            del controlnet_settings["path"]
+            del controlnet_settings["image"]
+    
+    if "upscale" in models_settings:
+        del models_settings["upscale"]["path"]
+
+    if "image" in settings["input"]:
+        del settings["input"]["image"]
+
+    del settings["output_path"]
+
+    return settings
 
 def execute_prompt(prompt):
     models_settings = prompt["models"]
