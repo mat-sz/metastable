@@ -110,7 +110,7 @@ export class BrushTool implements Tool {
 
   down(data: PointerEventData) {
     if (data.action === 'primary') {
-      this.draw(data.point, data.lastPoint);
+      this.draw(data.point);
     }
   }
 

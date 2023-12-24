@@ -165,7 +165,8 @@
 
 .colors {
   position: relative;
-  width: 2.3rem;
+  width: 2rem;
+  height: 2.3rem;
   margin-top: 1rem;
 
   input {
@@ -186,5 +187,28 @@
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
+  }
+
+  button {
+    font-size: 0;
+    position: absolute;
+    padding: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+
+    svg {
+      width: 0.6rem;
+      height: 0.6rem;
+    }
+  }
+
+  .swap {
+    bottom: 0;
+    left: 0;
+  }
+
+  .reset {
+    top: 0.25rem;
+    right: 0;
   }
 }

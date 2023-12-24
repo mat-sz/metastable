@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { BsArrow90DegUp } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import { useEditor } from './context';
+import { ResetColorsIcon } from './icons/ResetColors';
 
 export const Colors: React.FC = () => {
   const editor = useEditor();
@@ -43,6 +45,27 @@ export const Colors: React.FC = () => {
         onChange={e => (editor.backgroundColor = e.target.value)}
         className={styles.background}
       />
+      <button
+        className={styles.reset}
+        title="Reset colors"
+        onClick={() => {
+          editor.foregroundColor = '#000000';
+          editor.backgroundColor = '#ffffff';
+        }}
+      >
+        <ResetColorsIcon />
+      </button>
+      <button
+        className={styles.swap}
+        title="Swap colors"
+        onClick={() => {
+          const foregroundColor = editor.foregroundColor;
+          editor.foregroundColor = editor.backgroundColor;
+          editor.backgroundColor = foregroundColor;
+        }}
+      >
+        <BsArrow90DegUp />
+      </button>
     </div>
   );
 };
