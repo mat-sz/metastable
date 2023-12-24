@@ -167,13 +167,16 @@ def empty_latent_image(settings):
 def create_conditioning(clip, settings):
     return (clip_encode(clip, settings["positive"]), clip_encode(clip, settings["negative"]))
 
-def get_sigmas(model, scheduler, steps, denoise):
+def get_sigmas(model, scheduler, steps, denoise, discard_penultimate_sigma=False):
     custom_schedulers = custom.get_custom_schedulers()
     if scheduler in custom_schedulers:
         scheduler = custom_schedulers[scheduler]
         return scheduler(model, steps, denoise)
+    
+    sigmas = comfy.samplers.calculate_sigmas_scheduler(model, scheduler, steps)
 
-    sigmas = comfy.samplers.calculate_sigmas_scheduler(model.model, scheduler, steps).cpu()
+    if discard_penultimate_sigma:
+        sigmas = torch.cat([sigmas[:-2], sigmas[-1:]])
 
     if denoise == 0 or denoise > 0.9999:
         return sigmas.cpu()
@@ -206,8 +209,13 @@ def ksampler(model, latent, conditioning, settings):
     else:
         callback = latent_preview.prepare_callback(model, "none", steps)
 
+    discard_penultimate_sigma = False
+    if settings["sampler"] in ['dpm_2', 'dpm_2_ancestral', 'uni_pc', 'uni_pc_bh2']:
+        steps += 1
+        discard_penultimate_sigma = True
+    
     sampler = comfy.samplers.sampler_object(settings["sampler"])
-    sigmas = get_sigmas(model, settings["scheduler"], steps, denoise).cpu()
+    sigmas = get_sigmas(model, settings["scheduler"], steps, denoise, discard_penultimate_sigma).cpu()
 
     return comfy.sample.sample_custom(model, noise, cfg, sampler, sigmas, positive, negative, latent_image, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
 
