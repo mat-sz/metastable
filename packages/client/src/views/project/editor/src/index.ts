@@ -1,8 +1,3 @@
-// TODO: layer effects
-// TODO: undo/redo somehow
-// TODO: load image layer
-// TODO: fill tool
-
 import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 import { MoveTool } from './tools/move';
@@ -117,6 +112,29 @@ void main() {
 }
 `;
 
+const backgroundFragment = `
+@use wrap
+
+uniform vec2 iOffset;
+uniform float iScale;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / iResolution.x;
+  uv.x -= iOffset.x / iResolution.x;
+  uv.y += iOffset.y / iResolution.x;
+  uv *= iScale;
+
+  float tileWidth = 16.0;
+  float repeats = iResolution.x / tileWidth;
+  float cx = floor(repeats * uv.x);
+  float cy = floor(repeats * uv.y); 
+  float result = mod(cx + cy, 2.0);
+  float c = 0.3 + 0.1 * sign(result);
+
+  gl_FragColor = vec4(c, c, c, 1.0);
+}
+`;
+
 export class Editor extends BasicEventEmitter<{
   toolChanged: () => void;
   toolSettingsChanged: () => void;
@@ -131,12 +149,14 @@ export class Editor extends BasicEventEmitter<{
     canvas: document.createElement('canvas'),
     offset: { x: 1, y: 1 },
   };
+  scale = 1;
+  offset: Point = { x: 0, y: 0 };
 
   glueCanvas = new GlueCanvas();
   glue = this.glueCanvas.glue;
 
   tools: Record<string, Tool> = {
-    move: new MoveTool(),
+    move: new MoveTool(this),
     brush: new BrushTool(this),
     eraser: new EraserTool(this),
     select: new SelectTool(this),
@@ -147,6 +167,14 @@ export class Editor extends BasicEventEmitter<{
 
   private _foregroundColor = '#000000';
   private _backgroundColor = '#ffffff';
+
+  private _pointerTemp:
+    | {
+        startPoint: Point;
+        lastPoint: Point;
+        action?: 'primary' | 'secondary';
+      }
+    | undefined = undefined;
 
   get foregroundColor() {
     return this._foregroundColor;
@@ -172,20 +200,69 @@ export class Editor extends BasicEventEmitter<{
 
     const canvas = this.glueCanvas.canvas;
     canvas.addEventListener('pointerdown', e => {
-      // TODO: Handle offsets and zoom
-      this.currentTool.down(this.pointerEventToPoint(e));
+      const point = this.pointerEventToPoint(e);
+      const action = e.button === 0 ? 'primary' : 'secondary';
+      this._pointerTemp = { startPoint: point, lastPoint: point, action };
+
+      const scaledPoint = this.scalePoint(point);
+      this.currentTool.down({
+        action,
+        point: scaledPoint,
+        startPoint: scaledPoint,
+        lastPoint: scaledPoint,
+        diffStart: { x: 0, y: 0 },
+      });
     });
     canvas.addEventListener('pointermove', e => {
-      // TODO: Handle offsets and zoom
-      this.currentTool.move(this.pointerEventToPoint(e));
+      const point = this.pointerEventToPoint(e);
+
+      if (this._pointerTemp?.action) {
+        const start = this.scalePoint(this._pointerTemp.startPoint);
+        const current = this.scalePoint(point);
+        const last = this.scalePoint(this._pointerTemp.lastPoint);
+
+        this.currentTool.move({
+          action: this._pointerTemp.action,
+          point: current,
+          startPoint: start,
+          lastPoint: last,
+          diffStart: { x: current.x - start.x, y: current.y - start.y },
+        });
+        this._pointerTemp.lastPoint = point;
+      } else {
+        this.currentTool.move({
+          action: undefined,
+          point: this.scalePoint(point),
+        });
+      }
     });
     canvas.addEventListener('pointerup', e => {
-      // TODO: Handle offsets and zoom
-      this.currentTool.up(this.pointerEventToPoint(e));
+      const point = this.pointerEventToPoint(e);
+
+      if (this._pointerTemp?.action) {
+        const start = this.scalePoint(this._pointerTemp.startPoint);
+        const current = this.scalePoint(point);
+        const last = this.scalePoint(this._pointerTemp.lastPoint);
+
+        this.currentTool.move({
+          action: this._pointerTemp.action,
+          point: current,
+          startPoint: start,
+          lastPoint: last,
+          diffStart: { x: current.x - start.x, y: current.y - start.y },
+        });
+      } else {
+        this.currentTool.move({
+          action: undefined,
+          point: this.scalePoint(point),
+        });
+      }
+      this._pointerTemp = undefined;
     });
 
     this.glue.registerTexture('~selection', this.selection.canvas);
 
+    this.glue.registerProgram('~background', backgroundFragment);
     this.glue.registerProgram('~selectionEdge', selectionEdgeFragment);
     this.glue.registerProgram('~layerBounds', layerBoundsFragment);
 
@@ -200,7 +277,17 @@ export class Editor extends BasicEventEmitter<{
 
   private pointerEventToPoint(e: PointerEvent): Point {
     const rect = this.glueCanvas.canvas.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+  }
+
+  private scalePoint(point: Point): Point {
+    return {
+      x: point.x / this.scale - this.offset.x,
+      y: point.y / this.scale - this.offset.y,
+    };
   }
 
   get currentLayer() {
@@ -322,10 +409,10 @@ export class Editor extends BasicEventEmitter<{
     for (const layer of layers) {
       glue.texture(layer.id)?.update();
       glue.texture(layer.id)?.draw({
-        x: (layer.offset.x * layer.canvas.width) / this.glueCanvas.canvas.width,
-        y:
-          (layer.offset.y * layer.canvas.height) /
-          this.glueCanvas.canvas.height,
+        x: layer.offset.x,
+        y: layer.offset.y,
+        width: layer.canvas.width,
+        height: layer.canvas.height,
       });
     }
   }
@@ -343,6 +430,13 @@ export class Editor extends BasicEventEmitter<{
       this.glueCanvas.canvas.clientWidth || 1,
       this.glueCanvas.canvas.clientHeight || 1,
     );
+    glue.setScale(this.scale);
+    glue.setOffset(this.offset.x, this.offset.y);
+
+    glue.program('~background')?.apply({
+      iScale: this.scale,
+      iOffset: [this.offset.x, this.offset.y],
+    });
 
     this.renderLayers();
 
@@ -350,18 +444,23 @@ export class Editor extends BasicEventEmitter<{
     glue.texture('~selection')?.use();
     glue.program('~selectionEdge')?.apply({
       iImage: 1,
-      iOffset: [this.selection.offset.x, this.selection.offset.y],
-      iSize: [this.selection.canvas.width, this.selection.canvas.height],
+      ...glue.layerUniforms(
+        this.selection.offset.x,
+        this.selection.offset.y,
+        this.selection.canvas.width,
+        this.selection.canvas.height,
+      ),
     });
 
     const layer = this.currentLayer;
     if (layer) {
       glue.program('~layerBounds')?.apply({
-        iOffset: [
-          layer.offset.x / this.glueCanvas.canvas.width,
-          layer.offset.y / this.glueCanvas.canvas.height,
-        ],
-        iSize: [layer.canvas.width, layer.canvas.height],
+        ...glue.layerUniforms(
+          layer.offset.x,
+          layer.offset.y,
+          layer.canvas.width,
+          layer.canvas.height,
+        ),
       });
     }
 

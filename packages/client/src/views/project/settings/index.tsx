@@ -4,8 +4,12 @@ import { runInAction, toJS } from 'mobx';
 import { VarUI } from 'react-var-ui';
 
 import styles from './index.module.scss';
-import { BsWrench, BsRecordCircle, BsGearWideConnected } from 'react-icons/bs';
-import { GiResize } from 'react-icons/gi';
+import {
+  BsWrench,
+  BsRecordCircle,
+  BsGearWideConnected,
+  BsFullscreen,
+} from 'react-icons/bs';
 
 import { mainStore } from '../../../stores/MainStore';
 import { fixSettings, validateProject } from '../../../helpers';
@@ -38,7 +42,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
           title="Controlnets"
           icon={<BsGearWideConnected />}
         />
-        <Tab id="upscale" title="Upscale" icon={<GiResize />} />
+        <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
       </Tabs>
       <div className={styles.actions}>{!error && actions}</div>
       <VarUI

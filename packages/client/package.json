@@ -30,7 +30,7 @@
     "@metastable/metastable": "*",
     "clsx": "^2.0.0",
     "filesize": "^10.1.0",
-    "fxglue": "^0.2.0",
+    "fxglue": "^0.2.1",
     "lsrx": "^0.0.2",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.4",

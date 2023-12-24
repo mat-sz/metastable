@@ -1,6 +1,12 @@
 import type { Editor } from '..';
 import { linePoints } from '../helpers';
-import { Point, Tool, ToolOption, ToolOptionType } from '../types';
+import {
+  Point,
+  PointerEventData,
+  Tool,
+  ToolOption,
+  ToolOptionType,
+} from '../types';
 
 export class BrushTool implements Tool {
   readonly id: string = 'brush';
@@ -26,8 +32,6 @@ export class BrushTool implements Tool {
     },
   ];
 
-  private lastPoint: Point | undefined = undefined;
-  private isDown = false;
   private brushCanvas: HTMLCanvasElement = document.createElement('canvas');
 
   settings = {
@@ -72,14 +76,21 @@ export class BrushTool implements Tool {
     ctx.drawImage(this.brushCanvas, x - radius, y - radius);
   }
 
-  draw(point: Point, line = false) {
+  draw(point: Point, last?: Point, line = false) {
     const layer = this.editor.currentLayer;
     if (!layer) {
       return;
     }
 
+    point.x -= layer.offset.x;
+    point.y -= layer.offset.y;
+
+    if (last) {
+      last.x -= layer.offset.x;
+      last.y -= layer.offset.y;
+    }
+
     let points: Point[] = [point];
-    const last = this.lastPoint;
     if (line && last) {
       const distance = Math.sqrt(
         Math.pow(point.x - last.x, 2) + Math.pow(point.y - last.y, 2),
@@ -96,25 +107,21 @@ export class BrushTool implements Tool {
       this.renderBrush(ctx, point);
     }
     ctx.restore();
-
-    this.lastPoint = point;
   }
 
-  down(point: Point) {
-    this.isDown = true;
-    this.draw(point);
-  }
-
-  move(point: Point) {
-    if (this.isDown) {
-      this.draw(point, true);
+  down(data: PointerEventData) {
+    if (data.action === 'primary') {
+      this.draw(data.point, data.lastPoint);
     }
   }
 
-  up() {
-    this.isDown = false;
-    this.lastPoint = undefined;
+  move(data: PointerEventData) {
+    if (data.action === 'primary') {
+      this.draw(data.point, data.lastPoint, true);
+    }
   }
+
+  up() {}
 
   reset() {}
 }

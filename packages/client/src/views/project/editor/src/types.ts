@@ -1,4 +1,4 @@
-import type { GlueTexture } from 'fxglue/lib/GlueTexture';
+import type { GlueTexture } from 'fxglue';
 
 export enum ToolOptionType {
   SLIDER,
@@ -15,23 +15,14 @@ export interface ToolOption {
 }
 
 export interface Tool {
-  // TODO: options
-  // TODO: draw cursor - cursor as shader
-  // TODO: on left click
-
   readonly id: string;
   readonly name: string;
   readonly options: ToolOption[];
 
   settings: any;
-
-  // TODO: pass editor state
-  // TODO: return new editor state
-  // TODO: pass mouse state
-
-  down(point: Point): void;
-  move(point: Point): void;
-  up(point: Point): void;
+  down(point: PointerEventData): void;
+  move(point: PointerEventData): void;
+  up(point: PointerEventData): void;
 
   reset(): void;
 }
@@ -43,6 +34,22 @@ export interface Layer {
   texture: GlueTexture;
   offset: Point;
 }
+
+export interface PointerEventDataWithAction {
+  point: Point;
+  action: 'primary' | 'secondary';
+  startPoint: Point;
+  lastPoint: Point;
+  diffStart: Point;
+}
+export interface PointerEventDataWithoutAction {
+  point: Point;
+  action: undefined;
+}
+
+export type PointerEventData =
+  | PointerEventDataWithoutAction
+  | PointerEventDataWithAction;
 
 export interface Point {
   x: number;

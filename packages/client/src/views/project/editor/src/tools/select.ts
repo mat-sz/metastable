@@ -1,5 +1,5 @@
 import type { Editor } from '..';
-import { Point, Tool, ToolOption } from '../types';
+import { Point, PointerEventData, Tool, ToolOption } from '../types';
 
 export class SelectTool implements Tool {
   readonly id: string = 'select';
@@ -11,11 +11,11 @@ export class SelectTool implements Tool {
 
   constructor(private editor: Editor) {}
 
-  down(point: Point) {
+  down({ point }: PointerEventData) {
     this.lastPoint = point;
   }
 
-  move(point: Point) {
+  move({ point }: PointerEventData) {
     const last = this.lastPoint;
     if (!last) {
       return;
