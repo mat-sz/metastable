@@ -21,11 +21,11 @@ export interface Tool {
   readonly options: ToolOption[];
 
   settings: any;
-  down(point: PointerData): void;
-  move(point: PointerData): void;
-  up(point: PointerData): void;
+  down?(point: PointerData): void;
+  move?(point: PointerData): void;
+  up?(point: PointerData): void;
 
-  reset(): void;
+  reset?(): void;
 }
 
 export interface Layer {

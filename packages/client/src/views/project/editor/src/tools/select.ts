@@ -11,8 +11,6 @@ export class SelectTool implements Tool {
 
   constructor(private editor: Editor) {}
 
-  down() {}
-
   move(data: PointerData) {
     if (data.action !== 'primary') {
       return;
@@ -43,8 +41,4 @@ export class SelectTool implements Tool {
       canvas.height - inset * 2,
     );
   }
-
-  up() {}
-
-  reset() {}
 }

@@ -11,10 +11,6 @@ export class EyedropperTool implements Tool {
 
   constructor(private editor: Editor) {}
 
-  down() {}
-
-  move() {}
-
   up(data: PointerData) {
     if (!data.action) {
       return;
@@ -29,6 +25,4 @@ export class EyedropperTool implements Tool {
       .join('');
     this.editor.foregroundColor = `#${color}`;
   }
-
-  reset() {}
 }

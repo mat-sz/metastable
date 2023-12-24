@@ -110,8 +110,4 @@ export class BrushTool implements Tool {
       this.draw(data, true);
     }
   }
-
-  up() {}
-
-  reset() {}
 }

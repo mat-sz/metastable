@@ -54,6 +54,4 @@ export class MoveTool implements Tool {
   up() {
     this.startOffset = undefined;
   }
-
-  reset() {}
 }

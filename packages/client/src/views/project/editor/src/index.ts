@@ -211,12 +211,12 @@ export class Editor extends BasicEventEmitter<{
       const point = this.pointerEventToPoint(e);
       const action = e.button === 0 ? 'primary' : 'secondary';
       this._pointerState = { startPoint: point, lastPoint: point, action };
-      this.currentTool.down(new PointerData(this, point, this._pointerState));
+      this.currentTool.down?.(new PointerData(this, point, this._pointerState));
     });
     canvas.addEventListener('pointermove', e => {
       const point = this.pointerEventToPoint(e);
 
-      this.currentTool.move(new PointerData(this, point, this._pointerState));
+      this.currentTool.move?.(new PointerData(this, point, this._pointerState));
       if (this._pointerState) {
         this._pointerState.lastPoint = point;
       }
@@ -224,7 +224,7 @@ export class Editor extends BasicEventEmitter<{
     canvas.addEventListener('pointerup', e => {
       const point = this.pointerEventToPoint(e);
 
-      this.currentTool.up(new PointerData(this, point, this._pointerState));
+      this.currentTool.up?.(new PointerData(this, point, this._pointerState));
       this._pointerState = undefined;
     });
 
@@ -271,7 +271,7 @@ export class Editor extends BasicEventEmitter<{
   selectTool(id: string) {
     this.currentToolId = id;
     const tool = this.currentTool;
-    tool.reset();
+    tool.reset?.();
     this.emit('toolChanged');
   }
 

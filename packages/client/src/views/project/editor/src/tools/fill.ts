@@ -173,10 +173,6 @@ export class FillTool implements Tool {
 
   constructor(private editor: Editor) {}
 
-  down() {}
-
-  move() {}
-
   up(data: PointerData) {
     if (!data.action) {
       return;
@@ -195,6 +191,4 @@ export class FillTool implements Tool {
       );
     }
   }
-
-  reset() {}
 }
