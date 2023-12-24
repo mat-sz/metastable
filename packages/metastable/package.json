@@ -16,6 +16,7 @@
     "@metastable/downloader": "*",
     "@metastable/fs-helpers": "*",
     "@metastable/storage": "*",
+    "chokidar": "^3.5.3",
     "nanoid": "^5.0.4"
   },
   "exports": {

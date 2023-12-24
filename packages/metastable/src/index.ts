@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import path from 'path';
+import chokidar from 'chokidar';
 import { nanoid } from 'nanoid/non-secure';
 import { Storage } from '@metastable/storage';
 import { Comfy } from '@metastable/comfy';
@@ -24,6 +25,11 @@ export class Metastable extends EventEmitter {
   ) {
     super();
     this.storage = new Storage(dataRoot);
+    chokidar.watch(this.storage.modelsDir, {}).on('all', e => {
+      this.onEvent({
+        event: 'models.changed',
+      });
+    });
     this.downloader.on('event', this.onEvent);
   }
 

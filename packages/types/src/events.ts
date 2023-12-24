@@ -3,7 +3,6 @@ import { DownloadEvent } from './download.js';
 
 export interface ModelsChangedEvent {
   event: 'models.changed';
-  data: Record<string, never>;
 }
 
 export interface BackendStatusEvent {
