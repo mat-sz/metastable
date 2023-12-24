@@ -8,6 +8,7 @@ import { SelectTool } from './tools/select';
 import { loadImage } from '../../../../helpers';
 import { isVisible } from './helpers';
 import { FillTool } from './tools/fill';
+import { EyedropperTool } from './tools/eyedropper';
 
 export class BasicEventEmitter<
   TEvents extends { [key: string]: (...args: any[]) => void },
@@ -162,6 +163,7 @@ export class Editor extends BasicEventEmitter<{
     brush: new BrushTool(this),
     eraser: new EraserTool(this),
     fill: new FillTool(this),
+    eyedropper: new EyedropperTool(this),
   };
   currentToolId = 'move';
 
@@ -484,18 +486,8 @@ export class Editor extends BasicEventEmitter<{
     this.imageLayer(source, options);
   }
 
-  renderSelection() {
+  renderArea(x: number, y: number, width: number, height: number) {
     const glue = this.glue;
-    let { width, height } = this.selection.canvas;
-    let { x, y } = this.selection.offset;
-
-    if (!width || !height) {
-      width = this.currentLayer?.canvas.width || 512;
-      height = this.currentLayer?.canvas.width || 512;
-      x = this.currentLayer?.offset.x || 0;
-      y = this.currentLayer?.offset.y || 0;
-    }
-
     this.glueCanvas.setSize(width, height);
     glue.setScale(1);
     glue.setOffset(-x, -y);
@@ -513,6 +505,21 @@ export class Editor extends BasicEventEmitter<{
 
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(this.glueCanvas.canvas, 0, 0);
+    return canvas;
+  }
+
+  renderSelection() {
+    let { width, height } = this.selection.canvas;
+    let { x, y } = this.selection.offset;
+
+    if (!width || !height) {
+      width = this.currentLayer?.canvas.width || 512;
+      height = this.currentLayer?.canvas.width || 512;
+      x = this.currentLayer?.offset.x || 0;
+      y = this.currentLayer?.offset.y || 0;
+    }
+
+    const canvas = this.renderArea(x, y, width, height);
     return canvas.toDataURL('image/png');
   }
 }
