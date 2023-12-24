@@ -52,8 +52,8 @@ void main() {
   vec2 p = gl_FragCoord.xy / iResolution;
   vec2 uv = gl_FragCoord.xy / iResolution;
 
-  uv.x -= iOffset.x/iResolution.x;
-  uv.y += iOffset.y/iResolution.y - 1.0 + iSize.y / iResolution.y;
+  uv.x -= iOffset.x;
+  uv.y += iOffset.y - 1.0 + iSize.y / iResolution.y;
   uv *= iResolution / iSize;
 
   vec4 src = texture2D(iTexture, p);
@@ -426,12 +426,16 @@ export class Editor extends BasicEventEmitter<{
     }
 
     const glue = this.glue;
+    const gl = this.glueCanvas.gl;
     this.glueCanvas.setSize(
       this.glueCanvas.canvas.clientWidth || 1,
       this.glueCanvas.canvas.clientHeight || 1,
     );
     glue.setScale(this.scale);
     glue.setOffset(this.offset.x, this.offset.y);
+
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
     glue.program('~background')?.apply({
       iScale: this.scale,
@@ -476,20 +480,30 @@ export class Editor extends BasicEventEmitter<{
   }
 
   renderSelection() {
+    const glue = this.glue;
+
+    this.glueCanvas.setSize(
+      this.selection.canvas.width,
+      this.selection.canvas.height,
+    );
+    glue.setScale(1);
+    glue.setOffset(-this.selection.offset.x, -this.selection.offset.y);
+
+    const gl = this.glueCanvas.gl;
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     this.renderLayers();
     this.glue.render();
-    this.glueCanvas.gl.flush();
+    gl.flush();
 
     const canvas = document.createElement('canvas');
     canvas.width = this.selection.canvas.width;
     canvas.height = this.selection.canvas.height;
 
     const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(
-      this.glueCanvas.canvas,
-      -this.selection.offset.x,
-      -this.selection.offset.y,
-    );
-    return canvas.toDataURL('image/png');
+    ctx.drawImage(this.glueCanvas.canvas, 0, 0);
+    const url = canvas.toDataURL('image/png');
+    console.log(url);
+    return url;
   }
 }

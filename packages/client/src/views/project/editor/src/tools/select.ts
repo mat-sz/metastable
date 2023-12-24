@@ -1,30 +1,29 @@
 import type { Editor } from '..';
-import { Point, PointerEventData, Tool, ToolOption } from '../types';
+import { PointerEventData, Tool, ToolOption } from '../types';
 
 export class SelectTool implements Tool {
   readonly id: string = 'select';
   readonly name: string = 'Select';
   readonly options: ToolOption[] = [];
-  private lastPoint: Point | undefined = undefined;
 
   settings = {};
 
   constructor(private editor: Editor) {}
 
-  down({ point }: PointerEventData) {
-    this.lastPoint = point;
-  }
+  down() {}
 
-  move({ point }: PointerEventData) {
-    const last = this.lastPoint;
-    if (!last) {
+  move(data: PointerEventData) {
+    if (data.action !== 'primary') {
       return;
     }
 
-    const x1 = Math.min(point.x, last.x);
-    const x2 = Math.max(point.x, last.x);
-    const y1 = Math.min(point.y, last.y);
-    const y2 = Math.max(point.y, last.y);
+    const a = data.point;
+    const b = data.startPoint;
+
+    const x1 = Math.min(a.x, b.x);
+    const x2 = Math.max(a.x, b.x);
+    const y1 = Math.min(a.y, b.y);
+    const y2 = Math.max(a.y, b.y);
     const inset = 1;
 
     const { canvas, offset } = this.editor.selection;
@@ -44,9 +43,7 @@ export class SelectTool implements Tool {
     );
   }
 
-  up() {
-    this.lastPoint = undefined;
-  }
+  up() {}
 
   reset() {}
 }

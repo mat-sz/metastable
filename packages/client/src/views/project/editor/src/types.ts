@@ -62,7 +62,6 @@ export interface Rect extends Point {
 }
 
 export interface EditorState {
-  // TODO: history
   layers: Layer[];
   currentLayerId?: string;
 }
