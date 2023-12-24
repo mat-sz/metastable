@@ -67,7 +67,6 @@ export class BrushTool implements Tool {
   }
 
   prepareBrush(ctx: CanvasRenderingContext2D) {
-    ctx.globalCompositeOperation = 'hard-light';
     this.drawBrushCanvas(this.editor.foregroundColor);
   }
 

@@ -7,6 +7,7 @@ import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
 import { loadImage } from '../../../../helpers';
 import { isVisible } from './helpers';
+import { FillTool } from './tools/fill';
 
 export class BasicEventEmitter<
   TEvents extends { [key: string]: (...args: any[]) => void },
@@ -157,9 +158,10 @@ export class Editor extends BasicEventEmitter<{
 
   tools: Record<string, Tool> = {
     move: new MoveTool(this),
+    select: new SelectTool(this),
     brush: new BrushTool(this),
     eraser: new EraserTool(this),
-    select: new SelectTool(this),
+    fill: new FillTool(this),
   };
   currentToolId = 'move';
 
@@ -244,7 +246,7 @@ export class Editor extends BasicEventEmitter<{
         const current = this.scalePoint(point);
         const last = this.scalePoint(this._pointerTemp.lastPoint);
 
-        this.currentTool.move({
+        this.currentTool.up({
           action: this._pointerTemp.action,
           point: current,
           startPoint: start,
@@ -252,7 +254,7 @@ export class Editor extends BasicEventEmitter<{
           diffStart: { x: current.x - start.x, y: current.y - start.y },
         });
       } else {
-        this.currentTool.move({
+        this.currentTool.up({
           action: undefined,
           point: this.scalePoint(point),
         });
@@ -502,8 +504,6 @@ export class Editor extends BasicEventEmitter<{
 
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(this.glueCanvas.canvas, 0, 0);
-    const url = canvas.toDataURL('image/png');
-    console.log(url);
-    return url;
+    return canvas.toDataURL('image/png');
   }
 }

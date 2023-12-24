@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { BsBrush, BsCursor, BsEraser } from 'react-icons/bs';
-import { PiSelectionLight } from 'react-icons/pi';
+import { PiPaintBucket, PiSelectionLight } from 'react-icons/pi';
 
 import styles from './index.module.scss';
 import { Colors } from './Colors';
@@ -12,6 +12,7 @@ const toolIcons: Record<string, JSX.Element> = {
   brush: <BsBrush />,
   eraser: <BsEraser />,
   select: <PiSelectionLight />,
+  fill: <PiPaintBucket />,
 };
 
 export const Tools: React.FC = () => {
