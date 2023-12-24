@@ -243,13 +243,13 @@ export class Editor extends BasicEventEmitter<{
       offset: { x: 0, y: 0 },
       ...options,
     };
-    this.state.layers.unshift(layer);
-    this.state.currentLayerId = layer.id;
     return layer;
   }
 
   emptyLayer(options: Partial<Layer> = {}) {
-    this.newLayer(512, 512, options);
+    const layer = this.newLayer(512, 512, options);
+    this.state.layers.unshift(layer);
+    this.state.currentLayerId = layer.id;
 
     this.emit('state');
   }
@@ -260,6 +260,10 @@ export class Editor extends BasicEventEmitter<{
 
     const ctx = layer.canvas.getContext('2d')!;
     ctx.drawImage(image, 0, 0);
+
+    this.state.layers.unshift(layer);
+    this.state.currentLayerId = layer.id;
+
     this.emit('state');
   }
 
@@ -268,10 +272,43 @@ export class Editor extends BasicEventEmitter<{
     this.emit('state');
   }
 
+  duplicateLayer(id: string) {
+    const layer = this.state.layers.find(layer => layer.id === id);
+    if (!layer) {
+      return;
+    }
+
+    const layerIndex = this.state.layers.findIndex(layer => layer.id === id);
+    const newLayer = this.newLayer(layer.canvas.width, layer.canvas.height, {
+      name: `${layer.name} copy`,
+      offset: { ...layer.offset },
+    });
+
+    const ctx = newLayer.canvas.getContext('2d')!;
+    ctx.drawImage(layer.canvas, 0, 0);
+
+    this.state.layers.splice(layerIndex, 0, newLayer);
+    this.state.currentLayerId = newLayer.id;
+
+    this.emit('state');
+  }
+
   deleteLayer(id: string) {
     const layer = this.state.layers.find(layer => layer.id === id);
     if (!layer) {
       return;
+    }
+
+    if (layer.id === this.state.currentLayerId) {
+      if (this.state.layers.length > 1) {
+        const layerIndex = this.state.layers.findIndex(
+          layer => layer.id === id,
+        );
+        this.state.currentLayerId =
+          this.state.layers[layerIndex === 0 ? 1 : layerIndex - 1]?.id;
+      } else {
+        this.state.currentLayerId = undefined;
+      }
     }
 
     this.glue.deregisterTexture(layer.id);
@@ -331,7 +368,7 @@ export class Editor extends BasicEventEmitter<{
     glue.render();
     setTimeout(() => {
       requestAnimationFrame(() => this.render());
-    }, 50);
+    }, 16);
   }
 
   async addImage(url: string, options: Partial<Layer> = {}): Promise<void> {

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { BsImage, BsPlus } from 'react-icons/bs';
+import { useContextMenu, ContextMenuItem } from 'use-context-menu';
 
 import styles from './index.module.scss';
 import type { Layer } from './src/types';
@@ -14,6 +15,16 @@ export interface LayerProps {
 export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
   const editor = useEditor();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { contextMenu, onContextMenu, onKeyDown } = useContextMenu(
+    <>
+      <ContextMenuItem onSelect={() => editor.deleteLayer(layer.id)}>
+        Remove layer
+      </ContextMenuItem>
+      <ContextMenuItem onSelect={() => editor.duplicateLayer(layer.id)}>
+        Duplicate layer
+      </ContextMenuItem>
+    </>,
+  );
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -32,12 +43,15 @@ export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
     <div
       key={layer.id}
       onClick={() => editor.selectLayer(layer.id)}
+      onContextMenu={onContextMenu}
+      onKeyDown={onKeyDown}
       className={clsx(styles.layer, {
         [styles.active]: editor.state.currentLayerId === layer.id,
       })}
     >
       <div className={styles.preview} ref={wrapperRef} />
       <span>{layer.name}</span>
+      {contextMenu}
     </div>
   );
 };

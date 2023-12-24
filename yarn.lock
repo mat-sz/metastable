@@ -1078,6 +1078,7 @@ __metadata:
     tree-kill: "npm:^1.2.2"
     typescript: "npm:^5.0.2"
     typesocket: "npm:^1.1.0"
+    use-context-menu: "npm:^0.4.13"
     vite: "npm:^4.4.5"
     vite-plugin-electron: "npm:^0.15.5"
     vite-plugin-electron-renderer: "npm:^0.14.5"
@@ -1088,6 +1089,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/comfy@workspace:packages/comfy"
   dependencies:
+    "@metastable/python": "npm:*"
     "@metastable/types": "npm:*"
     "@types/node": "npm:^20.10.3"
     "@types/semver": "npm:^7.5.6"
@@ -1095,7 +1097,6 @@ __metadata:
     axios: "npm:^1.6.2"
     semver: "npm:^7.5.4"
     typescript: "npm:^5.3.2"
-    which: "npm:^4.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1158,7 +1159,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metastable/python@workspace:packages/python":
+"@metastable/python@npm:*, @metastable/python@workspace:packages/python":
   version: 0.0.0-use.local
   resolution: "@metastable/python@workspace:packages/python"
   dependencies:
@@ -7234,6 +7235,16 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 4ef57b45aa820d7ac6496e9208559986c665e49447cb072744c13b66925a362d96dd5a46c4530a6b8e203e5db5fe849369444440cb22ecfc26c679359e5dfa3c
+  languageName: node
+  linkType: hard
+
+"use-context-menu@npm:^0.4.13":
+  version: 0.4.13
+  resolution: "use-context-menu@npm:0.4.13"
+  peerDependencies:
+    react: ^16.14.0 || ^17 || ^18
+    react-dom: ^16.14.0 || ^17 || ^18
+  checksum: e00c71365b1cf2247b0c18f62b8a648aa46bfb9d44a151ea551d51dcb608594331568d7e2a7357a668a038ddec01a4b09888a1472387e3e95a5210c796d59f40
   languageName: node
   linkType: hard
 
