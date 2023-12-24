@@ -1,4 +1,5 @@
-import { Point } from './types';
+import type { Editor } from '.';
+import { Point, PointerState } from './types';
 
 export function linePoints(
   { x: startX, y: startY }: Point,
@@ -70,4 +71,41 @@ export function isVisible(el: HTMLElement) {
   } while ((pointContainer = pointContainer?.parentNode));
 
   return false;
+}
+
+export function pointsSubtract(a: Point, b: Point): Point {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
+  };
+}
+
+export class PointerData {
+  action: 'primary' | 'secondary' | undefined;
+  current: Point;
+  start: Point;
+  previous: Point;
+
+  constructor(
+    private editor: Editor,
+    current: Point,
+    state: PointerState | undefined,
+  ) {
+    this.action = state?.action;
+    this.current = editor.scalePoint(current);
+    this.start = editor.scalePoint(state?.startPoint ?? current);
+    this.previous = editor.scalePoint(state?.lastPoint ?? current);
+  }
+
+  get diffStart(): Point {
+    return pointsSubtract(this.current, this.start);
+  }
+
+  relative(type: 'current'): Point;
+  relative(type: 'start' | 'previous'): Point | undefined;
+  relative(type: 'current' | 'start' | 'previous'): Point | undefined {
+    const a = this[type];
+    const b = this.editor.currentLayer?.offset;
+    return a && b ? pointsSubtract(a, b) : undefined;
+  }
 }

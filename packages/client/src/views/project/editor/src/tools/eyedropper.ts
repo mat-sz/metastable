@@ -1,5 +1,6 @@
 import type { Editor } from '..';
-import { PointerEventData, Tool, ToolOption } from '../types';
+import { type PointerData } from '../helpers';
+import { Tool, ToolOption } from '../types';
 
 export class EyedropperTool implements Tool {
   readonly id: string = 'eyedropper';
@@ -14,12 +15,12 @@ export class EyedropperTool implements Tool {
 
   move() {}
 
-  up(data: PointerEventData) {
+  up(data: PointerData) {
     if (!data.action) {
       return;
     }
 
-    const canvas = this.editor.renderArea(data.point.x, data.point.y, 1, 1);
+    const canvas = this.editor.renderArea(data.current.x, data.current.y, 1, 1);
     const ctx = canvas.getContext('2d')!;
     const imageData = ctx.getImageData(0, 0, 1, 1);
     const color = [...imageData.data]

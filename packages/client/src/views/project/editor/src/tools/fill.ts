@@ -1,5 +1,6 @@
 import type { Editor } from '..';
-import { PointerEventData, Tool, ToolOption, ToolOptionType } from '../types';
+import { type PointerData } from '../helpers';
+import { Tool, ToolOption, ToolOptionType } from '../types';
 
 function getPixel(
   dataView: DataView,
@@ -176,18 +177,19 @@ export class FillTool implements Tool {
 
   move() {}
 
-  up(data: PointerEventData) {
+  up(data: PointerData) {
     if (!data.action) {
       return;
     }
 
     const layer = this.editor.currentLayer;
     if (layer) {
+      const point = data.relative('current')!;
       const ctx = layer.canvas.getContext('2d')!;
       floodFill(
         ctx,
-        data.point.x + layer.offset.x,
-        data.point.y + layer.offset.y,
+        point.x,
+        point.y,
         stringToColor(this.editor.foregroundColor),
         this.settings.tolerance,
       );

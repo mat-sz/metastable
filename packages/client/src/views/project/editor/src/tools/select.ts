@@ -1,5 +1,6 @@
 import type { Editor } from '..';
-import { PointerEventData, Tool, ToolOption } from '../types';
+import { type PointerData } from '../helpers';
+import { Tool, ToolOption } from '../types';
 
 export class SelectTool implements Tool {
   readonly id: string = 'select';
@@ -12,13 +13,13 @@ export class SelectTool implements Tool {
 
   down() {}
 
-  move(data: PointerEventData) {
+  move(data: PointerData) {
     if (data.action !== 'primary') {
       return;
     }
 
-    const a = data.point;
-    const b = data.startPoint;
+    const a = data.current;
+    const b = data.start!;
 
     const x1 = Math.min(a.x, b.x);
     const x2 = Math.max(a.x, b.x);

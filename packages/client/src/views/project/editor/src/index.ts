@@ -2,11 +2,18 @@ import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 import { MoveTool } from './tools/move';
 import { BrushTool } from './tools/brush';
-import { EditorSelection, EditorState, Layer, Point, Tool } from './types';
+import {
+  EditorSelection,
+  EditorState,
+  Layer,
+  Point,
+  PointerState,
+  Tool,
+} from './types';
 import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
 import { loadImage } from '../../../../helpers';
-import { isVisible } from './helpers';
+import { PointerData, isVisible } from './helpers';
 import { FillTool } from './tools/fill';
 import { EyedropperTool } from './tools/eyedropper';
 
@@ -172,13 +179,7 @@ export class Editor extends BasicEventEmitter<{
   private _foregroundColor = '#000000';
   private _backgroundColor = '#ffffff';
 
-  private _pointerTemp:
-    | {
-        startPoint: Point;
-        lastPoint: Point;
-        action?: 'primary' | 'secondary';
-      }
-    | undefined = undefined;
+  private _pointerState: PointerState | undefined = undefined;
 
   get foregroundColor() {
     return this._foregroundColor;
@@ -209,62 +210,22 @@ export class Editor extends BasicEventEmitter<{
     canvas.addEventListener('pointerdown', e => {
       const point = this.pointerEventToPoint(e);
       const action = e.button === 0 ? 'primary' : 'secondary';
-      this._pointerTemp = { startPoint: point, lastPoint: point, action };
-
-      const scaledPoint = this.scalePoint(point);
-      this.currentTool.down({
-        action,
-        point: scaledPoint,
-        startPoint: scaledPoint,
-        lastPoint: scaledPoint,
-        diffStart: { x: 0, y: 0 },
-      });
+      this._pointerState = { startPoint: point, lastPoint: point, action };
+      this.currentTool.down(new PointerData(this, point, this._pointerState));
     });
     canvas.addEventListener('pointermove', e => {
       const point = this.pointerEventToPoint(e);
 
-      if (this._pointerTemp?.action) {
-        const start = this.scalePoint(this._pointerTemp.startPoint);
-        const current = this.scalePoint(point);
-        const last = this.scalePoint(this._pointerTemp.lastPoint);
-
-        this.currentTool.move({
-          action: this._pointerTemp.action,
-          point: current,
-          startPoint: start,
-          lastPoint: last,
-          diffStart: { x: current.x - start.x, y: current.y - start.y },
-        });
-        this._pointerTemp.lastPoint = point;
-      } else {
-        this.currentTool.move({
-          action: undefined,
-          point: this.scalePoint(point),
-        });
+      this.currentTool.move(new PointerData(this, point, this._pointerState));
+      if (this._pointerState) {
+        this._pointerState.lastPoint = point;
       }
     });
     canvas.addEventListener('pointerup', e => {
       const point = this.pointerEventToPoint(e);
 
-      if (this._pointerTemp?.action) {
-        const start = this.scalePoint(this._pointerTemp.startPoint);
-        const current = this.scalePoint(point);
-        const last = this.scalePoint(this._pointerTemp.lastPoint);
-
-        this.currentTool.up({
-          action: this._pointerTemp.action,
-          point: current,
-          startPoint: start,
-          lastPoint: last,
-          diffStart: { x: current.x - start.x, y: current.y - start.y },
-        });
-      } else {
-        this.currentTool.up({
-          action: undefined,
-          point: this.scalePoint(point),
-        });
-      }
-      this._pointerTemp = undefined;
+      this.currentTool.up(new PointerData(this, point, this._pointerState));
+      this._pointerState = undefined;
     });
 
     this.glue.registerTexture('~selection', this.selection.canvas);
@@ -282,7 +243,7 @@ export class Editor extends BasicEventEmitter<{
     this._shouldRender = isVisible(this.glueCanvas.canvas);
   }
 
-  private pointerEventToPoint(e: PointerEvent): Point {
+  pointerEventToPoint(e: PointerEvent): Point {
     const rect = this.glueCanvas.canvas.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -290,7 +251,7 @@ export class Editor extends BasicEventEmitter<{
     };
   }
 
-  private scalePoint(point: Point): Point {
+  scalePoint(point: Point): Point {
     return {
       x: point.x / this.scale - this.offset.x,
       y: point.y / this.scale - this.offset.y,

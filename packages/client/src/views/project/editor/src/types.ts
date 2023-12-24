@@ -1,4 +1,5 @@
 import type { GlueTexture } from 'fxglue';
+import type { PointerData } from './helpers';
 
 export enum ToolOptionType {
   SLIDER,
@@ -20,9 +21,9 @@ export interface Tool {
   readonly options: ToolOption[];
 
   settings: any;
-  down(point: PointerEventData): void;
-  move(point: PointerEventData): void;
-  up(point: PointerEventData): void;
+  down(point: PointerData): void;
+  move(point: PointerData): void;
+  up(point: PointerData): void;
 
   reset(): void;
 }
@@ -34,22 +35,6 @@ export interface Layer {
   texture: GlueTexture;
   offset: Point;
 }
-
-export interface PointerEventDataWithAction {
-  point: Point;
-  action: 'primary' | 'secondary';
-  startPoint: Point;
-  lastPoint: Point;
-  diffStart: Point;
-}
-export interface PointerEventDataWithoutAction {
-  point: Point;
-  action: undefined;
-}
-
-export type PointerEventData =
-  | PointerEventDataWithoutAction
-  | PointerEventDataWithAction;
 
 export interface Point {
   x: number;
@@ -69,4 +54,10 @@ export interface EditorState {
 export interface EditorSelection {
   offset: Point;
   canvas: HTMLCanvasElement;
+}
+
+export interface PointerState {
+  startPoint: Point;
+  lastPoint: Point;
+  action?: 'primary' | 'secondary';
 }

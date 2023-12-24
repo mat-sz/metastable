@@ -1,5 +1,6 @@
 import type { Editor } from '..';
-import { Point, PointerEventData, Tool, ToolOption } from '../types';
+import { type PointerData } from '../helpers';
+import { Point, Tool, ToolOption } from '../types';
 
 export class MoveTool implements Tool {
   readonly id: string = 'move';
@@ -12,12 +13,12 @@ export class MoveTool implements Tool {
 
   constructor(private editor: Editor) {}
 
-  down({ action }: PointerEventData) {
-    if (!action) {
+  down(data: PointerData) {
+    if (!data.action) {
       return;
     }
 
-    if (action === 'primary') {
+    if (data.action === 'primary') {
       const layer = this.editor.currentLayer;
       if (layer) {
         this.startOffset = { ...layer.offset };
@@ -27,7 +28,7 @@ export class MoveTool implements Tool {
     }
   }
 
-  move(data: PointerEventData) {
+  move(data: PointerData) {
     if (!data.action || !this.startOffset) {
       return;
     }

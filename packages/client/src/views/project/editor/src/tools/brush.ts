@@ -1,12 +1,6 @@
 import type { Editor } from '..';
-import { linePoints } from '../helpers';
-import {
-  Point,
-  PointerEventData,
-  Tool,
-  ToolOption,
-  ToolOptionType,
-} from '../types';
+import { type PointerData, linePoints } from '../helpers';
+import { Point, Tool, ToolOption, ToolOptionType } from '../types';
 
 export class BrushTool implements Tool {
   readonly id: string = 'brush';
@@ -67,6 +61,7 @@ export class BrushTool implements Tool {
   }
 
   prepareBrush(ctx: CanvasRenderingContext2D) {
+    ctx.globalCompositeOperation = 'source-over';
     this.drawBrushCanvas(this.editor.foregroundColor);
   }
 
@@ -75,27 +70,23 @@ export class BrushTool implements Tool {
     ctx.drawImage(this.brushCanvas, x - radius, y - radius);
   }
 
-  draw(point: Point, last?: Point, line = false) {
+  draw(data: PointerData, line = false) {
     const layer = this.editor.currentLayer;
     if (!layer) {
       return;
     }
 
-    point.x -= layer.offset.x;
-    point.y -= layer.offset.y;
+    const current = data.relative('current');
+    const previous = data.relative('previous');
 
-    if (last) {
-      last.x -= layer.offset.x;
-      last.y -= layer.offset.y;
-    }
-
-    let points: Point[] = [point];
-    if (line && last) {
+    let points: Point[] = [current];
+    if (line && previous) {
       const distance = Math.sqrt(
-        Math.pow(point.x - last.x, 2) + Math.pow(point.y - last.y, 2),
+        Math.pow(current.x - previous.x, 2) +
+          Math.pow(current.y - previous.y, 2),
       );
       if (distance > Math.SQRT2) {
-        points = linePoints(last, point);
+        points = linePoints(previous, current);
       }
     }
 
@@ -108,15 +99,15 @@ export class BrushTool implements Tool {
     ctx.restore();
   }
 
-  down(data: PointerEventData) {
+  down(data: PointerData) {
     if (data.action === 'primary') {
-      this.draw(data.point);
+      this.draw(data);
     }
   }
 
-  move(data: PointerEventData) {
+  move(data: PointerData) {
     if (data.action === 'primary') {
-      this.draw(data.point, data.lastPoint, true);
+      this.draw(data, true);
     }
   }
 
