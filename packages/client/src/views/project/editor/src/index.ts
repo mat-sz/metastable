@@ -198,6 +198,9 @@ export class Editor extends BasicEventEmitter<{
 
   constructor() {
     super();
+
+    this.selection.canvas.width = 0;
+    this.selection.canvas.height = 0;
     this.render();
 
     const canvas = this.glueCanvas.canvas;
@@ -483,13 +486,19 @@ export class Editor extends BasicEventEmitter<{
 
   renderSelection() {
     const glue = this.glue;
+    let { width, height } = this.selection.canvas;
+    let { x, y } = this.selection.offset;
 
-    this.glueCanvas.setSize(
-      this.selection.canvas.width,
-      this.selection.canvas.height,
-    );
+    if (!width || !height) {
+      width = this.currentLayer?.canvas.width || 512;
+      height = this.currentLayer?.canvas.width || 512;
+      x = this.currentLayer?.offset.x || 0;
+      y = this.currentLayer?.offset.y || 0;
+    }
+
+    this.glueCanvas.setSize(width, height);
     glue.setScale(1);
-    glue.setOffset(-this.selection.offset.x, -this.selection.offset.y);
+    glue.setOffset(-x, -y);
 
     const gl = this.glueCanvas.gl;
     gl.clearColor(0, 0, 0, 0);
@@ -499,8 +508,8 @@ export class Editor extends BasicEventEmitter<{
     gl.flush();
 
     const canvas = document.createElement('canvas');
-    canvas.width = this.selection.canvas.width;
-    canvas.height = this.selection.canvas.height;
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(this.glueCanvas.canvas, 0, 0);

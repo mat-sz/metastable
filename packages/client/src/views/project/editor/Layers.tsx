@@ -17,11 +17,11 @@ export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { contextMenu, onContextMenu, onKeyDown } = useContextMenu(
     <>
-      <ContextMenuItem onSelect={() => editor.deleteLayer(layer.id)}>
-        Remove layer
-      </ContextMenuItem>
       <ContextMenuItem onSelect={() => editor.duplicateLayer(layer.id)}>
         Duplicate layer
+      </ContextMenuItem>
+      <ContextMenuItem onSelect={() => editor.deleteLayer(layer.id)}>
+        Remove layer
       </ContextMenuItem>
     </>,
   );

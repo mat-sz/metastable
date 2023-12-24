@@ -173,7 +173,7 @@ def get_sigmas(model, scheduler, steps, denoise, discard_penultimate_sigma=False
         scheduler = custom_schedulers[scheduler]
         return scheduler(model, steps, denoise)
     
-    sigmas = comfy.samplers.calculate_sigmas_scheduler(model, scheduler, steps)
+    sigmas = comfy.samplers.calculate_sigmas_scheduler(model.model, scheduler, steps)
 
     if discard_penultimate_sigma:
         sigmas = torch.cat([sigmas[:-2], sigmas[-1:]])
