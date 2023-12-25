@@ -34,11 +34,7 @@ export class Projects {
       if (item.isDirectory()) {
         const data = await this.getMetadata(item.name);
         if (data) {
-          const outputs = await this.filenames(item.name, 'output');
-          projects.push({
-            ...data,
-            lastOutput: outputs[outputs.length - 1],
-          });
+          projects.push(data);
         }
       }
     }
@@ -71,10 +67,12 @@ export class Projects {
       return undefined;
     }
 
+    const outputs = await this.filenames(id, 'output');
     return {
       id,
       name: id,
       ...data,
+      lastOutput: outputs[outputs.length - 1],
     };
   }
 

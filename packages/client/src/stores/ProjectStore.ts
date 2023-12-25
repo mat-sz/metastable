@@ -44,7 +44,7 @@ export class ProjectStore {
     const json = await API.projects.create(project);
 
     runInAction(() => {
-      this.projects.push(new Project(json.id, json.name, settings));
+      this.projects.push(new Project(json, settings));
       this.select(json.id);
     });
 
@@ -61,7 +61,7 @@ export class ProjectStore {
       settings.models.controlnets = [];
     }
 
-    const project = new Project(json.id, json.name, settings);
+    const project = new Project(json, settings);
     runInAction(() => {
       this.projects = [
         ...this.projects.filter(project => project.id !== id),

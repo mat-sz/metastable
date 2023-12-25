@@ -82,14 +82,20 @@ export class Project {
   editor = new Editor();
   addOutputToEditor: Point | undefined = undefined;
   mode: string = 'images';
+  id;
+  name;
 
   blobUrls: Record<string, string> = {};
 
   constructor(
-    public id: APIProject['id'],
-    public name: string,
+    public data: APIProject,
     public settings: ProjectSettings,
   ) {
+    console.log('data', data);
+    this.id = data.id;
+    this.name = data.name;
+    this.outputFilenames = data.lastOutput ? [data.lastOutput] : [];
+
     makeAutoObservable(this);
     this.refreshOutputs();
   }
