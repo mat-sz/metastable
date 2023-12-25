@@ -1,5 +1,6 @@
 import type { Editor } from '..';
 import { type PointerData } from '../helpers';
+import { Rectangle } from '../primitives/Rectangle';
 import { Tool, ToolOption } from '../types';
 
 export class SelectTool implements Tool {
@@ -16,29 +17,18 @@ export class SelectTool implements Tool {
       return;
     }
 
-    const a = data.current;
-    const b = data.start!;
-
-    const x1 = Math.min(a.x, b.x);
-    const x2 = Math.max(a.x, b.x);
-    const y1 = Math.min(a.y, b.y);
-    const y2 = Math.max(a.y, b.y);
+    const rect = new Rectangle(data.start, data.current);
     const inset = 1;
 
     const { canvas, offset } = this.editor.selection;
-    canvas.width = x2 - x1 + inset;
-    canvas.height = y2 - y1 + inset;
-    offset.x = x1 - inset;
-    offset.y = y1 - inset;
+    canvas.width = rect.width + inset * 2;
+    canvas.height = rect.height + inset * 2;
+    offset.x = rect.x - inset;
+    offset.y = rect.y - inset;
 
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#000000';
-    ctx.fillRect(
-      inset,
-      inset,
-      canvas.width - inset * 2,
-      canvas.height - inset * 2,
-    );
+    ctx.fillRect(inset, inset, rect.width, rect.height);
   }
 }

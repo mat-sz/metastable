@@ -2,21 +2,17 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './index.module.scss';
 import { Vector2 } from '../../views/project/editor/src/primitives/Vector2';
+import { Point } from '../../views/project/editor/src/types';
 
 interface ImagePreviewProps {
   url?: string;
 }
 
-interface Position {
-  x: number;
-  y: number;
-}
-
 interface PointerState {
   start: Vector2;
   current: Vector2;
-  pointerId: number;
   imageOffset: Vector2;
+  pointerId: number;
   scale: number;
 }
 
@@ -26,7 +22,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   const pointerStateRef = useRef<PointerState[]>([]);
 
   const [scale, setScale] = useState(1);
-  const [imageOffset, setImageOffset] = useState<Position>({ x: 0, y: 0 });
+  const [imageOffset, setImageOffset] = useState<Point>({ x: 0, y: 0 });
 
   const resetScale = useCallback(() => {
     const wrapperRect = wrapperRef.current!.getBoundingClientRect();
@@ -59,14 +55,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   }
 
   const zoom = (e: React.WheelEvent) => {
-    const wrapperRect = wrapperRef.current!.getBoundingClientRect();
-    const step = Math.sign(e.deltaY) * (scale * -0.1);
-
-    let newScale = scale + step;
-    if (newScale < 0.25) newScale = 0.25;
-    if (newScale > 3) newScale = 3;
-
+    const newScale = scale * (1 - Math.sign(e.deltaY) * 0.1);
     const scaleRatio = newScale / scale;
+    const wrapperRect = wrapperRef.current!.getBoundingClientRect();
 
     const vector = Vector2.fromEvent(e)
       .sub(Vector2.fromPoint(wrapperRect))
@@ -75,9 +66,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
 
     setImageOffset(vector.point);
     setScale(newScale);
-    if (pointerStateRef.current[0]) {
-      pointerStateRef.current[0].imageOffset = vector.clone();
-      pointerStateRef.current[0].start = Vector2.fromEvent(e);
+
+    const p = pointerStateRef.current[0];
+    if (p) {
+      p.imageOffset = vector.clone();
+      p.start = Vector2.fromEvent(e);
     }
   };
 
@@ -86,36 +79,32 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
 
     if (pointers.length === 1) {
       const p = pointers[0];
+      const vector = p.imageOffset.clone().sub(p.start).add(p.current);
 
-      setImageOffset({
-        x: p.imageOffset.x - p.start.x + p.current.x,
-        y: p.imageOffset.y - p.start.y + p.current.y,
-      });
+      setImageOffset(vector.point);
     } else if (pointers.length === 2) {
-      const startDistance = pointers[0].start.distanceTo(pointers[1].start);
-      const currentDistance = pointers[0].current.distanceTo(
-        pointers[1].current,
-      );
-      const scaleRatio = currentDistance / startDistance;
-      const newScale = pointers[1].scale * scaleRatio;
-
-      const startCenter = pointers[0].start.clone().midpoint(pointers[1].start);
-      const center = pointers[0].current.clone().midpoint(pointers[1].current);
-
+      const [first, second] = pointers;
+      const scaleRatio =
+        first.current.distanceTo(second.current) /
+        first.start.distanceTo(second.start);
+      const startCenter = first.start.clone().midpoint(second.start);
+      const currentCenter = first.current.clone().midpoint(second.current);
       const wrapperRect = wrapperRef.current!.getBoundingClientRect();
+
       const vector = startCenter
         .clone()
         .sub(Vector2.fromPoint(wrapperRect))
         .multiplyScalar(1 - scaleRatio)
         .add(
-          pointers[1].imageOffset
+          second.imageOffset
             .clone()
-            .add(center)
+            .add(currentCenter)
             .sub(startCenter)
             .multiplyScalar(scaleRatio),
         );
+
       setImageOffset(vector.point);
-      setScale(newScale);
+      setScale(second.scale * scaleRatio);
     }
   };
 
@@ -126,37 +115,45 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
       onWheel={zoom}
       onPointerDown={e => {
         e.preventDefault();
-        pointerStateRef.current.push({
+
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
+
+        const pointerState = {
           start: Vector2.fromEvent(e),
           current: Vector2.fromEvent(e),
-          pointerId: e.pointerId,
           imageOffset: Vector2.fromPoint(imageOffset),
+          pointerId: e.pointerId,
           scale: scale,
-        });
+        };
+
+        if (i !== -1) {
+          state[i] = pointerState;
+        } else {
+          state.push(pointerState);
+        }
       }}
       onPointerMove={e => {
         e.preventDefault();
-        const i = pointerStateRef.current.findIndex(
-          state => state.pointerId === e.pointerId,
-        );
+
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
         if (i !== -1) {
-          pointerStateRef.current[i].current = Vector2.fromEvent(e);
+          state[i].current = Vector2.fromEvent(e);
         }
 
         pan();
       }}
       onPointerUp={e => {
-        const i = pointerStateRef.current.findIndex(
-          state => state.pointerId === e.pointerId,
-        );
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
         if (i !== -1) {
-          pointerStateRef.current.splice(i, 1);
-        }
-        if (pointerStateRef.current.length === 1) {
-          (pointerStateRef.current[0].imageOffset =
-            Vector2.fromPoint(imageOffset)),
-            (pointerStateRef.current[0].start =
-              pointerStateRef.current[0].current.clone());
+          state.splice(i, 1);
+
+          if (state.length === 1) {
+            state[0].imageOffset = Vector2.fromPoint(imageOffset);
+            state[0].start = state[0].current.clone();
+          }
         }
       }}
       onDoubleClick={resetScale}

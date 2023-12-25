@@ -1,13 +1,14 @@
 import type { Editor } from '..';
 import { type PointerData } from '../helpers';
-import { Point, Tool, ToolOption } from '../types';
+import { Vector2 } from '../primitives/Vector2';
+import { Tool, ToolOption } from '../types';
 
 export class MoveTool implements Tool {
   readonly id: string = 'move';
   readonly name: string = 'Move';
   readonly options: ToolOption[] = [];
 
-  private startOffset: Point | undefined = undefined;
+  private startOffset: Vector2 | undefined = undefined;
 
   settings = {};
 
@@ -21,10 +22,10 @@ export class MoveTool implements Tool {
     if (data.action === 'primary') {
       const layer = this.editor.currentLayer;
       if (layer) {
-        this.startOffset = { ...layer.offset };
+        this.startOffset = Vector2.fromPoint(layer.offset);
       }
     } else {
-      this.startOffset = { ...this.editor.offset };
+      this.startOffset = Vector2.fromPoint(this.editor.offset);
     }
   }
 
@@ -34,20 +35,15 @@ export class MoveTool implements Tool {
     }
 
     const diff = data.diffStart;
+    const vector = this.startOffset.clone().add(diff);
 
     if (data.action === 'primary') {
       const layer = this.editor.currentLayer;
       if (layer) {
-        layer.offset = {
-          x: this.startOffset.x + diff.x,
-          y: this.startOffset.y + diff.y,
-        };
+        layer.offset = vector.point;
       }
     } else {
-      this.editor.offset = {
-        x: this.startOffset.x + diff.x,
-        y: this.startOffset.y + diff.y,
-      };
+      this.editor.offset = vector.point;
     }
   }
 

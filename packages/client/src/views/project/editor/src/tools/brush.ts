@@ -1,5 +1,6 @@
 import type { Editor } from '..';
 import { type PointerData, linePoints } from '../helpers';
+import { Vector2 } from '../primitives/Vector2';
 import { Point, Tool, ToolOption, ToolOptionType } from '../types';
 
 export class BrushTool implements Tool {
@@ -79,12 +80,9 @@ export class BrushTool implements Tool {
     const current = data.relative('current');
     const previous = data.relative('previous');
 
-    let points: Point[] = [current];
+    let points: Point[] = [current.point];
     if (line && previous) {
-      const distance = Math.sqrt(
-        Math.pow(current.x - previous.x, 2) +
-          Math.pow(current.y - previous.y, 2),
-      );
+      const distance = current.distanceTo(Vector2.fromPoint(previous));
       if (distance > Math.SQRT2) {
         points = linePoints(previous, current);
       }

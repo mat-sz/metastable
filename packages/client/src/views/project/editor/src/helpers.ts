@@ -1,4 +1,5 @@
 import type { Editor } from '.';
+import { Vector2 } from './primitives/Vector2';
 import { Point, PointerState } from './types';
 
 export function linePoints(
@@ -73,18 +74,11 @@ export function isVisible(el: HTMLElement) {
   return false;
 }
 
-export function pointsSubtract(a: Point, b: Point): Point {
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y,
-  };
-}
-
 export class PointerData {
   action: 'primary' | 'secondary' | undefined;
-  current: Point;
-  start: Point;
-  previous: Point;
+  current: Vector2;
+  start: Vector2;
+  previous: Vector2;
 
   constructor(
     private editor: Editor,
@@ -92,20 +86,25 @@ export class PointerData {
     state: PointerState | undefined,
   ) {
     this.action = state?.action;
-    this.current = editor.scalePoint(current);
-    this.start = editor.scalePoint(state?.startPoint ?? current);
-    this.previous = editor.scalePoint(state?.lastPoint ?? current);
+    this.current = Vector2.fromPoint(editor.scalePoint(current));
+    this.start = Vector2.fromPoint(
+      editor.scalePoint(state?.startPoint ?? current),
+    );
+    this.previous = Vector2.fromPoint(
+      editor.scalePoint(state?.lastPoint ?? current),
+    );
   }
 
-  get diffStart(): Point {
-    return pointsSubtract(this.current, this.start);
+  get diffStart(): Vector2 {
+    return this.current.clone().sub(this.start);
   }
 
-  relative(type: 'current'): Point;
-  relative(type: 'start' | 'previous'): Point | undefined;
-  relative(type: 'current' | 'start' | 'previous'): Point | undefined {
+  relative(type: 'current'): Vector2;
+  relative(type: 'start' | 'previous'): Vector2 | undefined;
+  relative(type: 'current' | 'start' | 'previous'): Vector2 | undefined {
     const a = this[type];
-    const b = this.editor.currentLayer?.offset;
-    return a && b ? pointsSubtract(a, b) : undefined;
+    const offset = this.editor.currentLayer?.offset;
+    const b = offset ? Vector2.fromPoint(offset) : undefined;
+    return a && b ? a.clone().sub(b) : undefined;
   }
 }
