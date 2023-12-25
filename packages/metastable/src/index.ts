@@ -26,12 +26,17 @@ export class Metastable extends EventEmitter {
   ) {
     super();
     this.storage = new Storage(dataRoot);
-    chokidar.watch(this.storage.modelsDir, {}).on('all', e => {
-      this.onEvent({
-        event: 'models.changed',
-      });
-    });
     this.downloader.on('event', this.onEvent);
+
+    let timeout: any = undefined;
+    chokidar.watch(this.storage.modelsDir, {}).on('all', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        this.onEvent({
+          event: 'models.changed',
+        });
+      }, 250);
+    });
   }
 
   async init() {
