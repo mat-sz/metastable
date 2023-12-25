@@ -69,6 +69,22 @@ class MainStore {
     this.init();
   }
 
+  get deviceName() {
+    if (this.status === 'ready') {
+      const device = this.torchInfo?.device;
+
+      if (device?.name) {
+        return device.name;
+      }
+
+      if (device?.type) {
+        return device.type;
+      }
+    }
+
+    return '(Unknown)';
+  }
+
   get project() {
     return this.projects.current;
   }

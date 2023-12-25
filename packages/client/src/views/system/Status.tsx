@@ -61,11 +61,7 @@ export const Status: React.FC = observer(() => {
       <div className={styles.info}>
         <div>
           <BsGpuCard />
-          {status === 'ready' ? (
-            <span>{mainStore.torchInfo?.device?.name}</span>
-          ) : (
-            <span>(Unknown)</span>
-          )}
+          <span>{mainStore.deviceName}</span>
         </div>
       </div>
     </div>
