@@ -10,22 +10,26 @@ import { BsPlay } from 'react-icons/bs';
 export const Images: React.FC = observer(() => {
   const project = mainStore.project!;
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const filenames = project.outputFilenames;
 
-  const selected = project.outputFilenames[selectedIndex];
-  const path =
-    selected && project.view('output', project.outputFilenames[selectedIndex]);
+  const selected = filenames[selectedIndex];
+  const path = selected && project.view('output', filenames[selectedIndex]);
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [project.outputFilenames, setSelectedIndex]);
+  }, [filenames, setSelectedIndex]);
 
   return (
     <div className={styles.main}>
       <div className={styles.preview}>
-        <ImagePreview url={path} />
-        {project.outputFilenames.length > 1 && (
+        {filenames.length ? (
+          <ImagePreview url={path} />
+        ) : (
+          <div className={styles.info}>Your output image will appear here.</div>
+        )}
+        {filenames.length > 1 && (
           <div className={styles.thumbnails}>
-            {project.outputFilenames.map((filename, i) => (
+            {filenames.map((filename, i) => (
               <img
                 className={selectedIndex === i ? styles.selected : undefined}
                 src={project.view('output', filename)}

@@ -8,6 +8,10 @@ export const Grid: React.FC = observer(() => {
   const project = mainStore.project!;
   const outputs = [...project.allOutputs].reverse();
 
+  if (!outputs.length) {
+    return <div className={styles.info}>No project output images found.</div>;
+  }
+
   return (
     <div className={styles.grid}>
       {outputs.map((filename, i) => (
