@@ -67,7 +67,9 @@ export class Projects {
       return undefined;
     }
 
-    const outputs = await this.filenames(id, 'output');
+    const outputs = (await this.filenames(id, 'output')).filter(name =>
+      name.endsWith('.png'),
+    );
     return {
       id,
       name: id,

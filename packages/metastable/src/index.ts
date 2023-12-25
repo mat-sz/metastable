@@ -1,23 +1,40 @@
 import EventEmitter from 'events';
 import path from 'path';
 import chokidar from 'chokidar';
+import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
 import { Storage } from '@metastable/storage';
 import { Comfy } from '@metastable/comfy';
 import { PythonInstance } from '@metastable/python';
 import { Downloader } from '@metastable/downloader';
 import { exists, isPathIn } from '@metastable/fs-helpers';
-import { Project, ProjectSettings } from '@metastable/types';
+import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
 export class Metastable extends EventEmitter {
   storage;
   downloader = new Downloader();
   python?: PythonInstance;
   comfy?: Comfy;
+  settingsCache: Record<Project['id'], string> = {};
 
-  onEvent = (event: any) => {
+  onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
     this.emit('event', event);
+
+    if (event.event === 'prompt.end') {
+      const settings = this.settingsCache[event.data.id];
+      for (const filename of event.data.output_filenames) {
+        const settingsPath = this.storage.projects.path(
+          event.data.project_id,
+          'output',
+          `${filename}.json`,
+        );
+        await fs.writeFile(settingsPath, settings);
+      }
+      delete this.settingsCache[event.data.id];
+    } else if (event.event === 'prompt.error') {
+      delete this.settingsCache[event.data.id];
+    }
   };
 
   constructor(
@@ -101,6 +118,9 @@ export class Metastable extends EventEmitter {
       return undefined;
     }
 
+    const id = nanoid();
+    this.settingsCache[id] = JSON.stringify(settings);
+
     settings.models.base.path = this.storage.models.path(
       'checkpoints',
       settings.models.base.name,
@@ -150,8 +170,6 @@ export class Metastable extends EventEmitter {
     }
 
     settings.sampler.tiling = !!settings.sampler.tiling;
-
-    const id = nanoid();
 
     this.comfy?.send('prompt', {
       ...settings,

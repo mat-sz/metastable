@@ -14,7 +14,6 @@ import math
 from comfy.cli_args import LatentPreviewMethod
 
 from PIL import Image, ImageOps
-from PIL.PngImagePlugin import PngInfo
 import numpy as np
 import safetensors.torch
 
@@ -239,7 +238,6 @@ def load_controlnet(controlnet_path):
 
 def save_images(settings, images):
     output_dir = settings["output_path"]
-    settings = sanitize_prompt(settings)
     counter = get_save_image_counter(output_dir)
 
     output_filenames = []
@@ -247,12 +245,8 @@ def save_images(settings, images):
     for image in images:
         i = 255. * image.cpu().detach().numpy()
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-        metadata = PngInfo()
-        if settings is not None:
-            metadata.add_text("metastable_settings", json.dumps(settings))
-        
         file = f"{counter:05}.png"
-        img.save(os.path.join(output_dir, file), pnginfo=metadata, compress_level=4)
+        img.save(os.path.join(output_dir, file), compress_level=4)
         output_filenames.append(file)
         counter += 1
 
@@ -302,36 +296,6 @@ def load_checkpoint_cached(path):
     last_checkpoint_path = path
     last_checkpoint = load_checkpoint(path)
     return last_checkpoint
-
-def sanitize_prompt(settings):
-    settings = copy.deepcopy(settings)
-
-    del settings["id"]
-    del settings["project_id"]
-    models_settings = settings["models"]
-
-    del models_settings["base"]["path"]
-    if "embeddings_path" in models_settings["base"]:
-        del models_settings["base"]["embeddings_path"]
-
-    if "loras" in models_settings:
-        for lora_settings in models_settings["loras"]:
-            del lora_settings["path"]
-
-    if "controlnets" in models_settings:
-        for controlnet_settings in models_settings["controlnets"]:
-            del controlnet_settings["path"]
-            del controlnet_settings["image"]
-    
-    if "upscale" in models_settings:
-        del models_settings["upscale"]["path"]
-
-    if "image" in settings["input"]:
-        del settings["input"]["image"]
-
-    del settings["output_path"]
-
-    return settings
 
 def execute_prompt(prompt):
     models_settings = prompt["models"]
