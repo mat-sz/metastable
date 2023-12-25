@@ -15,11 +15,18 @@ export type ProjectInput = ProjectInputEmpty | ProjectInputImage;
 export interface ProjectSettings {
   input: ProjectInput;
   models: {
-    base: { name: string };
-    loras: { name: string; strength: number }[];
-    upscale?: { name: string };
-    controlnets: {
-      name: string;
+    base: { name: string; path?: string; embeddings_path?: string };
+    loras?: {
+      enabled: boolean;
+      name?: string;
+      path?: string;
+      strength: number;
+    }[];
+    upscale?: { enabled: boolean; name?: string; path?: string };
+    controlnets?: {
+      enabled: boolean;
+      name?: string;
+      path?: string;
       strength: number;
       image: string;
       image_mode?: string;
@@ -38,6 +45,10 @@ export interface ProjectSettings {
     sampler: string;
     scheduler: string;
     tiling?: boolean;
+    preview?: {
+      method: string;
+      taesd?: any;
+    };
   };
 }
 

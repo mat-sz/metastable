@@ -5,8 +5,12 @@ import type { Metastable } from '@metastable/metastable';
 const promptBody = {
   type: 'object',
   properties: {
-    project_id: {
-      type: 'string',
+    input: {
+      type: 'object',
+      properties: {
+        mode: { type: 'string' },
+      },
+      required: ['mode'],
     },
     models: {
       type: 'object',
@@ -21,10 +25,11 @@ const promptBody = {
           items: {
             type: 'object',
             properties: {
+              enabled: { type: 'boolean' },
               name: { type: 'string' },
               strength: { type: 'number' },
             },
-            required: ['name', 'strength'],
+            required: ['enabled', 'strength'],
           },
         },
         controlnets: {
@@ -32,17 +37,21 @@ const promptBody = {
           items: {
             type: 'object',
             properties: {
+              enabled: { type: 'boolean' },
               name: { type: 'string' },
               strength: { type: 'number' },
               image: { type: 'string' },
             },
-            required: ['name', 'strength', 'image'],
+            required: ['enabled', 'strength', 'image'],
           },
         },
         upscale: {
           type: 'object',
-          properties: { name: { type: 'string' } },
-          required: ['name'],
+          properties: {
+            enabled: { type: 'boolean' },
+            name: { type: 'string' },
+          },
+          required: ['enabled'],
         },
       },
       required: ['base'],
@@ -76,7 +85,7 @@ const promptBody = {
       required: ['seed', 'steps', 'cfg', 'denoise', 'sampler', 'scheduler'],
     },
   },
-  required: ['project_id', 'models', 'conditioning', 'sampler'],
+  required: ['input', 'models', 'conditioning', 'sampler'],
 } as const satisfies JSONSchema;
 
 export function routesPrompts(metastable: Metastable) {
@@ -84,14 +93,15 @@ export function routesPrompts(metastable: Metastable) {
     fastify.post<{
       Body: FromSchema<typeof promptBody>;
     }>(
-      '/',
+      '/:id',
       {
         schema: {
           body: promptBody,
         },
       },
       async request => {
-        return await metastable.prompt(request.body);
+        const projectId = (request.params as any)?.id;
+        return await metastable.prompt(projectId, request.body as any);
       },
     );
   };

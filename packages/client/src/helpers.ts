@@ -103,8 +103,12 @@ export function validateProject(project: Project): string | undefined {
     return 'Selected checkpoint does not exist.';
   }
 
-  if (project.settings.models.loras.length) {
+  if (project.settings.models.loras?.length) {
     for (const lora of project.settings.models.loras) {
+      if (!lora.enabled) {
+        continue;
+      }
+
       if (!lora.name) {
         return 'No LoRA selected.';
       } else if (
@@ -115,8 +119,12 @@ export function validateProject(project: Project): string | undefined {
     }
   }
 
-  if (project.settings.models.controlnets.length) {
+  if (project.settings.models.controlnets?.length) {
     for (const controlnet of project.settings.models.controlnets) {
+      if (!controlnet.enabled) {
+        continue;
+      }
+
       if (!controlnet.name) {
         return 'No ControlNet selected.';
       } else if (

@@ -1,3 +1,4 @@
+import { Project } from '@metastable/types';
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -10,11 +11,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   projects: {
     all: () => ipcRenderer.invoke('projects:all'),
-    get: (id: number | string) => ipcRenderer.invoke('projects:get', id),
-    outputs: (id: number | string) =>
-      ipcRenderer.invoke('projects:outputs', id),
+    get: (id: Project['id']) => ipcRenderer.invoke('projects:get', id),
+    outputs: (id: Project['id']) => ipcRenderer.invoke('projects:outputs', id),
     create: (data: any) => ipcRenderer.invoke('projects:create', data),
-    update: (id: number | string, data: any) =>
+    update: (id: Project['id'], data: any) =>
       ipcRenderer.invoke('projects:update', id, data),
   },
   downloads: {
@@ -22,11 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     cancel: (id: string) => ipcRenderer.invoke('downloads:cancel', id),
   },
   prompts: {
-    create: (projectId: number | string, settings: any) =>
-      ipcRenderer.invoke('prompts:create', {
-        project_id: projectId,
-        ...settings,
-      }),
+    create: (projectId: Project['id'], settings: any) =>
+      ipcRenderer.invoke('prompts:create', projectId, settings),
   },
   isMac: process.platform === 'darwin',
 });

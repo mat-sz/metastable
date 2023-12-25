@@ -7,6 +7,7 @@ import {
   VarImage,
   VarSelect,
   VarSlider,
+  VarToggle,
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
 
@@ -39,6 +40,7 @@ export const Controlnets: React.FC = observer(() => {
               </>
             }
           >
+            <VarToggle label="Enable" path="enabled" />
             <VarSelect
               label="Model"
               path="name"

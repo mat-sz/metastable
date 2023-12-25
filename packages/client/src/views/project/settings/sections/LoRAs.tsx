@@ -6,6 +6,7 @@ import {
   VarCategory,
   VarSelect,
   VarSlider,
+  VarToggle,
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
 
@@ -38,6 +39,7 @@ export const LoRAs: React.FC = observer(() => {
               </>
             }
           >
+            <VarToggle label="Enable" path="enabled" />
             <VarSelect
               label="Model"
               path="name"

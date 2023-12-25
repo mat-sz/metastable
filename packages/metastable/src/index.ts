@@ -7,6 +7,7 @@ import { Comfy } from '@metastable/comfy';
 import { PythonInstance } from '@metastable/python';
 import { Downloader } from '@metastable/downloader';
 import { exists, isPathIn } from '@metastable/fs-helpers';
+import { Project, ProjectSettings } from '@metastable/types';
 
 export class Metastable extends EventEmitter {
   storage;
@@ -90,7 +91,7 @@ export class Metastable extends EventEmitter {
     }
   }
 
-  async prompt(settings: any) {
+  async prompt(projectId: Project['id'], settings: ProjectSettings) {
     if (this.comfy?.status !== 'ready') {
       return undefined;
     }
@@ -106,25 +107,30 @@ export class Metastable extends EventEmitter {
     }
 
     if (settings.models.loras) {
-      for (const lora of settings.models.loras) {
-        lora.path = this.storage.models.path('loras', lora.name);
-      }
+      settings.models.loras = settings.models.loras
+        .filter(model => model.enabled && model.name)
+        .map(model => ({
+          ...model,
+          path: this.storage.models.path('loras', model.name!),
+        }));
     }
 
     if (settings.models.controlnets) {
-      for (const controlnet of settings.models.controlnets) {
-        controlnet.path = this.storage.models.path(
-          'controlnet',
-          controlnet.name,
-        );
-      }
+      settings.models.controlnets = settings.models.controlnets
+        .filter(model => model.enabled && model.name)
+        .map(model => ({
+          ...model,
+          path: this.storage.models.path('controlnet', model.name!),
+        }));
     }
 
-    if (settings.models.upscale) {
+    if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
       settings.models.upscale.path = this.storage.models.path(
         'upscale_models',
         settings.models.upscale.name,
       );
+    } else {
+      settings.models.upscale = undefined;
     }
 
     if (settings.sampler.preview?.method === 'taesd') {
@@ -145,7 +151,8 @@ export class Metastable extends EventEmitter {
     this.comfy?.send('prompt', {
       ...settings,
       id: id,
-      output_path: this.storage.projects.path(settings.project_id, 'output'),
+      project_id: projectId,
+      output_path: this.storage.projects.path(projectId, 'output'),
     });
 
     return { id };

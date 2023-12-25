@@ -37,10 +37,10 @@ export const WebAPI: API = {
   },
   prompts: {
     async create(projectId, settings) {
-      return await httpPost('/prompts', {
-        project_id: projectId,
-        ...settings,
-      });
+      return await httpPost(
+        `/prompts/${encodeURIComponent(projectId)}`,
+        settings,
+      );
     },
   },
 };

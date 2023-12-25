@@ -18,14 +18,14 @@ export const Upscale: React.FC = observer(() => {
       {upscale_models?.[0] ? (
         <VarToggle
           label="Enable"
+          path="models.upscale.enabled"
           value={enabled}
           onChange={value => {
-            if (value) {
+            if (value && !project.settings.models.upscale?.name) {
               project.settings.models.upscale = {
+                enabled: true,
                 name: upscale_models[0].name,
               };
-            } else {
-              project.settings.models.upscale = undefined;
             }
           }}
         />

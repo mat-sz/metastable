@@ -132,9 +132,12 @@ async function createWindow() {
   ipcMain.handle('instance:compatibility', async () => {
     return await validateRequirements(metastable.python);
   });
-  ipcMain.handle('prompts:create', async (_, settings: any) => {
-    return await metastable.prompt(settings);
-  });
+  ipcMain.handle(
+    'prompts:create',
+    async (_, id: Project['id'], settings: any) => {
+      return await metastable.prompt(id, settings);
+    },
+  );
 
   ipcMain.handle('projects:all', async () => {
     return await metastable.storage.projects.all();

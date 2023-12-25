@@ -173,7 +173,12 @@ export class Project {
   addLora(name: string, strength = 1) {
     const settings = { ...this.settings };
 
+    if (!settings.models.loras) {
+      settings.models.loras = [];
+    }
+
     settings.models.loras.push({
+      enabled: true,
       name,
       strength,
     });
@@ -182,14 +187,19 @@ export class Project {
 
   removeLora(index: number) {
     const settings = { ...this.settings };
-    settings.models.loras.splice(index, 1);
+    settings.models.loras?.splice(index, 1);
     this.settings = settings;
   }
 
   addControlnet(name: string, strength = 1) {
     const settings = { ...this.settings };
 
+    if (!settings.models.controlnets) {
+      settings.models.controlnets = [];
+    }
+
     settings.models.controlnets.push({
+      enabled: true,
       name,
       strength,
       image: '',
@@ -199,7 +209,7 @@ export class Project {
 
   removeControlnet(index: number) {
     const settings = { ...this.settings };
-    settings.models.controlnets.splice(index, 1);
+    settings.models.controlnets?.splice(index, 1);
     this.settings = settings;
   }
 
