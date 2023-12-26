@@ -1,6 +1,7 @@
 import which from 'which';
 import { spawn } from 'child_process';
 import path from 'path';
+import { exists } from '@metastable/fs-helpers';
 
 import { stdout } from './spawn.js';
 
@@ -118,6 +119,14 @@ export class PythonInstance {
     return await this.runPython(
       PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
     );
+  }
+
+  async hasPip(): Promise<boolean> {
+    if (this.pythonHome) {
+      return await exists(path.join(this.pythonHome, 'bin', 'pip3'));
+    } else {
+      return await hasCommand('pip3');
+    }
   }
 
   static async fromDirectory(dir: string, packagesDir?: string) {

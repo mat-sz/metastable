@@ -1,12 +1,4 @@
-import { Model } from './model.js';
 import { Project } from './project.js';
-
-export interface Requirement {
-  name: string;
-  expected: string | number | boolean;
-  actual: string | number | boolean;
-  satisfied: boolean;
-}
 
 export interface ComfyTorchInfo {
   memory: {
@@ -86,9 +78,3 @@ export type ComfyEvent =
   | PromptProgressEvent
   | PromptEndEvent
   | TorchInfoEvent;
-
-export interface InstanceInfo {
-  samplers: string[];
-  schedulers: string[];
-  models: Record<string, Model[]>;
-}

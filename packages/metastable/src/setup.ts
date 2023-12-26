@@ -126,10 +126,12 @@ async function getPython(python?: PythonInstance) {
       });
     }
 
+    const hasPip = await python.hasPip();
     return {
+      hasPip,
       version: version.version,
       required: REQUIRED_PYTHON_VERSION,
-      compatible,
+      compatible: compatible && hasPip,
       requirements,
     };
   } catch {
@@ -141,7 +143,7 @@ export class Setup {
 
   async info() {
     return {
-      required: false,
+      required: true,
     };
   }
 

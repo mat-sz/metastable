@@ -4,3 +4,5 @@ export * from './events.js';
 export * from './comfy.js';
 export * from './file.js';
 export * from './download.js';
+export * from './instance.js';
+export * from './setup.js';

@@ -1166,6 +1166,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/python@workspace:packages/python"
   dependencies:
+    "@metastable/fs-helpers": "npm:*"
     "@types/decompress": "npm:^4.2.7"
     "@types/node": "npm:^20.10.3"
     "@types/semver": "npm:^7.5.6"

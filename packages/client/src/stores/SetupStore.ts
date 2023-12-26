@@ -187,10 +187,16 @@ export class SetupStore {
     const python = this.details.python;
     if (python) {
       requirements.push({
-        name: 'Python',
+        name: 'python',
         expected: python.required,
         actual: python.version,
         satisfied: python.compatible,
+      });
+      requirements.push({
+        name: 'pip',
+        expected: true,
+        actual: python.hasPip,
+        satisfied: python.hasPip,
       });
       requirements.push(...python.requirements);
 
@@ -204,9 +210,15 @@ export class SetupStore {
       }
     } else {
       requirements.push({
-        name: 'Python',
+        name: 'python',
         expected: python.required,
         actual: 'unavailable',
+        satisfied: false,
+      });
+      requirements.push({
+        name: 'pip',
+        expected: true,
+        actual: false,
         satisfied: false,
       });
 

@@ -3,3 +3,18 @@
   margin-bottom: 0.2rem;
   text-align: center;
 }
+
+.toggle {
+  label span {
+    color: var(--color-fg) !important;
+    font-size: 0.9rem;
+  }
+
+  .info {
+    margin-top: 0.2rem;
+    font-size: 0.7rem;
+    color: var(--color-fg-soft);
+  }
+
+  margin-bottom: 0.5rem;
+}
