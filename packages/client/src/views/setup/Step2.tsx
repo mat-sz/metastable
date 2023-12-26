@@ -40,13 +40,12 @@ export const Step2: React.FC = observer(() => {
       </div>
       {details ? (
         <>
-          <List>
+          <List hint="Click on an item to reveal more information.">
             {tasks.map(([id, task]) => (
               <Item
                 key={id}
                 id={id}
                 title={TASK_TITLE[id] || ''}
-                description={`${task.progress}`}
                 icon={TASK_ICONS[id] || <BsHourglassSplit />}
                 status={
                   task.state === 'done'

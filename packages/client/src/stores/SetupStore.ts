@@ -202,6 +202,8 @@ export class SetupStore {
     let status: SetupItemState['status'] = 'ok';
     const requirements: Requirement[] = [];
     const python = this.details.python;
+    const storage = 5 * GB;
+
     if (python) {
       requirements.push({
         name: 'python',
@@ -249,6 +251,7 @@ export class SetupStore {
       description,
       status,
       requirements,
+      storage,
     };
   }
 

@@ -10,14 +10,18 @@ interface Props {
   id: string;
   icon: React.ReactNode;
   title: React.ReactNode;
-  description: React.ReactNode;
+  description?: React.ReactNode;
   status: 'incomplete' | 'ok' | 'warning' | 'error';
   progress?: number;
 }
 
 export const Item: React.FC<React.PropsWithChildren<Props>> = observer(
-  ({ id, icon, title, description, status, children }) => {
+  ({ id, icon, title, description, status, children, progress }) => {
     const { toggle, isOpen, shouldDarken } = useListItem(id);
+
+    if (status !== 'incomplete') {
+      progress = undefined;
+    }
 
     return (
       <div
@@ -31,13 +35,32 @@ export const Item: React.FC<React.PropsWithChildren<Props>> = observer(
           <div className={styles.icon}>{icon}</div>
           <div className={styles.info}>
             <div className={styles.title}>{title}</div>
-            <div className={styles.description}>{description}</div>
+            {!!description && (
+              <div className={styles.description}>{description}</div>
+            )}
           </div>
-          <div className={clsx(styles.status, styles[status])}>
-            {status === 'incomplete' && <BsChevronRight />}
-            {status === 'ok' && <BsCheck />}
-            {status === 'warning' && <BsExclamation />}
-            {status === 'error' && <BsX />}
+          <div
+            className={clsx(styles.status, styles[status])}
+            style={
+              typeof progress === 'undefined'
+                ? undefined
+                : {
+                    background: `conic-gradient(var(--progress-fg) ${
+                      progress * 3.6
+                    }deg, var(--progress-bg) 0deg)`,
+                  }
+            }
+          >
+            {typeof progress === 'undefined' ? (
+              <>
+                {status === 'incomplete' && <BsChevronRight />}
+                {status === 'ok' && <BsCheck />}
+                {status === 'warning' && <BsExclamation />}
+                {status === 'error' && <BsX />}
+              </>
+            ) : (
+              <div className={styles.progress}>{Math.floor(progress)}%</div>
+            )}
           </div>
         </div>
         <div className={styles.body} onClick={e => e.stopPropagation()}>

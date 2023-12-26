@@ -4,6 +4,8 @@
   transition: 0.2s ease-in-out all;
   height: 5.5rem;
   overflow: hidden;
+  --progress-fg: var(--color-accent);
+  --progress-bg: var(--color-bg-panel);
 
   .header {
     display: flex;
@@ -56,6 +58,11 @@
     align-items: center;
     justify-content: center;
     border-radius: 100%;
+  }
+
+  .progress {
+    font-size: 0.7rem;
+    font-weight: bold;
   }
 
   .icon {

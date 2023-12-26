@@ -25,6 +25,7 @@ import { download } from '@metastable/downloader';
 import decompress from 'decompress';
 import { spawn } from 'child_process';
 import { rimraf } from 'rimraf';
+import { tryUnlink } from '@metastable/fs-helpers';
 
 interface PipDependency {
   name: string;
@@ -190,6 +191,7 @@ class DownloadPythonTask extends BaseTask {
   }
 
   async run() {
+    tryUnlink(this.archivePath);
     this.appendLog('Getting download URL.');
     const url = await getPythonDownloadUrl();
     this.appendLog(`Downloading from: ${url}`);
@@ -220,6 +222,8 @@ class ExtractPythonTask extends BaseTask {
     this.appendLog(`Extracting ${this.archivePath} to ${this.targetPath}`);
 
     await decompress(this.archivePath, this.targetPath, { strip: 1 });
+    tryUnlink(this.archivePath);
+
     this.appendLog('Done.');
   }
 }

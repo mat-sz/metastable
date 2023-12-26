@@ -3,7 +3,14 @@ import React, { useState } from 'react';
 import styles from './List.module.scss';
 import { ListContext } from './ListContext';
 
-export const List: React.FC<React.PropsWithChildren> = ({ children }) => {
+interface Props {
+  hint?: string;
+}
+
+export const List: React.FC<React.PropsWithChildren<Props>> = ({
+  children,
+  hint,
+}) => {
   const [open, setOpen] = useState<string>();
   return (
     <div className={styles.list}>
@@ -15,9 +22,7 @@ export const List: React.FC<React.PropsWithChildren> = ({ children }) => {
       >
         {children}
       </ListContext.Provider>
-      <div className={styles.hint}>
-        Click on an item to reveal more options.
-      </div>
+      {!!hint && <div className={styles.hint}>{hint}</div>}
     </div>
   );
 };

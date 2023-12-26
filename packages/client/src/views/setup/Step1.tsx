@@ -23,7 +23,7 @@ export const Step1: React.FC = observer(() => {
       </div>
       {details ? (
         <>
-          <List>
+          <List hint="Click on an item to reveal more options.">
             <OSItem />
             <HardwareItem />
             <PythonItem />
