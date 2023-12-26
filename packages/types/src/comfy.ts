@@ -3,10 +3,9 @@ import { Project } from './project.js';
 
 export interface Requirement {
   name: string;
-  expected: string;
-  actual: string;
+  expected: string | number | boolean;
+  actual: string | number | boolean;
   satisfied: boolean;
-  type: string;
 }
 
 export interface ComfyTorchInfo {

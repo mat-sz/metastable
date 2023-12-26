@@ -13,12 +13,16 @@ import { OpenProject } from '../../modals/openProject';
 import { ModelManager } from '../../modals/models';
 import { IS_ELECTRON, IS_MAC } from '../../config';
 
-export const Header: React.FC = () => {
+interface Props {
+  showMenu?: boolean;
+}
+
+export const Header: React.FC<Props> = ({ showMenu = !IS_MAC }) => {
   const { showModal } = useUI();
 
   return (
     <div className={styles.header}>
-      {!IS_MAC && (
+      {showMenu && (
         <div className={styles.menu}>
           <button
             onClick={() => showModal(<NewProject />)}

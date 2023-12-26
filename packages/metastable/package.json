@@ -17,7 +17,9 @@
     "@metastable/fs-helpers": "*",
     "@metastable/storage": "*",
     "chokidar": "^3.5.3",
-    "nanoid": "^5.0.4"
+    "diskusage": "^1.2.0",
+    "nanoid": "^5.0.4",
+    "systeminformation": "^5.21.22"
   },
   "exports": {
     ".": {

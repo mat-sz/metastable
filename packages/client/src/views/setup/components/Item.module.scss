@@ -1,0 +1,84 @@
+.item {
+  background: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-bg);
+  transition: 0.2s ease-in-out all;
+  height: 5.5rem;
+  overflow: hidden;
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    height: 5.5rem;
+    cursor: pointer;
+  }
+
+  &.darken {
+    opacity: 0.75;
+  }
+
+  &:hover,
+  &.open {
+    background: var(--color-bg-interactive);
+  }
+
+  .body {
+    height: 14.5rem;
+    overflow: auto;
+    padding: 0 1rem;
+  }
+
+  &.open {
+    height: 20rem;
+  }
+
+  .info {
+    flex: 1;
+    margin: 0 1rem;
+
+    .title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .description {
+      font-size: 1rem;
+    }
+  }
+
+  .icon,
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+  }
+
+  .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-bg-panel-dark);
+  }
+
+  .status {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    color: white;
+
+    &.ok {
+      color: var(--color-fg-ok);
+      background: var(--color-bg-ok);
+    }
+
+    &.warning {
+      color: var(--color-fg-warning);
+      background: var(--color-bg-warning);
+    }
+
+    &.error {
+      color: var(--color-fg-error);
+      background: var(--color-bg-error);
+    }
+  }
+}

@@ -8,7 +8,11 @@ import {
 export interface API {
   instance: {
     info(): Promise<InstanceInfo>;
-    compatibility(): Promise<Requirement[]>;
+  };
+  setup: {
+    info(): Promise<any>;
+    details(): Promise<any>;
+    requirements(): Promise<Requirement[]>;
   };
   projects: {
     all(): Promise<Project[]>;

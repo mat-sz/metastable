@@ -10,12 +10,15 @@ import { Downloader } from '@metastable/downloader';
 import { exists, isPathIn } from '@metastable/fs-helpers';
 import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
+import { Setup } from './setup.js';
+
 export class Metastable extends EventEmitter {
   storage;
   downloader = new Downloader();
   python?: PythonInstance;
   comfy?: Comfy;
   settingsCache: Record<Project['id'], string> = {};
+  setup = new Setup(this);
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);

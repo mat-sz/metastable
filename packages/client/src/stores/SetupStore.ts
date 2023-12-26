@@ -1,0 +1,254 @@
+import { makeAutoObservable, runInAction } from 'mobx';
+import { Requirement } from '@metastable/types';
+
+import { API } from '../api';
+import { filesize } from '../helpers';
+
+const GB = 1024 * 1024 * 1024;
+const VRAM_MIN = 2 * GB;
+const VRAM_RECOMMENDED = 6 * GB;
+const STORAGE_MIN = 16 * GB;
+const STORAGE_RECOMMENDED = 64 * GB;
+
+interface SetupItemState {
+  description: string;
+  status: 'incomplete' | 'ok' | 'warning' | 'error';
+  requirements: Requirement[];
+}
+
+export class SetupStore {
+  details: any = undefined;
+  requirements: Requirement[] = [];
+  selected: string | undefined = undefined;
+
+  pythonMode: 'system' | 'static' = 'static';
+
+  constructor() {
+    makeAutoObservable(this);
+    this.init();
+  }
+
+  async init() {
+    const details = await API.setup.details();
+    const compatibility = await API.setup.requirements();
+    runInAction(() => {
+      this.details = details;
+      this.requirements = compatibility;
+    });
+  }
+
+  get os(): SetupItemState {
+    if (!this.details) {
+      return {
+        description: 'Something went wrong.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    let description = 'Great! Your operating system is compatible.';
+    let status: SetupItemState['status'] = 'ok';
+
+    const os = this.details.os;
+
+    let name = `${os.platform.value} ${os.version.value}`;
+    const extraRequirements: Requirement[] = [];
+
+    switch (os.platform.value) {
+      case 'linux':
+        name = `Linux ${os.version.value}`;
+
+        {
+          extraRequirements.push({
+            name: 'GNU libc',
+            expected: true,
+            actual: os.isGlibc,
+            satisfied: !!os.isGlibc,
+          });
+
+          if (!os.isGlibc) {
+            status = 'error';
+            description = 'GNU libc is required to run Metastable.';
+          }
+        }
+        break;
+      case 'darwin':
+        name = `macOS ${os.version.value}`;
+        break;
+      case 'win32':
+        name = `Windows ${os.version.value}`;
+        break;
+    }
+
+    const requirements: Requirement[] = [];
+    requirements.push({
+      name: 'Operating System',
+      expected: 'Windows 10.0+, macOS 10.9+, Linux',
+      actual: name,
+      satisfied: os.platform.compatible && os.version.compatible,
+    });
+    requirements.push({
+      name: 'CPU Architecture',
+      expected: os.architecture.supported.join(', '),
+      actual: os.architecture.value,
+      satisfied: os.architecture.compatible,
+    });
+    requirements.push(...extraRequirements);
+
+    if (!os.version.compatible) {
+      status = 'error';
+      description = 'Your operating system is out of date.';
+    } else if (!os.platform.compatible) {
+      status = 'error';
+      description = 'Your operating system is not supported.';
+    }
+
+    return {
+      description,
+      status,
+      requirements,
+    };
+  }
+
+  get hardware(): SetupItemState {
+    if (!this.details) {
+      return {
+        description: 'Something went wrong.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    let description = 'Great! Your computer is compatible.';
+    let status: SetupItemState['status'] = 'ok';
+
+    const requirements: Requirement[] = [];
+
+    const vendor = this.details.graphics[0]?.vendor;
+    const vram = this.details.graphics[0]?.vram;
+    const humanVram = vram ? filesize(vram) : 'not available';
+
+    requirements.push({
+      name: 'GPU Vendor',
+      expected: 'NVIDIA',
+      actual: vendor,
+      satisfied: vendor.includes('NVIDIA'),
+    });
+    requirements.push({
+      name: 'GPU VRAM',
+      expected: `>= ${filesize(VRAM_RECOMMENDED)}`,
+      actual: humanVram,
+      satisfied: vram > VRAM_RECOMMENDED,
+    });
+
+    if (!vendor) {
+      description = 'A GPU is required for an optimal user experience.';
+      status = 'error';
+    } else if (vram < VRAM_MIN) {
+      description = `Current amount of VRAM (${humanVram}) is lower than the minimum required (${filesize(
+        VRAM_MIN,
+      )}).`;
+      status = 'error';
+    } else if (vram < VRAM_RECOMMENDED) {
+      description = `Current amount of VRAM (${humanVram}) is lower than the recommended amount (${filesize(
+        VRAM_RECOMMENDED,
+      )}).`;
+      status = 'warning';
+    } else if (!vendor.includes('NVIDIA')) {
+      description = `Non-NVIDIA GPUs haven't been tested, but should work correctly.`;
+      status = 'warning';
+    }
+
+    return {
+      description,
+      status,
+      requirements,
+    };
+  }
+
+  get python(): SetupItemState {
+    if (!this.details) {
+      return {
+        description: 'Something went wrong.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    let description = `We'll install and configure Python for you.`;
+    let status: SetupItemState['status'] = 'ok';
+    const requirements: Requirement[] = [];
+    const python = this.details.python;
+    if (python) {
+      requirements.push({
+        name: 'Python',
+        expected: python.required,
+        actual: python.version,
+        satisfied: python.compatible,
+      });
+      requirements.push(...python.requirements);
+
+      if (this.pythonMode === 'static') {
+        description = `Python ${python.version} is installed, but we'll install and configure a separate instance.`;
+      } else if (python.compatible) {
+        description = `We'll use the system-wide Python ${python.version} installation.`;
+      } else {
+        description = `You've chosen to use an incompatible system Python installation.`;
+        status = 'error';
+      }
+    } else {
+      requirements.push({
+        name: 'Python',
+        expected: python.required,
+        actual: 'unavailable',
+        satisfied: false,
+      });
+
+      if (this.pythonMode === 'system') {
+        description = `You've chosen to use an unavailable system Python installation.`;
+        status = 'error';
+      }
+    }
+
+    return {
+      description,
+      status,
+      requirements,
+    };
+  }
+
+  get storage(): SetupItemState {
+    if (!this.details) {
+      return {
+        description: 'Something went wrong.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    const storage = this.details.storage;
+    const free = storage.free;
+    const humanFree = filesize(free);
+
+    let description = `You have around ${humanFree} of free space left. That's more than enough!`;
+    let status: SetupItemState['status'] = 'ok';
+
+    if (free < STORAGE_MIN) {
+      description = `A minimum of ${filesize(
+        STORAGE_MIN,
+      )} of free space is required.`;
+      status = 'error';
+    } else if (free < STORAGE_RECOMMENDED) {
+      description = `For optimal performance, ${filesize(
+        STORAGE_RECOMMENDED,
+      )} of free space is recommended.`;
+      status = 'warning';
+    }
+
+    return {
+      description,
+      status,
+      requirements: [],
+    };
+  }
+}

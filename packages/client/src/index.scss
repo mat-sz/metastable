@@ -12,9 +12,15 @@
   --color-fg: #ddd;
   --color-primary: #35353b;
   --color-primary-soft: #575760;
-  --color-ok: #3ea74e;
-  --color-error: #8d0000;
-  --color-error-soft: #570000;
+
+  --color-fg-ok: #0f5132;
+  --color-bg-ok: #75b798;
+
+  --color-fg-warning: #332701;
+  --color-bg-warning: #ffda6a;
+
+  --color-fg-error: #842029;
+  --color-bg-error: #ea868f;
 }
 
 /* Firefox */

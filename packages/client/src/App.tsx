@@ -9,10 +9,22 @@ import { Projects } from './views/system/Projects';
 import { Welcome } from './views/system/Welcome';
 import { Status } from './views/system/Status';
 import { UI } from './components';
+import { Setup } from './views/setup';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
     return <div className="app">Loading...</div>;
+  }
+
+  if (mainStore.setupRequired) {
+    return (
+      <UI>
+        <div className="app">
+          <Header showMenu={false} />
+          <Setup />
+        </div>
+      </UI>
+    );
   }
 
   return (

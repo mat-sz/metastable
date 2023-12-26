@@ -6,7 +6,6 @@ import {
   ComfyStatus,
   AnyEvent,
   ComfyTorchInfo,
-  Requirement,
   InstanceInfo,
   Project as APIProject,
 } from '@metastable/types';
@@ -14,6 +13,7 @@ import {
 import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
 import { DownloadStore } from './DownloadStore';
+import { SetupStore } from './SetupStore';
 import { API } from '../api';
 
 declare global {
@@ -33,7 +33,9 @@ class MainStore {
     models: {},
   };
   torchInfo?: ComfyTorchInfo = undefined;
-  compatibility: Requirement[] = [];
+
+  setup = new SetupStore();
+  setupRequired = false;
 
   promptRemaining = 0;
   promptValue = 0;
@@ -90,11 +92,13 @@ class MainStore {
   }
 
   async init() {
-    this.refresh();
+    await this.refresh();
 
-    const compatibility = await API.instance.compatibility();
+    const setupInfo = await API.setup.info();
+
     runInAction(() => {
-      this.compatibility = compatibility;
+      this.setupRequired = setupInfo.required;
+      this.ready = true;
     });
   }
 
@@ -102,7 +106,6 @@ class MainStore {
     const data = await API.instance.info();
     runInAction(() => {
       this.info = data;
-      this.ready = true;
     });
 
     const dataDir = (data as any).dataDir;

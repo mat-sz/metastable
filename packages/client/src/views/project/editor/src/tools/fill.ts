@@ -98,12 +98,7 @@ function floodFill(
 
       // Move downward
       while (contiguousDown && y < height) {
-        try {
-          dataView.setUint32((y * width + x) * 4, fillColor, false);
-        } catch {
-          console.log(x, width, y, (y * width + x) * 4);
-          return;
-        }
+        dataView.setUint32((y * width + x) * 4, fillColor, false);
 
         // Check left
         if (

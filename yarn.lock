@@ -1134,7 +1134,9 @@ __metadata:
     "@metastable/types": "npm:*"
     "@types/node": "npm:^20.10.3"
     chokidar: "npm:^3.5.3"
+    diskusage: "npm:^1.2.0"
     nanoid: "npm:^5.0.4"
+    systeminformation: "npm:^5.21.22"
     typescript: "npm:^5.3.2"
   languageName: unknown
   linkType: soft
@@ -2981,6 +2983,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"diskusage@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "diskusage@npm:1.2.0"
+  dependencies:
+    es6-promise: "npm:^4.2.8"
+    nan: "npm:^2.18.0"
+    node-gyp: "npm:latest"
+  checksum: c60a7ae720f7e940145b16c6ce5d1db871a3ee430d3f3c972861ff484d058a803b628f71a8eb5a6dddbd09dac817bc2cba060a1b3fbb81e5c49abfd954627679
+  languageName: node
+  linkType: hard
+
 "dmg-builder@npm:24.9.1":
   version: 24.9.1
   resolution: "dmg-builder@npm:24.9.1"
@@ -3268,6 +3281,13 @@ __metadata:
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
   checksum: 357663fb1e845c047d548c3d30f86e005db71e122678f4184ced0693f634688c3f3ef2d7de7d4af732f734de01f528b05954e270f06aa7d133679fb9fe6600ef
+  languageName: node
+  linkType: hard
+
+"es6-promise@npm:^4.2.8":
+  version: 4.2.8
+  resolution: "es6-promise@npm:4.2.8"
+  checksum: 2373d9c5e9a93bdd9f9ed32ff5cb6dd3dd785368d1c21e9bbbfd07d16345b3774ae260f2bd24c8f836a6903f432b4151e7816a7fa8891ccb4e1a55a028ec42c3
   languageName: node
   linkType: hard
 
@@ -5349,6 +5369,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nan@npm:^2.18.0":
+  version: 2.18.0
+  resolution: "nan@npm:2.18.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 9209d80134fdb98c0afe35c1372d2b930a0a8d3c52706cb5e4257a27e9845c375f7a8daedadadec8d6403ca2eebb3b37d362ff5d1ec03249462abf65fef2a148
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.7":
   version: 3.3.7
   resolution: "nanoid@npm:3.3.7"
@@ -6852,6 +6881,16 @@ __metadata:
   peerDependencies:
     react: ^16.11.0 || ^17.0.0 || ^18.0.0
   checksum: ad7d3205f2b4969f6727b25819f2f999af792083b63a25c54fae10bc841c94827fb06652764ef94fa7a46cf9dda25a41f088809919d070dd0fec5b0005a3e839
+  languageName: node
+  linkType: hard
+
+"systeminformation@npm:^5.21.22":
+  version: 5.21.22
+  resolution: "systeminformation@npm:5.21.22"
+  bin:
+    systeminformation: lib/cli.js
+  checksum: 483141ce10cd3e7e8f6734d9f7a63557ead5646530a955b2ed42057790b3338964eb365f89cbdf733a16192680de31a4f4f4a80b079d07ea093cb0d7fdb7967c
+  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
 

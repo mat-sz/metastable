@@ -91,7 +91,6 @@ export class Project {
     public data: APIProject,
     public settings: ProjectSettings,
   ) {
-    console.log('data', data);
     this.id = data.id;
     this.name = data.name;
     this.outputFilenames = data.lastOutput ? [data.lastOutput] : [];

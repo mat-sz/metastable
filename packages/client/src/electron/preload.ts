@@ -7,7 +7,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ready: () => ipcRenderer.send('ready'),
   instance: {
     info: () => ipcRenderer.invoke('instance:info'),
-    compatibility: () => ipcRenderer.invoke('instance:compatibility'),
+  },
+  setup: {
+    info: () => ipcRenderer.invoke('setup:info'),
+    details: () => ipcRenderer.invoke('setup:details'),
+    requirements: () => ipcRenderer.invoke('setup:requirements'),
   },
   projects: {
     all: () => ipcRenderer.invoke('projects:all'),

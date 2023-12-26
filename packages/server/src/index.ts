@@ -11,6 +11,7 @@ import { routesModels } from './routes/models.js';
 import { routesPrompts } from './routes/prompts.js';
 import { routesDownloads } from './routes/downloads.js';
 import { routesInstance } from './routes/instance.js';
+import { routesSetup } from './routes/setup.js';
 import { ClientManager } from './ws.js';
 
 const metastable = new Metastable(dataRoot);
@@ -76,6 +77,7 @@ app.register(async function (fastify) {
 });
 
 app.register(routesInstance(metastable), { prefix: '/instance' });
+app.register(routesSetup(metastable), { prefix: '/setup' });
 app.register(routesProjects(metastable), { prefix: '/projects' });
 app.register(routesModels(metastable), { prefix: '/models' });
 app.register(routesPrompts(metastable), { prefix: '/prompts' });

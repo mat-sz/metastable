@@ -2,7 +2,6 @@ import path from 'node:path';
 import url from 'node:url';
 import os from 'node:os';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
-import { validateRequirements } from '@metastable/comfy';
 import { Project } from '@metastable/types';
 import { Metastable } from '@metastable/metastable';
 
@@ -129,8 +128,14 @@ async function createWindow() {
       dataDir: url.pathToFileURL(dataRoot).toString(),
     };
   });
-  ipcMain.handle('instance:compatibility', async () => {
-    return await validateRequirements(metastable.python);
+  ipcMain.handle('setup:info', async () => {
+    return await metastable.setup.info();
+  });
+  ipcMain.handle('setup:details', async () => {
+    return await metastable.setup.details();
+  });
+  ipcMain.handle('setup:requirements', async () => {
+    return await metastable.setup.requirements();
   });
   ipcMain.handle(
     'prompts:create',

@@ -6,8 +6,16 @@ export const WebAPI: API = {
     async info() {
       return await httpGet('/instance/info');
     },
-    async compatibility() {
-      return await httpGet('/instance/compatibility');
+  },
+  setup: {
+    async info() {
+      return await httpGet('/setup/info');
+    },
+    async details() {
+      return await httpGet('/setup/details');
+    },
+    async requirements() {
+      return await httpGet('/setup/requirements');
     },
   },
   projects: {
