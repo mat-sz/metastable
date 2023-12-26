@@ -47,8 +47,8 @@ const requiredPackages: PipDependency[] = [
   { name: 'torchaudio' },
   { name: 'torchsde' },
   { name: 'einops' },
-  { name: 'transformers', version: '>=4.25.1' },
-  { name: 'safetensors', version: '>=0.3.0' },
+  { name: 'transformers' },
+  { name: 'safetensors' },
   { name: 'accelerate' },
   { name: 'pyyaml' },
   { name: 'Pillow' },
@@ -230,24 +230,26 @@ class ExtractPythonTask extends BaseTask {
 
 class InstallPythonTask extends BaseTask {
   constructor(
-    private packagesDir: string,
+    private packagesDir?: string,
     private pythonHome?: string,
   ) {
     super();
   }
 
   async run() {
+    let collecting: string[] = [];
+    let required: string[] = requiredPackages.map(pkg =>
+      pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
+    );
+
     const proc = spawn(
       this.pythonHome ? path.join(this.pythonHome, 'bin', 'pip3') : 'pip3',
       [
         'install',
-        '--target',
-        this.packagesDir,
+        ...(this.packagesDir ? ['--target', this.packagesDir] : []),
         '--extra-index-url',
         'https://download.pytorch.org/whl/cu121',
-        ...requiredPackages.map(pkg =>
-          pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
-        ),
+        ...required,
       ],
       {
         env: { PYTHONHOME: this.pythonHome, PYTHONPATH: this.packagesDir },
@@ -259,7 +261,32 @@ class InstallPythonTask extends BaseTask {
       proc.kill('SIGTERM');
     });
 
+    const PIP_PROGRESS_STARTS_WITH = [
+      'Collecting ',
+      'Requirement already satisfied: ',
+    ];
     proc.stdout.on('data', chunk => {
+      const trimmed = chunk.toString().trim();
+      if (PIP_PROGRESS_STARTS_WITH.find(item => trimmed.startsWith(item))) {
+        let name = trimmed;
+        for (const item of PIP_PROGRESS_STARTS_WITH) {
+          name = name.replace(item, '');
+        }
+        name = name.split(' ')[0];
+        if (name && required.includes(name)) {
+          collecting.push(name);
+
+          // TODO: Can't think of anything better.
+          if (collecting.length === 1) {
+            this.setProgress(5);
+          } else {
+            this.setProgress(
+              Math.min(((collecting.length - 1) / required.length) * 100, 90),
+            );
+          }
+        }
+      }
+
       this.appendLog(chunk.toString().trimEnd());
     });
     proc.stderr.on('data', chunk => {
@@ -397,12 +424,6 @@ export class Setup extends EventEmitter {
     this._status = 'in_progress';
     const tasks: Record<string, BaseTask> = {};
 
-    const packagesDir = path.join(
-      this.metastable.storage.dataRoot,
-      'python',
-      'pip',
-    );
-    this._packagesDir = packagesDir;
     let pythonHome: string | undefined = undefined;
 
     if (settings.pythonMode === 'static') {
@@ -412,11 +433,21 @@ export class Setup extends EventEmitter {
       );
       const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
       pythonHome = targetPath;
+      this._packagesDir = undefined;
       this._pythonHome = targetPath;
       tasks['python.download'] = new DownloadPythonTask(archivePath);
       tasks['python.extract'] = new ExtractPythonTask(archivePath, targetPath);
+      tasks['python.install'] = new InstallPythonTask(undefined, pythonHome);
+    } else {
+      const packagesDir = path.join(
+        this.metastable.storage.dataRoot,
+        'python',
+        'pip',
+      );
+      this._packagesDir = packagesDir;
+      this._pythonHome = undefined;
+      tasks['python.install'] = new InstallPythonTask(packagesDir, pythonHome);
     }
-    tasks['python.install'] = new InstallPythonTask(packagesDir, pythonHome);
 
     if (settings.downloads.length) {
       tasks['models.download'] = new DownloadModelsTask(

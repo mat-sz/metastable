@@ -40,7 +40,9 @@ export const Item: React.FC<React.PropsWithChildren<Props>> = observer(
             )}
           </div>
           <div
-            className={clsx(styles.status, styles[status])}
+            className={clsx(styles.status, {
+              [styles[status]]: typeof progress === 'undefined',
+            })}
             style={
               typeof progress === 'undefined'
                 ? undefined

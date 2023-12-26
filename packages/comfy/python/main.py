@@ -1,11 +1,8 @@
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), ".pip"))
 
 import comfy.options
 comfy.options.enable_args_parsing()
-
-import custom
 
 import importlib.util
 import time
@@ -19,6 +16,7 @@ import gc
 import json
 
 import comfy.samplers
+import custom
 from helpers import jsonout, get_torch_info
 from comfy.cli_args import args
 
