@@ -35,7 +35,9 @@
 
   @media screen and (min-width: 960px) {
     width: 900px;
+    min-height: auto;
     height: auto;
+    max-height: 800px;
   }
 }
 

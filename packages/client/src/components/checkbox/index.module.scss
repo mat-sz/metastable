@@ -1,0 +1,39 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  input {
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .indicator {
+    background: var(--color-bg-panel-dark);
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+    transition: 0.2s ease-in-out all;
+    color: var(--color-fg-ok);
+
+    svg {
+      opacity: 0;
+      font-size: 1.5rem;
+      transition: 0.2s ease-in-out all;
+    }
+  }
+
+  input:checked + .indicator {
+    background: var(--color-bg-ok);
+
+    svg {
+      opacity: 1;
+    }
+  }
+}

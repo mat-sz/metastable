@@ -1,11 +1,11 @@
 import React from 'react';
 import { FaWindows, FaApple, FaLinux } from 'react-icons/fa';
+import { BsQuestion } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../../stores/MainStore';
-import { Item } from '../components/Item';
-import { BsQuestion } from 'react-icons/bs';
 import { RequirementsTable } from '../../../components/requirementsTable';
+import { Item } from '../components/Item';
 
 const ICONS: Record<string, React.ReactNode> = {
   windows: <FaWindows />,

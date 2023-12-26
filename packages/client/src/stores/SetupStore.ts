@@ -3,6 +3,7 @@ import { Requirement } from '@metastable/types';
 
 import { API } from '../api';
 import { filesize } from '../helpers';
+import { DownloadFile } from '../types/model';
 
 const GB = 1024 * 1024 * 1024;
 const VRAM_MIN = 2 * GB;
@@ -14,6 +15,7 @@ interface SetupItemState {
   description: string;
   status: 'incomplete' | 'ok' | 'warning' | 'error';
   requirements: Requirement[];
+  storage?: number;
 }
 
 export class SetupStore {
@@ -21,6 +23,7 @@ export class SetupStore {
   selected: string | undefined = undefined;
 
   pythonMode: 'system' | 'static' = 'static';
+  downloads: DownloadFile[] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -251,14 +254,15 @@ export class SetupStore {
     let description = `You have around ${humanFree} of free space left. That's more than enough!`;
     let status: SetupItemState['status'] = 'ok';
 
-    if (free < STORAGE_MIN) {
-      description = `A minimum of ${filesize(
-        STORAGE_MIN,
-      )} of free space is required.`;
+    const min = Math.max(this.predictedStorage.total, STORAGE_MIN);
+    const recommended = Math.max(min + STORAGE_MIN, STORAGE_RECOMMENDED);
+
+    if (free < min) {
+      description = `A minimum of ${filesize(min)} of free space is required.`;
       status = 'error';
-    } else if (free < STORAGE_RECOMMENDED) {
+    } else if (free < recommended) {
       description = `For optimal performance, ${filesize(
-        STORAGE_RECOMMENDED,
+        recommended,
       )} of free space is recommended.`;
       status = 'warning';
     }
@@ -268,5 +272,55 @@ export class SetupStore {
       status,
       requirements: [],
     };
+  }
+
+  get models(): SetupItemState {
+    if (!this.details) {
+      return {
+        description: 'Something went wrong.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    let description = `Select models to download and install.`;
+    let status: SetupItemState['status'] = 'incomplete';
+    const storage = this.downloads.reduce(
+      (total, file) => total + (file.size || 0),
+      0,
+    );
+
+    if (this.downloads.length > 0) {
+      description = `Selected ${
+        this.downloads.length
+      } model(s), download size: ${filesize(storage)}`;
+      status = 'ok';
+    }
+
+    return {
+      description,
+      status,
+      requirements: [],
+      storage,
+    };
+  }
+
+  get predictedStorage(): { total: number; breakdown: Record<string, number> } {
+    let total = 0;
+    const breakdown: Record<string, number> = {};
+
+    const pythonStorage = this.python.storage;
+    if (pythonStorage) {
+      total += pythonStorage;
+      breakdown['Python'] = pythonStorage;
+    }
+
+    const modelsStorage = this.models.storage;
+    if (modelsStorage) {
+      total += modelsStorage;
+      breakdown['Model downloads'] = modelsStorage;
+    }
+
+    return { total, breakdown };
   }
 }

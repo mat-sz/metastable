@@ -1,4 +1,5 @@
 import React from 'react';
+import { runInAction } from 'mobx';
 import { FaPython } from 'react-icons/fa';
 import { observer } from 'mobx-react-lite';
 
@@ -7,7 +8,6 @@ import { mainStore } from '../../../stores/MainStore';
 import { Item } from '../components/Item';
 import { RequirementsTable } from '../../../components/requirementsTable';
 import { Toggle } from '../../../components';
-import { runInAction } from 'mobx';
 
 export const PythonItem: React.FC = observer(() => {
   const item = mainStore.setup.python;

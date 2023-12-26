@@ -162,7 +162,27 @@ button {
 }
 
 table {
+  border-collapse: collapse;
+  width: 100%;
+
+  tr:not(:last-child) {
+    border-bottom: 1px solid var(--color-bg-panel-dark);
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+  }
+
   th {
+    color: var(--color-fg-soft);
+    background: var(--color-bg-panel-dark);
+    font-size: 0.8rem;
+    text-transform: uppercase;
     text-align: left;
+  }
+
+  td {
+    font-size: 0.9rem;
   }
 }

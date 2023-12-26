@@ -143,7 +143,7 @@ export class Setup {
 
   async info() {
     return {
-      required: true,
+      required: false,
     };
   }
 
