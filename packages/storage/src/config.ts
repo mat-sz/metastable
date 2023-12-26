@@ -4,8 +4,8 @@ interface ConfigType {
   python: {
     configured: boolean;
     mode: 'system' | 'static';
-    executablePath?: string;
-    packagesPath?: string;
+    pythonHome?: string;
+    packagesDir?: string;
   };
   civitai?: {
     apiKey?: string;

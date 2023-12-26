@@ -166,11 +166,11 @@ class BaseTask extends EventEmitter {
   progress: number = 0;
 
   async run(): Promise<void> {
-    throw new Error('Nto implemented');
+    throw new Error('Not implemented');
   }
 
   appendLog(data: string) {
-    this.log += `\n${data}`;
+    this.log += !this.log ? data : `\n${data}`;
     this.emit('state');
   }
 
@@ -303,12 +303,24 @@ export class Setup extends EventEmitter {
   settings: SetupSettings | undefined = undefined;
   private _status: SetupStatus['status'] = 'required';
   private _tasks: Record<string, BaseTask> = {};
+  private _pythonHome: string | undefined = undefined;
+  private _packagesDir: string | undefined = undefined;
+
+  private _checked = false;
 
   constructor(private metastable: Metastable) {
     super();
   }
 
   async status(): Promise<SetupStatus> {
+    if (!this._checked) {
+      const python = await this.metastable.storage.config.get('python');
+
+      if (python?.configured) {
+        this._status = 'done';
+      }
+    }
+
     return {
       status: this._status,
       tasks: Object.fromEntries(
@@ -360,9 +372,19 @@ export class Setup extends EventEmitter {
       } catch (e) {
         value.appendLog('Error: ' + String(e));
         value.setState('error');
+        return;
       }
       value.removeAllListeners();
     }
+
+    this._status = 'done';
+    await this.metastable.storage.config.set('python', {
+      configured: true,
+      mode: this.settings.pythonMode,
+      pythonHome: this._pythonHome,
+      packagesDir: this._packagesDir,
+    });
+    this.metastable.restartComfy();
   }
 
   async start(settings: SetupSettings) {
@@ -380,6 +402,7 @@ export class Setup extends EventEmitter {
       'python',
       'pip',
     );
+    this._packagesDir = packagesDir;
     let pythonHome: string | undefined = undefined;
 
     if (settings.pythonMode === 'static') {
@@ -389,6 +412,7 @@ export class Setup extends EventEmitter {
       );
       const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
       pythonHome = targetPath;
+      this._pythonHome = targetPath;
       tasks['python.download'] = new DownloadPythonTask(archivePath);
       tasks['python.extract'] = new ExtractPythonTask(archivePath, targetPath);
     }

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  BsArchiveFill,
-  BsChevronRight,
-  BsDownload,
-  BsHourglassSplit,
-} from 'react-icons/bs';
+import { BsArchiveFill, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
@@ -60,12 +55,6 @@ export const Step2: React.FC = observer(() => {
               </Item>
             ))}
           </List>
-          <div className={styles.footer}>
-            <button className={styles.cta}>
-              <span>Continue</span>
-              <BsChevronRight />
-            </button>
-          </div>
         </>
       ) : (
         <Loading />

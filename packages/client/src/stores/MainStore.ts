@@ -75,7 +75,7 @@ class MainStore {
   }
 
   get ready() {
-    return this.info.samplers.length && this.setup.status;
+    return this.infoReady && this.setup.status;
   }
 
   get deviceName() {
