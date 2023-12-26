@@ -47,6 +47,7 @@ export class Metastable extends EventEmitter {
     super();
     this.storage = new Storage(dataRoot);
     this.downloader.on('event', this.onEvent);
+    this.setup.on('event', this.onEvent);
 
     let timeout: any = undefined;
     chokidar.watch(this.storage.modelsDir, {}).on('all', event => {
@@ -75,7 +76,9 @@ export class Metastable extends EventEmitter {
     const config = await this.storage.config.all();
     this.python =
       config.python.mode === 'system' || !config.python.executablePath
-        ? await PythonInstance.fromSystem(path.resolve('../comfy/python/.pip'))
+        ? await PythonInstance.fromSystem(
+            path.join(this.storage.dataRoot, 'python', 'pip'),
+          )
         : await PythonInstance.fromDirectory(config.python.executablePath);
     this.comfy = new Comfy(this.python, this.settings.comfyMainPath);
 

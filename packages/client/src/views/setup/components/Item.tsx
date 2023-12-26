@@ -12,6 +12,7 @@ interface Props {
   title: React.ReactNode;
   description: React.ReactNode;
   status: 'incomplete' | 'ok' | 'warning' | 'error';
+  progress?: number;
 }
 
 export const Item: React.FC<React.PropsWithChildren<Props>> = observer(

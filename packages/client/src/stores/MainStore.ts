@@ -41,6 +41,7 @@ class MainStore {
 
   backendStatus: ComfyStatus = 'starting';
   backendLog: ComfyLogItem[] = [];
+  infoReady = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -62,7 +63,11 @@ class MainStore {
 
       this.socket.on('connected', () => this.onConnected());
       this.socket.on('disconnected', () => this.onDisconnected());
-      this.socket.on('message', message => this.onMessage(message));
+      this.socket.on('message', message => {
+        runInAction(() => {
+          this.onMessage(message);
+        });
+      });
       this.socket.connect();
     }
 
@@ -95,6 +100,9 @@ class MainStore {
 
   async init() {
     await this.refresh();
+    runInAction(() => {
+      this.infoReady = true;
+    });
   }
 
   async refresh() {
@@ -201,6 +209,9 @@ class MainStore {
         break;
       case 'info.torch':
         this.torchInfo = message.data;
+        break;
+      case 'setup.status':
+        this.setup.status = message.data;
         break;
     }
   }

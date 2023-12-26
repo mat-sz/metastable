@@ -47,6 +47,10 @@ export class SetupStore {
     });
   }
 
+  start() {
+    API.setup.start({ pythonMode: this.pythonMode, downloads: this.downloads });
+  }
+
   get requirements() {
     return [
       ...this.os.requirements,

@@ -90,4 +90,9 @@
       transform: rotate(0deg);
     }
   }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
 }

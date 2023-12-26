@@ -5,9 +5,15 @@ export interface Requirement {
   satisfied: boolean;
 }
 
+export interface SetupTask {
+  progress: number;
+  log: string;
+  state: 'queued' | 'in_progress' | 'done' | 'error';
+}
+
 export interface SetupStatus {
-  status: 'required' | 'complete' | 'in_progress';
-  tasks: Record<string, number>;
+  status: 'required' | 'done' | 'in_progress';
+  tasks: Record<string, SetupTask>;
 }
 
 export interface SetupOS {
@@ -51,3 +57,15 @@ export interface SetupDetails {
   python?: SetupPython;
   storage: SetupStorage;
 }
+
+export interface SetupSettings {
+  downloads: { name: string; type: string; url: string }[];
+  pythonMode: 'static' | 'system';
+}
+
+export interface SetupStatusEvent {
+  event: 'setup.status';
+  data: SetupStatus;
+}
+
+export type SetupEvent = SetupStatusEvent;

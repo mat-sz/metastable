@@ -1,18 +1,30 @@
 import semver from 'semver';
 import os from 'os';
+import path from 'path';
 import fs from 'fs/promises';
 import si from 'systeminformation';
 import disk from 'diskusage';
+import { EventEmitter } from 'events';
 import {
   Requirement,
   SetupDetails,
   SetupOS,
   SetupPython,
+  SetupSettings,
   SetupStatus,
+  SetupTask,
 } from '@metastable/types';
-import { PythonInstance } from '@metastable/python';
+import {
+  PromiseWrapper,
+  PythonInstance,
+  getPythonDownloadUrl,
+} from '@metastable/python';
 
 import type { Metastable } from './index.js';
+import { download } from '@metastable/downloader';
+import decompress from 'decompress';
+import { spawn } from 'child_process';
+import { rimraf } from 'rimraf';
 
 interface PipDependency {
   name: string;
@@ -146,13 +158,161 @@ async function getPython(
     return undefined;
   }
 }
-export class Setup {
-  constructor(private metastable: Metastable) {}
+
+class BaseTask extends EventEmitter {
+  log: string = '';
+  state: SetupTask['state'] = 'queued';
+  progress: number = 0;
+
+  async run(): Promise<void> {
+    throw new Error('Nto implemented');
+  }
+
+  appendLog(data: string) {
+    this.log += `\n${data}`;
+    this.emit('state');
+  }
+
+  setState(state: SetupTask['state']) {
+    this.state = state;
+    this.emit('state');
+  }
+
+  setProgress(progress: number) {
+    this.progress = progress;
+    this.emit('state');
+  }
+}
+
+class DownloadPythonTask extends BaseTask {
+  constructor(private archivePath: string) {
+    super();
+  }
+
+  async run() {
+    this.appendLog('Getting download URL.');
+    const url = await getPythonDownloadUrl();
+    this.appendLog(`Downloading from: ${url}`);
+    this.appendLog(`Will save to: ${this.archivePath}`);
+
+    await download(url, this.archivePath, task => {
+      this.setProgress((task.progress / task.size) * 100);
+    });
+
+    this.appendLog('Done.');
+  }
+}
+
+class ExtractPythonTask extends BaseTask {
+  constructor(
+    private archivePath: string,
+    private targetPath: string,
+  ) {
+    super();
+  }
+
+  async run() {
+    this.appendLog('Cleaning up...');
+    try {
+      await rimraf(this.targetPath);
+    } catch {}
+
+    this.appendLog(`Extracting ${this.archivePath} to ${this.targetPath}`);
+
+    await decompress(this.archivePath, this.targetPath, { strip: 1 });
+    this.appendLog('Done.');
+  }
+}
+
+class InstallPythonTask extends BaseTask {
+  constructor(
+    private packagesDir: string,
+    private pythonHome?: string,
+  ) {
+    super();
+  }
+
+  async run() {
+    const proc = spawn(
+      this.pythonHome ? path.join(this.pythonHome, 'bin', 'pip3') : 'pip3',
+      [
+        'install',
+        '--target',
+        this.packagesDir,
+        '--extra-index-url',
+        'https://download.pytorch.org/whl/cu121',
+        ...requiredPackages.map(pkg =>
+          pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
+        ),
+      ],
+      {
+        env: { PYTHONHOME: this.pythonHome, PYTHONPATH: this.packagesDir },
+      },
+    );
+
+    const wrapped = new PromiseWrapper<void>();
+    wrapped.on('finish', () => {
+      proc.kill('SIGTERM');
+    });
+
+    proc.stdout.on('data', chunk => {
+      this.appendLog(chunk.toString().trimEnd());
+    });
+    proc.stderr.on('data', chunk => {
+      this.appendLog(chunk.toString().trimEnd());
+    });
+
+    proc.on('exit', code => {
+      if (code !== 0) {
+        wrapped.reject(
+          new Error(`Process exited with non-zero exit code: ${code}`),
+        );
+      } else {
+        wrapped.resolve();
+      }
+    });
+    proc.on('error', err => {
+      wrapped.reject(err);
+    });
+
+    return await wrapped.promise;
+  }
+}
+
+class DownloadModelsTask extends BaseTask {
+  constructor(
+    private metastable: Metastable,
+    private downloads: SetupSettings['downloads'],
+  ) {
+    super();
+  }
+
+  async run() {
+    this.appendLog('Will continue your downloads to download manager.');
+    for (const download of this.downloads) {
+      this.metastable.downloadModel(download);
+    }
+  }
+}
+
+export class Setup extends EventEmitter {
+  settings: SetupSettings | undefined = undefined;
+  private _status: SetupStatus['status'] = 'required';
+  private _tasks: Record<string, BaseTask> = {};
+
+  constructor(private metastable: Metastable) {
+    super();
+  }
 
   async status(): Promise<SetupStatus> {
     return {
-      status: 'required',
-      tasks: {},
+      status: this._status,
+      tasks: Object.fromEntries(
+        Object.entries(this._tasks).map(([key, value]) => [
+          key,
+          { log: value.log, progress: value.progress, state: value.state },
+        ]),
+      ),
     };
   }
 
@@ -172,5 +332,73 @@ export class Setup {
         ...(await disk.check(dataRoot)),
       },
     };
+  }
+
+  private async emitStatus() {
+    this.emit('event', {
+      event: 'setup.status',
+      data: await this.status(),
+    });
+  }
+
+  async run() {
+    if (!this.settings) {
+      throw new Error('Error.');
+    }
+
+    for (const value of Object.values(this._tasks)) {
+      value.on('state', () => this.emitStatus());
+      value.setState('in_progress');
+      try {
+        await value.run();
+        value.setProgress(100);
+        value.setState('done');
+      } catch (e) {
+        value.appendLog('Error: ' + String(e));
+        value.setState('error');
+      }
+      value.removeAllListeners();
+    }
+  }
+
+  async start(settings: SetupSettings) {
+    if (this.settings) {
+      return;
+    }
+
+    this.settings = settings;
+
+    this._status = 'in_progress';
+    const tasks: Record<string, BaseTask> = {};
+
+    const packagesDir = path.join(
+      this.metastable.storage.dataRoot,
+      'python',
+      'pip',
+    );
+    let pythonHome: string | undefined = undefined;
+
+    if (settings.pythonMode === 'static') {
+      const archivePath = path.join(
+        this.metastable.storage.dataRoot,
+        'python.tar.gz',
+      );
+      const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
+      pythonHome = targetPath;
+      tasks['python.download'] = new DownloadPythonTask(archivePath);
+      tasks['python.extract'] = new ExtractPythonTask(archivePath, targetPath);
+    }
+    tasks['python.install'] = new InstallPythonTask(packagesDir, pythonHome);
+
+    if (settings.downloads.length) {
+      tasks['models.download'] = new DownloadModelsTask(
+        this.metastable,
+        settings.downloads,
+      );
+    }
+
+    this._tasks = tasks;
+    this.emitStatus();
+    this.run();
   }
 }

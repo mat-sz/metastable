@@ -7,7 +7,6 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@types/decompress": "^4.2.7",
     "@types/node": "^20.10.3",
     "@types/semver": "^7.5.6",
     "@types/which": "^3.0.3",
@@ -16,7 +15,6 @@
   },
   "dependencies": {
     "@metastable/fs-helpers": "*",
-    "decompress": "^4.2.1",
     "semver": "^7.5.4",
     "which": "^4.0.0"
   },

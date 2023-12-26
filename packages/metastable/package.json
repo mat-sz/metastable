@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@metastable/types": "*",
+    "@types/decompress": "^4.2.7",
     "@types/node": "^20.10.3",
     "typescript": "^5.3.2"
   },
@@ -17,8 +18,10 @@
     "@metastable/fs-helpers": "*",
     "@metastable/storage": "*",
     "chokidar": "^3.5.3",
+    "decompress": "^4.2.1",
     "diskusage": "^1.2.0",
     "nanoid": "^5.0.4",
+    "rimraf": "^5.0.5",
     "systeminformation": "^5.21.22"
   },
   "exports": {

@@ -134,6 +134,9 @@ async function createWindow() {
   ipcMain.handle('setup:details', async () => {
     return await metastable.setup.details();
   });
+  ipcMain.handle('setup:start', async (_, settings: any) => {
+    return await metastable.setup.start(settings);
+  });
   ipcMain.handle(
     'prompts:create',
     async (_, id: Project['id'], settings: any) => {

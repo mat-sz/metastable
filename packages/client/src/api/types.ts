@@ -3,6 +3,7 @@ import {
   Project,
   ProjectSettings,
   SetupDetails,
+  SetupSettings,
   SetupStatus,
 } from '@metastable/types';
 
@@ -13,6 +14,7 @@ export interface API {
   setup: {
     status(): Promise<SetupStatus>;
     details(): Promise<SetupDetails>;
+    start(settings: SetupSettings): Promise<void>;
   };
   projects: {
     all(): Promise<Project[]>;

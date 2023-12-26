@@ -14,6 +14,9 @@ export const WebAPI: API = {
     async details() {
       return await httpGet('/setup/details');
     },
+    async start(settings) {
+      return await httpPost('/setup/start', settings);
+    },
   },
   projects: {
     async all() {

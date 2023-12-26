@@ -97,7 +97,7 @@ async function getLatestReleaseInfo() {
   }
 }
 
-async function getPythonDownloadUrl() {
+export async function getPythonDownloadUrl() {
   const platform = await getPlatform();
   const release = await getLatestReleaseInfo();
   const assets = release.assets;
@@ -128,10 +128,4 @@ async function getPythonDownloadUrl() {
   }
 
   throw new Error('Unable to find a suitable Python build');
-}
-
-export class PythonDownloader {
-  constructor() {}
-
-  async download(targetDirectory: string) {}
 }

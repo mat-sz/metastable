@@ -146,6 +146,23 @@ export class DownloadTask extends EventEmitter implements Download {
   }
 }
 
+export function download(
+  url: string,
+  savePath: string,
+  onProgress?: (task: DownloadTask) => void,
+): Promise<void> {
+  return new Promise(resolve => {
+    const task = new DownloadTask(url, savePath);
+    task.prepare().then(() => task.start());
+    task.on('progress', () => {
+      onProgress?.(task);
+    });
+    task.on('end', () => {
+      resolve();
+    });
+  });
+}
+
 export class Downloader extends EventEmitter {
   queue: DownloadTask[] = [];
   current: DownloadItem | undefined = undefined;

@@ -1,5 +1,6 @@
 import { ComfyEvent, ComfyLogItem, ComfyStatus } from './comfy.js';
 import { DownloadEvent } from './download.js';
+import { SetupEvent } from './setup.js';
 
 export interface ModelsChangedEvent {
   event: 'models.changed';
@@ -32,4 +33,5 @@ export type AnyEvent =
   | BackendStatusEvent
   | BackendLogEvent
   | BackendLogBufferEvent
-  | PingEvent;
+  | PingEvent
+  | SetupEvent;
