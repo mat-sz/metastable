@@ -30,6 +30,10 @@
 
   &.open {
     height: 20rem;
+
+    .status.incomplete {
+      transform: rotate(90deg);
+    }
   }
 
   .info {
@@ -79,6 +83,11 @@
     &.error {
       color: var(--color-fg-error);
       background: var(--color-bg-error);
+    }
+
+    &.incomplete {
+      transition: 0.2s ease-in-out all;
+      transform: rotate(0deg);
     }
   }
 }

@@ -4,8 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { BsCheck, BsChevronRight, BsExclamation, BsX } from 'react-icons/bs';
 
 import styles from './Item.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { runInAction } from 'mobx';
+import { useListItem } from './ListContext';
 
 interface Props {
   id: string;
@@ -17,20 +16,15 @@ interface Props {
 
 export const Item: React.FC<React.PropsWithChildren<Props>> = observer(
   ({ id, icon, title, description, status, children }) => {
-    const selected = id === mainStore.setup.selected;
-    const otherSelected = !!mainStore.setup.selected && !selected;
+    const { toggle, isOpen, shouldDarken } = useListItem(id);
 
     return (
       <div
         className={clsx(styles.item, {
-          [styles.open]: selected,
-          [styles.darken]: otherSelected,
+          [styles.open]: isOpen,
+          [styles.darken]: shouldDarken,
         })}
-        onClick={() => {
-          runInAction(() => {
-            mainStore.setup.selected = selected ? undefined : id;
-          });
-        }}
+        onClick={toggle}
       >
         <div className={styles.header}>
           <div className={styles.icon}>{icon}</div>

@@ -65,7 +65,7 @@ export class SetupStore {
       };
     }
 
-    let description = 'Great! Your operating system is compatible.';
+    let description = 'Your operating system is compatible.';
     let status: SetupItemState['status'] = 'ok';
 
     const os = this.details.os;
@@ -138,7 +138,7 @@ export class SetupStore {
       };
     }
 
-    let description = 'Great! Your computer is compatible.';
+    let description = 'Your computer is compatible.';
     let status: SetupItemState['status'] = 'ok';
 
     const requirements: Requirement[] = [];

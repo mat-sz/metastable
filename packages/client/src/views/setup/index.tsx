@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
+import { List } from './components/List';
 import { Loading } from '../../components';
 import { OSItem } from './items/OSItem';
 import { HardwareItem } from './items/HardwareItem';
@@ -23,14 +24,13 @@ export const Setup: React.FC = observer(() => {
       {details ? (
         <>
           <div className={styles.list}>
-            <OSItem />
-            <HardwareItem />
-            <PythonItem />
-            <StorageItem />
-            <ModelsItem />
-            <div className={styles.hint}>
-              Click on an item to reveal more options.
-            </div>
+            <List>
+              <OSItem />
+              <HardwareItem />
+              <PythonItem />
+              <StorageItem />
+              <ModelsItem />
+            </List>
           </div>
           <div className={styles.footer}>
             <button className={styles.cta}>
