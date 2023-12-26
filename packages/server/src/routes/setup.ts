@@ -10,9 +10,5 @@ export function routesSetup(metastable: Metastable) {
     fastify.get('/details', async () => {
       return await metastable.setup.details();
     });
-
-    fastify.get('/requirements', async () => {
-      return await metastable.setup.requirements();
-    });
   };
 }

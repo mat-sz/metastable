@@ -11,7 +11,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setup: {
     info: () => ipcRenderer.invoke('setup:info'),
     details: () => ipcRenderer.invoke('setup:details'),
-    requirements: () => ipcRenderer.invoke('setup:requirements'),
   },
   projects: {
     all: () => ipcRenderer.invoke('projects:all'),

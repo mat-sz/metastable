@@ -12,7 +12,6 @@ export interface API {
   setup: {
     info(): Promise<any>;
     details(): Promise<any>;
-    requirements(): Promise<Requirement[]>;
   };
   projects: {
     all(): Promise<Project[]>;

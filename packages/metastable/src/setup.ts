@@ -1,5 +1,4 @@
 import semver from 'semver';
-import path from 'path';
 import os from 'os';
 import fs from 'fs/promises';
 import si from 'systeminformation';
@@ -137,67 +136,6 @@ async function getPython(python?: PythonInstance) {
     return undefined;
   }
 }
-
-async function osRequirements() {
-  return [];
-}
-
-async function pythonRequirements(python?: PythonInstance) {
-  const requirements: Requirement[] = [];
-
-  const pythonRequirement = {
-    name: 'Python',
-    expected: REQUIRED_PYTHON_VERSION,
-    actual: 'Not installed',
-    satisfied: false,
-  };
-
-  let isPython38OrNewer = false;
-  if (python) {
-    try {
-      const version = await python.version();
-      pythonRequirement.actual = version.version;
-      pythonRequirement.satisfied = semver.satisfies(
-        version.version,
-        REQUIRED_PYTHON_VERSION,
-      );
-
-      if (semver.satisfies(version.version, '>=3.8.0')) {
-        isPython38OrNewer = true;
-      }
-    } catch {}
-  }
-
-  requirements.push(pythonRequirement);
-
-  // let packageVersions: Record<string, string | null> = {};
-
-  // if (isPython38OrNewer && python) {
-  //   try {
-  //     packageVersions = await python.packages(
-  //       requiredPackages.map(pkg => pkg.name),
-  //     );
-  //   } catch {}
-  // }
-
-  // for (const pkg of requiredPackages) {
-  //   const version = packageVersions[pkg.name];
-
-  //   requirements.push({
-  //     name: pkg.name,
-  //     expected: pkg.version || 'any',
-  //     actual: version || 'Not installed',
-  //     satisfied: version
-  //       ? pkg.version
-  //         ? semver.satisfies(version, pkg.version)
-  //         : true
-  //       : false,
-  //   });
-  // }
-
-  return requirements;
-}
-
 export class Setup {
   constructor(private metastable: Metastable) {}
 
@@ -222,17 +160,6 @@ export class Setup {
         dataRoot,
         ...(await disk.check(dataRoot)),
       },
-      // python
-      // pip
-      // storage space
-      // gpu + vram
     };
-  }
-
-  async requirements() {
-    return [
-      ...(await osRequirements()),
-      ...(await pythonRequirements(this.metastable.python)),
-    ];
   }
 }

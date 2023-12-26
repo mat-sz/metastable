@@ -18,7 +18,6 @@ interface SetupItemState {
 
 export class SetupStore {
   details: any = undefined;
-  requirements: Requirement[] = [];
   selected: string | undefined = undefined;
 
   pythonMode: 'system' | 'static' = 'static';
@@ -30,11 +29,18 @@ export class SetupStore {
 
   async init() {
     const details = await API.setup.details();
-    const compatibility = await API.setup.requirements();
     runInAction(() => {
       this.details = details;
-      this.requirements = compatibility;
     });
+  }
+
+  get requirements() {
+    return [
+      ...this.os.requirements,
+      ...this.hardware.requirements,
+      ...this.python.requirements,
+      ...this.storage.requirements,
+    ];
   }
 
   get os(): SetupItemState {
