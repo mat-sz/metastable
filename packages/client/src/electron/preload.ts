@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     info: () => ipcRenderer.invoke('instance:info'),
   },
   setup: {
-    info: () => ipcRenderer.invoke('setup:info'),
+    status: () => ipcRenderer.invoke('setup:status'),
     details: () => ipcRenderer.invoke('setup:details'),
   },
   projects: {

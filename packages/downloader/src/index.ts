@@ -130,7 +130,9 @@ export class DownloadTask extends EventEmitter implements Download {
         }
       });
       data.on('close', () => {
-        onClose();
+        if (this.cancelled) {
+          onClose();
+        }
       });
       data.pipe(writer, { end: false });
     };

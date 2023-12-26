@@ -16,7 +16,7 @@ export const App: React.FC = observer(() => {
     return <div className="app">Loading...</div>;
   }
 
-  if (mainStore.setupRequired) {
+  if (mainStore.setup?.status?.status !== 'complete') {
     return (
       <UI>
         <div className="app">

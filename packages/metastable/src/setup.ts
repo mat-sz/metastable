@@ -3,7 +3,13 @@ import os from 'os';
 import fs from 'fs/promises';
 import si from 'systeminformation';
 import disk from 'diskusage';
-import { Requirement } from '@metastable/types';
+import {
+  Requirement,
+  SetupDetails,
+  SetupOS,
+  SetupPython,
+  SetupStatus,
+} from '@metastable/types';
 import { PythonInstance } from '@metastable/python';
 
 import type { Metastable } from './index.js';
@@ -40,7 +46,7 @@ const requiredPackages: PipDependency[] = [
 
 const REQUIRED_PYTHON_VERSION = '3.8.0 - 3.11.x';
 
-async function getOS() {
+async function getOS(): Promise<SetupOS> {
   const platform = os.platform();
   const release = os.release();
   let platformCompatible = false;
@@ -88,7 +94,9 @@ async function getOS() {
   };
 }
 
-async function getPython(python?: PythonInstance) {
+async function getPython(
+  python?: PythonInstance,
+): Promise<SetupPython | undefined> {
   if (!python) {
     return undefined;
   }
@@ -141,13 +149,14 @@ async function getPython(python?: PythonInstance) {
 export class Setup {
   constructor(private metastable: Metastable) {}
 
-  async info() {
+  async status(): Promise<SetupStatus> {
     return {
-      required: false,
+      status: 'required',
+      tasks: {},
     };
   }
 
-  async details() {
+  async details(): Promise<SetupDetails> {
     const graphics = await si.graphics();
     const dataRoot = this.metastable.storage.dataRoot;
 

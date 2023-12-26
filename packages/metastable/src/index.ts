@@ -49,7 +49,11 @@ export class Metastable extends EventEmitter {
     this.downloader.on('event', this.onEvent);
 
     let timeout: any = undefined;
-    chokidar.watch(this.storage.modelsDir, {}).on('all', () => {
+    chokidar.watch(this.storage.modelsDir, {}).on('all', event => {
+      if (event !== 'add' && event !== 'unlink') {
+        return;
+      }
+
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         this.onEvent({

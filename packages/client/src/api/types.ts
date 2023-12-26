@@ -2,7 +2,8 @@ import {
   InstanceInfo,
   Project,
   ProjectSettings,
-  Requirement,
+  SetupDetails,
+  SetupStatus,
 } from '@metastable/types';
 
 export interface API {
@@ -10,8 +11,8 @@ export interface API {
     info(): Promise<InstanceInfo>;
   };
   setup: {
-    info(): Promise<any>;
-    details(): Promise<any>;
+    status(): Promise<SetupStatus>;
+    details(): Promise<SetupDetails>;
   };
   projects: {
     all(): Promise<Project[]>;

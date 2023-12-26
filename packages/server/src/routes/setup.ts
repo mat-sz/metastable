@@ -3,8 +3,8 @@ import type { Metastable } from '@metastable/metastable';
 
 export function routesSetup(metastable: Metastable) {
   return async (fastify: FastifyInstance) => {
-    fastify.get('/info', async () => {
-      return await metastable.setup.info();
+    fastify.get('/status', async () => {
+      return await metastable.setup.status();
     });
 
     fastify.get('/details', async () => {

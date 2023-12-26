@@ -8,8 +8,8 @@ export const WebAPI: API = {
     },
   },
   setup: {
-    async info() {
-      return await httpGet('/setup/info');
+    async status() {
+      return await httpGet('/setup/status');
     },
     async details() {
       return await httpGet('/setup/details');

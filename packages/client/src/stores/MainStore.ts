@@ -25,7 +25,6 @@ class MainStore {
   projects = new ProjectStore();
   downloads = new DownloadStore();
   connected = false;
-  ready = false;
   private socket;
   info: InstanceInfo = {
     samplers: [],
@@ -35,7 +34,6 @@ class MainStore {
   torchInfo?: ComfyTorchInfo = undefined;
 
   setup = new SetupStore();
-  setupRequired = false;
 
   promptRemaining = 0;
   promptValue = 0;
@@ -71,6 +69,10 @@ class MainStore {
     this.init();
   }
 
+  get ready() {
+    return this.info.samplers.length && this.setup.status;
+  }
+
   get deviceName() {
     if (this.status === 'ready') {
       const device = this.torchInfo?.device;
@@ -93,13 +95,6 @@ class MainStore {
 
   async init() {
     await this.refresh();
-
-    const setupInfo = await API.setup.info();
-
-    runInAction(() => {
-      this.setupRequired = setupInfo.required;
-      this.ready = true;
-    });
   }
 
   async refresh() {

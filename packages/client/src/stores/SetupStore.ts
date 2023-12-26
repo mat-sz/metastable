@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { Requirement } from '@metastable/types';
+import { Requirement, SetupDetails, SetupStatus } from '@metastable/types';
 
 import { API } from '../api';
 import { filesize } from '../helpers';
@@ -19,7 +19,8 @@ interface SetupItemState {
 }
 
 export class SetupStore {
-  details: any = undefined;
+  status: SetupStatus | undefined = undefined;
+  details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
 
   pythonMode: 'system' | 'static' = 'static';
@@ -31,9 +32,18 @@ export class SetupStore {
   }
 
   async init() {
+    this.refresh();
+
     const details = await API.setup.details();
     runInAction(() => {
       this.details = details;
+    });
+  }
+
+  async refresh() {
+    const status = await API.setup.status();
+    runInAction(() => {
+      this.status = status;
     });
   }
 
@@ -71,7 +81,7 @@ export class SetupStore {
           extraRequirements.push({
             name: 'GNU libc',
             expected: true,
-            actual: os.isGlibc,
+            actual: !!os.isGlibc,
             satisfied: !!os.isGlibc,
           });
 
@@ -134,7 +144,7 @@ export class SetupStore {
     const requirements: Requirement[] = [];
 
     const vendor = this.details.graphics[0]?.vendor;
-    const vram = this.details.graphics[0]?.vram;
+    const vram = this.details.graphics[0]?.vram || 0;
     const humanVram = vram ? filesize(vram) : 'not available';
 
     requirements.push({
@@ -214,7 +224,7 @@ export class SetupStore {
     } else {
       requirements.push({
         name: 'python',
-        expected: python.required,
+        expected: '',
         actual: 'unavailable',
         satisfied: false,
       });

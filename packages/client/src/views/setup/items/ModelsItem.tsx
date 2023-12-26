@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsArrowUpRightSquare, BsBoxFill, BsStarFill } from 'react-icons/bs';
+import { BsBoxFill } from 'react-icons/bs';
 
-import styles from './ModelsItem.module.scss';
 import { Item } from '../components/Item';
-import { TYPE_NAMES, downloadable } from '../../../data/models';
-import { IconButton } from '../../../components';
 import { Checkbox } from '../../../components/checkbox';
 import { ModelList } from '../../../components/modelList';
 import { mainStore } from '../../../stores/MainStore';
-import { runInAction, toJS } from 'mobx';
+import { runInAction } from 'mobx';
 import { DownloadableModel } from '../../../types/model';
 
 interface ModelCheckboxProps {

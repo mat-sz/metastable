@@ -128,8 +128,8 @@ async function createWindow() {
       dataDir: url.pathToFileURL(dataRoot).toString(),
     };
   });
-  ipcMain.handle('setup:info', async () => {
-    return await metastable.setup.info();
+  ipcMain.handle('setup:status', async () => {
+    return await metastable.setup.status();
   });
   ipcMain.handle('setup:details', async () => {
     return await metastable.setup.details();

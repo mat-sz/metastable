@@ -11,7 +11,7 @@ import { Item } from '../components/Item';
 export const StorageItem: React.FC = observer(() => {
   const item = mainStore.setup.storage;
 
-  const storage = mainStore.setup.details.storage;
+  const storage = mainStore.setup.details?.storage;
   const predicted = mainStore.setup.predictedStorage;
   const entries = Object.entries(predicted.breakdown);
 
