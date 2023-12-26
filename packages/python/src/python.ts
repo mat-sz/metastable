@@ -1,6 +1,7 @@
 import which from 'which';
 import { spawn } from 'child_process';
 import path from 'path';
+import os from 'os';
 import { exists } from '@metastable/fs-helpers';
 
 import { stdout } from './spawn.js';
@@ -29,23 +30,14 @@ async function getPythonCommand() {
 }
 
 interface PythonVersion {
-  tag: { interpreter: string; abi: string; platform: string };
   version: string;
 }
 
 const PYTHON_VERSION = `
-from packaging.tags import sys_tags
 from platform import python_version
 import json
 
-tag = next(sys_tags())
-
 print(json.dumps({
-  "tag": {
-    "interpreter": tag.interpreter,
-    "abi": tag.abi,
-    "platform": tag.platform
-  },
   "version": python_version()
 }))
 `;
@@ -68,7 +60,7 @@ print(json.dumps(output))
 
 export class PythonInstance {
   constructor(
-    private path: string,
+    public path: string,
     private pythonHome?: string,
     private packagesDir?: string,
   ) {}
@@ -131,11 +123,12 @@ export class PythonInstance {
 
   static async fromDirectory(dir: string, packagesDir?: string) {
     dir = path.resolve(dir);
-    const instance = new PythonInstance(
-      path.join(dir, 'bin', 'python3'),
-      dir,
-      packagesDir,
-    );
+    const pythonBin =
+      os.platform() === 'win32'
+        ? path.join(dir, 'python.exe')
+        : path.join(dir, 'bin', 'python3');
+
+    const instance = new PythonInstance(pythonBin, dir, packagesDir);
 
     // Ensure everything works.
     await instance.version();

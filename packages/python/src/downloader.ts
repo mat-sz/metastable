@@ -71,7 +71,7 @@ async function getPlatform() {
       return 'x86_64-apple-darwin';
     }
   } else if (platform === 'win32' && os.arch() === 'x64') {
-    return 'x86_64-pc-windows-msvc-shared';
+    return 'x86_64-pc-windows-msvc-static';
   } else if (platform === 'linux') {
     const arch = await getLinuxArchitecture();
     if (!arch) {

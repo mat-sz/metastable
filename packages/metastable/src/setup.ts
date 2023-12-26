@@ -242,9 +242,20 @@ class InstallPythonTask extends BaseTask {
       pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
     );
 
+    const python = this.pythonHome
+      ? await PythonInstance.fromDirectory(this.pythonHome)
+      : await PythonInstance.fromSystem();
+
+    const env = {
+      PYTHONHOME: this.pythonHome!,
+      PYTHONPATH: this.packagesDir!,
+    };
+
     const proc = spawn(
-      this.pythonHome ? path.join(this.pythonHome, 'bin', 'pip3') : 'pip3',
+      python.path,
       [
+        '-m',
+        'pip',
         'install',
         ...(this.packagesDir ? ['--target', this.packagesDir] : []),
         '--extra-index-url',
@@ -252,7 +263,7 @@ class InstallPythonTask extends BaseTask {
         ...required,
       ],
       {
-        env: { PYTHONHOME: this.pythonHome, PYTHONPATH: this.packagesDir },
+        env,
       },
     );
 

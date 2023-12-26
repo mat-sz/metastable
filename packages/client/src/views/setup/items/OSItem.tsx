@@ -8,7 +8,7 @@ import { RequirementsTable } from '../../../components/requirementsTable';
 import { Item } from '../components/Item';
 
 const ICONS: Record<string, React.ReactNode> = {
-  windows: <FaWindows />,
+  win32: <FaWindows />,
   darwin: <FaApple />,
   linux: <FaLinux />,
 };
