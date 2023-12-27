@@ -7,6 +7,10 @@ interface ConfigType {
     pythonHome?: string;
     packagesDir?: string;
   };
+  comfy?: {
+    args?: string[];
+    env?: Record<string, string>;
+  };
   civitai?: {
     apiKey?: string;
   };

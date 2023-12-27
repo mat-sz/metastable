@@ -35,15 +35,15 @@ export interface SetupOS {
 
 export interface SetupPython {
   hasPip: boolean;
-  version: string;
+  version?: string;
   required: string;
   compatible: boolean;
-  requirements: Requirement[];
+  requirements?: Requirement[];
 }
 
 export interface SetupGraphics {
   vendor: string;
-  vram?: number;
+  vram: number;
 }
 
 export interface SetupStorage {
@@ -55,13 +55,14 @@ export interface SetupStorage {
 export interface SetupDetails {
   os: SetupOS;
   graphics: SetupGraphics[];
-  python?: SetupPython;
+  python: SetupPython;
   storage: SetupStorage;
 }
 
 export interface SetupSettings {
   downloads: { name: string; type: string; url: string }[];
   pythonMode: 'static' | 'system';
+  torchMode: 'nvidia' | 'amd' | 'cpu';
 }
 
 export interface SetupStatusEvent {

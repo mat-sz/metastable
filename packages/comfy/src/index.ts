@@ -24,6 +24,8 @@ export class Comfy extends EventEmitter {
   constructor(
     public python: PythonInstance,
     private mainPath = path.join(baseDir, 'python', 'main.py'),
+    private args: string[] = [],
+    private env: Record<string, string> = {},
   ) {
     super();
 
@@ -55,14 +57,8 @@ export class Comfy extends EventEmitter {
       return;
     }
 
-    const args: string[] = [];
-
-    if (os.arch() === 'arm64' && os.platform() === 'darwin') {
-      // We're running on an M1 Mac.
-      args.push('--force-fp16');
-    }
-
-    const proc = this.python.spawn([this.mainPath, ...args]);
+    const args: string[] = [...this.args];
+    const proc = this.python.spawn([this.mainPath, ...args], this.env);
 
     proc.stdin.setDefaultEncoding('utf-8');
     proc.stdout.setEncoding('utf-8');

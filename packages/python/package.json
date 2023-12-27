@@ -14,7 +14,6 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
-    "@metastable/fs-helpers": "*",
     "semver": "^7.5.4",
     "which": "^4.0.0"
   },

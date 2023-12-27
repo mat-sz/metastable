@@ -75,6 +75,7 @@ export class Metastable extends EventEmitter {
 
     const config = await this.storage.config.all();
     if (!config.python.configured) {
+      this.python = await PythonInstance.fromSystem();
       return;
     }
 
@@ -90,7 +91,12 @@ export class Metastable extends EventEmitter {
           config.python.pythonHome!,
           config.python.packagesDir,
         );
-    this.comfy = new Comfy(this.python, this.settings.comfyMainPath);
+    this.comfy = new Comfy(
+      this.python,
+      this.settings.comfyMainPath,
+      config.comfy?.args,
+      config.comfy?.env,
+    );
 
     const comfy = this.comfy;
     comfy.on('event', this.onEvent);

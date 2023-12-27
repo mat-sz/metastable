@@ -1,5 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { Requirement, SetupDetails, SetupStatus } from '@metastable/types';
+import {
+  Requirement,
+  SetupDetails,
+  SetupSettings,
+  SetupStatus,
+} from '@metastable/types';
 
 import { API } from '../api';
 import { filesize } from '../helpers';
@@ -23,7 +28,8 @@ export class SetupStore {
   details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
 
-  pythonMode: 'system' | 'static' = 'static';
+  pythonMode: SetupSettings['pythonMode'] = 'static';
+  gpuIndex: number = 0;
   downloads: DownloadFile[] = [];
 
   constructor() {
@@ -37,6 +43,11 @@ export class SetupStore {
     const details = await API.setup.details();
     runInAction(() => {
       this.details = details;
+      const gpus = [...this.details.graphics]
+        .map((value, i) => ({ i, ...value }))
+        .sort((a, b) => b.vram - a.vram);
+      const bestGpu = gpus[0];
+      this.gpuIndex = bestGpu?.i || 0;
     });
   }
 
@@ -48,7 +59,22 @@ export class SetupStore {
   }
 
   start() {
-    API.setup.start({ pythonMode: this.pythonMode, downloads: this.downloads });
+    let torchMode: SetupSettings['torchMode'] = 'cpu';
+
+    const gpu = this.details?.graphics[this.gpuIndex];
+    if (gpu) {
+      if (gpu.vendor.toLowerCase().includes('nvidia')) {
+        torchMode = 'nvidia';
+      } else if (gpu.vendor.toLowerCase().includes('amd')) {
+        torchMode = 'amd';
+      }
+    }
+
+    API.setup.start({
+      pythonMode: this.pythonMode,
+      downloads: this.downloads,
+      torchMode,
+    });
   }
 
   get requirements() {
@@ -147,9 +173,11 @@ export class SetupStore {
 
     const requirements: Requirement[] = [];
 
-    const vendor = this.details.graphics[0]?.vendor;
-    const vram = this.details.graphics[0]?.vram || 0;
-    const humanVram = vram ? filesize(vram) : 'not available';
+    const gpu = this.details.graphics[this.gpuIndex];
+
+    const vendor = gpu?.vendor;
+    const vram = gpu?.vram || 0;
+    const humanVram = vram ? filesize(vram) : 'unknown';
 
     requirements.push({
       name: 'GPU Vendor',
@@ -164,7 +192,7 @@ export class SetupStore {
       satisfied: vram > VRAM_RECOMMENDED,
     });
 
-    if (!vendor) {
+    if (!gpu) {
       description = 'A GPU is required for an optimal user experience.';
       status = 'error';
     } else if (vram < VRAM_MIN) {
@@ -204,7 +232,7 @@ export class SetupStore {
     const python = this.details.python;
     const storage = 5 * GB;
 
-    if (python) {
+    if (python.version) {
       requirements.push({
         name: 'python',
         expected: python.required,
@@ -217,7 +245,7 @@ export class SetupStore {
         actual: python.hasPip,
         satisfied: python.hasPip,
       });
-      requirements.push(...python.requirements);
+      requirements.push(...(python.requirements || []));
 
       if (this.pythonMode === 'static') {
         description = `Python ${python.version} is installed, but we'll install and configure a separate instance.`;
@@ -230,7 +258,7 @@ export class SetupStore {
     } else {
       requirements.push({
         name: 'python',
-        expected: '',
+        expected: python.required,
         actual: 'unavailable',
         satisfied: false,
       });

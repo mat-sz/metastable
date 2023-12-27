@@ -2,7 +2,6 @@ import which from 'which';
 import { spawn } from 'child_process';
 import path from 'path';
 import os from 'os';
-import { exists } from '@metastable/fs-helpers';
 
 import { stdout } from './spawn.js';
 
@@ -15,14 +14,11 @@ const PYTHON_COMMANDS = [
   'python',
 ];
 
-async function hasCommand(name: string) {
-  return !!(await which(name, { nothrow: true }));
-}
-
 async function getPythonCommand() {
   for (const command of PYTHON_COMMANDS) {
-    if (await hasCommand(command)) {
-      return command;
+    const binPath = await which(command, { nothrow: true });
+    if (binPath) {
+      return binPath;
     }
   }
 
@@ -79,12 +75,14 @@ export class PythonInstance {
     return env;
   }
 
-  spawn(args: string[]) {
+  spawn(args: string[], env?: Record<string, string>) {
     const proc = spawn(this.path, ['-u', ...args], {
       cwd: process.cwd(),
       detached: true,
       env: {
         ...process.env,
+        ...this.env,
+        ...env,
       },
     });
 
@@ -114,10 +112,11 @@ export class PythonInstance {
   }
 
   async hasPip(): Promise<boolean> {
-    if (this.pythonHome) {
-      return await exists(path.join(this.pythonHome, 'bin', 'pip3'));
-    } else {
-      return await hasCommand('pip3');
+    try {
+      const out = await this.stdout(['-m', 'pip', '--version']);
+      return out.startsWith('pip ');
+    } catch {
+      return false;
     }
   }
 

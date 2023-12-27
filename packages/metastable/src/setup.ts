@@ -107,11 +107,14 @@ async function getOS(): Promise<SetupOS> {
   };
 }
 
-async function getPython(
-  python?: PythonInstance,
-): Promise<SetupPython | undefined> {
+async function getPython(python?: PythonInstance): Promise<SetupPython> {
+  const noPython = {
+    required: REQUIRED_PYTHON_VERSION,
+    compatible: false,
+    hasPip: false,
+  };
   if (!python) {
-    return undefined;
+    return noPython;
   }
 
   try {
@@ -156,7 +159,7 @@ async function getPython(
       requirements,
     };
   } catch {
-    return undefined;
+    return noPython;
   }
 }
 
@@ -230,6 +233,7 @@ class ExtractPythonTask extends BaseTask {
 
 class InstallPythonTask extends BaseTask {
   constructor(
+    private torchMode: SetupSettings['torchMode'],
     private packagesDir?: string,
     private pythonHome?: string,
   ) {
@@ -251,17 +255,38 @@ class InstallPythonTask extends BaseTask {
       PYTHONPATH: this.packagesDir!,
     };
 
-    // Index URL:
-    // macOS:
-    //   CPU: https://download.pytorch.org/whl/nightly/cpu + --force-fp16 to args
-    // Linux:
-    //   NVIDIA: https://download.pytorch.org/whl/cu121
-    //   CPU: https://download.pytorch.org/whl/cpu
-    //   AMD: https://download.pytorch.org/whl/nightly/rocm5.7
-    // Windows:
-    //   NVIDIA: https://download.pytorch.org/whl/cu121
-    //   CPU: none
-    //   AMD (DirectML): torch-directml instead of torch, + --directml to args
+    let extraIndexUrl: string | undefined = undefined;
+    const platform = os.platform();
+
+    switch (platform) {
+      case 'win32':
+        switch (this.torchMode) {
+          case 'nvidia':
+            extraIndexUrl = 'https://download.pytorch.org/whl/cu121';
+            break;
+          case 'amd':
+            required = required.map(pkg =>
+              pkg === 'torch' ? 'torch-directml' : pkg,
+            );
+            break;
+        }
+        break;
+      case 'darwin':
+        extraIndexUrl = 'https://download.pytorch.org/whl/nightly/cpu';
+        break;
+      case 'linux':
+        switch (this.torchMode) {
+          case 'nvidia':
+            extraIndexUrl = 'https://download.pytorch.org/whl/cu121';
+            break;
+          case 'amd':
+            extraIndexUrl = 'https://download.pytorch.org/whl/nightly/rocm5.7';
+            break;
+          default:
+            extraIndexUrl = 'https://download.pytorch.org/whl/cpu';
+        }
+        break;
+    }
 
     const proc = spawn(
       python.path,
@@ -270,8 +295,7 @@ class InstallPythonTask extends BaseTask {
         'pip',
         'install',
         ...(this.packagesDir ? ['--target', this.packagesDir] : []),
-        '--extra-index-url',
-        'https://download.pytorch.org/whl/cu121',
+        ...(extraIndexUrl ? ['--extra-index-url', extraIndexUrl] : []),
         ...required,
       ],
       {
@@ -391,8 +415,8 @@ export class Setup extends EventEmitter {
     return {
       os: await getOS(),
       graphics: graphics.controllers.map(item => ({
-        vendor: item.vendor,
-        vram: item.vram ? item.vram * 1024 * 1024 : undefined,
+        vendor: item.vendor || 'unknown',
+        vram: item.vram ? item.vram * 1024 * 1024 : 0,
       })),
       python: await getPython(this.metastable.python),
       storage: {
@@ -438,6 +462,18 @@ export class Setup extends EventEmitter {
       pythonHome: this._pythonHome,
       packagesDir: this._packagesDir,
     });
+
+    const platform = os.platform();
+    if (platform === 'win32' && this.settings.torchMode === 'amd') {
+      await this.metastable.storage.config.set('comfy', {
+        args: ['--directml'],
+      });
+    } else if (platform === 'darwin' && os.arch() === 'arm64') {
+      await this.metastable.storage.config.set('comfy', {
+        args: ['--force-fp16'],
+      });
+    }
+
     this.metastable.restartComfy();
   }
 
@@ -451,20 +487,21 @@ export class Setup extends EventEmitter {
     this._status = 'in_progress';
     const tasks: Record<string, BaseTask> = {};
 
-    let pythonHome: string | undefined = undefined;
-
     if (settings.pythonMode === 'static') {
       const archivePath = path.join(
         this.metastable.storage.dataRoot,
         'python.tar.gz',
       );
       const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
-      pythonHome = targetPath;
       this._packagesDir = undefined;
       this._pythonHome = targetPath;
       tasks['python.download'] = new DownloadPythonTask(archivePath);
       tasks['python.extract'] = new ExtractPythonTask(archivePath, targetPath);
-      tasks['python.install'] = new InstallPythonTask(undefined, pythonHome);
+      tasks['python.install'] = new InstallPythonTask(
+        settings.torchMode,
+        undefined,
+        targetPath,
+      );
     } else {
       const packagesDir = path.join(
         this.metastable.storage.dataRoot,
@@ -473,7 +510,11 @@ export class Setup extends EventEmitter {
       );
       this._packagesDir = packagesDir;
       this._pythonHome = undefined;
-      tasks['python.install'] = new InstallPythonTask(packagesDir, pythonHome);
+      tasks['python.install'] = new InstallPythonTask(
+        settings.torchMode,
+        packagesDir,
+        undefined,
+      );
     }
 
     if (settings.downloads.length) {
