@@ -40,7 +40,6 @@ The backend is based on [ComfyUI's backend](https://github.com/comfyanonymous/Co
 
 #### Windows
 
-- Install Windows 10 SDK, version 2004 (10.0.19041.0) - https://go.microsoft.com/fwlink/?linkid=2120843
 - Install node.js 18 or newer: https://nodejs.org/en/download
 - Install git: https://git-scm.com/download/win
 - Open Command Prompt (or Powershell)

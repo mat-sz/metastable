@@ -922,9 +922,9 @@ __metadata:
     "@metastable/types": "npm:*"
     "@types/decompress": "npm:^4.2.7"
     "@types/node": "npm:^20.10.3"
+    check-disk-space: "npm:^3.4.0"
     chokidar: "npm:^3.5.3"
     decompress: "npm:^4.2.1"
-    diskusage: "npm:^1.2.0"
     nanoid: "npm:^5.0.4"
     rimraf: "npm:^5.0.5"
     systeminformation: "npm:^5.21.22"
@@ -2058,6 +2058,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"check-disk-space@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "check-disk-space@npm:3.4.0"
+  checksum: cc39c91e1337e974fb5069c2fbd9eb92aceca6e35f3da6863a4eada58f15c1bf6970055bffed1e41c15cde1fd0ad2580bb99bef8275791ed56d69947f8657aa5
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:>=3.0.0 <4.0.0, chokidar@npm:^3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
@@ -2485,17 +2492,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"diskusage@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "diskusage@npm:1.2.0"
-  dependencies:
-    es6-promise: "npm:^4.2.8"
-    nan: "npm:^2.18.0"
-    node-gyp: "npm:latest"
-  checksum: c60a7ae720f7e940145b16c6ce5d1db871a3ee430d3f3c972861ff484d058a803b628f71a8eb5a6dddbd09dac817bc2cba060a1b3fbb81e5c49abfd954627679
-  languageName: node
-  linkType: hard
-
 "dmg-builder@npm:24.9.1":
   version: 24.9.1
   resolution: "dmg-builder@npm:24.9.1"
@@ -2731,13 +2727,6 @@ __metadata:
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
   checksum: 357663fb1e845c047d548c3d30f86e005db71e122678f4184ced0693f634688c3f3ef2d7de7d4af732f734de01f528b05954e270f06aa7d133679fb9fe6600ef
-  languageName: node
-  linkType: hard
-
-"es6-promise@npm:^4.2.8":
-  version: 4.2.8
-  resolution: "es6-promise@npm:4.2.8"
-  checksum: 2373d9c5e9a93bdd9f9ed32ff5cb6dd3dd785368d1c21e9bbbfd07d16345b3774ae260f2bd24c8f836a6903f432b4151e7816a7fa8891ccb4e1a55a028ec42c3
   languageName: node
   linkType: hard
 
@@ -4642,15 +4631,6 @@ __metadata:
   version: 2.1.2
   resolution: "ms@npm:2.1.2"
   checksum: a437714e2f90dbf881b5191d35a6db792efbca5badf112f87b9e1c712aace4b4b9b742dd6537f3edf90fd6f684de897cec230abde57e87883766712ddda297cc
-  languageName: node
-  linkType: hard
-
-"nan@npm:^2.18.0":
-  version: 2.18.0
-  resolution: "nan@npm:2.18.0"
-  dependencies:
-    node-gyp: "npm:latest"
-  checksum: 9209d80134fdb98c0afe35c1372d2b930a0a8d3c52706cb5e4257a27e9845c375f7a8daedadadec8d6403ca2eebb3b37d362ff5d1ec03249462abf65fef2a148
   languageName: node
   linkType: hard
 

@@ -3,7 +3,7 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs/promises';
 import si from 'systeminformation';
-import disk from 'diskusage';
+import checkDiskSpace from 'check-disk-space';
 import { EventEmitter } from 'events';
 import {
   Requirement,
@@ -251,6 +251,18 @@ class InstallPythonTask extends BaseTask {
       PYTHONPATH: this.packagesDir!,
     };
 
+    // Index URL:
+    // macOS:
+    //   CPU: https://download.pytorch.org/whl/nightly/cpu + --force-fp16 to args
+    // Linux:
+    //   NVIDIA: https://download.pytorch.org/whl/cu121
+    //   CPU: https://download.pytorch.org/whl/cpu
+    //   AMD: https://download.pytorch.org/whl/nightly/rocm5.7
+    // Windows:
+    //   NVIDIA: https://download.pytorch.org/whl/cu121
+    //   CPU: none
+    //   AMD (DirectML): torch-directml instead of torch, + --directml to args
+
     const proc = spawn(
       python.path,
       [
@@ -373,6 +385,8 @@ export class Setup extends EventEmitter {
   async details(): Promise<SetupDetails> {
     const graphics = await si.graphics();
     const dataRoot = this.metastable.storage.dataRoot;
+    // @ts-ignore
+    const usage = await checkDiskSpace(dataRoot);
 
     return {
       os: await getOS(),
@@ -383,7 +397,9 @@ export class Setup extends EventEmitter {
       python: await getPython(this.metastable.python),
       storage: {
         dataRoot,
-        ...(await disk.check(dataRoot)),
+        diskPath: usage.diskPath,
+        free: usage.free,
+        total: usage.size,
       },
     };
   }

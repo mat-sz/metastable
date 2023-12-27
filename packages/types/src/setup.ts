@@ -48,6 +48,7 @@ export interface SetupGraphics {
 
 export interface SetupStorage {
   dataRoot: string;
+  diskPath: string;
   free: number;
   total: number;
 }

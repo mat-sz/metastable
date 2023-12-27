@@ -27,7 +27,7 @@ export const StorageItem: React.FC = observer(() => {
         <AvailableStorage
           free={storage.free}
           total={storage.total}
-          path={storage.dataRoot}
+          path={storage.diskPath}
         />
       )}
       <div className={styles.predicted}>
