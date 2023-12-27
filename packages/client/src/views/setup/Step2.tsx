@@ -1,6 +1,7 @@
 import React from 'react';
 import { BsArchiveFill, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
+import Ansi from 'ansi-to-react';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
@@ -51,7 +52,9 @@ export const Step2: React.FC = observer(() => {
                 }
                 progress={task.progress}
               >
-                <pre>{task.log}</pre>
+                <pre>
+                  <Ansi>{task.log}</Ansi>
+                </pre>
               </Item>
             ))}
           </List>

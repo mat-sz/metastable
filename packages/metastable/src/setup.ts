@@ -173,6 +173,11 @@ class BaseTask extends EventEmitter {
   }
 
   appendLog(data: string) {
+    if (data.startsWith('\r')) {
+      this.log = this.log.substring(0, this.log.lastIndexOf('\n'));
+    }
+
+    data = data.replace('\r', '');
     this.log += !this.log ? data : `\n${data}`;
     this.emit('state');
   }
@@ -253,6 +258,7 @@ class InstallPythonTask extends BaseTask {
     const env = {
       PYTHONHOME: this.pythonHome!,
       PYTHONPATH: this.packagesDir!,
+      FORCE_COLOR: '1',
     };
 
     let extraIndexUrl: string | undefined = undefined;
@@ -296,6 +302,9 @@ class InstallPythonTask extends BaseTask {
         'install',
         ...(this.packagesDir ? ['--target', this.packagesDir] : []),
         ...(extraIndexUrl ? ['--extra-index-url', extraIndexUrl] : []),
+        '--disable-pip-version-check',
+        '--no-input',
+        '--no-cache',
         ...required,
       ],
       {
@@ -331,6 +340,27 @@ class InstallPythonTask extends BaseTask {
               Math.min(((collecting.length - 1) / required.length) * 100, 90),
             );
           }
+        }
+      }
+
+      if (trimmed.startsWith('\u001b[2K')) {
+        const currentPackage = collecting[collecting.length - 1];
+        if (currentPackage) {
+          const split = trimmed
+            .split('\u001b[32m')[1]
+            ?.split(' ')[0]
+            ?.split('/');
+          const progress = split
+            ? parseFloat(split[0]) / parseFloat(split[1])
+            : 0;
+          this.setProgress(
+            Math.min(
+              ((collecting.length - 1) / required.length +
+                progress / required.length) *
+                100,
+              90,
+            ),
+          );
         }
       }
 
