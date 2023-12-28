@@ -304,7 +304,6 @@ class InstallPythonTask extends BaseTask {
         ...(extraIndexUrl ? ['--extra-index-url', extraIndexUrl] : []),
         '--disable-pip-version-check',
         '--no-input',
-        '--no-cache',
         ...required,
       ],
       {

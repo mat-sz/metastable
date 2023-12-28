@@ -55,6 +55,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   }
 
   const zoom = (e: React.WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const newScale = scale * (1 - Math.sign(e.deltaY) * 0.1);
     const scaleRatio = newScale / scale;
     const wrapperRect = wrapperRef.current!.getBoundingClientRect();
