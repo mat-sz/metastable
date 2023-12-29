@@ -71,9 +71,9 @@ export class Projects {
       name.endsWith('.png'),
     );
     return {
+      ...data,
       id,
       name: id,
-      ...data,
       lastOutput: outputs[outputs.length - 1],
     };
   }

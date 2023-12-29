@@ -53,7 +53,9 @@ export class ProjectStore {
 
   async open(id: APIProject['id']) {
     const json = await API.projects.get(id);
-    const settings = JSON.parse(json.settings);
+    const settings = json.settings
+      ? JSON.parse(json.settings)
+      : defaultProjectSettings();
     if (!settings.models.loras) {
       settings.models.loras = [];
     }
