@@ -1,7 +1,7 @@
 .storage {
   .info {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
     align-items: center;
@@ -32,9 +32,6 @@
 
     .used {
       background: var(--color-bg-panel);
-    }
-
-    .free {
     }
   }
 }
