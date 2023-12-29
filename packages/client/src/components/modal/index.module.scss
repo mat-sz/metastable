@@ -10,10 +10,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
 }
 
 .modal {
   background: var(--color-bg-panel-dark);
+  position: absolute;
   width: 100%;
   height: 100%;
   color: var(--color-fg);
@@ -34,10 +39,8 @@
   flex-direction: column;
 
   @media screen and (min-width: 960px) {
-    width: 900px;
-    min-height: auto;
-    height: auto;
-    max-height: 800px;
+    height: 50%;
+    bottom: 0;
   }
 }
 

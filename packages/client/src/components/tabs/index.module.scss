@@ -6,6 +6,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
 }
 
 .tab {
@@ -43,6 +44,10 @@
 
 .tabView {
   &.horizontal {
+    display: grid;
+    grid-template-rows: 1.5rem calc(100% - 1.5rem);
+    height: 100%;
+
     .tabs {
       display: flex;
       border-bottom: 1px solid var(--color-bg-interactive-hover);
