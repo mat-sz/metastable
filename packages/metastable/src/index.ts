@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
 import path from 'path';
-import chokidar from 'chokidar';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
 import { Storage } from '@metastable/storage';
@@ -11,6 +10,8 @@ import { exists, isPathIn } from '@metastable/fs-helpers';
 import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
 import { Setup } from './setup.js';
+
+const chokidar = require('chokidar');
 
 export class Metastable extends EventEmitter {
   storage;
@@ -50,7 +51,7 @@ export class Metastable extends EventEmitter {
     this.setup.on('event', this.onEvent);
 
     let timeout: any = undefined;
-    chokidar.watch(this.storage.modelsDir, {}).on('all', event => {
+    chokidar.watch(this.storage.modelsDir, {}).on('all', (event: string) => {
       if (event !== 'add' && event !== 'unlink') {
         return;
       }
