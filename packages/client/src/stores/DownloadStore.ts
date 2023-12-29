@@ -40,6 +40,10 @@ export class DownloadStore {
     await API.downloads.cancel(id);
   }
 
+  dismiss(id: string) {
+    this.queue = this.queue.filter(download => download.id !== id);
+  }
+
   async download(type: ModelType, url: string, name: string) {
     this.waiting.add(name);
 

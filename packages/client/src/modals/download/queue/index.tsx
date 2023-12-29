@@ -39,10 +39,14 @@ export const Queue: React.FC = observer(() => {
               </div>
             </div>
             <div>
-              {(download.state === 'in_progress' ||
-                download.state === 'queued') && (
+              {download.state === 'in_progress' ||
+              download.state === 'queued' ? (
                 <button onClick={() => downloads.cancel(download.id)}>
                   Cancel
+                </button>
+              ) : (
+                <button onClick={() => downloads.dismiss(download.id)}>
+                  Dismiss
                 </button>
               )}
             </div>
