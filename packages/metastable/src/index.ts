@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
@@ -11,6 +12,7 @@ import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
 import { Setup } from './setup.js';
 
+const require = createRequire(import.meta.url);
 const chokidar = require('chokidar');
 
 export class Metastable extends EventEmitter {

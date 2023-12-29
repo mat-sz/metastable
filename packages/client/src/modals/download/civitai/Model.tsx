@@ -91,15 +91,7 @@ export const Model: React.FC<ModelProps> = ({ model, onClose }) => {
           <BsArrowLeft />
         </IconButton>
         <div>{model.name}</div>
-        <IconButton
-          onClick={() =>
-            window.open(
-              `https://civitai.com/models/${model.id}`,
-              '_blank',
-              'noopener noreferrer',
-            )
-          }
-        >
+        <IconButton href={`https://civitai.com/models/${model.id}`}>
           <BsArrowUpRightSquare />
         </IconButton>
       </div>

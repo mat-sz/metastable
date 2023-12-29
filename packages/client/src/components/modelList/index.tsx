@@ -41,15 +41,7 @@ export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
                         {TYPE_NAMES[model.type]}
                       </div>
                       {!!model.homepage && (
-                        <IconButton
-                          onClick={() =>
-                            window.open(
-                              model.homepage,
-                              '_blank',
-                              'noopener noreferrer',
-                            )
-                          }
-                        >
+                        <IconButton href={model.homepage}>
                           <BsArrowUpRightSquare />
                         </IconButton>
                       )}

@@ -31,6 +31,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
         )}
         href={href}
         download={download}
+        rel="noreferrer noopener"
+        target="_blank"
         {...props}
       >
         {children}
