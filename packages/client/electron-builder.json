@@ -32,7 +32,7 @@
   },
   "extraFiles": [
     {
-      "from": "../comfy/python/**/*",
+      "from": "../metastable/python/**/*",
       "to": "Resources/python",
       "filter": "**/*"
     }

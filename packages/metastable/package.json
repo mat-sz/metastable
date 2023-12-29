@@ -10,19 +10,18 @@
     "@metastable/types": "*",
     "@types/decompress": "^4.2.7",
     "@types/node": "^20.10.3",
+    "@types/which": "^3.0.3",
     "typescript": "^5.3.2"
   },
   "dependencies": {
-    "@metastable/comfy": "*",
-    "@metastable/downloader": "*",
-    "@metastable/fs-helpers": "*",
-    "@metastable/storage": "*",
+    "axios": "^1.6.2",
     "check-disk-space": "^3.4.0",
     "chokidar": "^3.5.3",
     "decompress": "^4.2.1",
     "nanoid": "^5.0.4",
     "rimraf": "^5.0.5",
-    "systeminformation": "^5.21.22"
+    "systeminformation": "^5.21.22",
+    "which": "^4.0.0"
   },
   "exports": {
     ".": {

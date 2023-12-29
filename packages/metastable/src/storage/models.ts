@@ -1,7 +1,8 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Model } from '@metastable/types';
-import { tryUnlink, walk } from '@metastable/fs-helpers';
+
+import { tryUnlink, walk } from '../helpers.js';
 import { JSONFile } from './helpers.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];

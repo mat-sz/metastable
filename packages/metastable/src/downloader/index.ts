@@ -5,7 +5,8 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import EventEmitter from 'events';
 import { Download, DownloadState } from '@metastable/types';
-import { exists } from '@metastable/fs-helpers';
+
+import { exists } from '../helpers.js';
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;

@@ -90,7 +90,7 @@ function createMenu() {
 async function createWindow() {
   const dataRoot = path.join(app.getPath('documents'), 'Metastable');
   const comfyMainPath = path.join(
-    app.isPackaged ? app.getAppPath() : path.resolve('../comfy'),
+    app.isPackaged ? app.getAppPath() : path.resolve('../metastable'),
     'python',
     'main.py',
   );

@@ -874,74 +874,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metastable/comfy@npm:*, @metastable/comfy@workspace:packages/comfy":
-  version: 0.0.0-use.local
-  resolution: "@metastable/comfy@workspace:packages/comfy"
-  dependencies:
-    "@metastable/python": "npm:*"
-    "@metastable/types": "npm:*"
-    "@types/node": "npm:^20.10.3"
-    "@types/semver": "npm:^7.5.6"
-    "@types/which": "npm:^3.0.3"
-    axios: "npm:^1.6.2"
-    semver: "npm:^7.5.4"
-    typescript: "npm:^5.3.2"
-  languageName: unknown
-  linkType: soft
-
-"@metastable/downloader@npm:*, @metastable/downloader@workspace:packages/downloader":
-  version: 0.0.0-use.local
-  resolution: "@metastable/downloader@workspace:packages/downloader"
-  dependencies:
-    "@metastable/fs-helpers": "npm:*"
-    "@metastable/types": "npm:*"
-    "@types/node": "npm:^20.10.3"
-    axios: "npm:^1.6.2"
-    nanoid: "npm:^5.0.4"
-    typescript: "npm:^5.3.2"
-  languageName: unknown
-  linkType: soft
-
-"@metastable/fs-helpers@npm:*, @metastable/fs-helpers@workspace:packages/fs-helpers":
-  version: 0.0.0-use.local
-  resolution: "@metastable/fs-helpers@workspace:packages/fs-helpers"
-  dependencies:
-    "@metastable/types": "npm:*"
-    "@types/node": "npm:^20.10.3"
-    typescript: "npm:^5.3.2"
-  languageName: unknown
-  linkType: soft
-
 "@metastable/metastable@npm:*, @metastable/metastable@workspace:packages/metastable":
   version: 0.0.0-use.local
   resolution: "@metastable/metastable@workspace:packages/metastable"
   dependencies:
-    "@metastable/comfy": "npm:*"
-    "@metastable/downloader": "npm:*"
-    "@metastable/fs-helpers": "npm:*"
-    "@metastable/storage": "npm:*"
     "@metastable/types": "npm:*"
     "@types/decompress": "npm:^4.2.7"
     "@types/node": "npm:^20.10.3"
+    "@types/which": "npm:^3.0.3"
+    axios: "npm:^1.6.2"
     check-disk-space: "npm:^3.4.0"
     chokidar: "npm:^3.5.3"
     decompress: "npm:^4.2.1"
     nanoid: "npm:^5.0.4"
     rimraf: "npm:^5.0.5"
     systeminformation: "npm:^5.21.22"
-    typescript: "npm:^5.3.2"
-  languageName: unknown
-  linkType: soft
-
-"@metastable/python@npm:*, @metastable/python@workspace:packages/python":
-  version: 0.0.0-use.local
-  resolution: "@metastable/python@workspace:packages/python"
-  dependencies:
-    "@types/node": "npm:^20.10.3"
-    "@types/semver": "npm:^7.5.6"
-    "@types/which": "npm:^3.0.3"
-    semver: "npm:^7.5.4"
-    tsx: "npm:^4.6.2"
     typescript: "npm:^5.3.2"
     which: "npm:^4.0.0"
   languageName: unknown
@@ -969,18 +916,6 @@ __metadata:
     tsx: "npm:^4.6.2"
     typescript: "npm:^5.3.2"
     ws: "npm:^8.14.2"
-  languageName: unknown
-  linkType: soft
-
-"@metastable/storage@npm:*, @metastable/storage@workspace:packages/storage":
-  version: 0.0.0-use.local
-  resolution: "@metastable/storage@workspace:packages/storage"
-  dependencies:
-    "@metastable/fs-helpers": "npm:*"
-    "@metastable/types": "npm:*"
-    "@types/node": "npm:^20.10.3"
-    rimraf: "npm:^5.0.5"
-    typescript: "npm:^5.3.2"
   languageName: unknown
   linkType: soft
 
@@ -1280,7 +1215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.5.0, @types/semver@npm:^7.5.6":
+"@types/semver@npm:^7.5.0":
   version: 7.5.6
   resolution: "@types/semver@npm:7.5.6"
   checksum: 196dc32db5f68cbcde2e6a42bb4aa5cbb100fa2b7bd9c8c82faaaf3e03fbe063e205dbb4f03c7cdf53da2edb70a0d34c9f2e601b54281b377eb8dc1743226acd

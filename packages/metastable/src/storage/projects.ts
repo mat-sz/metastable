@@ -2,8 +2,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import { Project } from '@metastable/types';
 
+import { freeDirName, filenames } from '../helpers.js';
 import { JSONFile, TextFile } from './helpers.js';
-import { freeDirName, filenames } from '@metastable/fs-helpers';
 import { rimraf } from 'rimraf';
 
 export class Projects {

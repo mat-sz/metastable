@@ -1,14 +1,17 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import EventEmitter from 'events';
-import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
-import type { PythonInstance } from '@metastable/python';
 
+import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from './helpers.js';
 
-const baseDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const baseDir = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+);
 
 export class Comfy extends EventEmitter {
   process?: ChildProcessWithoutNullStreams;

@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { FileInfo, Project } from '@metastable/types';
+import { FileInfo } from '@metastable/types';
 
 export function isPathIn(parent: string, filePath: string) {
   const rel = path.relative(parent, filePath);

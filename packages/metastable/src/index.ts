@@ -3,14 +3,14 @@ import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
-import { Storage } from '@metastable/storage';
-import { Comfy } from '@metastable/comfy';
-import { PythonInstance } from '@metastable/python';
-import { Downloader } from '@metastable/downloader';
-import { exists, isPathIn } from '@metastable/fs-helpers';
 import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
-import { Setup } from './setup.js';
+import { Setup } from './setup/index.js';
+import { Comfy } from './comfy/index.js';
+import { PythonInstance } from './python/index.js';
+import { Downloader } from './downloader/index.js';
+import { Storage } from './storage/index.js';
+import { exists, isPathIn } from './helpers.js';
 
 const require = createRequire(import.meta.url);
 const chokidar = require('chokidar');
