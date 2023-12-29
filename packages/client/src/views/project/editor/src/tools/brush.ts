@@ -24,6 +24,7 @@ export class BrushTool implements Tool {
       min: 0,
       max: 1000,
       step: 1,
+      unit: 'px',
     },
   ];
 

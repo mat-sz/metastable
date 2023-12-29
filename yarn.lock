@@ -861,7 +861,7 @@ __metadata:
     react-dnd-html5-backend: "npm:^16.0.1"
     react-dom: "npm:^18.2.0"
     react-icons: "npm:^4.11.0"
-    react-var-ui: "npm:^1.4.2"
+    react-var-ui: "npm:^1.5.0"
     sass: "npm:^1.66.1"
     swr: "npm:^2.2.4"
     tree-kill: "npm:^1.2.2"
@@ -5305,9 +5305,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-var-ui@npm:^1.4.2":
-  version: 1.4.3
-  resolution: "react-var-ui@npm:1.4.3"
+"react-var-ui@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "react-var-ui@npm:1.5.0"
   dependencies:
     filesize: "npm:^8.0.6"
     radash: "npm:^11.0.0"
@@ -5315,7 +5315,7 @@ __metadata:
     react-use-pointer-drag: "npm:^0.1.1"
   peerDependencies:
     react: ">=16"
-  checksum: 58b64a37ceb4a20e75c376bc83a9232ea7ba202b73aca81ae83f2e09c598e22bf207706c081901fac66d071338f5c684fe34b9b0b57f8971ad7da6cba579806d
+  checksum: 8653b11d04a128bfe70ff62fc84df443f3d721f8bee079ec772e2e5a1882c02f8ed1ad1ae1ffc44e4b1ba5d72d692b7489753a7b378e869360e48eab772bcb79
   languageName: node
   linkType: hard
 

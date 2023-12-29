@@ -44,6 +44,7 @@ export const ToolSettings: React.FC = () => {
             max={option.max}
             step={option.step}
             defaultValue={option.defaultValue}
+            unit={option.unit}
           />
         ))}
       </VarUI>

@@ -13,6 +13,7 @@ export interface ToolOption {
   min: number;
   max: number;
   step: number;
+  unit?: string;
 }
 
 export interface Tool {

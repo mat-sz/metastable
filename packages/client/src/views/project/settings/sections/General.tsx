@@ -53,6 +53,7 @@ export const General: React.FC = observer(() => {
               step={8}
               defaultValue={512}
               showInput
+              unit="px"
             />
             <VarSlider
               label="Height"
@@ -62,6 +63,7 @@ export const General: React.FC = observer(() => {
               step={8}
               defaultValue={512}
               showInput
+              unit="px"
             />
             <VarSlider
               label="Batch size"
