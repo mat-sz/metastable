@@ -186,3 +186,9 @@ table {
     font-size: 0.9rem;
   }
 }
+
+@media (prefers-reduced-motion) {
+  * {
+    transition: none !important;
+  }
+}
