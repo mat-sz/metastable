@@ -45,9 +45,13 @@ export class Metastable extends EventEmitter {
 
   constructor(
     dataRoot: string,
-    private settings: { comfyMainPath?: string } = {},
+    private settings: {
+      comfyMainPath?: string;
+      skipPythonSetup?: boolean;
+    } = {},
   ) {
     super();
+    this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.storage = new Storage(dataRoot);
     this.downloader.on('event', this.onEvent);
     this.setup.on('event', this.onEvent);

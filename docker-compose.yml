@@ -1,0 +1,21 @@
+version: '3.9'
+name: metastable
+
+services:
+  metastable:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - '5001:5001'
+    volumes:
+      - ./data:/app/data
+    stop_signal: SIGKILL
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [compute, utility]

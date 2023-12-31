@@ -15,6 +15,7 @@ import { DownloadModelsTask } from './tasks/downloadModels.js';
 
 export class Setup extends EventEmitter {
   settings: SetupSettings | undefined = undefined;
+  skipPythonSetup: boolean = false;
   private _status: SetupStatus['status'] = 'required';
   private _tasks: Record<string, BaseTask> = {};
   private _pythonHome: string | undefined = undefined;
@@ -30,7 +31,7 @@ export class Setup extends EventEmitter {
     if (!this._checked) {
       const python = await this.metastable.storage.config.get('python');
 
-      if (python?.configured) {
+      if (python?.configured || this.skipPythonSetup) {
         this._status = 'done';
       }
     }

@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "start:prod": "node lib/index.js",
+    "start": "node lib/index.js",
+    "dev": "tsx src/index.ts",
     "build": "tsc"
   },
   "devDependencies": {

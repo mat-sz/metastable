@@ -5,9 +5,10 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "yarn workspaces foreach -Api --topological-dev run build",
     "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server run build",
-    "start": "yarn build:deps && yarn dev",
-    "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run start"
+    "start": "yarn workspace @metastable/server run start",
+    "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run dev"
   },
   "packageManager": "yarn@4.0.2"
 }

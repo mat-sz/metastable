@@ -5,7 +5,14 @@ import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
 import { Metastable } from '@metastable/metastable';
 
-import { host, port, useProxy, staticRoot, dataRoot } from './config.js';
+import {
+  host,
+  port,
+  useProxy,
+  staticRoot,
+  dataRoot,
+  skipPythonSetup,
+} from './config.js';
 import { routesProjects } from './routes/projects.js';
 import { routesModels } from './routes/models.js';
 import { routesPrompts } from './routes/prompts.js';
@@ -14,7 +21,7 @@ import { routesInstance } from './routes/instance.js';
 import { routesSetup } from './routes/setup.js';
 import { ClientManager } from './ws.js';
 
-const metastable = new Metastable(dataRoot);
+const metastable = new Metastable(dataRoot, { skipPythonSetup });
 const clientManager = new ClientManager();
 
 await metastable.init();
