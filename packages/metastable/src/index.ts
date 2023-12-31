@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
 import { createRequire } from 'module';
-import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
 import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
@@ -87,13 +86,11 @@ export class Metastable extends EventEmitter {
     }
 
     const useSystemPython =
-      config.python.mode === 'system' || !config.python.pythonHome;
+      !this.settings.skipPythonSetup &&
+      (config.python.mode === 'system' || !config.python.pythonHome);
 
     this.python = useSystemPython
-      ? await PythonInstance.fromSystem(
-          config.python.packagesDir ||
-            path.join(this.storage.dataRoot, 'python', 'pip'),
-        )
+      ? await PythonInstance.fromSystem(config.python.packagesDir)
       : await PythonInstance.fromDirectory(
           config.python.pythonHome!,
           config.python.packagesDir,

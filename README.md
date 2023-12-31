@@ -50,7 +50,8 @@ The backend is based on [ComfyUI's backend](https://github.com/comfyanonymous/Co
 - Open Terminal/Command Prompt/Powershell
 - `git clone https://github.com/mat-sz/metastable.git`
 - `cd metastable`
-- `yarn`
+- `yarn install`
+- `yarn build`
 - `yarn start`
 - Follow the on-screen instructions.
 
