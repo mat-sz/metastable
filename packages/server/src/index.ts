@@ -20,6 +20,7 @@ import { routesDownloads } from './routes/downloads.js';
 import { routesInstance } from './routes/instance.js';
 import { routesSetup } from './routes/setup.js';
 import { ClientManager } from './ws.js';
+import { routesTasks } from './routes/tasks.js';
 
 const metastable = new Metastable(dataRoot, { skipPythonSetup });
 const clientManager = new ClientManager();
@@ -89,6 +90,7 @@ app.register(routesProjects(metastable), { prefix: '/projects' });
 app.register(routesModels(metastable), { prefix: '/models' });
 app.register(routesPrompts(metastable), { prefix: '/prompts' });
 app.register(routesDownloads(metastable), { prefix: '/downloads' });
+app.register(routesTasks(metastable), { prefix: '/tasks' });
 
 app.listen({ host, port });
 

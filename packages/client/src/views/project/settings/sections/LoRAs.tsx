@@ -9,6 +9,7 @@ import {
   VarToggle,
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
+import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
@@ -44,7 +45,7 @@ export const LoRAs: React.FC = observer(() => {
               label="Model"
               path="name"
               options={loras?.map(
-                ({ name }) =>
+                ({ file: { name } }) =>
                   ({
                     key: name,
                     label: name,
@@ -67,7 +68,7 @@ export const LoRAs: React.FC = observer(() => {
         <VarButton
           buttonLabel="Add LoRA"
           onClick={() => {
-            project.addLora(loras?.[0].name);
+            project.addLora(mainStore.defaultModelName(ModelType.LORA));
           }}
         />
       ) : (

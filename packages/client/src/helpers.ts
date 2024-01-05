@@ -27,7 +27,7 @@ export function defaultProjectSettings(): ProjectSettings {
   return {
     input: { mode: 'empty', batch_size: 1, width: 512, height: 512 },
     models: {
-      base: { name: mainStore.info.models.checkpoints?.[0]?.name },
+      base: { name: mainStore.defaultModelName(ModelType.CHECKPOINT) },
       loras: [],
       controlnets: [],
     },
@@ -71,7 +71,9 @@ export function fixSettings(settings: ProjectSettings) {
     settings.input.batch_size ||= 1;
   }
 
-  settings.models.base.name ||= mainStore.info.models.checkpoints?.[0]?.name;
+  settings.models.base.name ||= mainStore.defaultModelName(
+    ModelType.CHECKPOINT,
+  );
   return settings;
 }
 

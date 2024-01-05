@@ -160,6 +160,16 @@ async function createWindow() {
     return await metastable.storage.projects.filenames(id, 'output');
   });
 
+  ipcMain.handle('tasks:all', async () => {
+    return metastable.getQueues();
+  });
+  ipcMain.handle('tasks:queue', async (_, queueId: string) => {
+    return metastable.getTasks(queueId);
+  });
+  ipcMain.handle('tasks:cancel', async (_, queueId: string, taskId: string) => {
+    return metastable.cancelTask(queueId, taskId);
+  });
+
   win.setMenu(null);
 
   // macOS menu bar

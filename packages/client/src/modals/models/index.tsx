@@ -28,9 +28,9 @@ export const ModelManager: React.FC = observer(() => {
         <TabContent>
           {available.map(([key, models]) => (
             <TabPanel id={key} key={key}>
-              {models.map(model => (
-                <li key={model.name}>
-                  {model.name} - {filesize(model.size)}
+              {models.map(({ file }) => (
+                <li key={file.name}>
+                  {file.name} - {filesize(file.size)}
                 </li>
               ))}
             </TabPanel>

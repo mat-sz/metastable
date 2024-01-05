@@ -5,6 +5,7 @@ import {
   SetupDetails,
   SetupSettings,
   SetupStatus,
+  Task,
 } from '@metastable/types';
 
 export interface API {
@@ -32,12 +33,16 @@ export interface API {
       type: string;
       url: string;
     }): Promise<{ id: string; size: number; name: string } | { error: string }>;
-    cancel(id: string): Promise<void>;
   };
   prompts: {
     create(
       projectId: Project['id'],
       settings: ProjectSettings,
     ): Promise<{ id: string }>;
+  };
+  tasks: {
+    all(): Promise<Record<string, Task<any>[]>>;
+    queue(queueId: string): Promise<Task<any>[]>;
+    cancel(queueId: string, taskId: string): Promise<void>;
   };
 }

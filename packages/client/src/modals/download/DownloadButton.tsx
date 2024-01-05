@@ -23,20 +23,10 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       (_, i) => typeof fileState[i] === 'undefined',
     );
     const isWaiting = files.some(file =>
-      mainStore.downloads.waiting.has(file.name),
+      mainStore.tasks.waiting.has(file.name),
     );
-    const error = files
-      .map(file => mainStore.downloads.errors[file.name])
-      .find(error => !!error);
 
-    if (error) {
-      return (
-        <button disabled>
-          <BsXCircle />
-          <span>{error}</span>
-        </button>
-      );
-    } else if (isWaiting) {
+    if (isWaiting) {
       return (
         <button disabled>
           <BsHourglass />
@@ -51,17 +41,17 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
         </button>
       );
     } else if (allQueued) {
-      const items = mainStore.downloads.queue.filter(
+      const items = mainStore.tasks.downloads.filter(
         item =>
-          !!files.find(file => file.name === item.name) &&
+          !!files.find(file => file.name === item.data.name) &&
           ['done', 'queued', 'in_progress'].includes(item.state),
       );
 
       if (items.length) {
         const percent =
           Math.round(
-            (items.reduce((progress, item) => progress + item.progress, 0) /
-              items.reduce((size, item) => size + item.size, 0)) *
+            (items.reduce((progress, item) => progress + item.data.offset, 0) /
+              items.reduce((size, item) => size + item.data.size, 0)) *
               100,
           ) || 0;
 
@@ -87,7 +77,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       <button
         onClick={() => {
           for (const file of remaining) {
-            mainStore.downloads.download(file.type, file.url, file.name);
+            mainStore.tasks.download(file.type, file.url, file.name);
           }
         }}
       >

@@ -6,3 +6,4 @@ export * from './file.js';
 export * from './download.js';
 export * from './instance.js';
 export * from './setup.js';
+export * from './task.js';

@@ -4,7 +4,7 @@ import { SetupSettings } from '@metastable/types';
 
 import { PromiseWrapper, PythonInstance } from '../../python/index.js';
 import { requiredPackages } from '../helpers.js';
-import { BaseTask } from './base.js';
+import { BaseTask } from '../../task/task.js';
 
 export class ConfigurePythonTask extends BaseTask {
   constructor(
@@ -12,10 +12,10 @@ export class ConfigurePythonTask extends BaseTask {
     private packagesDir?: string,
     private pythonHome?: string,
   ) {
-    super();
+    super('python.configure', undefined);
   }
 
-  async run() {
+  async execute() {
     let collecting: string[] = [];
     let required: string[] = requiredPackages.map(pkg =>
       pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
@@ -103,10 +103,11 @@ export class ConfigurePythonTask extends BaseTask {
 
           // TODO: Can't think of anything better.
           if (collecting.length === 1) {
-            this.setProgress(5);
+            this.progress = 0.05;
           } else {
-            this.setProgress(
-              Math.min(((collecting.length - 1) / required.length) * 100, 90),
+            this.progress = Math.min(
+              (collecting.length - 1) / required.length,
+              90,
             );
           }
         }
@@ -122,13 +123,10 @@ export class ConfigurePythonTask extends BaseTask {
           const progress = split
             ? parseFloat(split[0]) / parseFloat(split[1])
             : 0;
-          this.setProgress(
-            Math.min(
-              ((collecting.length - 1) / required.length +
-                progress / required.length) *
-                100,
-              90,
-            ),
+          this.progress = Math.min(
+            (collecting.length - 1) / required.length +
+              progress / required.length,
+            0.9,
           );
         }
       }

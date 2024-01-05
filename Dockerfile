@@ -7,8 +7,7 @@ RUN apt update && \
   mkdir -p /etc/apt/keyrings && \
   curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
   echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-  apt update && apt install -y nodejs  && \
-  npm install -g yarn && \
+  apt update && apt install -y nodejs && \
   apt clean
 
 WORKDIR /app
@@ -17,6 +16,7 @@ COPY . /app
 
 RUN --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.npm \
+  npm install -g yarn && \
   yarn install && \
   yarn setup:other && \
   yarn build

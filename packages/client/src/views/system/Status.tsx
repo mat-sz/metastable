@@ -9,6 +9,7 @@ import {
 } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
+import { TaskState } from '@metastable/types';
 
 import styles from './Status.module.scss';
 import { mainStore } from '../../stores/MainStore';
@@ -20,6 +21,18 @@ import { DownloadManager } from '../../modals/download';
 export const Status: React.FC = observer(() => {
   const status = mainStore.status;
   const { showModal } = useUI();
+
+  const downloads = mainStore.tasks.downloads;
+  const count = downloads.filter(
+    item =>
+      item.state === TaskState.SUCCESS ||
+      item.state === TaskState.RUNNING ||
+      item.state === TaskState.PREPARING ||
+      item.state === TaskState.QUEUED,
+  ).length;
+  const remaining = downloads.filter(
+    item => item.state !== TaskState.SUCCESS,
+  ).length;
 
   return (
     <div className={styles.status}>
@@ -48,14 +61,12 @@ export const Status: React.FC = observer(() => {
           <span>Queued images: {mainStore.promptRemaining}</span>
         </ProgressButton>
         <ProgressButton
-          value={
-            mainStore.downloads.queue.length - mainStore.downloads.remaining
-          }
-          max={mainStore.downloads.queue.length}
+          value={remaining}
+          max={count}
           onClick={() => showModal(<DownloadManager />)}
         >
           <BsDownload />
-          <span>Queued downloads: {mainStore.downloads.remaining}</span>
+          <span>Queued downloads: {remaining}</span>
         </ProgressButton>
       </div>
       <div className={styles.info}>

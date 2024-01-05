@@ -29,6 +29,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     create: (projectId: Project['id'], settings: any) =>
       ipcRenderer.invoke('prompts:create', projectId, settings),
   },
+  tasks: {
+    all: () => ipcRenderer.invoke('tasks:all'),
+    queue: (queueId: string) => ipcRenderer.invoke('tasks:queue', queueId),
+    cancel: (queueId: string, taskId: string) =>
+      ipcRenderer.invoke('tasks:cancel', queueId, taskId),
+  },
   isMac: process.platform === 'darwin',
 });
 

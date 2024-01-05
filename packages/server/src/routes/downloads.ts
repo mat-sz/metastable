@@ -29,10 +29,5 @@ export function routesDownloads(metastable: Metastable) {
         }
       },
     );
-
-    fastify.delete('/:id', async request => {
-      const downloadId = (request.params as any)?.id;
-      metastable.downloader.cancel(downloadId);
-    });
   };
 }

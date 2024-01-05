@@ -22,7 +22,7 @@ export const General: React.FC = observer(() => {
           label="Checkpoint"
           path="models.base.name"
           options={
-            mainStore.info.models.checkpoints?.map(({ name }) => ({
+            mainStore.info.models.checkpoints?.map(({ file: { name } }) => ({
               key: name,
               label: name,
             })) || []

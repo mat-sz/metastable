@@ -2,17 +2,17 @@ import decompress from 'decompress';
 import { rimraf } from 'rimraf';
 
 import { tryUnlink } from '../../helpers.js';
-import { BaseTask } from './base.js';
+import { BaseTask } from '../../task/task.js';
 
 export class ExtractPythonTask extends BaseTask {
   constructor(
     private archivePath: string,
     private targetPath: string,
   ) {
-    super();
+    super('python.extract', undefined);
   }
 
-  async run() {
+  async execute() {
     this.appendLog('Cleaning up...');
     try {
       await rimraf(this.targetPath);

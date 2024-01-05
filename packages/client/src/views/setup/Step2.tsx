@@ -2,31 +2,32 @@ import React from 'react';
 import { BsArchiveFill, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 import Ansi from 'ansi-to-react';
+import { FaPython } from 'react-icons/fa';
+import { TaskState } from '@metastable/types';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { List } from './components/List';
 import { Loading } from '../../components';
 import { Item } from './components/Item';
-import { FaPython } from 'react-icons/fa';
 
 const TASK_ICONS: Record<string, React.ReactNode> = {
   'python.download': <BsDownload />,
   'python.extract': <BsArchiveFill />,
-  'python.install': <FaPython />,
+  'python.configure': <FaPython />,
   'models.download': <BsDownload />,
 };
 
 const TASK_TITLE: Record<string, string> = {
   'python.download': 'Download Python',
   'python.extract': 'Extract Python',
-  'python.install': 'Install Python dependencies',
+  'python.configure': 'Install Python dependencies',
   'models.download': 'Download models',
 };
 
 export const Step2: React.FC = observer(() => {
   const details = mainStore.setup.details;
-  const tasks = Object.entries(mainStore.setup.status?.tasks || {});
+  const tasks = mainStore.tasks.queues.setup || [];
 
   return (
     <div className={styles.setup}>
@@ -37,20 +38,20 @@ export const Step2: React.FC = observer(() => {
       {details ? (
         <>
           <List hint="Click on an item to reveal more information.">
-            {tasks.map(([id, task]) => (
+            {tasks.map(task => (
               <Item
-                key={id}
-                id={id}
-                title={TASK_TITLE[id] || ''}
-                icon={TASK_ICONS[id] || <BsHourglassSplit />}
+                key={task.id}
+                id={task.id}
+                title={TASK_TITLE[task.type] || ''}
+                icon={TASK_ICONS[task.type] || <BsHourglassSplit />}
                 status={
-                  task.state === 'done'
+                  task.state === TaskState.SUCCESS
                     ? 'ok'
-                    : task.state === 'error'
+                    : task.state === TaskState.FAILED
                       ? 'error'
                       : 'incomplete'
                 }
-                progress={task.progress}
+                progress={(task.progress || 0) * 100}
               >
                 <pre>
                   <Ansi>{task.log}</Ansi>

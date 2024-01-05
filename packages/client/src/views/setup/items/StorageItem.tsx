@@ -44,7 +44,7 @@ export const StorageItem: React.FC = observer(() => {
             </thead>
             <tbody>
               {entries.map(([key, value]) => (
-                <tr>
+                <tr key={key}>
                   <td>{key}</td>
                   <td>{filesize(value)}</td>
                 </tr>

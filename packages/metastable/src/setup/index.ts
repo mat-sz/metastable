@@ -7,7 +7,6 @@ import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 
 import type { Metastable } from '../index.js';
 import { getOS, getPython } from './helpers.js';
-import { BaseTask } from './tasks/base.js';
 import { DownloadPythonTask } from './tasks/downloadPython.js';
 import { ExtractPythonTask } from './tasks/extractPython.js';
 import { ConfigurePythonTask } from './tasks/configurePython.js';
@@ -17,7 +16,6 @@ export class Setup extends EventEmitter {
   settings: SetupSettings | undefined = undefined;
   skipPythonSetup: boolean = false;
   private _status: SetupStatus['status'] = 'required';
-  private _tasks: Record<string, BaseTask> = {};
   private _pythonHome: string | undefined = undefined;
   private _packagesDir: string | undefined = undefined;
 
@@ -38,12 +36,6 @@ export class Setup extends EventEmitter {
 
     return {
       status: this._status,
-      tasks: Object.fromEntries(
-        Object.entries(this._tasks).map(([key, value]) => [
-          key,
-          { log: value.log, progress: value.progress, state: value.state },
-        ]),
-      ),
     };
   }
 
@@ -76,27 +68,14 @@ export class Setup extends EventEmitter {
     });
   }
 
-  async run() {
+  private async done() {
     if (!this.settings) {
       throw new Error('Error.');
     }
 
-    for (const value of Object.values(this._tasks)) {
-      value.on('state', () => this.emitStatus());
-      value.setState('in_progress');
-      try {
-        await value.run();
-        value.setProgress(100);
-        value.setState('done');
-      } catch (e) {
-        value.appendLog('Error: ' + String(e));
-        value.setState('error');
-        return;
-      }
-      value.removeAllListeners();
-    }
-
     this._status = 'done';
+    this.emitStatus();
+
     await this.metastable.storage.config.set('python', {
       configured: true,
       mode: this.settings.pythonMode,
@@ -126,7 +105,9 @@ export class Setup extends EventEmitter {
     this.settings = settings;
 
     this._status = 'in_progress';
-    const tasks: Record<string, BaseTask> = {};
+    this.emitStatus();
+
+    this.metastable.queues.setup.once('empty', () => this.done());
 
     if (settings.pythonMode === 'static') {
       const archivePath = path.join(
@@ -136,12 +117,12 @@ export class Setup extends EventEmitter {
       const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
       this._packagesDir = undefined;
       this._pythonHome = targetPath;
-      tasks['python.download'] = new DownloadPythonTask(archivePath);
-      tasks['python.extract'] = new ExtractPythonTask(archivePath, targetPath);
-      tasks['python.install'] = new ConfigurePythonTask(
-        settings.torchMode,
-        undefined,
-        targetPath,
+      this.metastable.queues.setup.add(new DownloadPythonTask(archivePath));
+      this.metastable.queues.setup.add(
+        new ExtractPythonTask(archivePath, targetPath),
+      );
+      this.metastable.queues.setup.add(
+        new ConfigurePythonTask(settings.torchMode, undefined, targetPath),
       );
     } else {
       const packagesDir = path.join(
@@ -151,22 +132,15 @@ export class Setup extends EventEmitter {
       );
       this._packagesDir = packagesDir;
       this._pythonHome = undefined;
-      tasks['python.install'] = new ConfigurePythonTask(
-        settings.torchMode,
-        packagesDir,
-        undefined,
+      this.metastable.queues.setup.add(
+        new ConfigurePythonTask(settings.torchMode, packagesDir, undefined),
       );
     }
 
     if (settings.downloads.length) {
-      tasks['models.download'] = new DownloadModelsTask(
-        this.metastable,
-        settings.downloads,
+      this.metastable.queues.setup.add(
+        new DownloadModelsTask(this.metastable, settings.downloads),
       );
     }
-
-    this._tasks = tasks;
-    this.emitStatus();
-    this.run();
   }
 }

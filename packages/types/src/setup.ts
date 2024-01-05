@@ -5,15 +5,8 @@ export interface Requirement {
   satisfied: boolean;
 }
 
-export interface SetupTask {
-  progress: number;
-  log: string;
-  state: 'queued' | 'in_progress' | 'done' | 'error';
-}
-
 export interface SetupStatus {
   status: 'required' | 'done' | 'in_progress';
-  tasks: Record<string, SetupTask>;
 }
 
 export interface SetupOS {

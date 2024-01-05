@@ -39,15 +39,25 @@ export const WebAPI: API = {
     async create(data) {
       return await httpPost('/downloads', data);
     },
-    async cancel(id) {
-      return await httpDelete(`/downloads/${encodeURIComponent(id)}`);
-    },
   },
   prompts: {
     async create(projectId, settings) {
       return await httpPost(
         `/prompts/${encodeURIComponent(projectId)}`,
         settings,
+      );
+    },
+  },
+  tasks: {
+    async all() {
+      return await httpGet(`/tasks`);
+    },
+    async queue(queueId) {
+      return await httpGet(`/tasks/${encodeURIComponent(queueId)}`);
+    },
+    async cancel(queueId, taskId) {
+      return await httpDelete(
+        `/tasks/${encodeURIComponent(queueId)}/${encodeURIComponent(taskId)}`,
       );
     },
   },

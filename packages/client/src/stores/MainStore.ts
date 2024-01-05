@@ -8,13 +8,14 @@ import {
   ComfyTorchInfo,
   InstanceInfo,
   Project as APIProject,
+  TaskState,
 } from '@metastable/types';
 
 import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
 import { ProjectStore } from './ProjectStore';
-import { DownloadStore } from './DownloadStore';
 import { SetupStore } from './SetupStore';
 import { API } from '../api';
+import { TaskStore } from './TaskStore';
 
 declare global {
   // eslint-disable-next-line
@@ -23,7 +24,6 @@ declare global {
 
 class MainStore {
   projects = new ProjectStore();
-  downloads = new DownloadStore();
   connected = false;
   private socket;
   info: InstanceInfo = {
@@ -42,6 +42,8 @@ class MainStore {
   backendStatus: ComfyStatus = 'starting';
   backendLog: ComfyLogItem[] = [];
   infoReady = false;
+
+  tasks = new TaskStore();
 
   constructor() {
     makeAutoObservable(this);
@@ -170,23 +172,6 @@ class MainStore {
           }
         }
         break;
-      case 'download.queue':
-        this.downloads.remaining = message.data.queue_remaining;
-        break;
-      case 'download.state':
-        this.downloads.updateDownload(message.data.id, {
-          state: message.data.state,
-          startedAt: message.data.startedAt,
-        });
-        this.refresh();
-        break;
-      case 'download.progress':
-        this.downloads.updateDownload(message.data.id, {
-          state: 'in_progress',
-          progress: message.data.progress,
-          startedAt: message.data.startedAt,
-        });
-        break;
       case 'models.changed':
         this.refresh();
         break;
@@ -213,22 +198,28 @@ class MainStore {
       case 'setup.status':
         this.setup.status = message.data;
         break;
+      case 'task.create':
+      case 'task.log':
+      case 'task.update':
+      case 'task.delete':
+        this.tasks.onMessage(message);
+        break;
     }
   }
 
   hasFile(type: ModelType, name: string) {
-    if (this.info.models[type]?.find(file => file.name === name)) {
+    if (this.info.models[type]?.find(({ file }) => file.name === name)) {
       return 'downloaded';
     }
 
-    const item = this.downloads.queue.find(
+    const item = this.tasks.queues.downloads?.find(
       item =>
-        item.name === name &&
+        item.data.name === name &&
         ['done', 'queued', 'in_progress'].includes(item.state),
     );
 
     if (item) {
-      if (item.state === 'done') {
+      if (item.state === TaskState.SUCCESS) {
         return 'downloaded';
       } else {
         return 'queued';
@@ -236,6 +227,10 @@ class MainStore {
     }
 
     return undefined;
+  }
+
+  defaultModelName(type: ModelType) {
+    return mainStore.info.models[type]?.[0]?.file.name;
   }
 }
 

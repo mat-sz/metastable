@@ -10,6 +10,7 @@ import {
   VarToggle,
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
+import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
@@ -45,7 +46,7 @@ export const Controlnets: React.FC = observer(() => {
               label="Model"
               path="name"
               options={controlnets?.map(
-                ({ name }) =>
+                ({ file: { name } }) =>
                   ({
                     key: name,
                     label: name,
@@ -79,7 +80,9 @@ export const Controlnets: React.FC = observer(() => {
         <VarButton
           buttonLabel="Add Controlnet"
           onClick={() => {
-            project.addControlnet(controlnets?.[0].name);
+            project.addControlnet(
+              mainStore.defaultModelName(ModelType.CONTROLNET),
+            );
           }}
         />
       ) : (

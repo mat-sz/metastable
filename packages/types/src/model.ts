@@ -16,11 +16,12 @@ export enum ModelType {
   VAE_APPROX = 'vae_approx',
 }
 
-export interface Model extends FileInfo {
-  longName?: string;
+export interface Model {
+  file: FileInfo;
+  name?: string;
   description?: string;
   source?: string;
   sourceId?: string;
   nsfw?: boolean;
-  imageFile?: string;
+  image?: string;
 }

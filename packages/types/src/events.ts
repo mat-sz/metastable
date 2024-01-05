@@ -1,6 +1,6 @@
 import { ComfyEvent, ComfyLogItem, ComfyStatus } from './comfy.js';
-import { DownloadEvent } from './download.js';
 import { SetupEvent } from './setup.js';
+import { TaskEvent } from './task.js';
 
 export interface ModelsChangedEvent {
   event: 'models.changed';
@@ -28,10 +28,10 @@ export interface PingEvent {
 
 export type AnyEvent =
   | ComfyEvent
-  | DownloadEvent
   | ModelsChangedEvent
   | BackendStatusEvent
   | BackendLogEvent
   | BackendLogBufferEvent
   | PingEvent
+  | TaskEvent
   | SetupEvent;

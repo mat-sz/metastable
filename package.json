@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach -Api --topological-dev run build",
-    "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server run build",
+    "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server --exclude metastable run build",
     "start": "yarn workspace @metastable/server run start",
     "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run dev"
   },

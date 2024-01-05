@@ -1,26 +1,27 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
+import { TaskState } from '@metastable/types';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { filesize } from '../../../helpers';
 
 export const Queue: React.FC = observer(() => {
-  const downloads = mainStore.downloads;
+  const downloads = mainStore.tasks.downloads;
   return (
     <div>
-      {downloads.queue.map(download => {
-        const percent = (download.progress / download.size) * 100;
+      {downloads.map(download => {
+        const percent = (download.progress || 0) * 100;
         const speed =
-          download.startedAt && download.state === 'in_progress'
-            ? download.progress /
+          download.startedAt && download.state === TaskState.RUNNING
+            ? (download.data.offset || 0) /
               ((new Date().getTime() - download.startedAt) / 1000)
             : undefined;
 
         return (
           <div key={download.id} className={styles.item}>
             <div>
-              <div>{download.name}</div>
+              <div>{download.data.name}</div>
             </div>
             <div>
               <div className={styles.progress}>
@@ -28,7 +29,8 @@ export const Queue: React.FC = observer(() => {
                   <span>{Math.round(percent)}%</span>
                   {speed && <span>[{filesize(speed)}/s]</span>}
                   <span>
-                    [{filesize(download.progress)} / {filesize(download.size)}]
+                    [{filesize(download.data.offset)} /{' '}
+                    {filesize(download.data.size)}]
                   </span>
                   <span>[{download.state}]</span>
                 </div>
@@ -39,13 +41,21 @@ export const Queue: React.FC = observer(() => {
               </div>
             </div>
             <div>
-              {download.state === 'in_progress' ||
-              download.state === 'queued' ? (
-                <button onClick={() => downloads.cancel(download.id)}>
+              {download.state === TaskState.RUNNING ||
+              download.state === TaskState.QUEUED ? (
+                <button
+                  onClick={() =>
+                    mainStore.tasks.cancel('downloads', download.id)
+                  }
+                >
                   Cancel
                 </button>
               ) : (
-                <button onClick={() => downloads.dismiss(download.id)}>
+                <button
+                  onClick={() =>
+                    mainStore.tasks.dismiss('downloads', download.id)
+                  }
+                >
                   Dismiss
                 </button>
               )}
@@ -53,7 +63,7 @@ export const Queue: React.FC = observer(() => {
           </div>
         );
       })}
-      {downloads.queue.length === 0 && <div>No active downloads.</div>}
+      {downloads.length === 0 && <div>No active downloads.</div>}
     </div>
   );
 });

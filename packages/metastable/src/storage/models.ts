@@ -35,7 +35,7 @@ export class Models {
   private modelFile(
     type: string,
     filename: string,
-  ): JSONFile<Omit<Model, 'name' | 'size' | 'imageFile'>> {
+  ): JSONFile<Omit<Model, 'file' | 'image'>> {
     return new JSONFile(this.path(type, `${filename}.json`), {});
   }
 
@@ -83,14 +83,14 @@ export class Models {
 
           for (const extension of IMAGE_EXTENSIONS) {
             if (fileNames.includes(`${name}.${extension}`)) {
-              data.imageFile = `${name}.${extension}`;
+              data.image = `${name}.${extension}`;
               break;
             }
           }
 
           models[dir.name].push({
             ...data,
-            ...file,
+            file,
           });
         }
       }

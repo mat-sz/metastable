@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { VarButton, VarCategory, VarSelect, VarToggle } from 'react-var-ui';
+import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { useUI } from '../../../../contexts/ui';
@@ -24,7 +25,7 @@ export const Upscale: React.FC = observer(() => {
             if (value && !project.settings.models.upscale?.name) {
               project.settings.models.upscale = {
                 enabled: true,
-                name: upscale_models[0].name,
+                name: mainStore.defaultModelName(ModelType.UPSCALE_MODEL),
               };
             }
           }}
@@ -40,7 +41,7 @@ export const Upscale: React.FC = observer(() => {
           label="Model"
           path="models.upscale.name"
           options={upscale_models?.map(
-            ({ name }) =>
+            ({ file: { name } }) =>
               ({
                 key: name,
                 label: name,
