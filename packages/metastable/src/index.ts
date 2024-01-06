@@ -9,7 +9,7 @@ import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
-import { exists, isPathIn } from './helpers.js';
+import { exists, isPathIn } from './helpers/fs.js';
 import { DownloadTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 

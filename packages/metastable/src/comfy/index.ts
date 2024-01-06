@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
 
 import type { PythonInstance } from '../python/index.js';
-import { CircularBuffer } from './helpers.js';
+import { CircularBuffer } from '../helpers/buffer.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

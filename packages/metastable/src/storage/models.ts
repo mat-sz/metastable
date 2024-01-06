@@ -2,8 +2,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Model } from '@metastable/types';
 
-import { tryUnlink, walk } from '../helpers.js';
-import { JSONFile } from './helpers.js';
+import { tryUnlink, walk, JSONFile } from '../helpers/fs.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
 const IMAGE_EXTENSIONS = ['png', 'jpeg', 'jpg', 'gif', 'webp', 'heif', 'avif'];

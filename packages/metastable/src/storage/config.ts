@@ -1,4 +1,4 @@
-import { JSONFile } from './helpers.js';
+import { JSONFile } from '../helpers/fs.js';
 
 interface ConfigType {
   python: {

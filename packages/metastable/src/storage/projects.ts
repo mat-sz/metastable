@@ -1,10 +1,9 @@
 import path from 'path';
 import fs from 'fs/promises';
+import { rimraf } from 'rimraf';
 import { Project } from '@metastable/types';
 
-import { freeDirName, filenames } from '../helpers.js';
-import { JSONFile, TextFile } from './helpers.js';
-import { rimraf } from 'rimraf';
+import { freeDirName, filenames, JSONFile, TextFile } from '../helpers/fs.js';
 
 export class Projects {
   constructor(private projectsDir: string) {}

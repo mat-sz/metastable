@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { nanoid } from 'nanoid/non-secure';
 import { Task, TaskState } from '@metastable/types';
 
-import { PromiseWrapper } from '../python/spawn.js';
+import { WrappedPromise } from '../helpers/promise.js';
 
 export class BaseTask<T = any> extends EventEmitter implements Task<T> {
   id: string = nanoid();
@@ -14,7 +14,7 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
   #data: T;
   protected cancellationPending = false;
 
-  #preparedPromises: PromiseWrapper<void>[] = [];
+  #preparedPromises: WrappedPromise<void>[] = [];
 
   constructor(
     public readonly type: string,
@@ -28,7 +28,7 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
 
   async waitForPrepared(): Promise<void> {
     if (this.#state === TaskState.PREPARING) {
-      const promise = new PromiseWrapper<void>();
+      const promise = new WrappedPromise<void>();
       this.#preparedPromises.push(promise);
       return promise.promise;
     }

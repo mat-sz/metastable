@@ -4,9 +4,9 @@ import { createWriteStream } from 'fs';
 import axios from 'axios';
 import { TaskState } from '@metastable/types';
 
-import { exists } from '../helpers.js';
+import { exists } from '../helpers/fs.js';
 import { BaseTask } from '../tasks/task.js';
-import { PromiseWrapper } from '../python/spawn.js';
+import { WrappedPromise } from '../helpers/promise.js';
 
 interface DownloadData {
   offset: number;
@@ -80,7 +80,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       await fs.mkdir(path.dirname(partPath), { recursive: true });
     }
 
-    const wrapped = new PromiseWrapper<TaskState>();
+    const wrapped = new WrappedPromise<TaskState>();
     const writer = createWriteStream(partPath);
 
     const onClose = async () => {

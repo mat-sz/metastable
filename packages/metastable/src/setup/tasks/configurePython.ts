@@ -2,9 +2,10 @@ import os from 'os';
 import { spawn } from 'child_process';
 import { SetupSettings, TaskState } from '@metastable/types';
 
-import { PromiseWrapper, PythonInstance } from '../../python/index.js';
+import { PythonInstance } from '../../python/index.js';
 import { requiredPackages } from '../helpers.js';
 import { BaseTask } from '../../tasks/task.js';
+import { WrappedPromise } from '../../helpers/promise.js';
 
 export class ConfigurePythonTask extends BaseTask {
   constructor(
@@ -81,7 +82,7 @@ export class ConfigurePythonTask extends BaseTask {
       },
     );
 
-    const wrapped = new PromiseWrapper<TaskState>();
+    const wrapped = new WrappedPromise<TaskState>();
     wrapped.on('finish', () => {
       proc.kill('SIGTERM');
     });
