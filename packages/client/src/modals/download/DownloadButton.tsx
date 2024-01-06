@@ -1,14 +1,13 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsDownload, BsHourglass } from 'react-icons/bs';
+import { DownloadSettings, TaskState } from '@metastable/types';
 
 import { mainStore } from '../../stores/MainStore';
-import { DownloadFile } from '../../types/model';
 import { filesize } from '../../helpers';
-import { TaskState } from '@metastable/types';
 
 interface DownloadButtonProps {
-  files: DownloadFile[];
+  files: DownloadSettings[];
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
@@ -83,7 +82,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       <button
         onClick={() => {
           for (const file of remaining) {
-            mainStore.tasks.download(file.type, file.url, file.name);
+            mainStore.tasks.download(file);
           }
         }}
       >

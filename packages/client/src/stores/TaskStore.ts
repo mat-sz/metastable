@@ -1,5 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { DownloadData, ModelType, Task, TaskEvent } from '@metastable/types';
+import {
+  DownloadData,
+  DownloadSettings,
+  Task,
+  TaskEvent,
+} from '@metastable/types';
 
 import { API } from '../api';
 
@@ -43,12 +48,12 @@ export class TaskStore {
     await API.tasks.dismiss(queueId, taskId);
   }
 
-  async download(type: ModelType, url: string, name: string) {
-    this.waiting.add(name);
+  async download(settings: DownloadSettings) {
+    this.waiting.add(settings.name);
 
-    await API.downloads.create({ type, url, name });
+    await API.downloads.create(settings);
     runInAction(() => {
-      this.waiting.delete(name);
+      this.waiting.delete(settings.name);
     });
   }
 

@@ -1,18 +1,11 @@
-import { ModelType } from '@metastable/types';
-
-export interface DownloadFile {
-  name: string;
-  type: ModelType;
-  url: string;
-  size?: number;
-}
+import { DownloadSettings, ModelType } from '@metastable/types';
 
 export interface DownloadableModel {
   name: string;
   source?: string;
   sourceId?: string;
   type: ModelType;
-  downloads: DownloadFile[];
+  downloads: DownloadSettings[];
   recommended?: boolean;
   description?: string;
   homepage?: string;

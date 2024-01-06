@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { createWriteStream } from 'fs';
 import axios from 'axios';
-import { TaskState } from '@metastable/types';
+import { DownloadSettings, TaskState } from '@metastable/types';
 
 import { exists } from '../helpers/fs.js';
 import { BaseTask } from '../tasks/task.js';
@@ -102,45 +102,49 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
         end = 0;
       }
 
-      const { data } = await axios({
-        url: this.downloadUrl,
-        method: 'GET',
-        responseType: 'stream',
-        headers: {
-          'User-Agent': USER_AGENT,
-          Range: `bytes=${start}-${end || ''}`,
-        },
-      });
-      data.on('data', (chunk: any) => {
-        if (this.cancellationPending) {
-          data.destroy();
-          return;
-        }
+      try {
+        const { data } = await axios({
+          url: this.downloadUrl,
+          method: 'GET',
+          responseType: 'stream',
+          headers: {
+            'User-Agent': USER_AGENT,
+            Range: `bytes=${start}-${end || ''}`,
+          },
+        });
+        data.on('data', (chunk: any) => {
+          if (this.cancellationPending) {
+            data.destroy();
+            return;
+          }
 
-        this.#offset = chunk.length + (this.#offset || 0);
-        this.emitProgress();
-      });
-      data.on('end', async () => {
-        if (this.cancellationPending) {
-          data.close();
-          return;
-        }
+          this.#offset = chunk.length + (this.#offset || 0);
+          this.emitProgress();
+        });
+        data.on('end', () => {
+          if (this.cancellationPending) {
+            data.close();
+            return;
+          }
 
-        if (!end) {
-          onClose();
-        } else {
-          data.removeAllListeners();
-          start = end + 1;
-          end += CHUNK_SIZE;
-          nextChunk();
-        }
-      });
-      data.on('close', () => {
-        if (this.cancellationPending) {
-          onClose();
-        }
-      });
-      data.pipe(writer, { end: false });
+          if (!end) {
+            onClose();
+          } else {
+            data.removeAllListeners();
+            start = end + 1;
+            end += CHUNK_SIZE;
+            nextChunk();
+          }
+        });
+        data.on('close', () => {
+          if (this.cancellationPending) {
+            onClose();
+          }
+        });
+        data.pipe(writer, { end: false });
+      } catch (e) {
+        wrapped.reject(e);
+      }
     };
 
     nextChunk();
@@ -167,5 +171,58 @@ export class DownloadTask extends BaseDownloadTask {
     public savePath: string,
   ) {
     super('download', url, savePath);
+  }
+}
+
+export class DownloadModelTask extends BaseDownloadTask {
+  constructor(
+    public settings: DownloadSettings,
+    public savePath: string,
+  ) {
+    super('download', settings.url, savePath);
+  }
+
+  async execute() {
+    const state = await super.execute();
+
+    if (state === TaskState.SUCCESS) {
+      const { imageUrl, info } = this.settings;
+
+      if (imageUrl) {
+        try {
+          const { data, headers } = await axios({
+            url: imageUrl,
+            method: 'GET',
+            responseType: 'stream',
+            headers: {
+              'User-Agent': USER_AGENT,
+            },
+          });
+
+          let ext: string | undefined = undefined;
+          switch (headers['content-type']) {
+            case 'image/jpeg':
+              ext = 'jpg';
+              break;
+            case 'image/png':
+              ext = 'png';
+              break;
+          }
+
+          if (ext) {
+            const writeStream = createWriteStream(`${this.savePath}.${ext}`);
+            data.pipe(writeStream);
+          }
+        } catch {}
+      }
+
+      if (info) {
+        try {
+          await fs.writeFile(`${this.savePath}.json`, JSON.stringify(info));
+        } catch {}
+      }
+    }
+
+    return state;
   }
 }

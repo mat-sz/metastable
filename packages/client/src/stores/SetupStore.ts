@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import {
+  DownloadSettings,
   Requirement,
   SetupDetails,
   SetupSettings,
@@ -8,7 +9,6 @@ import {
 
 import { API } from '../api';
 import { filesize } from '../helpers';
-import { DownloadFile } from '../types/model';
 
 const GB = 1024 * 1024 * 1024;
 const VRAM_MIN = 2 * GB;
@@ -30,7 +30,7 @@ export class SetupStore {
 
   pythonMode: SetupSettings['pythonMode'] = 'static';
   gpuIndex: number = 0;
-  downloads: DownloadFile[] = [];
+  downloads: DownloadSettings[] = [];
 
   constructor() {
     makeAutoObservable(this);

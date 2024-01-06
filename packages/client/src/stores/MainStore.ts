@@ -207,7 +207,7 @@ class MainStore {
     }
   }
 
-  hasFile(type: ModelType, name: string) {
+  hasFile(type: string, name: string) {
     if (this.info.models[type]?.find(({ file }) => file.name === name)) {
       return 'downloaded';
     }

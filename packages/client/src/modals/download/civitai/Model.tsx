@@ -31,6 +31,7 @@ interface ModelVersionProps {
 
 const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
   const primaryFile = version.files.find(file => file.primary);
+  const imageUrl = version.images[0]?.url;
   const type = CivitAITypeMap[model.type];
 
   return (
@@ -45,6 +46,14 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                   type,
                   url: primaryFile.downloadUrl,
                   size: primaryFile.sizeKB * 1024,
+                  imageUrl,
+                  info: {
+                    name: model.name,
+                    nsfw: model.nsfw,
+                    description: model.description,
+                    source: 'civitai',
+                    sourceId: `${model.id}`,
+                  },
                 },
               ]}
             />

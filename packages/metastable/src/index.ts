@@ -3,14 +3,19 @@ import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
-import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
+import {
+  AnyEvent,
+  DownloadSettings,
+  Project,
+  ProjectSettings,
+} from '@metastable/types';
 
 import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
 import { exists, isPathIn } from './helpers/fs.js';
-import { DownloadTask } from './downloader/index.js';
+import { DownloadModelTask, DownloadTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 
 const require = createRequire(import.meta.url);
@@ -213,7 +218,7 @@ export class Metastable extends EventEmitter {
     return { id };
   }
 
-  async downloadModel(data: { name: string; type: string; url: string }) {
+  async downloadModel(data: DownloadSettings) {
     const savePath = this.storage.models.path(data.type, data.name);
     if (!isPathIn(this.storage.modelsDir, savePath)) {
       throw new Error(
@@ -236,7 +241,7 @@ export class Metastable extends EventEmitter {
     }
 
     return this.tasks.queues.downloads.add(
-      new DownloadTask(data.url, savePath),
+      new DownloadModelTask(data, savePath),
     );
   }
 

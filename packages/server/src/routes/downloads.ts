@@ -8,6 +8,8 @@ const downloadBody = {
     url: { type: 'string' },
     type: { type: 'string' },
     name: { type: 'string' },
+    imageUrl: { type: 'string' },
+    info: { type: 'object' },
   },
   required: ['url', 'name', 'type'],
 } as const satisfies JSONSchema;
