@@ -16,6 +16,7 @@ import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
 import { useUI } from '../../../../contexts/ui';
 import { DownloadManager } from '../../../../modals/download';
+import { VarModel } from '../components/VarModel';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -42,17 +43,7 @@ export const Controlnets: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarSelect
-              label="Model"
-              path="name"
-              options={controlnets?.map(
-                ({ file: { name } }) =>
-                  ({
-                    key: name,
-                    label: name,
-                  }) || [],
-              )}
-            />
+            <VarModel path="name" modelType="controlnet" />
             <VarSlider
               label="Strength"
               path="strength"

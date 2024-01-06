@@ -11,6 +11,7 @@ import {
 } from 'react-var-ui';
 
 import { mainStore } from '../../../../stores/MainStore';
+import { VarModel } from '../components/VarModel';
 
 export const General: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -18,16 +19,7 @@ export const General: React.FC = observer(() => {
   return (
     <>
       <VarCategory label="Checkpoint">
-        <VarSelect
-          label="Checkpoint"
-          path="models.base.name"
-          options={
-            mainStore.info.models.checkpoints?.map(({ file: { name } }) => ({
-              key: name,
-              label: name,
-            })) || []
-          }
-        />
+        <VarModel path="models.base.name" modelType="checkpoints" />
       </VarCategory>
       <VarCategory label="Conditioning">
         <VarString label="Positive" path="conditioning.positive" multiline />

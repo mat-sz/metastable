@@ -6,6 +6,10 @@ export function getUrl(path: string, protocol = 'http') {
 }
 
 export function getStaticUrl(path: string) {
+  if (!path.startsWith('/')) {
+    path = `/${path}`;
+  }
+
   if (window.dataDir) {
     return `${window.dataDir}${path}`;
   }

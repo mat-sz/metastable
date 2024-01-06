@@ -1,11 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { VarButton, VarCategory, VarSelect, VarToggle } from 'react-var-ui';
+import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { useUI } from '../../../../contexts/ui';
 import { DownloadManager } from '../../../../modals/download';
+import { VarModel } from '../components/VarModel';
 
 export const Upscale: React.FC = observer(() => {
   const project = mainStore.project!;
@@ -37,17 +38,7 @@ export const Upscale: React.FC = observer(() => {
         />
       )}
       {enabled && (
-        <VarSelect
-          label="Model"
-          path="models.upscale.name"
-          options={upscale_models?.map(
-            ({ file: { name } }) =>
-              ({
-                key: name,
-                label: name,
-              }) || [],
-          )}
-        />
+        <VarModel path="models.upscale.name" modelType="upscale_models" />
       )}
     </VarCategory>
   );

@@ -4,7 +4,6 @@ import {
   VarArray,
   VarButton,
   VarCategory,
-  VarSelect,
   VarSlider,
   VarToggle,
 } from 'react-var-ui';
@@ -15,6 +14,7 @@ import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
 import { DownloadManager } from '../../../../modals/download';
 import { useUI } from '../../../../contexts/ui';
+import { VarModel } from '../components/VarModel';
 
 export const LoRAs: React.FC = observer(() => {
   const { showModal } = useUI();
@@ -41,17 +41,7 @@ export const LoRAs: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarSelect
-              label="Model"
-              path="name"
-              options={loras?.map(
-                ({ file: { name } }) =>
-                  ({
-                    key: name,
-                    label: name,
-                  }) || [],
-              )}
-            />
+            <VarModel path="name" modelType="loras" />
             <VarSlider
               label="Strength"
               path="strength"

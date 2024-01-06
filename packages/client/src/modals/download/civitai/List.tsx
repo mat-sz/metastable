@@ -15,11 +15,7 @@ export const Item: React.FC<ItemProps> = ({ model, onSelect }) => {
   const imageUrl = model.modelVersions?.[0]?.images[0]?.url;
 
   return (
-    <div
-      key={model.id}
-      className={styles.model}
-      onClick={() => onSelect(model)}
-    >
+    <div className={styles.model} onClick={() => onSelect(model)}>
       <div className={styles.preview}>
         {imageUrl ? (
           <img
@@ -67,7 +63,7 @@ export const List: React.FC<ListProps> = ({ data, onSelect }) => {
   return (
     <div className={styles.list}>
       {data.items.map(model => (
-        <Item key={model.id} onSelect={() => onSelect(model)} model={model} />
+        <Item key={model.id} onSelect={onSelect} model={model} />
       ))}
     </div>
   );
