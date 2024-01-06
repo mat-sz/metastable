@@ -34,6 +34,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     queue: (queueId: string) => ipcRenderer.invoke('tasks:queue', queueId),
     cancel: (queueId: string, taskId: string) =>
       ipcRenderer.invoke('tasks:cancel', queueId, taskId),
+    dismiss: (queueId: string, taskId: string) =>
+      ipcRenderer.invoke('tasks:dismiss', queueId, taskId),
   },
   isMac: process.platform === 'darwin',
 });

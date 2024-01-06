@@ -56,6 +56,13 @@ export const WebAPI: API = {
       return await httpGet(`/tasks/${encodeURIComponent(queueId)}`);
     },
     async cancel(queueId, taskId) {
+      return await httpPost(
+        `/tasks/${encodeURIComponent(queueId)}/${encodeURIComponent(
+          taskId,
+        )}/cancel`,
+      );
+    },
+    async dismiss(queueId, taskId) {
       return await httpDelete(
         `/tasks/${encodeURIComponent(queueId)}/${encodeURIComponent(taskId)}`,
       );

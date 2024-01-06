@@ -215,7 +215,12 @@ class MainStore {
     const item = this.tasks.queues.downloads?.find(
       item =>
         item.data.name === name &&
-        ['done', 'queued', 'in_progress'].includes(item.state),
+        [
+          TaskState.SUCCESS,
+          TaskState.RUNNING,
+          TaskState.QUEUED,
+          TaskState.PREPARING,
+        ].includes(item.state),
     );
 
     if (item) {

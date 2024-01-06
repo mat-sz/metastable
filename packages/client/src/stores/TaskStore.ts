@@ -24,10 +24,11 @@ export class TaskStore {
   }
 
   update(update: { id: string; queueId: string } & Partial<Task<any>>) {
-    this.queues[update.queueId] = this.queues[update.queueId].map(item =>
-      item.id === update.id ? { ...item, ...update } : item,
+    this.updateQueue(update.queueId, queue =>
+      queue.map(item =>
+        item.id === update.id ? { ...item, ...update } : item,
+      ),
     );
-    this.queues = { ...this.queues };
   }
 
   async cancel(queueId: string, taskId: string) {
@@ -38,51 +39,58 @@ export class TaskStore {
     return this.queues.downloads || [];
   }
 
-  dismiss(queueId: string, taskId: string) {
-    this.queues[queueId] = this.queues[queueId].filter(
-      task => task.id !== taskId,
-    );
+  async dismiss(queueId: string, taskId: string) {
+    await API.tasks.dismiss(queueId, taskId);
   }
 
   async download(type: ModelType, url: string, name: string) {
     this.waiting.add(name);
 
-    try {
-      await API.downloads.create({ type, url, name });
-    } catch {
-      // TODO: Handle json-less HTTP calls differently.
-    }
+    await API.downloads.create({ type, url, name });
     runInAction(() => {
       this.waiting.delete(name);
     });
   }
 
-  onMessage(message: TaskEvent) {
-    switch (message.event) {
+  find(queueId: string, id: string) {
+    return this.queues[queueId]?.find(item => item.id === id);
+  }
+
+  updateQueue(queueId: string, callback: (queue: Task<any>[]) => Task<any>[]) {
+    const queue = this.queues[queueId] || [];
+    this.queues[queueId] = callback(queue);
+  }
+
+  appendLog(queueId: string, taskId: string, log: string) {
+    const item = this.find(queueId, taskId);
+    if (item?.log) {
+      const update = {
+        id: taskId,
+        queueId,
+        log: (log.startsWith('\b')
+          ? `${item.log.substring(0, item.log.lastIndexOf('\n'))}\n${log}`
+          : `\n${log}`
+        ).trim(),
+      };
+      this.update(update);
+    }
+  }
+
+  onMessage({ event, data }: TaskEvent) {
+    switch (event) {
       case 'task.create':
-        this.queues[message.data.queueId].push(message.data);
+        this.updateQueue(data.queueId, queue => [...queue, data]);
         break;
       case 'task.log':
-        {
-          const item = this.queues[message.data.queueId].find(
-            item => item.id === message.data.id,
-          );
-          if (item?.log) {
-            const update = {
-              ...message.data,
-              log: (message.data.log.startsWith('\b')
-                ? `${item.log.substring(0, item.log.lastIndexOf('\n'))}\n${
-                    message.data.log
-                  }`
-                : `\n${message.data.log}`
-              ).trim(),
-            };
-            this.update(update);
-          }
-        }
+        this.appendLog(data.queueId, data.id, data.log);
         break;
       case 'task.update':
-        this.update(message.data);
+        this.update(data);
+        break;
+      case 'task.delete':
+        this.updateQueue(data.queueId, queue =>
+          queue.filter(item => item.id !== data.id),
+        );
         break;
     }
   }

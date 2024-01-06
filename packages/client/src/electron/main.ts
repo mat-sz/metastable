@@ -161,14 +161,20 @@ async function createWindow() {
   });
 
   ipcMain.handle('tasks:all', async () => {
-    return metastable.getQueues();
+    return metastable.tasks.all();
   });
   ipcMain.handle('tasks:queue', async (_, queueId: string) => {
-    return metastable.getTasks(queueId);
+    return metastable.tasks.queue(queueId);
   });
   ipcMain.handle('tasks:cancel', async (_, queueId: string, taskId: string) => {
-    return metastable.cancelTask(queueId, taskId);
+    return metastable.tasks.cancel(queueId, taskId);
   });
+  ipcMain.handle(
+    'tasks:dismiss',
+    async (_, queueId: string, taskId: string) => {
+      return metastable.tasks.dismiss(queueId, taskId);
+    },
+  );
 
   win.setMenu(null);
 

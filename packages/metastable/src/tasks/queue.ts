@@ -15,7 +15,7 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
     return this.#tasks.map(task => task.toJSON());
   }
 
-  async add(task: BaseTask<T>) {
+  add(task: BaseTask<T>) {
     this.#tasks.push(task);
     this.emit('event', {
       event: 'task.create',
@@ -63,8 +63,8 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
       await current.waitForPrepared();
       current.started();
       try {
-        await current.execute();
-        current.stopped(TaskState.SUCCESS);
+        const state = await current.execute();
+        current.stopped(state);
       } catch (e) {
         current.appendLog(String(e));
         current.stopped(TaskState.FAILED);
@@ -82,13 +82,34 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
     item?.cancel();
   }
 
+  dismiss(id: string) {
+    const item = this.#tasks.find(item => item.id === id);
+    if (
+      item &&
+      item.state !== TaskState.RUNNING &&
+      item.state !== TaskState.CANCELLING
+    ) {
+      this.#tasks = this.#tasks.filter(item => item.id !== id);
+      this.emit('event', {
+        event: 'task.delete',
+        data: {
+          id: item.id,
+          queueId: this.id,
+        },
+      });
+    }
+  }
+
   purge() {
-    this.#tasks = this.#tasks.filter(
-      item =>
+    for (const item of this.#tasks) {
+      if (
         item.state !== TaskState.QUEUED &&
         item.state !== TaskState.RUNNING &&
-        item.state !== TaskState.CANCELLING,
-    );
+        item.state !== TaskState.CANCELLING
+      ) {
+        this.dismiss(item.id);
+      }
+    }
   }
 
   toJSON(): TaskQueue<T> {

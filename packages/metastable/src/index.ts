@@ -1,22 +1,17 @@
 import EventEmitter from 'events';
 import { createRequire } from 'module';
+import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
-import {
-  AnyEvent,
-  Project,
-  ProjectSettings,
-  Task,
-  TaskQueue,
-} from '@metastable/types';
+import { AnyEvent, Project, ProjectSettings } from '@metastable/types';
 
 import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
 import { exists, isPathIn } from './helpers.js';
-import { BaseQueue } from './task/queue.js';
 import { DownloadTask } from './downloader/index.js';
+import { Tasks } from './tasks/index.js';
 
 const require = createRequire(import.meta.url);
 const chokidar = require('chokidar');
@@ -27,10 +22,7 @@ export class Metastable extends EventEmitter {
   comfy?: Comfy;
   settingsCache: Record<Project['id'], string> = {};
   setup = new Setup(this);
-  queues: Record<string, BaseQueue> = {
-    downloads: new BaseQueue('downloads'),
-    setup: new BaseQueue('setup'),
-  };
+  tasks = new Tasks();
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
@@ -63,10 +55,7 @@ export class Metastable extends EventEmitter {
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.storage = new Storage(dataRoot);
     this.setup.on('event', this.onEvent);
-
-    for (const value of Object.values(this.queues)) {
-      value.on('event', this.onEvent);
-    }
+    this.tasks.on('event', this.onEvent);
 
     let timeout: any = undefined;
     chokidar.watch(this.storage.modelsDir, {}).on('all', (event: string) => {
@@ -237,7 +226,16 @@ export class Metastable extends EventEmitter {
       throw new Error('Only HTTP(S) URLs are supported.');
     }
 
-    return await this.queues.downloads.add(
+    const basename = path.basename(savePath);
+    if (
+      this.tasks.queues.downloads.tasks.find(
+        item => item.data.name === basename,
+      )
+    ) {
+      return;
+    }
+
+    return this.tasks.queues.downloads.add(
       new DownloadTask(data.url, savePath),
     );
   }
@@ -248,21 +246,5 @@ export class Metastable extends EventEmitter {
       schedulers: this.comfy?.schedulers || [],
       models: await this.storage.models.all(),
     };
-  }
-
-  getQueues(): Record<string, Task<any>[]> {
-    const queues: Record<string, Task<any>[]> = {};
-    for (const [key, value] of Object.entries(this.queues)) {
-      queues[key] = value.toJSON().tasks;
-    }
-    return queues;
-  }
-
-  getTasks(queueId: string): Task<any>[] {
-    return this.queues[queueId]?.tasks || [];
-  }
-
-  cancelTask(queueId: string, taskId: string) {
-    this.queues[queueId]?.cancel(taskId);
   }
 }

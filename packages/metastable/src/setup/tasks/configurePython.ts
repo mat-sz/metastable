@@ -1,10 +1,10 @@
 import os from 'os';
 import { spawn } from 'child_process';
-import { SetupSettings } from '@metastable/types';
+import { SetupSettings, TaskState } from '@metastable/types';
 
 import { PromiseWrapper, PythonInstance } from '../../python/index.js';
 import { requiredPackages } from '../helpers.js';
-import { BaseTask } from '../../task/task.js';
+import { BaseTask } from '../../tasks/task.js';
 
 export class ConfigurePythonTask extends BaseTask {
   constructor(
@@ -81,7 +81,7 @@ export class ConfigurePythonTask extends BaseTask {
       },
     );
 
-    const wrapped = new PromiseWrapper<void>();
+    const wrapped = new PromiseWrapper<TaskState>();
     wrapped.on('finish', () => {
       proc.kill('SIGTERM');
     });
@@ -143,7 +143,7 @@ export class ConfigurePythonTask extends BaseTask {
           new Error(`Process exited with non-zero exit code: ${code}`),
         );
       } else {
-        wrapped.resolve();
+        wrapped.resolve(TaskState.SUCCESS);
       }
     });
     proc.on('error', err => {

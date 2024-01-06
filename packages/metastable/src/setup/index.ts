@@ -107,7 +107,12 @@ export class Setup extends EventEmitter {
     this._status = 'in_progress';
     this.emitStatus();
 
-    this.metastable.queues.setup.once('empty', () => this.done());
+    const setupQueue = this.metastable.tasks.queues.setup;
+
+    setupQueue.once('empty', () => {
+      setupQueue.purge();
+      this.done();
+    });
 
     if (settings.pythonMode === 'static') {
       const archivePath = path.join(
@@ -117,11 +122,9 @@ export class Setup extends EventEmitter {
       const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
       this._packagesDir = undefined;
       this._pythonHome = targetPath;
-      this.metastable.queues.setup.add(new DownloadPythonTask(archivePath));
-      this.metastable.queues.setup.add(
-        new ExtractPythonTask(archivePath, targetPath),
-      );
-      this.metastable.queues.setup.add(
+      setupQueue.add(new DownloadPythonTask(archivePath));
+      setupQueue.add(new ExtractPythonTask(archivePath, targetPath));
+      setupQueue.add(
         new ConfigurePythonTask(settings.torchMode, undefined, targetPath),
       );
     } else {
@@ -132,13 +135,13 @@ export class Setup extends EventEmitter {
       );
       this._packagesDir = packagesDir;
       this._pythonHome = undefined;
-      this.metastable.queues.setup.add(
+      setupQueue.add(
         new ConfigurePythonTask(settings.torchMode, packagesDir, undefined),
       );
     }
 
     if (settings.downloads.length) {
-      this.metastable.queues.setup.add(
+      this.metastable.tasks.queues.setup.add(
         new DownloadModelsTask(this.metastable, settings.downloads),
       );
     }

@@ -1,10 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsDownload, BsHourglass, BsXCircle } from 'react-icons/bs';
+import { BsDownload, BsHourglass } from 'react-icons/bs';
 
 import { mainStore } from '../../stores/MainStore';
 import { DownloadFile } from '../../types/model';
 import { filesize } from '../../helpers';
+import { TaskState } from '@metastable/types';
 
 interface DownloadButtonProps {
   files: DownloadFile[];
@@ -44,7 +45,12 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       const items = mainStore.tasks.downloads.filter(
         item =>
           !!files.find(file => file.name === item.data.name) &&
-          ['done', 'queued', 'in_progress'].includes(item.state),
+          [
+            TaskState.SUCCESS,
+            TaskState.RUNNING,
+            TaskState.QUEUED,
+            TaskState.PREPARING,
+          ].includes(item.state),
       );
 
       if (items.length) {

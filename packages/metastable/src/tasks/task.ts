@@ -36,7 +36,7 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
     return Promise.resolve();
   }
 
-  async execute(): Promise<void> {
+  async execute(): Promise<TaskState> {
     throw new Error('Not implemented');
   }
 

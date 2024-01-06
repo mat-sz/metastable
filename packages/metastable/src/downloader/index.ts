@@ -5,7 +5,7 @@ import axios from 'axios';
 import { TaskState } from '@metastable/types';
 
 import { exists } from '../helpers.js';
-import { BaseTask } from '../task/task.js';
+import { BaseTask } from '../tasks/task.js';
 import { PromiseWrapper } from '../python/spawn.js';
 
 interface DownloadData {
@@ -80,18 +80,17 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       await fs.mkdir(path.dirname(partPath), { recursive: true });
     }
 
-    const wrapped = new PromiseWrapper<void>();
+    const wrapped = new PromiseWrapper<TaskState>();
     const writer = createWriteStream(partPath);
 
     const onClose = async () => {
       writer.close();
       if (this.cancellationPending) {
         await fs.unlink(partPath);
-        // TODO: Return cancelled?
-        wrapped.resolve();
+        wrapped.resolve(TaskState.CANCELLED);
       } else {
         await fs.rename(partPath, this.savePath);
-        wrapped.resolve();
+        wrapped.resolve(TaskState.SUCCESS);
       }
     };
 

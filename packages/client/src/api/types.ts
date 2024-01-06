@@ -44,5 +44,6 @@ export interface API {
     all(): Promise<Record<string, Task<any>[]>>;
     queue(queueId: string): Promise<Task<any>[]>;
     cancel(queueId: string, taskId: string): Promise<void>;
+    dismiss(queueId: string, taskId: string): Promise<void>;
   };
 }

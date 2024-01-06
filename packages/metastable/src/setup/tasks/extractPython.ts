@@ -1,8 +1,9 @@
 import decompress from 'decompress';
 import { rimraf } from 'rimraf';
+import { TaskState } from '@metastable/types';
 
 import { tryUnlink } from '../../helpers.js';
-import { BaseTask } from '../../task/task.js';
+import { BaseTask } from '../../tasks/task.js';
 
 export class ExtractPythonTask extends BaseTask {
   constructor(
@@ -24,5 +25,7 @@ export class ExtractPythonTask extends BaseTask {
     tryUnlink(this.archivePath);
 
     this.appendLog('Done.');
+
+    return TaskState.SUCCESS;
   }
 }
