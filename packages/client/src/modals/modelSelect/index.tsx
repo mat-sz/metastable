@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../stores/MainStore';
@@ -13,13 +13,23 @@ interface Props {
 
 export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
   const { close } = useModal();
+  const [search, setSearch] = useState('');
   const available = mainStore.info.models[type] || [];
 
   return (
     <Modal title="Select model">
+      <input
+        type="text"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
       <List
         type={type}
-        data={available}
+        data={
+          search
+            ? available.filter(item => item.file.name.includes(search.trim()))
+            : available
+        }
         onSelect={model => {
           onSelect(model.file.name);
           close();
