@@ -900,7 +900,6 @@ __metadata:
     "@types/http-errors": "npm:^2.0.4"
     "@types/node": "npm:^20.10.3"
     "@types/ws": "npm:^8.5.10"
-    dotenv-flow: "npm:^4.0.1"
     fastify: "npm:^4.24.3"
     http-errors: "npm:^2.0.0"
     json-schema-to-ts: "npm:^2.9.2"
@@ -2632,22 +2631,6 @@ __metadata:
   version: 5.1.0
   resolution: "dotenv-expand@npm:5.1.0"
   checksum: 24ac633de853ef474d0421cc639328b7134109c8dc2baaa5e3afb7495af5e9237136d7e6971e55668e4dce915487eb140967cdd2b3e99aa439e0f6bf8b56faeb
-  languageName: node
-  linkType: hard
-
-"dotenv-flow@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "dotenv-flow@npm:4.0.1"
-  dependencies:
-    dotenv: "npm:^16.0.0"
-  checksum: 3316952472432ddf66594c5af4880e83da022ec0e541bdc386c899630c22adbd91f92cd92f22bd82cd0f7867232090c0863beea0f4a06df075f17753d001c784
-  languageName: node
-  linkType: hard
-
-"dotenv@npm:^16.0.0":
-  version: 16.3.1
-  resolution: "dotenv@npm:16.3.1"
-  checksum: b95ff1bbe624ead85a3cd70dbd827e8e06d5f05f716f2d0cbc476532d54c7c9469c3bc4dd93ea519f6ad711cb522c00ac9a62b6eb340d5affae8008facc3fbd7
   languageName: node
   linkType: hard
 

@@ -1,6 +1,3 @@
-import dotenvFlow from 'dotenv-flow';
-dotenvFlow.config();
-
 import path from 'path';
 
 export const useProxy = process.env.SERVER_USE_PROXY === '1';
