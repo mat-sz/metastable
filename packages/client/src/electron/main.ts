@@ -103,6 +103,7 @@ async function createWindow() {
     minHeight: 1000,
     width: 1200,
     height: 1000,
+    resizable: true,
     titleBarStyle: 'hidden',
     backgroundColor: '#11111a',
     transparent: true,
@@ -121,7 +122,25 @@ async function createWindow() {
 
   ipcMain.on('ready', () => {
     metastable.replayEvents(event => win.webContents.send('event', event));
+    win.webContents.send('window:maximized', win.isMaximized());
   });
+
+  ipcMain.on('window:minimize', () => {
+    win.minimize();
+  });
+  ipcMain.on('window:maximize', () => {
+    win.maximize();
+  });
+  ipcMain.on('window:restore', () => {
+    win.unmaximize();
+  });
+  ipcMain.on('window:close', () => {
+    win.close();
+  });
+  win.on('resize', () => {
+    win.webContents.send('window:maximized', win.isMaximized());
+  });
+
   ipcMain.handle('instance:info', async () => {
     return {
       ...(await metastable.info()),

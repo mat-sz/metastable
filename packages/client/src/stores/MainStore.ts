@@ -35,6 +35,7 @@ class MainStore {
 
   setup = new SetupStore();
 
+  isMaximized = false;
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
@@ -51,6 +52,9 @@ class MainStore {
     if (IS_ELECTRON) {
       window.electronAPI.ready();
       window.electronAPI.onEvent((event: any) => this.onMessage(event));
+      window.electronWindow.onMaximized((isMaximized: boolean) =>
+        runInAction(() => (this.isMaximized = isMaximized)),
+      );
       this.connected = true;
     } else {
       this.socket = new TypeSocket<AnyEvent>(getUrl('/ws', 'ws'), {

@@ -40,6 +40,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isMac: process.platform === 'darwin',
 });
 
+contextBridge.exposeInMainWorld('electronWindow', {
+  onMaximized: (callback: (isMaximized: boolean) => void) =>
+    ipcRenderer.on('window:maximized', (_: any, value: boolean) =>
+      callback(value),
+    ),
+  minimize: () => ipcRenderer.send('window:minimize'),
+  maximize: () => ipcRenderer.send('window:maximize'),
+  restore: () => ipcRenderer.send('window:restore'),
+  close: () => ipcRenderer.send('window:close'),
+});
+
 function domReady(
   condition: DocumentReadyState[] = ['complete', 'interactive'],
 ) {
