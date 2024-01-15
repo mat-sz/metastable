@@ -14,7 +14,7 @@ import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
-import { exists, isPathIn } from './helpers/fs.js';
+import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
 import { DownloadModelTask, DownloadTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 
@@ -50,7 +50,7 @@ export class Metastable extends EventEmitter {
   };
 
   constructor(
-    dataRoot: string,
+    private dataRoot: string,
     private settings: {
       comfyMainPath?: string;
       skipPythonSetup?: boolean;
@@ -82,6 +82,10 @@ export class Metastable extends EventEmitter {
     await this.restartComfy();
   }
 
+  private resolvePath(value: string | undefined) {
+    return resolveConfigPath(value, this.dataRoot);
+  }
+
   async restartComfy() {
     this.comfy?.removeAllListeners();
     this.comfy?.stop(true);
@@ -97,10 +101,12 @@ export class Metastable extends EventEmitter {
       (config.python.mode === 'system' || !config.python.pythonHome);
 
     this.python = useSystemPython
-      ? await PythonInstance.fromSystem(config.python.packagesDir)
+      ? await PythonInstance.fromSystem(
+          this.resolvePath(config.python.packagesDir),
+        )
       : await PythonInstance.fromDirectory(
-          config.python.pythonHome!,
-          config.python.packagesDir,
+          this.resolvePath(config.python.pythonHome)!,
+          this.resolvePath(config.python.packagesDir),
         );
     this.comfy = new Comfy(
       this.python,

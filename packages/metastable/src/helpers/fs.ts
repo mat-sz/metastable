@@ -62,6 +62,21 @@ export async function walk(currentPath: string, relative: string) {
   return output;
 }
 
+export function resolveConfigPath(
+  value: string | undefined,
+  basePath: string,
+): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  if (path.isAbsolute(value)) {
+    return path.resolve(value);
+  }
+
+  return path.resolve(basePath, value);
+}
+
 const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
 const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
