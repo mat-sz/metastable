@@ -5,6 +5,7 @@ import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
 import { List } from './List';
 import { useModal } from '../../contexts/modal';
+import { Search } from '../../components/search';
 
 interface Props {
   type: string;
@@ -18,11 +19,7 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
 
   return (
     <Modal title="Select model">
-      <input
-        type="text"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-      />
+      <Search value={search} onChange={setSearch} />
       <List
         type={type}
         data={

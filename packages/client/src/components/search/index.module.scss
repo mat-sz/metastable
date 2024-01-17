@@ -1,0 +1,26 @@
+.search {
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-interactive);
+  border-radius: 5px;
+  padding: 0 0.5rem;
+
+  &:focus-within {
+    background: var(--color-bg-interactive-hover);
+  }
+
+  input {
+    background: transparent;
+    outline: none;
+    flex: 1;
+  }
+
+  button {
+    background: none;
+    padding: 0;
+
+    svg {
+      font-size: 1.2rem;
+    }
+  }
+}
