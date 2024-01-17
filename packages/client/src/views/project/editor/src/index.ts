@@ -483,4 +483,19 @@ export class Editor extends BasicEventEmitter<{
     const canvas = this.renderArea(x, y, width, height);
     return canvas.toDataURL('image/png');
   }
+
+  renderProject() {
+    const minX = Math.min(...this.state.layers.map(layer => layer.offset.x), 0);
+    const minY = Math.min(...this.state.layers.map(layer => layer.offset.y), 0);
+    const maxX = Math.max(
+      ...this.state.layers.map(layer => layer.offset.x + layer.canvas.width),
+      128,
+    );
+    const maxY = Math.max(
+      ...this.state.layers.map(layer => layer.offset.y + layer.canvas.height),
+      128,
+    );
+    const canvas = this.renderArea(minX, minY, maxX - minX, maxY - minY);
+    return canvas.toDataURL('image/png');
+  }
 }

@@ -9,6 +9,7 @@ import { Layers } from './Layers';
 import { Actions } from './Actions';
 import { ToolSettings } from './ToolSettings';
 import { EditorContext } from './context';
+import { ProjectActions } from './ProjectActions';
 
 export const ImageEditor: React.FC = observer(() => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export const ImageEditor: React.FC = observer(() => {
       <div className={styles.main}>
         <div className={styles.editor}>
           <ToolSettings />
+          <ProjectActions />
           <Tools />
           <div className={styles.wrapper} ref={wrapperRef}></div>
           <Layers />

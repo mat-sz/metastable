@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { VarSlider, VarUI } from 'react-var-ui';
 
 import styles from './index.module.scss';
 import { useEditor } from './context';
-import { VarSlider, VarUI } from 'react-var-ui';
 
 export const ToolSettings: React.FC = () => {
   const editor = useEditor();
