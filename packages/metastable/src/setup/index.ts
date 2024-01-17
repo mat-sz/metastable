@@ -79,8 +79,12 @@ export class Setup extends EventEmitter {
     await this.metastable.storage.config.set('python', {
       configured: true,
       mode: this.settings.pythonMode,
-      pythonHome: this._pythonHome,
-      packagesDir: this._packagesDir,
+      pythonHome: this._pythonHome
+        ? path.relative(this.metastable.storage.dataRoot, this._pythonHome)
+        : undefined,
+      packagesDir: this._packagesDir
+        ? path.relative(this.metastable.storage.dataRoot, this._packagesDir)
+        : undefined,
     });
 
     const platform = os.platform();
