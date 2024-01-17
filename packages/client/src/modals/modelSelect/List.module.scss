@@ -4,10 +4,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   font-size: 0;
-
-  @media screen and (min-width: 960px) {
-    height: 600px;
-  }
 }
 
 .model {
@@ -21,6 +17,10 @@
 
   @media screen and (min-width: 960px) {
     width: 25%;
+  }
+
+  @media screen and (min-width: 1500px) {
+    width: 12.5%;
   }
 
   .name {
