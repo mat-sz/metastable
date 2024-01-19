@@ -1,4 +1,4 @@
-import path, { resolve } from 'path';
+import path from 'path';
 import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
@@ -45,7 +45,7 @@ if (useProxy) {
     upstream: 'http://127.0.0.1:3000/',
   });
 } else {
-  const STATIC_ROOT = resolve(staticRoot);
+  const STATIC_ROOT = path.resolve(staticRoot);
 
   app.register(fastifyStatic, {
     root: STATIC_ROOT,
