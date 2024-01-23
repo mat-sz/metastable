@@ -66,7 +66,28 @@ export const Layers: React.FC = () => {
     };
     editor.on('state', onState);
 
+    const onPaste = async (e: ClipboardEvent) => {
+      const element = e.target as HTMLElement;
+      if (
+        document.body.contains(element) &&
+        (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT')
+      ) {
+        return;
+      }
+
+      for (let item of e.clipboardData!.items) {
+        const file = item.getAsFile();
+
+        if (file?.type.startsWith('image/')) {
+          editor.addImage(URL.createObjectURL(file), { name: file.name });
+        }
+      }
+    };
+
+    document.addEventListener('paste', onPaste);
+
     return () => {
+      document.removeEventListener('paste', onPaste);
       editor.off('state', onState);
     };
   }, [editor, setEditorState]);
