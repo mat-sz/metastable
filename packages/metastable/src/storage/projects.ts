@@ -150,6 +150,7 @@ export class Projects {
     }
 
     return {
+      version: 1,
       ...project,
       id,
       name: id,
