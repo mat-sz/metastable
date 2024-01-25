@@ -26,6 +26,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     type: string,
     public url: string,
     public savePath: string,
+    public headers: Record<string, string> = {},
   ) {
     super(type, { offset: 0, size: 0, url, name: path.basename(savePath) });
   }
@@ -36,6 +37,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       method: 'GET',
       headers: {
         'User-Agent': USER_AGENT,
+        ...this.headers,
       },
       responseType: 'stream',
     });
@@ -102,6 +104,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
           responseType: 'stream',
           headers: {
             'User-Agent': USER_AGENT,
+            ...this.headers,
             Range: `bytes=${start}-${end || ''}`,
           },
         });
@@ -171,6 +174,7 @@ export class DownloadModelTask extends BaseDownloadTask {
   constructor(
     public settings: DownloadSettings,
     public savePath: string,
+    public headers: Record<string, string> = {},
   ) {
     super('download', settings.url, savePath);
   }

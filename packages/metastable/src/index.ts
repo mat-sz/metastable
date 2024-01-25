@@ -246,6 +246,14 @@ export class Metastable extends EventEmitter {
       return;
     }
 
+    const headers: Record<string, string> = {};
+    if (url.hostname.includes('civitai')) {
+      const settings = await this.storage.config.get('civitai');
+      if (settings?.apiKey) {
+        headers['Authorization'] = `Bearer ${settings.apiKey}`;
+      }
+    }
+
     return this.tasks.queues.downloads.add(
       new DownloadModelTask(data, savePath),
     );
