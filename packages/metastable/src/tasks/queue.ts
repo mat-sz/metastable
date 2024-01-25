@@ -60,9 +60,9 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
     );
     if (current) {
       this.running = true;
-      await current.waitForPrepared();
-      current.started();
       try {
+        await current.waitForPrepared();
+        current.started();
         const state = await current.execute();
         current.stopped(state);
       } catch (e) {

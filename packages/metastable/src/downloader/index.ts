@@ -27,15 +27,10 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     public url: string,
     public savePath: string,
   ) {
-    super(
-      type,
-      { offset: 0, size: 0, url, name: path.basename(savePath) },
-      TaskState.PREPARING,
-    );
-    this.init();
+    super(type, { offset: 0, size: 0, url, name: path.basename(savePath) });
   }
 
-  async init() {
+  init = async () => {
     const { data, headers, request } = await axios({
       url: this.url,
       method: 'GET',
@@ -54,8 +49,8 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     this.downloadUrl = responseUrl || this.url;
 
     const size = parseInt(headers['content-length']);
-    this.prepared({ ...this.data, size });
-  }
+    return { ...this.data, size };
+  };
 
   private lastProgress = Date.now();
   private emitProgress() {
@@ -70,8 +65,6 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
   }
 
   async execute() {
-    await this.waitForPrepared();
-
     const partPath = `${this.savePath}.part`;
     if (await exists(partPath)) {
       // TODO: Continue download?

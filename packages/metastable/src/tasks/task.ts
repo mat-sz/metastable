@@ -13,17 +13,25 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
   #progress: number | undefined = undefined;
   #data: T;
   protected cancellationPending = false;
+  init?: (() => Promise<T>) | undefined = undefined;
 
   #preparedPromises: WrappedPromise<void>[] = [];
 
   constructor(
     public readonly type: string,
     data: T,
-    initialState?: TaskState,
   ) {
     super();
     this.#data = data;
-    this.#state = initialState ?? TaskState.QUEUED;
+    this.#state = this.init ? TaskState.PREPARING : TaskState.QUEUED;
+
+    this.init?.()
+      .then(data => {
+        this.prepared(data);
+      })
+      .catch(e => {
+        this.failed(e);
+      });
   }
 
   async waitForPrepared(): Promise<void> {
@@ -38,6 +46,18 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
 
   async execute(): Promise<TaskState> {
     throw new Error('Not implemented');
+  }
+
+  protected failed(error: any = new Error('Failed.')) {
+    this.#state = TaskState.FAILED;
+
+    for (const promise of this.#preparedPromises) {
+      promise.reject(error);
+    }
+
+    this.emit('update', {
+      state: this.#state,
+    });
   }
 
   protected prepared(data: T) {
