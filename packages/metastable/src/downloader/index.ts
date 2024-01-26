@@ -31,7 +31,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     super(type, { offset: 0, size: 0, url, name: path.basename(savePath) });
   }
 
-  init = async () => {
+  async init() {
     const { data, headers, request } = await axios({
       url: this.url,
       method: 'GET',
@@ -52,7 +52,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
 
     const size = parseInt(headers['content-length']);
     return { ...this.data, size };
-  };
+  }
 
   private lastProgress = Date.now();
   private emitProgress() {

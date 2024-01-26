@@ -146,6 +146,6 @@ export class DownloadPythonTask extends BaseDownloadTask {
     this.appendLog(`Will save to: ${this.savePath}`);
     this.url = url;
 
-    await super.init();
+    return await super.init();
   }
 }

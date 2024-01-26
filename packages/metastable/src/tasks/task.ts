@@ -13,7 +13,8 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
   #progress: number | undefined = undefined;
   #data: T;
   protected cancellationPending = false;
-  init?: (() => Promise<T>) | undefined = undefined;
+
+  init?(): Promise<T>;
 
   #preparedPromises: WrappedPromise<void>[] = [];
 
