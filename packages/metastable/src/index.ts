@@ -91,14 +91,15 @@ export class Metastable extends EventEmitter {
     this.comfy?.stop(true);
 
     const config = await this.storage.config.all();
-    if (!config.python.configured) {
+    if (!this.settings.skipPythonSetup && !config.python.configured) {
       this.python = await PythonInstance.fromSystem();
       return;
     }
 
     const useSystemPython =
-      !this.settings.skipPythonSetup &&
-      (config.python.mode === 'system' || !config.python.pythonHome);
+      this.settings.skipPythonSetup ||
+      config.python.mode === 'system' ||
+      !config.python.pythonHome;
 
     this.python = useSystemPython
       ? await PythonInstance.fromSystem(
