@@ -64,7 +64,7 @@ export function routesProjects(metastable: Metastable) {
 
     fastify.get('/:id/outputs', async request => {
       const projectId = (request.params as any)?.id;
-      return await metastable.storage.projects.filenames(projectId, 'output');
+      return await metastable.storage.projects.outputs(projectId);
     });
   };
 }

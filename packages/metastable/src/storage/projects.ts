@@ -57,6 +57,12 @@ export class Projects {
     return project;
   }
 
+  async outputs(id: Project['id']) {
+    return (await this.filenames(id, 'output')).filter(name =>
+      name.endsWith('.png'),
+    );
+  }
+
   async getMetadata(
     id: Project['id'],
   ): Promise<Omit<Project, 'settings'> | undefined> {
@@ -66,9 +72,7 @@ export class Projects {
       return undefined;
     }
 
-    const outputs = (await this.filenames(id, 'output')).filter(name =>
-      name.endsWith('.png'),
-    );
+    const outputs = await this.outputs(id);
     return {
       ...data,
       id,

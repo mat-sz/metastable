@@ -184,7 +184,7 @@ async function createWindow() {
     return await metastable.storage.projects.update(id, data);
   });
   ipcMain.handle('projects:outputs', async (_, id: Project['id']) => {
-    return await metastable.storage.projects.filenames(id, 'output');
+    return await metastable.storage.projects.outputs(id);
   });
 
   ipcMain.handle('tasks:all', async () => {
