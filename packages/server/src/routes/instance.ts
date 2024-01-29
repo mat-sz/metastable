@@ -6,5 +6,17 @@ export function routesInstance(metastable: Metastable) {
     fastify.get('/info', async () => {
       return await metastable.info();
     });
+
+    fastify.get('/config', async () => {
+      return await metastable.storage.config.all();
+    });
+
+    fastify.post('/config', async request => {
+      const data = request.body as any;
+      if (typeof data === 'object') {
+        await metastable.storage.config.store(data);
+      }
+      return await metastable.storage.config.all();
+    });
   };
 }

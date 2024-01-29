@@ -5,3 +5,19 @@ export interface InstanceInfo {
   schedulers: string[];
   models: Record<string, Model[]>;
 }
+
+export interface ConfigType {
+  python: {
+    configured: boolean;
+    mode: 'system' | 'static';
+    pythonHome?: string;
+    packagesDir?: string;
+  };
+  comfy?: {
+    args?: string[];
+    env?: Record<string, string>;
+  };
+  civitai?: {
+    apiKey?: string;
+  };
+}

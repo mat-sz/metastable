@@ -147,6 +147,14 @@ async function createWindow() {
       dataDir: url.pathToFileURL(dataRoot).toString(),
     };
   });
+
+  ipcMain.handle('config:all', async () => {
+    return await metastable.storage.config.all();
+  });
+  ipcMain.handle('config:store', async (_, config: any) => {
+    return await metastable.storage.config.store(config);
+  });
+
   ipcMain.handle('setup:status', async () => {
     return await metastable.setup.status();
   });

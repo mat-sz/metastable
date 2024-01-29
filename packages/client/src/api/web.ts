@@ -7,6 +7,14 @@ export const WebAPI: API = {
       return await httpGet('/instance/info');
     },
   },
+  config: {
+    async all() {
+      return await httpGet('/instance/config');
+    },
+    async store(config) {
+      return await httpPost('/instance/config', config);
+    },
+  },
   setup: {
     async status() {
       return await httpGet('/setup/status');

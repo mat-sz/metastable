@@ -1,4 +1,5 @@
 import {
+  ConfigType,
   DownloadSettings,
   InstanceInfo,
   Project,
@@ -12,6 +13,10 @@ import {
 export interface API {
   instance: {
     info(): Promise<InstanceInfo>;
+  };
+  config: {
+    all(): Promise<ConfigType>;
+    store(value: ConfigType): Promise<ConfigType>;
   };
   setup: {
     status(): Promise<SetupStatus>;

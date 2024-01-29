@@ -1,20 +1,6 @@
-import { JSONFile } from '../helpers/fs.js';
+import { ConfigType } from '@metastable/types';
 
-interface ConfigType {
-  python: {
-    configured: boolean;
-    mode: 'system' | 'static';
-    pythonHome?: string;
-    packagesDir?: string;
-  };
-  comfy?: {
-    args?: string[];
-    env?: Record<string, string>;
-  };
-  civitai?: {
-    apiKey?: string;
-  };
-}
+import { JSONFile } from '../helpers/fs.js';
 
 const CONFIG_DEFAULTS: ConfigType = {
   python: {
@@ -39,6 +25,10 @@ export class Config {
     };
   }
 
+  async store(config: ConfigType): Promise<void> {
+    await this.configFile.writeJson({ ...config });
+  }
+
   async get<TKey extends keyof ConfigType>(
     key: TKey,
   ): Promise<ConfigType[TKey]> {
@@ -51,6 +41,6 @@ export class Config {
     value: ConfigType[TKey],
   ): Promise<void> {
     const all = await this.all();
-    await this.configFile.writeJson({ ...all, [key]: value });
+    await this.store({ ...all, [key]: value });
   }
 }

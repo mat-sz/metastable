@@ -8,6 +8,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   instance: {
     info: () => ipcRenderer.invoke('instance:info'),
   },
+  config: {
+    all: () => ipcRenderer.invoke('config:all'),
+    store: (config: any) => ipcRenderer.invoke('config:store', config),
+  },
   setup: {
     status: () => ipcRenderer.invoke('setup:status'),
     details: () => ipcRenderer.invoke('setup:details'),
