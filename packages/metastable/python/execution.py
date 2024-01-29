@@ -5,7 +5,6 @@ import json
 import time
 import logging
 import threading
-import heapq
 import traceback
 import gc
 from io import BytesIO
@@ -400,7 +399,7 @@ class PromptQueue:
 
     def put(self, item):
         with self.mutex:
-            heapq.heappush(self.queue, item)
+            self.queue.append(item)
             self.queue_updated()
             self.not_empty.notify()
 
@@ -408,7 +407,7 @@ class PromptQueue:
         with self.not_empty:
             while len(self.queue) == 0:
                 self.not_empty.wait()
-            item = heapq.heappop(self.queue)
+            item = self.queue.pop(0)
             i = self.task_counter
             self.currently_running[i] = copy.deepcopy(item)
             self.task_counter += 1
@@ -444,7 +443,6 @@ class PromptQueue:
                         self.wipe_queue()
                     else:
                         self.queue.pop(x)
-                        heapq.heapify(self.queue)
                         self.queue_updated()
                     return True
         return False
