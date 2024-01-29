@@ -15,6 +15,7 @@ import { OpenProject } from '../../modals/openProject';
 import { ModelManager } from '../../modals/models';
 import { IS_ELECTRON, IS_MAC } from '../../config';
 import { ElectronWindow } from '../../api/electron';
+import { Config } from '../../modals/config';
 
 interface Props {
   showMenu?: boolean;
@@ -42,6 +43,7 @@ export const Header: React.FC<Props> = observer(({ showMenu = !IS_MAC }) => {
           <button onClick={() => showModal(<ModelManager />)}>
             Model manager
           </button>
+          <button onClick={() => showModal(<Config />)}>Settings</button>
         </div>
       )}
       <div className={styles.title}>

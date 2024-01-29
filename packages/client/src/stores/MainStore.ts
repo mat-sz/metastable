@@ -16,6 +16,7 @@ import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { API } from '../api';
 import { TaskStore } from './TaskStore';
+import { ConfigStore } from './ConfigStore';
 
 declare global {
   // eslint-disable-next-line
@@ -45,6 +46,7 @@ class MainStore {
   infoReady = false;
 
   tasks = new TaskStore();
+  config = new ConfigStore();
 
   constructor() {
     makeAutoObservable(this);
