@@ -2,6 +2,7 @@ import { IVarBaseInputProps, VarBase, useVarUIValue } from 'react-var-ui';
 
 import { ModelSelect } from '../../../../modals/modelSelect';
 import { useUI } from '../../../../contexts/ui';
+import { mainStore } from '../../../../stores/MainStore';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: string;
@@ -39,7 +40,19 @@ export const VarModel = ({
         <button
           onClick={() => {
             showModal(
-              <ModelSelect type={modelType} onSelect={setCurrentValue} />,
+              <ModelSelect
+                type={modelType}
+                onSelect={model => {
+                  setCurrentValue(model.file.name);
+
+                  if (model.samplerSettings && mainStore.project) {
+                    mainStore.project.settings.sampler = {
+                      ...mainStore.project.settings.sampler,
+                      ...model.samplerSettings,
+                    };
+                  }
+                }}
+              />,
             );
           }}
         >

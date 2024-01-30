@@ -15,6 +15,7 @@ export const Recommended: React.FC = () => {
               description: model.description,
               source: model.source,
               sourceId: model.sourceId,
+              samplerSettings: model.samplerSettings,
             },
           }))}
         />

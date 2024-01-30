@@ -97,6 +97,11 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/stabilityai/sdxl-turbo',
+        samplerSettings: {
+          steps: 1,
+          cfg: 1,
+          scheduler: 'turbo',
+        },
       },
     ],
   },

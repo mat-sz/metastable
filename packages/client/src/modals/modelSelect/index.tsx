@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { Model } from '@metastable/types';
 
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
@@ -10,7 +11,7 @@ import { getStaticUrl } from '../../config';
 
 interface Props {
   type: string;
-  onSelect: (name: string) => void;
+  onSelect: (model: Model) => void;
 }
 
 export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
@@ -36,7 +37,7 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
                 : undefined
             }
             onClick={() => {
-              onSelect(item.file.name);
+              onSelect(item);
               close();
             }}
           />
