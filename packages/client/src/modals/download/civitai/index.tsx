@@ -6,8 +6,8 @@ import useSWR from 'swr';
 import styles from './index.module.scss';
 import { CivitAIModel, CivitAIResponse } from '../../../types/civitai';
 import { Pagination, Loading, Toggle, IconButton } from '../../../components';
-import { List } from './List';
 import { Model } from './Model';
+import { Card, CardStats, List } from '../../../components/list';
 
 const CivitAISort = [
   'Highest Rated',
@@ -129,7 +129,18 @@ export const CivitAI: React.FC = observer(() => {
       {error && <div className={styles.info}>{`${error}`}</div>}
       {data?.items && (
         <>
-          <List data={data} onSelect={setItem} />
+          <List>
+            {data.items.map(item => (
+              <Card
+                name={item.name}
+                imageUrl={item.modelVersions?.[0]?.images[0]?.url}
+                onClick={() => setItem(item)}
+                key={item.id}
+              >
+                <CardStats {...item.stats} />
+              </Card>
+            ))}
+          </List>
           <Pagination
             current={data.metadata.currentPage}
             max={data.metadata.totalPages}

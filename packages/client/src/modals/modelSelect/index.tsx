@@ -3,9 +3,10 @@ import { observer } from 'mobx-react-lite';
 
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
-import { List } from './List';
 import { useModal } from '../../contexts/modal';
 import { Search } from '../../components/search';
+import { Card, List } from '../../components/list';
+import { getStaticUrl } from '../../config';
 
 interface Props {
   type: string;
@@ -17,21 +18,30 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
   const [search, setSearch] = useState('');
   const available = mainStore.info.models[type] || [];
 
+  const data = search
+    ? available.filter(item => item.file.name.includes(search.trim()))
+    : available;
+
   return (
     <Modal title="Select model">
       <Search value={search} onChange={setSearch} />
-      <List
-        type={type}
-        data={
-          search
-            ? available.filter(item => item.file.name.includes(search.trim()))
-            : available
-        }
-        onSelect={model => {
-          onSelect(model.file.name);
-          close();
-        }}
-      />
+      <List>
+        {data.map(item => (
+          <Card
+            name={item.name || item.file.name}
+            key={item.file.name}
+            imageUrl={
+              item.image
+                ? getStaticUrl(`/models/${type}/${item.image}`)
+                : undefined
+            }
+            onClick={() => {
+              onSelect(item.file.name);
+              close();
+            }}
+          />
+        ))}
+      </List>
     </Modal>
   );
 });
