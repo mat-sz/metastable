@@ -2,7 +2,7 @@ import React from 'react';
 import { BsDownload, BsHeartFill } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
 
-import styles from './Card.module.scss';
+import styles from './index.module.scss';
 import { Rating } from '../rating';
 
 interface CardProps {
@@ -19,22 +19,20 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
 }) => {
   return (
     <div className={styles.card} onClick={onClick}>
-      <div className={styles.preview}>
-        {imageUrl ? (
-          <img
-            crossOrigin="anonymous"
-            className={styles.background}
-            src={imageUrl}
-          />
-        ) : (
-          <div className={styles.noPhotos}>
-            <MdNoPhotography />
-          </div>
-        )}
-        <div className={styles.details}>
-          <div>{children}</div>
-          <div className={styles.name}>{name}</div>
+      {imageUrl ? (
+        <img
+          crossOrigin="anonymous"
+          className={styles.background}
+          src={imageUrl}
+        />
+      ) : (
+        <div className={styles.noPhotos}>
+          <MdNoPhotography />
         </div>
+      )}
+      <div className={styles.details}>
+        <div>{children}</div>
+        <div className={styles.name}>{name}</div>
       </div>
     </div>
   );
@@ -61,10 +59,6 @@ export const CardStats: React.FC<CardStatsProps> = ({
             <Rating value={rating} small />
             {!!ratingCount && <span>({ratingCount})</span>}
           </div>
-        </div>
-      )}
-      {!!downloadCount && !!favoriteCount && (
-        <div className={styles.stats}>
           {!!downloadCount && (
             <div>
               <BsDownload />

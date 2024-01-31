@@ -1,0 +1,17 @@
+.switch {
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-panel);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.option {
+  background: none;
+  border-radius: 0;
+  height: 100%;
+
+  &.active {
+    background: var(--color-bg-interactive);
+  }
+}
