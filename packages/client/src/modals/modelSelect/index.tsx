@@ -7,6 +7,9 @@ import { Modal } from '../../components';
 import { useModal } from '../../contexts/modal';
 import { Card, List } from '../../components/list';
 import { getStaticUrl } from '../../config';
+import { fuzzy } from '../../utils/fuzzy';
+import { removeFileExtension } from '../../utils/string';
+
 interface Props {
   type: string;
   onSelect: (model: Model) => void;
@@ -21,12 +24,16 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
       <List
         items={data}
         quickFilter={(items, search) =>
-          items.filter(item => item.file.name.includes(search))
+          fuzzy(
+            items,
+            search,
+            item => `${item.name} ${removeFileExtension(item.file.name)}`,
+          )
         }
       >
         {item => (
           <Card
-            name={item.name || item.file.name}
+            name={item.name || removeFileExtension(item.file.name)}
             key={item.file.name}
             imageUrl={
               item.image

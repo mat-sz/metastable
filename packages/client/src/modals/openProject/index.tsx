@@ -6,6 +6,7 @@ import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
 import { Card, List } from '../../components/list';
 import { useModal } from '../../contexts/modal';
+import { fuzzy } from '../../utils/fuzzy';
 
 export const OpenProject: React.FC = observer(() => {
   const { close } = useModal();
@@ -14,7 +15,12 @@ export const OpenProject: React.FC = observer(() => {
   return (
     <Modal title="Open project">
       <div className={styles.body}>
-        <List items={data}>
+        <List
+          items={data}
+          quickFilter={(items, search) =>
+            fuzzy(items, search, item => item.name)
+          }
+        >
           {item => (
             <Card
               name={item.name}
