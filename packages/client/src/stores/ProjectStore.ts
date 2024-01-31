@@ -4,11 +4,15 @@ import { Project as APIProject } from '@metastable/types';
 import { Project } from './project';
 import { arrayMove, defaultProjectSettings } from '../helpers';
 import { API } from '../api';
+import { tryParse } from '../utils/json';
 
+const LS_RECENT = 'metastable_recent_projects';
+const MAX_RECENT_ITEMS = 6;
 export class ProjectStore {
   projects: Project[] = [];
   currentId: APIProject['id'] | undefined = undefined;
   recent: APIProject[] = [];
+  all: APIProject[] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -26,8 +30,31 @@ export class ProjectStore {
   async refresh() {
     const json = await API.projects.all();
     runInAction(() => {
-      this.recent = json;
+      this.all = json;
+
+      const recentArray = tryParse(localStorage.getItem(LS_RECENT)) || [];
+      const recent: APIProject[] = Array.isArray(recentArray)
+        ? (recentArray
+            .slice(0, MAX_RECENT_ITEMS)
+            .map(id => json.find(project => project.id === id))
+            .filter(item => !!item) as APIProject[])
+        : [];
+      this.recent =
+        recent.length > 0 ? recent : json.slice(0, MAX_RECENT_ITEMS);
     });
+  }
+
+  private pushRecent(id: string) {
+    const recentArray: string[] =
+      tryParse(localStorage.getItem(LS_RECENT)) || [];
+    const recent = Array.isArray(recentArray)
+      ? recentArray.filter(itemId => itemId !== id)
+      : [];
+    recent.unshift(id);
+    localStorage.setItem(
+      LS_RECENT,
+      JSON.stringify(recent.slice(0, MAX_RECENT_ITEMS)),
+    );
   }
 
   async create(name: string) {
@@ -48,6 +75,7 @@ export class ProjectStore {
       this.select(json.id);
     });
 
+    this.pushRecent(json.id);
     this.refresh();
   }
 
@@ -72,6 +100,7 @@ export class ProjectStore {
       this.select(json.id);
     });
 
+    this.pushRecent(json.id);
     this.refresh();
   }
 

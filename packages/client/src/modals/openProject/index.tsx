@@ -10,7 +10,7 @@ import { fuzzy } from '../../utils/fuzzy';
 
 export const OpenProject: React.FC = observer(() => {
   const { close } = useModal();
-  const data = mainStore.projects.recent;
+  const data = mainStore.projects.all;
 
   return (
     <Modal title="Open project">
