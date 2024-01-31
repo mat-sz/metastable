@@ -4,7 +4,6 @@ export interface DownloadableModel extends ModelInfo {
   type: ModelType;
   downloads: DownloadSettings[];
   recommended?: boolean;
-  homepage?: string;
 }
 
 export interface DownloadableModelGroup {

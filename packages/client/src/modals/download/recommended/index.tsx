@@ -11,11 +11,10 @@ export const Recommended: React.FC = () => {
           files={model.downloads.map(download => ({
             ...download,
             info: {
-              name: model.name,
-              description: model.description,
-              source: model.source,
-              sourceId: model.sourceId,
-              samplerSettings: model.samplerSettings,
+              ...model,
+              downloads: undefined,
+              recommended: undefined,
+              type: undefined,
             },
           }))}
         />
