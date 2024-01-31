@@ -40,6 +40,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-hotkeys-hook": "^4.4.4",
     "react-icons": "^4.11.0",
     "react-var-ui": "^1.5.1",
     "sass": "^1.66.1",
