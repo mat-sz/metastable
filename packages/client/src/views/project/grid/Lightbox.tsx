@@ -1,8 +1,14 @@
 import React, { useCallback } from 'react';
 
 import styles from './Lightbox.module.scss';
-import { BsArrowLeft, BsArrowRight, BsX } from 'react-icons/bs';
-import { ImagePreview } from '../../../components';
+import {
+  BsArrowLeft,
+  BsArrowRight,
+  BsArrowUpRightSquare,
+  BsDownload,
+  BsXLg,
+} from 'react-icons/bs';
+import { IconButton, ImagePreview } from '../../../components';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 interface Props {
@@ -19,6 +25,7 @@ export const Lightbox: React.FC<Props> = ({
   onClose,
 }) => {
   const currentUrl = images[current];
+  const filename = currentUrl.split('/').slice(-1)[0];
 
   const previous = useCallback(
     () => onChange(current === 0 ? images.length - 1 : current - 1),
@@ -39,10 +46,17 @@ export const Lightbox: React.FC<Props> = ({
         <div>
           {current + 1}/{images.length}
         </div>
+        <div>{filename}</div>
         <div>
-          <button onClick={onClose}>
-            <BsX />
-          </button>
+          <IconButton href={currentUrl} download={filename}>
+            <BsDownload />
+          </IconButton>
+          <IconButton href={currentUrl}>
+            <BsArrowUpRightSquare />
+          </IconButton>
+          <IconButton onClick={onClose}>
+            <BsXLg />
+          </IconButton>
         </div>
       </div>
       <div className={styles.main} onClick={e => e.stopPropagation()}>

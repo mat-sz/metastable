@@ -6,21 +6,41 @@
   flex-direction: column;
   z-index: 9999;
 
+  a,
   button {
     background: none;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     padding: 0;
+
+    svg {
+      font-size: 1.25rem;
+    }
+
+    &:hover {
+      background: none;
+    }
   }
 
   .header {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     justify-content: space-between;
     align-items: center;
     background: #000000;
     padding: 0.5rem;
 
+    & > *:nth-child(2) {
+      justify-self: center;
+    }
+
+    & > *:nth-child(3) {
+      justify-self: end;
+    }
+
+    a,
     button {
       padding: 0.25rem;
+      margin-left: 0.5rem;
     }
   }
 
@@ -28,14 +48,6 @@
     display: grid;
     grid-template-columns: 2rem 1fr 2rem;
     flex: 1;
-
-    button {
-      padding: 0;
-
-      &:hover {
-        background: none;
-      }
-    }
   }
 
   .thumbnails {
