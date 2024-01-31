@@ -25,7 +25,9 @@ export class BaseTask<T = any> extends EventEmitter implements Task<T> {
     super();
     this.#data = data;
     this.#state = this.init ? TaskState.PREPARING : TaskState.QUEUED;
+  }
 
+  protected created() {
     this.init?.()
       .then(data => {
         this.prepared(data);

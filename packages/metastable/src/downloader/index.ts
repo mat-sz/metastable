@@ -29,6 +29,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     public headers: Record<string, string> = {},
   ) {
     super(type, { offset: 0, size: 0, url, name: path.basename(savePath) });
+    this.created();
   }
 
   async init() {
