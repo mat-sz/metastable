@@ -25,6 +25,7 @@ export interface ModelInfo {
   nsfw?: boolean;
   samplerSettings?: Partial<ProjectSettings['sampler']>;
   homepage?: string;
+  baseModel?: string;
 }
 
 export interface Model extends ModelInfo {

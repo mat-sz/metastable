@@ -42,6 +42,7 @@ export const downloadable: DownloadableModelGroup[] = [
           'The most commonly used checkpoint model. Most models on CivitAI are based on this.',
         recommended: true,
         homepage: 'https://huggingface.co/runwayml/stable-diffusion-v1-5',
+        baseModel: 'SD 1.5',
       },
       {
         name: 'SD 2.1 512x',
@@ -59,6 +60,7 @@ export const downloadable: DownloadableModelGroup[] = [
           'A newer version of Stable Diffusion with some censorship around artist names.',
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-2-1-base',
+        baseModel: 'SD 2.1',
       },
       {
         name: 'SD 2.1 768x',
@@ -74,6 +76,7 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         description: 'A version of SD 2.1 made for 768x768 image generation.',
         homepage: 'https://huggingface.co/stabilityai/stable-diffusion-2-1',
+        baseModel: 'SD 2.1 768',
       },
     ],
   },
@@ -102,6 +105,7 @@ export const downloadable: DownloadableModelGroup[] = [
           cfg: 1,
           scheduler: 'turbo',
         },
+        baseModel: 'SDXL Turbo',
       },
     ],
   },
@@ -127,6 +131,7 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0',
+        baseModel: 'SDXL 1.0',
       },
       {
         name: 'SDXL 1.0 - Refiner',
@@ -144,6 +149,7 @@ export const downloadable: DownloadableModelGroup[] = [
           'A model designed for improving the output from base SDXL.',
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0',
+        baseModel: 'SDXL 1.0',
       },
     ],
   },
@@ -165,6 +171,7 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/runwayml/stable-diffusion-inpainting',
+        baseModel: 'SD 1.5',
       },
       {
         name: 'SD 2.0 Inpainting',
@@ -180,6 +187,7 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-2-inpainting',
+        baseModel: 'SD 2.0',
       },
     ],
   },
@@ -328,6 +336,7 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
+        baseModel: 'SD 1.5',
       },
       {
         name: 'QRCode ControlNet - SD 2.1',
@@ -342,6 +351,7 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
+        baseModel: 'SD 2.1',
       },
     ],
   },

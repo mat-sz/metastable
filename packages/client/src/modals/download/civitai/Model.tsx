@@ -54,6 +54,7 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                     source: 'civitai',
                     sourceId: `${model.id}`,
                     homepage: `https://civitai.com/models/${model.id}`,
+                    baseModel: version.baseModel,
                   },
                 },
               ]}
