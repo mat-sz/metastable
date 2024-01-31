@@ -129,8 +129,8 @@ export const CivitAI: React.FC = observer(() => {
       {error && <div className={styles.info}>{`${error}`}</div>}
       {data?.items && (
         <>
-          <List>
-            {data.items.map(item => (
+          <List items={data.items}>
+            {item => (
               <Card
                 name={item.name}
                 imageUrl={item.modelVersions?.[0]?.images[0]?.url}
@@ -139,7 +139,7 @@ export const CivitAI: React.FC = observer(() => {
               >
                 <CardStats {...item.stats} />
               </Card>
-            ))}
+            )}
           </List>
           <Pagination
             current={data.metadata.currentPage}

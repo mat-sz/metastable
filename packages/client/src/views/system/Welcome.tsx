@@ -17,8 +17,8 @@ export const Welcome: React.FC = observer(() => {
       <div className={styles.welcome}>
         <div className={styles.recent}>
           <h2>Recent</h2>
-          <List small>
-            {data.map(item => (
+          <List small items={data}>
+            {item => (
               <Card
                 name={item.name}
                 key={item.id}
@@ -28,11 +28,10 @@ export const Welcome: React.FC = observer(() => {
                     : undefined
                 }
                 onClick={() => {
-                  // TODO: Close modal.
                   mainStore.projects.open(item.id);
                 }}
               />
-            ))}
+            )}
           </List>
         </div>
         <div className={styles.actions}>

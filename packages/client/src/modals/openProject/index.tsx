@@ -5,15 +5,17 @@ import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
 import { Card, List } from '../../components/list';
+import { useModal } from '../../contexts/modal';
 
 export const OpenProject: React.FC = observer(() => {
+  const { close } = useModal();
   const data = mainStore.projects.recent;
 
   return (
     <Modal title="Open project">
       <div className={styles.body}>
-        <List>
-          {data.map(item => (
+        <List items={data}>
+          {item => (
             <Card
               name={item.name}
               key={item.id}
@@ -23,11 +25,11 @@ export const OpenProject: React.FC = observer(() => {
                   : undefined
               }
               onClick={() => {
-                // TODO: Close modal.
                 mainStore.projects.open(item.id);
+                close();
               }}
             />
-          ))}
+          )}
         </List>
       </div>
     </Modal>

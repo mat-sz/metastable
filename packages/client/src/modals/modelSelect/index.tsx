@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Model } from '@metastable/types';
 
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
 import { useModal } from '../../contexts/modal';
-import { Search } from '../../components/search';
 import { Card, List } from '../../components/list';
 import { getStaticUrl } from '../../config';
-
 interface Props {
   type: string;
   onSelect: (model: Model) => void;
@@ -16,18 +14,17 @@ interface Props {
 
 export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
   const { close } = useModal();
-  const [search, setSearch] = useState('');
-  const available = mainStore.info.models[type] || [];
-
-  const data = search
-    ? available.filter(item => item.file.name.includes(search.trim()))
-    : available;
+  const data = mainStore.info.models[type] || [];
 
   return (
     <Modal title="Select model">
-      <Search value={search} onChange={setSearch} />
-      <List>
-        {data.map(item => (
+      <List
+        items={data}
+        quickFilter={(items, search) =>
+          items.filter(item => item.file.name.includes(search))
+        }
+      >
+        {item => (
           <Card
             name={item.name || item.file.name}
             key={item.file.name}
@@ -41,7 +38,7 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
               close();
             }}
           />
-        ))}
+        )}
       </List>
     </Modal>
   );
