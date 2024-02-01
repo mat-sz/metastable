@@ -21,25 +21,32 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const pointerStateRef = useRef<PointerState[]>([]);
 
+  const [loaded, setLoaded] = useState(false);
   const [scale, setScale] = useState(1);
   const [imageOffset, setImageOffset] = useState<Point>({ x: 0, y: 0 });
 
-  const resetScale = useCallback(() => {
-    const wrapperRect = wrapperRef.current!.getBoundingClientRect();
+  const resetScale = useCallback(
+    (isLoad = false) => {
+      const wrapperRect = wrapperRef.current!.getBoundingClientRect();
 
-    const height = imageRef.current!.naturalHeight;
-    const width = imageRef.current!.naturalWidth;
-    const scale = Math.max(
-      Math.min(wrapperRect.width / width, wrapperRect.height / height, 1),
-      0.25,
-    );
+      const height = imageRef.current!.naturalHeight;
+      const width = imageRef.current!.naturalWidth;
+      const scale = Math.max(
+        Math.min(wrapperRect.width / width, wrapperRect.height / height, 1),
+        0.25,
+      );
 
-    const vector = Vector2.fromSize(wrapperRect)
-      .sub(new Vector2(width, height).multiplyScalar(scale))
-      .divideScalar(2);
-    setImageOffset(vector.point);
-    setScale(scale);
-  }, [setScale, setImageOffset]);
+      const vector = Vector2.fromSize(wrapperRect)
+        .sub(new Vector2(width, height).multiplyScalar(scale))
+        .divideScalar(2);
+      setImageOffset(vector.point);
+      setScale(scale);
+      if (isLoad) {
+        setLoaded(true);
+      }
+    },
+    [setScale, setImageOffset, setLoaded],
+  );
 
   useEffect(() => {
     const onResize = () => {
@@ -49,6 +56,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [resetScale]);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [url, setLoaded]);
 
   if (!url) {
     return <div className={styles.preview} />;
@@ -159,19 +170,21 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
           }
         }
       }}
-      onDoubleClick={resetScale}
+      onDoubleClick={() => resetScale()}
     >
       <img
         src={url}
         ref={imageRef}
         draggable={false}
         onLoad={() => {
-          resetScale();
+          resetScale(true);
         }}
         style={{
           transform: `translate(${imageOffset.x}px, ${imageOffset.y}px) scale(${scale}) `,
+          opacity: loaded ? 1 : 0.0001,
         }}
       />
+      {!loaded && <div>Loading...</div>}
     </div>
   );
 };
