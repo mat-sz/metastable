@@ -7,11 +7,13 @@ import { useModal } from '../../contexts/modal';
 
 export interface ModalProps {
   title: string;
+  size?: 'big' | 'small';
 }
 
 export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   children,
   title,
+  size = 'big',
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { close } = useModal();
@@ -32,14 +34,17 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
 
   return (
     <dialog ref={dialogRef} className={styles.dialog} onClick={close}>
-      <div className={clsx(styles.modal)} onClick={e => e.stopPropagation()}>
-        <div className={clsx(styles.title)}>
+      <div
+        className={clsx(styles.modal, styles[`modal_${size}`])}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className={styles.title}>
           <span>{title}</span>
           <button onClick={close}>
             <BsX />
           </button>
         </div>
-        <div className={clsx(styles.body)}>{children}</div>
+        <div className={styles.body}>{children}</div>
       </div>
     </dialog>
   );
