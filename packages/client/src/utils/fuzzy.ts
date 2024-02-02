@@ -59,11 +59,12 @@ export function fuzzy<T>(
 ) {
   const normalizedPattern = normalizeString(pattern);
   const patternSplit = normalizedPattern.split(SPLIT_REGEX);
+  const itemStrings = items.map(toString);
 
-  const matchFn = (item: T) => {
-    const normalized = normalizeString(toString(item));
+  const matchFn = (str: string) => {
+    const normalized = normalizeString(str);
     if (normalized.includes(normalizedPattern)) {
-      return true;
+      return 2;
     }
 
     const split = normalized.split(SPLIT_REGEX);
@@ -78,12 +79,22 @@ export function fuzzy<T>(
       }
 
       if (!found) {
-        return false;
+        return 0;
       }
     }
 
-    return true;
+    return 1;
   };
 
-  return items.filter(matchFn);
+  return items
+    .map((item, index) => {
+      const str = itemStrings[index];
+
+      return [matchFn(itemStrings[index]), str, item] as const;
+    })
+    .filter(([score]) => !!score)
+    .sort(([a, aStr], [b, bStr]) =>
+      a === b ? aStr.localeCompare(bStr) : b - a,
+    )
+    .map(entry => entry[2]);
 }
