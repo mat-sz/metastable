@@ -16,7 +16,7 @@ import { mainStore } from '../../stores/MainStore';
 import { ProgressButton } from '../../components';
 import { useUI } from '../../contexts/ui';
 import { Backend } from '../../modals/backend';
-import { DownloadManager } from '../../modals/download';
+import { ModelManager } from '../../modals/models';
 
 export const Status: React.FC = observer(() => {
   const status = mainStore.status;
@@ -63,7 +63,7 @@ export const Status: React.FC = observer(() => {
         <ProgressButton
           value={remaining}
           max={count}
-          onClick={() => showModal(<DownloadManager />)}
+          onClick={() => showModal(<ModelManager defaultTab="queue" />)}
         >
           <BsDownload />
           <span>Queued downloads: {remaining}</span>

@@ -1,7 +1,5 @@
 import React from 'react';
-import { observer } from 'mobx-react-lite';
 
-import { mainStore } from '../../stores/MainStore';
 import {
   Modal,
   Tab,
@@ -10,33 +8,40 @@ import {
   TabView,
   Tabs,
 } from '../../components';
-import { filesize } from '../../helpers';
+import { Queue } from './queue';
+import { Recommended } from './recommended';
+import { CivitAI } from './civitai';
+import { InstalledModels } from './installed';
 
-export const ModelManager: React.FC = observer(() => {
-  const available = Object.entries(mainStore.info.models).filter(
-    entry => entry[1].length > 0,
-  );
+interface Props {
+  defaultTab?: 'installed' | 'queue' | 'recommended' | 'civitai';
+}
 
+export const ModelManager: React.FC<Props> = ({ defaultTab = 'installed' }) => {
   return (
     <Modal title="Model manager">
-      <TabView defaultTab="queue">
+      <TabView defaultTab={defaultTab}>
         <Tabs>
-          {available.map(([key]) => (
-            <Tab id={key} key={key} title={key} />
-          ))}
+          <Tab id="installed" title="Installed models" />
+          <Tab id="queue" title="Download queue" />
+          <Tab id="recommended" title="Recommended" />
+          <Tab id="civitai" title="CivitAI" />
         </Tabs>
         <TabContent>
-          {available.map(([key, models]) => (
-            <TabPanel id={key} key={key}>
-              {models.map(({ file }) => (
-                <li key={file.name}>
-                  {file.name} - {filesize(file.size)}
-                </li>
-              ))}
-            </TabPanel>
-          ))}
+          <TabPanel id="installed">
+            <InstalledModels />
+          </TabPanel>
+          <TabPanel id="queue">
+            <Queue />
+          </TabPanel>
+          <TabPanel id="recommended">
+            <Recommended />
+          </TabPanel>
+          <TabPanel id="civitai">
+            <CivitAI />
+          </TabPanel>
         </TabContent>
       </TabView>
     </Modal>
   );
-});
+};
