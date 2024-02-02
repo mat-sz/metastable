@@ -6,6 +6,7 @@ import styles from './index.module.scss';
 interface CardProps {
   name?: string;
   imageUrl?: string;
+  icon?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -13,6 +14,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   children,
   imageUrl,
   name,
+  icon,
   onClick,
 }) => {
   return (
@@ -24,9 +26,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
           src={imageUrl}
         />
       ) : (
-        <div className={styles.noPhotos}>
-          <MdNoPhotography />
-        </div>
+        <div className={styles.noPhotos}>{icon || <MdNoPhotography />}</div>
       )}
       <div className={styles.details}>
         <div className={styles.info}>{children}</div>

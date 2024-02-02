@@ -33,7 +33,11 @@ export async function tryUnlink(filePath: string) {
   }
 }
 
-export async function walk(currentPath: string, relative: string) {
+export async function walk(
+  currentPath: string,
+  relative: string,
+  parts: string[] = [],
+) {
   const files = await fs.readdir(currentPath, {
     withFileTypes: true,
   });
@@ -45,15 +49,18 @@ export async function walk(currentPath: string, relative: string) {
         continue;
       }
 
+      const filePath = path.join(currentPath, file.name);
       output.push({
         name: path.join(relative, file.name),
-        size: (await fs.stat(path.join(currentPath, file.name))).size,
+        size: (await fs.stat(filePath)).size,
+        parts,
       });
     } else if (file.isDirectory()) {
       output.push(
         ...(await walk(
           path.join(currentPath, file.name),
           path.join(relative, file.name),
+          [...parts, file.name],
         )),
       );
     }
