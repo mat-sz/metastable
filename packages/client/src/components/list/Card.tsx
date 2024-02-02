@@ -1,9 +1,7 @@
 import React from 'react';
-import { BsDownload, BsHeartFill } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
 
 import styles from './index.module.scss';
-import { Rating } from '../rating';
 
 interface CardProps {
   name?: string;
@@ -31,48 +29,27 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
         </div>
       )}
       <div className={styles.details}>
-        <div>{children}</div>
+        <div className={styles.info}>{children}</div>
         <div className={styles.name}>{name}</div>
       </div>
     </div>
   );
 };
 
-interface CardStatsProps {
-  rating?: number;
-  ratingCount?: number;
-  downloadCount?: number;
-  favoriteCount?: number;
+export const CardTags: React.FC<React.PropsWithChildren> = ({ children }) => {
+  return <div className={styles.tags}>{children}</div>;
+};
+
+interface CardTagProps {
+  icon?: React.ReactNode;
+  text?: React.ReactNode;
 }
 
-export const CardStats: React.FC<CardStatsProps> = ({
-  rating,
-  ratingCount,
-  downloadCount,
-  favoriteCount,
-}) => {
+export const CardTag: React.FC<CardTagProps> = ({ icon, text }) => {
   return (
-    <>
-      {!!rating && (
-        <div className={styles.stats}>
-          <div>
-            <Rating value={rating} small />
-            {!!ratingCount && <span>({ratingCount})</span>}
-          </div>
-          {!!downloadCount && (
-            <div>
-              <BsDownload />
-              <span>{downloadCount}</span>
-            </div>
-          )}
-          {!!favoriteCount && (
-            <div>
-              <BsHeartFill />
-              <span>{favoriteCount}</span>
-            </div>
-          )}
-        </div>
-      )}
-    </>
+    <div className={styles.tag}>
+      {icon}
+      {!!text && <span>{text}</span>}
+    </div>
   );
 };

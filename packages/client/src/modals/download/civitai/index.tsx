@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsSearch } from 'react-icons/bs';
+import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
 import useSWR from 'swr';
 
 import styles from './index.module.scss';
 import { CivitAIModel, CivitAIResponse } from '../../../types/civitai';
-import { Pagination, Loading, Toggle, IconButton } from '../../../components';
+import {
+  Pagination,
+  Loading,
+  Toggle,
+  IconButton,
+  Rating,
+} from '../../../components';
 import { Model } from './Model';
-import { Card, CardStats, List } from '../../../components/list';
+import { Card, CardTag, CardTags, List } from '../../../components/list';
 
 const CivitAISort = [
   'Highest Rated',
@@ -137,7 +143,22 @@ export const CivitAI: React.FC = observer(() => {
                 onClick={() => setItem(item)}
                 key={item.id}
               >
-                <CardStats {...item.stats} />
+                <CardTags>
+                  <CardTag
+                    icon={<Rating value={item.stats.rating} small />}
+                    text={`(${item.stats.ratingCount})`}
+                  />
+                </CardTags>
+                <CardTags>
+                  <CardTag
+                    icon={<BsDownload />}
+                    text={`(${item.stats.downloadCount})`}
+                  />
+                  <CardTag
+                    icon={<BsHeartFill />}
+                    text={`(${item.stats.favoriteCount})`}
+                  />
+                </CardTags>
               </Card>
             )}
           </List>
