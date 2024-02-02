@@ -12,7 +12,7 @@ import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
-import { DownloadManager } from '../../../../modals/download';
+import { ModelManager } from '../../../../modals/models';
 import { useUI } from '../../../../contexts/ui';
 import { VarModel } from '../components/VarModel';
 
@@ -64,7 +64,7 @@ export const LoRAs: React.FC = observer(() => {
       ) : (
         <VarButton
           buttonLabel="Download manager"
-          onClick={() => showModal(<DownloadManager />)}
+          onClick={() => showModal(<ModelManager defaultTab="recommended" />)}
         />
       )}
     </>

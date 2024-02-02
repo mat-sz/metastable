@@ -15,7 +15,7 @@ import { ModelType } from '@metastable/types';
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
 import { useUI } from '../../../../contexts/ui';
-import { DownloadManager } from '../../../../modals/download';
+import { ModelManager } from '../../../../modals/models';
 import { VarModel } from '../components/VarModel';
 
 export const Controlnets: React.FC = observer(() => {
@@ -79,7 +79,7 @@ export const Controlnets: React.FC = observer(() => {
       ) : (
         <VarButton
           buttonLabel="Download manager"
-          onClick={() => showModal(<DownloadManager />)}
+          onClick={() => showModal(<ModelManager defaultTab="recommended" />)}
         />
       )}
     </>

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 
 import styles from './Welcome.module.scss';
 import { mainStore } from '../../stores/MainStore';
-import { DownloadManager } from '../../modals/download';
+import { ModelManager } from '../../modals/models';
 import { useUI } from '../../contexts/ui';
 import { Card, List } from '../../components/list';
 
@@ -52,7 +52,11 @@ export const Welcome: React.FC = observer(() => {
               <div>
                 Please install a checkpoint model before creating a new project.
               </div>
-              <button onClick={() => showModal(<DownloadManager />)}>
+              <button
+                onClick={() =>
+                  showModal(<ModelManager defaultTab="recommended" />)
+                }
+              >
                 Download manager
               </button>
             </>
