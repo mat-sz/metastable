@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Model } from '@metastable/types';
 
-import styles from './index.module.scss';
 import { mainStore } from '../../stores/MainStore';
 import { Modal } from '../../components';
 import { useModal } from '../../contexts/modal';
@@ -10,7 +9,8 @@ import { Card, List } from '../../components/list';
 import { getStaticUrl } from '../../config';
 import { fuzzy } from '../../utils/fuzzy';
 import { removeFileExtension } from '../../utils/string';
-import { BsChevronRight, BsFolder, BsHouseFill } from 'react-icons/bs';
+import { BsFolder } from 'react-icons/bs';
+import { Breadcrumbs } from '../../components/breadcrumbs';
 
 interface Props {
   type: string;
@@ -67,19 +67,7 @@ export const ModelSelect: React.FC<Props> = observer(({ type, onSelect }) => {
 
   return (
     <Modal title="Select model">
-      <div className={styles.breadcrumbs}>
-        <button onClick={() => setParts([])}>
-          <BsHouseFill />
-        </button>
-        {parts.map((part, i) => (
-          <React.Fragment key={i}>
-            <BsChevronRight />
-            <button onClick={() => setParts(parts => parts.slice(0, i + 1))}>
-              {part}
-            </button>
-          </React.Fragment>
-        ))}
-      </div>
+      <Breadcrumbs value={parts} onChange={setParts} />
       <List
         items={[...directories, ...models]}
         quickFilter={(_, search) =>
