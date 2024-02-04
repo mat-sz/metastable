@@ -5,6 +5,7 @@ import { TaskState } from '@metastable/types';
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { filesize } from '../../../helpers';
+import { ProgressBar } from '../../../components/progressBar';
 
 export const Queue: React.FC = observer(() => {
   const downloads = mainStore.tasks.downloads;
@@ -24,21 +25,18 @@ export const Queue: React.FC = observer(() => {
               <div>{download.data.name}</div>
             </div>
             <div>
-              <div className={styles.progress}>
-                <div className={styles.progressInfo}>
-                  <span>{Math.round(percent)}%</span>
-                  {speed && <span>[{filesize(speed)}/s]</span>}
-                  <span>
-                    [{filesize(download.data.offset)} /{' '}
-                    {filesize(download.data.size)}]
-                  </span>
-                  <span>[{download.state}]</span>
-                </div>
-                <div
-                  className={styles.progressBar}
-                  style={{ width: `${percent}%` }}
-                ></div>
-              </div>
+              <ProgressBar
+                value={download.data.offset}
+                max={download.data.size}
+              >
+                <span>{Math.round(percent)}%</span>
+                {speed && <span>[{filesize(speed)}/s]</span>}
+                <span>
+                  [{filesize(download.data.offset)} /{' '}
+                  {filesize(download.data.size)}]
+                </span>
+                <span>[{download.state}]</span>
+              </ProgressBar>
             </div>
             <div>
               {download.state === TaskState.RUNNING ||

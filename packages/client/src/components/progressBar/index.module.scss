@@ -1,0 +1,58 @@
+.progress {
+  display: block;
+  position: relative;
+  font-size: 0.7rem;
+  overflow: hidden;
+  border-radius: 5px;
+  background-color: var(--color-bg-panel-dark);
+  flex: 1;
+
+  .progressInfo {
+    position: relative;
+    text-align: center;
+    z-index: 100;
+    padding: 0.25rem;
+
+    span {
+      margin-right: 1rem;
+    }
+  }
+
+  .progressBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: var(--color-accent);
+  }
+
+  &.marquee:after {
+    content: ' ';
+    position: absolute;
+    display: block;
+    width: 200%;
+    top: 0;
+    height: 100%;
+    animation: marquee 1s linear infinite;
+    z-index: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      #77f,
+      #77f 10%,
+      #465298 10%,
+      #465298 20%
+    );
+    transform: skewX(45deg);
+    transform-origin: bottom left;
+    opacity: 0.33;
+  }
+}
+
+@keyframes marquee {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 0%;
+  }
+}

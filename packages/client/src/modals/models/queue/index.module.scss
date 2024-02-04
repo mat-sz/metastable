@@ -27,32 +27,3 @@
     align-items: center;
   }
 }
-
-.progress {
-  display: block;
-  position: relative;
-  font-size: 0.7rem;
-  overflow: hidden;
-  border-radius: 5px;
-  background-color: var(--color-bg-panel-dark);
-  flex: 1;
-
-  .progressInfo {
-    position: relative;
-    text-align: center;
-    z-index: 100;
-    padding: 0.25rem;
-
-    span {
-      margin-right: 1rem;
-    }
-  }
-
-  .progressBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    background-color: var(--color-accent);
-  }
-}
