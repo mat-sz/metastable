@@ -3,11 +3,14 @@ import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
+import si from 'systeminformation';
+import checkDiskSpace from 'check-disk-space';
 import {
   AnyEvent,
   DownloadSettings,
   Project,
   ProjectSettings,
+  UtilizationEvent,
 } from '@metastable/types';
 
 import { Setup } from './setup/index.js';
@@ -75,6 +78,35 @@ export class Metastable extends EventEmitter {
         });
       }, 250);
     });
+
+    setInterval(async () => {
+      // @ts-ignore
+      const [graphics, cpuTemperature, currentLoad, mem, usage] =
+        await Promise.all([
+          si.graphics(),
+          si.cpuTemperature(),
+          si.currentLoad(),
+          si.mem(),
+          (checkDiskSpace as any)(this.dataRoot),
+        ]);
+
+      const gpu = graphics.controllers[0];
+      this.onEvent({
+        event: 'utilization',
+        data: {
+          cpuUsage: currentLoad.currentLoad,
+          hddTotal: usage.size,
+          hddUsed: usage.size - usage.free,
+          ramTotal: mem.total,
+          ramUsed: mem.used,
+          cpuTemperature: cpuTemperature.main,
+          gpuTemperature: gpu?.temperatureGpu,
+          gpuUsage: gpu?.utilizationGpu,
+          vramTotal: gpu?.memoryTotal,
+          vramUsed: gpu?.memoryUsed,
+        },
+      } as UtilizationEvent);
+    }, 1000);
   }
 
   async init() {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BsDownload,
   BsFillCheckCircleFill,
@@ -17,10 +17,12 @@ import { ProgressButton } from '../../components';
 import { useUI } from '../../contexts/ui';
 import { Backend } from '../../modals/backend';
 import { ModelManager } from '../../modals/models';
+import { Utilization } from './Utilization';
 
 export const Status: React.FC = observer(() => {
   const status = mainStore.status;
   const { showModal } = useUI();
+  const [showUtilization, setShowUtilization] = useState(false);
 
   const downloads = mainStore.tasks.downloads;
   const count = downloads.filter(
@@ -70,7 +72,8 @@ export const Status: React.FC = observer(() => {
         </ProgressButton>
       </div>
       <div className={styles.info}>
-        <div>
+        {showUtilization && <Utilization />}
+        <div onClick={() => setShowUtilization(current => !current)}>
           <BsGpuCard />
           <span>{mainStore.deviceName}</span>
         </div>

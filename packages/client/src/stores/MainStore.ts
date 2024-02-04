@@ -9,6 +9,7 @@ import {
   InstanceInfo,
   Project as APIProject,
   TaskState,
+  UtilizationEvent,
 } from '@metastable/types';
 
 import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
@@ -44,6 +45,13 @@ class MainStore {
   backendStatus: ComfyStatus = 'starting';
   backendLog: ComfyLogItem[] = [];
   infoReady = false;
+  utilization: UtilizationEvent['data'] = {
+    cpuUsage: 0,
+    hddTotal: 0,
+    hddUsed: 0,
+    ramTotal: 0,
+    ramUsed: 0,
+  };
 
   tasks = new TaskStore();
   config = new ConfigStore();
@@ -209,6 +217,9 @@ class MainStore {
       case 'task.update':
       case 'task.delete':
         this.tasks.onMessage(message);
+        break;
+      case 'utilization':
+        this.utilization = message.data;
         break;
     }
   }

@@ -21,6 +21,24 @@ export interface BackendLogBufferEvent {
   data: ComfyLogItem[];
 }
 
+export interface UtilizationEvent {
+  event: 'utilization';
+  data: {
+    cpuUsage: number;
+    ramUsed: number;
+    ramTotal: number;
+    hddUsed: number;
+    hddTotal: number;
+    cpuTemperature?: number;
+
+    // Only available for NVIDIA.
+    gpuUsage?: number;
+    vramUsed?: number;
+    vramTotal?: number;
+    gpuTemperature?: number;
+  };
+}
+
 export interface PingEvent {
   event: 'ping';
   data: number;
@@ -34,4 +52,5 @@ export type AnyEvent =
   | BackendLogBufferEvent
   | PingEvent
   | TaskEvent
-  | SetupEvent;
+  | SetupEvent
+  | UtilizationEvent;
