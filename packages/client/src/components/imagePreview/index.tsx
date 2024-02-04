@@ -66,7 +66,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   }
 
   const zoom = (e: React.WheelEvent) => {
-    e.preventDefault();
     e.stopPropagation();
 
     const newScale = scale * (1 - Math.sign(e.deltaY) * 0.1);
@@ -123,57 +122,58 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   };
 
   return (
-    <div
-      className={styles.preview}
-      ref={wrapperRef}
-      onWheel={zoom}
-      onPointerDown={e => {
-        e.preventDefault();
-
-        const state = pointerStateRef.current;
-        const i = state.findIndex(p => p.pointerId === e.pointerId);
-
-        const pointerState = {
-          start: Vector2.fromEvent(e),
-          current: Vector2.fromEvent(e),
-          imageOffset: Vector2.fromPoint(imageOffset),
-          pointerId: e.pointerId,
-          scale: scale,
-        };
-
-        if (i !== -1) {
-          state[i] = pointerState;
-        } else {
-          state.push(pointerState);
-        }
-      }}
-      onPointerMove={e => {
-        e.preventDefault();
-
-        const state = pointerStateRef.current;
-        const i = state.findIndex(p => p.pointerId === e.pointerId);
-        if (i !== -1) {
-          state[i].current = Vector2.fromEvent(e);
-        }
-
-        pan();
-      }}
-      onPointerUp={e => {
-        const state = pointerStateRef.current;
-        const i = state.findIndex(p => p.pointerId === e.pointerId);
-        if (i !== -1) {
-          state.splice(i, 1);
-
-          if (state.length === 1) {
-            state[0].imageOffset = Vector2.fromPoint(imageOffset);
-            state[0].start = state[0].current.clone();
-          }
-        }
-      }}
-      onDoubleClick={() => resetScale()}
-    >
+    <div className={styles.preview} ref={wrapperRef}>
       <img
         src={url}
+        onWheel={zoom}
+        onClick={e => e.stopPropagation()}
+        onPointerDown={e => {
+          e.preventDefault();
+          if (e.pointerType === 'mouse' && e.button !== 0) {
+            return;
+          }
+
+          const state = pointerStateRef.current;
+          const i = state.findIndex(p => p.pointerId === e.pointerId);
+
+          const pointerState = {
+            start: Vector2.fromEvent(e),
+            current: Vector2.fromEvent(e),
+            imageOffset: Vector2.fromPoint(imageOffset),
+            pointerId: e.pointerId,
+            scale: scale,
+          };
+
+          if (i !== -1) {
+            state[i] = pointerState;
+          } else {
+            state.push(pointerState);
+          }
+        }}
+        onPointerMove={e => {
+          e.preventDefault();
+
+          const state = pointerStateRef.current;
+          const i = state.findIndex(p => p.pointerId === e.pointerId);
+          if (i !== -1) {
+            state[i].current = Vector2.fromEvent(e);
+          }
+
+          pan();
+        }}
+        onPointerUp={e => {
+          const state = pointerStateRef.current;
+          const i = state.findIndex(p => p.pointerId === e.pointerId);
+          if (i !== -1) {
+            state.splice(i, 1);
+
+            if (state.length === 1) {
+              state[0].imageOffset = Vector2.fromPoint(imageOffset);
+              state[0].start = state[0].current.clone();
+            }
+          }
+        }}
+        onDoubleClick={() => resetScale()}
         ref={imageRef}
         draggable={false}
         onLoad={() => {

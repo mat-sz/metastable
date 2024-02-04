@@ -59,12 +59,22 @@ export const Lightbox: React.FC<Props> = ({
           </IconButton>
         </div>
       </div>
-      <div className={styles.main} onClick={e => e.stopPropagation()}>
-        <button onClick={previous}>
+      <div className={styles.main}>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            previous();
+          }}
+        >
           <BsArrowLeft />
         </button>
         <ImagePreview url={currentUrl} />
-        <button onClick={next}>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            next();
+          }}
+        >
           <BsArrowRight />
         </button>
       </div>
