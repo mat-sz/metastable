@@ -91,7 +91,7 @@ export class Metastable extends EventEmitter {
         ]);
 
       const gpu = graphics.controllers[0];
-      this.onEvent({
+      this.emit('event', {
         event: 'utilization',
         data: {
           cpuUsage: currentLoad.currentLoad,
