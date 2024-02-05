@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { BsGrid, BsList, BsListUl } from 'react-icons/bs';
 import clsx from 'clsx';
 
@@ -11,9 +11,11 @@ interface ListProps<T> {
   items: T[];
   children: (item: T) => JSX.Element;
   quickFilter?: (data: T[], search: string) => T[];
+  header?: React.ReactNode;
 }
 
 export function List<T>({
+  header,
   children,
   items,
   small,
@@ -30,6 +32,7 @@ export function List<T>({
   return (
     <div className={styles.wrapper}>
       <div className={styles.options}>
+        {!!header && <div>{header}</div>}
         <div>
           {!!quickFilter && <Search value={search} onChange={setSearch} />}
         </div>

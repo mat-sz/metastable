@@ -16,8 +16,7 @@ export const Welcome: React.FC = observer(() => {
     <div className={styles.wrapper}>
       <div className={styles.welcome}>
         <div className={styles.recent}>
-          <h2>Recent</h2>
-          <List small items={data}>
+          <List header={<h2>Recent</h2>} small items={data}>
             {item => (
               <Card
                 name={item.name}
