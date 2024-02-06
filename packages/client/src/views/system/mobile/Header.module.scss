@@ -1,0 +1,83 @@
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: var(--color-bg-panel-dark);
+  -webkit-app-region: drag;
+
+  .toggle {
+    font-size: 2rem;
+    transition: 0.2s ease-in-out all;
+    opacity: 1;
+
+    &.open {
+      opacity: 0;
+    }
+  }
+
+  .title {
+    grid-column: 2 / 3;
+    justify-self: center;
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    background: rgba(0, 0, 0, 0.8);
+    width: 0;
+    transition: 0.2s ease-in-out all;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    align-items: start;
+
+    .main {
+      & > div,
+      .status > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0;
+      }
+
+      .status {
+        background: none;
+
+        button {
+          font-size: 0.8rem;
+        }
+      }
+
+      button {
+        margin: 0.5rem 0;
+        font-size: 1rem;
+        justify-content: flex-start;
+      }
+    }
+
+    &.open {
+      width: 100%;
+    }
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: normal;
+    color: var(--color-fg-soft);
+  }
+
+  button {
+    background: transparent;
+    padding: 0.2rem 0.6rem;
+    font-weight: normal;
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
+}

@@ -17,17 +17,17 @@ export const Utilization: React.FC = observer(() => {
         <span>CPU</span>
         <ProgressBar value={utilization.cpuUsage} max={100}>
           <span>{Math.round(utilization.cpuUsage)}%</span>
-          {typeof utilization.cpuTemperature !== 'undefined' && (
+          {typeof utilization.cpuTemperature === 'number' && (
             <span>{utilization.cpuTemperature}°C</span>
           )}
         </ProgressBar>
       </div>
-      {typeof utilization.gpuUsage !== 'undefined' && (
+      {typeof utilization.gpuUsage === 'number' && (
         <div>
           <span>GPU</span>
           <ProgressBar value={utilization.gpuUsage} max={100}>
             <span>{Math.round(utilization.gpuUsage)}%</span>
-            {typeof utilization.gpuTemperature !== 'undefined' && (
+            {typeof utilization.gpuTemperature === 'number' && (
               <span>{utilization.gpuTemperature}°C</span>
             )}
           </ProgressBar>
@@ -44,8 +44,8 @@ export const Utilization: React.FC = observer(() => {
           </span>
         </ProgressBar>
       </div>
-      {typeof utilization.vramTotal !== 'undefined' &&
-        typeof utilization.vramUsed !== 'undefined' && (
+      {typeof utilization.vramTotal === 'number' &&
+        typeof utilization.vramUsed === 'number' && (
           <div>
             <span>VRAM</span>
             <ProgressBar

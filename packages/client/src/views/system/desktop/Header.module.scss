@@ -1,0 +1,70 @@
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: var(--color-bg-panel-dark);
+  -webkit-app-region: drag;
+  min-height: 1.6rem;
+  padding-bottom: 0.5rem;
+
+  .title {
+    grid-column: 2 / 3;
+    justify-self: center;
+  }
+
+  .menu {
+    flex: 1;
+    padding: 0.25rem 0.2rem;
+    grid-column: 1 / 2;
+
+    button {
+      -webkit-app-region: no-drag;
+      margin-right: 2px;
+      padding: 0.2rem 0.6rem;
+    }
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    grid-column: 3 / 4;
+
+    button {
+      background: none;
+      font-size: 0;
+      height: 100%;
+      border-radius: 0;
+      padding: 0.2rem 0.9rem;
+      -webkit-app-region: no-drag;
+
+      &:hover {
+        background: var(--color-bg-panel);
+      }
+
+      svg {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: var(--color-fg-soft);
+  }
+
+  button {
+    background: transparent;
+    padding: 0.2rem 0.6rem;
+    font-weight: normal;
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
+}

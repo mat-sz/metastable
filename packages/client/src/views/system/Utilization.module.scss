@@ -1,14 +1,16 @@
 .utilization {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  width: 300px;
-  background: rgba(0, 0, 0, 0.4);
-
   & > div {
     display: grid;
     grid-template-columns: 50px auto;
     align-items: center;
     margin: 0.5rem 0;
+  }
+
+  @media screen and (min-width: 960px) {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    width: 300px;
+    background: rgba(0, 0, 0, 0.4);
   }
 }
