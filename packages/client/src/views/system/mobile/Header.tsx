@@ -7,22 +7,28 @@ import styles from './Header.module.scss';
 import { Menu } from '../common/Menu';
 import { Status } from '../common/Status';
 
-export const Header: React.FC = observer(() => {
+interface Props {
+  showMenu?: boolean;
+}
+
+export const Header: React.FC<Props> = observer(({ showMenu = true }) => {
   const [isOpen, setOpen] = useState(false);
 
   return (
     <div className={styles.header}>
       <div>
-        <button
-          onClick={() => setOpen(current => !current)}
-          title="Open menu"
-          className={clsx(styles.toggle, { [styles.open]: isOpen })}
-        >
-          <BsList />
-        </button>
+        {showMenu && (
+          <button
+            onClick={() => setOpen(current => !current)}
+            title="Open menu"
+            className={clsx(styles.toggle, { [styles.open]: isOpen })}
+          >
+            <BsList />
+          </button>
+        )}
       </div>
       <div
-        className={clsx(styles.menu, { [styles.open]: isOpen })}
+        className={clsx(styles.menu, { [styles.open]: isOpen && showMenu })}
         onClick={() => setOpen(false)}
       >
         <button

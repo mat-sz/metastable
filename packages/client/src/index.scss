@@ -83,14 +83,6 @@ body,
   touch-action: none;
 }
 
-.app {
-  height: 100%;
-  max-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 progress {
   background: rgba(255, 255, 255, 0.1);
   border: none;

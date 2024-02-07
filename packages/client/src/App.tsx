@@ -4,12 +4,11 @@ import { observer } from 'mobx-react-lite';
 import './index.scss';
 import { mainStore } from './stores/MainStore';
 import { Project } from './views/project';
-import { Header } from './views/system/Header';
 import { Projects } from './views/system/Projects';
 import { Welcome } from './views/system/Welcome';
-import { Status } from './views/system/Status';
 import { UI } from './components';
 import { Setup } from './views/setup';
+import { Main } from './views/system/Main';
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
@@ -19,18 +18,16 @@ export const App: React.FC = observer(() => {
   if (mainStore.setup?.status?.status !== 'done') {
     return (
       <UI>
-        <div className="app">
-          <Header showMenu={false} />
+        <Main showMenu={false}>
           <Setup />
-        </div>
+        </Main>
       </UI>
     );
   }
 
   return (
     <UI>
-      <div className="app">
-        <Header />
+      <Main>
         {mainStore.projects.projects.length === 0 ? (
           <Welcome />
         ) : (
@@ -39,8 +36,7 @@ export const App: React.FC = observer(() => {
             <Project />
           </>
         )}
-        <Status />
-      </div>
+      </Main>
     </UI>
   );
 });
