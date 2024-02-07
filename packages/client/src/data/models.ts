@@ -374,7 +374,7 @@ export const downloadable: DownloadableModelGroup[] = [
           {
             type: ModelType.CLIP_VISION,
             name: 'ipadapter_clipvision_sd15.safetensors',
-            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/image_encoder/model.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors',
             size: 2528373448,
           },
         ],

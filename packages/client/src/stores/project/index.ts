@@ -133,6 +133,19 @@ export class Project {
       }
     }
 
+    if (settings.models.ipadapters) {
+      for (const ipadapter of settings.models.ipadapters) {
+        ipadapter.image = await base64ify(
+          await prepareImage(
+            ipadapter.image!,
+            width,
+            height,
+            ipadapter.image_mode,
+          ),
+        );
+      }
+    }
+
     this.save();
     await API.prompts.create(this.id, settings);
   }

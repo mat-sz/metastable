@@ -717,7 +717,7 @@ def apply(ipadapter,
                     clip_vision=None, 
                     image=None, 
                     weight_type="original", 
-                    noise=None, 
+                    noise=0.0, 
                     embeds=None, 
                     attn_mask=None, 
                     start_at=0.0, 
@@ -862,6 +862,7 @@ def ipadapter_apply_patch(work_model, is_sdxl, patch_kwargs):
             set_model_patch_replace(work_model, patch_kwargs, ("middle", 0, index))
             patch_kwargs["number"] += 1
 
+    return work_model
 
 def load(path):
     model = comfy.utils.load_torch_file(path, safe_load=True)
