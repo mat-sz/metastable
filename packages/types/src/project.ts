@@ -31,6 +31,16 @@ export interface ProjectSettings {
       image: string;
       image_mode?: string;
     }[];
+    ipadapters?: {
+      enabled: boolean;
+      name?: string;
+      path?: string;
+      weight: number;
+      clip_vision_name?: string;
+      clip_vision_path?: string;
+      image?: string;
+      image_mode?: string;
+    }[];
   };
   conditioning: {
     positive: string;

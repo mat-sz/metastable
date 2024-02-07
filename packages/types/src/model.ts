@@ -10,6 +10,7 @@ export enum ModelType {
   EMBEDDING = 'embeddings',
   GLIGEN = 'gligen',
   HYPERNETWORK = 'hypernetworks',
+  IPADAPTER = 'ipadapter',
   LORA = 'loras',
   STYLE_MODEL = 'style_models',
   UPSCALE_MODEL = 'upscale_models',

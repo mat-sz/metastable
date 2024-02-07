@@ -1,12 +1,9 @@
 import os
 import sys
 import copy
-import json
 import time
-import logging
 import threading
 import traceback
-import gc
 from io import BytesIO
 import base64
 import math
@@ -20,13 +17,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "co
 
 import torch
 
-import comfy.diffusers_load
 import comfy.samplers
 import comfy.sample
 import comfy.sd
 import comfy.utils
 import comfy.controlnet
-
 import comfy.clip_vision
 
 import comfy.model_management
@@ -35,6 +30,7 @@ import custom
 
 import latent_preview
 from helpers import jsonout, get_save_image_counter
+import ipadapter
 
 def load_image(img):
     i = Image.open(BytesIO(base64.b64decode(img)))
@@ -296,6 +292,9 @@ def load_checkpoint_cached(path):
     last_checkpoint = load_checkpoint(path)
     return last_checkpoint
 
+def load_clip_vision(path):
+    return comfy.clip_vision.load(path)
+
 def execute_prompt(prompt):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint_cached(models_settings["base"])
@@ -304,6 +303,13 @@ def execute_prompt(prompt):
     if "loras" in models_settings:
         for lora_settings in models_settings["loras"]:
             (model, clip) = load_lora(model, clip, lora_settings)
+
+    if "ipadapters" in models_settings:
+        for ipadapter_settings in models_settings["ipadapters"]:
+            ipadapter = ipadapter.load(ipadapter_settings["path"])
+            clip_vision = load_clip_vision(ipadapter_settings["clip_vision_path"])
+            (image, _) = load_image(prompt["input"]["image"])
+            model = ipadapter.apply(ipadapter, model, ipadapter_settings["weight"], clip_vision, image)
 
     if tiling:
         model.model.apply(model_make_circular)

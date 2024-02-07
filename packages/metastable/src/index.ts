@@ -18,7 +18,7 @@ import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
 import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
-import { DownloadModelTask, DownloadTask } from './downloader/index.js';
+import { DownloadModelTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 
 const require = createRequire(import.meta.url);
@@ -232,6 +232,25 @@ export class Metastable extends EventEmitter {
       );
     } else {
       settings.models.upscale = undefined;
+    }
+
+    if (settings.models.ipadapters) {
+      settings.models.ipadapters = settings.models.ipadapters
+        .filter(
+          model =>
+            model.enabled &&
+            model.name &&
+            model.clip_vision_name &&
+            model.image,
+        )
+        .map(model => ({
+          ...model,
+          path: this.storage.models.path('ipadapters', model.name!),
+          clip_vision_path: this.storage.models.path(
+            'clip_vision',
+            model.clip_vision_name!,
+          ),
+        }));
     }
 
     if (settings.sampler.preview?.method === 'taesd') {

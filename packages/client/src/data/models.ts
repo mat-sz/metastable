@@ -11,6 +11,7 @@ export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.EMBEDDING]: 'Embedding',
   [ModelType.GLIGEN]: 'GLIGEN',
   [ModelType.HYPERNETWORK]: 'HyperNetwork',
+  [ModelType.IPADAPTER]: 'IPAdapter',
   [ModelType.LORA]: 'LoRA',
   [ModelType.STYLE_MODEL]: 'Style model',
   [ModelType.UPSCALE_MODEL]: 'Upscale model',
@@ -325,7 +326,7 @@ export const downloadable: DownloadableModelGroup[] = [
     models: [
       {
         name: 'QRCode ControlNet - SD 1.5',
-        source: 'github',
+        source: 'huggingface',
         type: ModelType.CONTROLNET,
         downloads: [
           {
@@ -340,7 +341,7 @@ export const downloadable: DownloadableModelGroup[] = [
       },
       {
         name: 'QRCode ControlNet - SD 2.1',
-        source: 'github',
+        source: 'huggingface',
         type: ModelType.CONTROLNET,
         downloads: [
           {
@@ -352,6 +353,54 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
         baseModel: 'SD 2.1',
+      },
+    ],
+  },
+  {
+    name: 'IPAdapter',
+    type: ModelType.IPADAPTER,
+    models: [
+      {
+        name: 'IPAdapter Plus - SD 1.5',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.IPADAPTER,
+            name: 'ipadapter_plus_sd15.bin',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus_sd15.bin',
+            size: 158033179,
+          },
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'ipadapter_clipvision_sd15.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/image_encoder/model.safetensors',
+            size: 2528373448,
+          },
+        ],
+        homepage: 'https://huggingface.co/h94/IP-Adapter',
+        baseModel: 'SD 1.5',
+      },
+      {
+        name: 'IPAdapter Plus - SDXL 1.0',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.IPADAPTER,
+            name: 'ipadapter_plus_sdxl.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors',
+            size: 847517512,
+          },
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'ipadapter_clipvision_sdxl.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/image_encoder/model.safetensors',
+            size: 3689912664,
+          },
+        ],
+        homepage: 'https://huggingface.co/h94/IP-Adapter',
+        baseModel: 'SDXL 1.0',
       },
     ],
   },

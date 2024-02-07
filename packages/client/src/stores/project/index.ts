@@ -212,6 +212,26 @@ export class Project {
     this.settings = settings;
   }
 
+  addIPAdapter() {
+    const settings = { ...this.settings };
+
+    if (!settings.models.ipadapters) {
+      settings.models.ipadapters = [];
+    }
+
+    settings.models.ipadapters.push({
+      enabled: true,
+      weight: 1,
+    });
+    this.settings = settings;
+  }
+
+  removeIPAdapter(index: number) {
+    const settings = { ...this.settings };
+    settings.models.ipadapters?.splice(index, 1);
+    this.settings = settings;
+  }
+
   onPromptDone(outputFilenames: string[]) {
     this.outputFilenames = outputFilenames;
     this.allOutputs.push(...outputFilenames);

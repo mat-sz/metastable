@@ -30,7 +30,7 @@ export const Queue: React.FC = observer(() => {
                 max={download.data.size}
               >
                 <span>{Math.round(percent)}%</span>
-                {speed && <span>[{filesize(speed)}/s]</span>}
+                {!!speed && <span>[{filesize(speed)}/s]</span>}
                 <span>
                   [{filesize(download.data.offset)} /{' '}
                   {filesize(download.data.size)}]

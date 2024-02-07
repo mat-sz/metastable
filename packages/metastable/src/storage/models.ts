@@ -1,28 +1,12 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { FileInfo, Model } from '@metastable/types';
+import { FileInfo, Model, ModelType } from '@metastable/types';
 
 import { tryUnlink, walk, JSONFile } from '../helpers/fs.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
 const IMAGE_EXTENSIONS = ['png', 'jpeg', 'jpg', 'gif', 'webp', 'heif', 'avif'];
-const MODEL_TYPES = [
-  'checkpoints',
-  'clip',
-  'clip_vision',
-  'configs',
-  'controlnet',
-  'diffusers',
-  'embeddings',
-  'gligen',
-  'hypernetworks',
-  'loras',
-  'style_models',
-  'unet',
-  'upscale_models',
-  'vae',
-  'vae_approx',
-];
+const MODEL_TYPES = Object.values(ModelType);
 
 function isModel(name: string) {
   return MODEL_EXTENSIONS.includes(name.split('.').pop()!);
