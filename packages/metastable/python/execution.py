@@ -306,10 +306,10 @@ def execute_prompt(prompt):
 
     if "ipadapters" in models_settings:
         for ipadapter_settings in models_settings["ipadapters"]:
-            ipadapter = ipadapter.load(ipadapter_settings["path"])
-            clip_vision = load_clip_vision(ipadapter_settings["clip_vision_path"])
+            ipadapter_model = ipadapter.load(ipadapter_settings["path"])
+            clip_vision_model = load_clip_vision(ipadapter_settings["clip_vision_path"])
             (image, _) = load_image(prompt["input"]["image"])
-            model = ipadapter.apply(ipadapter, model, ipadapter_settings["weight"], clip_vision, image)
+            model = ipadapter.apply(ipadapter_model, model, ipadapter_settings["weight"], clip_vision_model, image)
 
     if tiling:
         model.model.apply(model_make_circular)

@@ -202,6 +202,7 @@ export class Project {
       name,
       strength,
       image: '',
+      image_mode: 'cover',
     });
     this.settings = settings;
   }
@@ -222,6 +223,7 @@ export class Project {
     settings.models.ipadapters.push({
       enabled: true,
       weight: 1,
+      image_mode: 'cover',
     });
     this.settings = settings;
   }
