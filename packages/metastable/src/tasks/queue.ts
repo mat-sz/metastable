@@ -65,8 +65,15 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
         current.started();
         const state = await current.execute();
         current.stopped(state);
-      } catch (e) {
-        current.appendLog(String(e));
+      } catch (e: any) {
+        if (typeof e === 'object' && 'errors' in e) {
+          for (const error of e.errors) {
+            current.appendLog(`${String(error)}\n${error.stack}`);
+          }
+        } else {
+          current.appendLog(String(e));
+        }
+
         current.stopped(TaskState.FAILED);
       }
       this.running = false;
