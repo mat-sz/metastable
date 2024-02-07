@@ -192,6 +192,46 @@ export const downloadable: DownloadableModelGroup[] = [
       },
     ],
   },
+  {
+    name: 'Stable Video Diffusion',
+    type: ModelType.CHECKPOINT,
+    models: [
+      {
+        name: 'Stable Video Diffusion',
+        description: '14 frames version of SVD',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        downloads: [
+          {
+            type: ModelType.CHECKPOINT,
+            name: 'svd.safetensors',
+            url: 'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid/resolve/main/svd.safetensors',
+            size: 9559625980,
+          },
+        ],
+        homepage:
+          'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
+        baseModel: 'SVD 1.0',
+      },
+      {
+        name: 'Stable Video Diffusion XT',
+        description: '25 frames version of SVD',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        downloads: [
+          {
+            type: ModelType.CHECKPOINT,
+            name: 'svd_xt.safetensors',
+            url: 'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/resolve/main/svd_xt.safetensors',
+            size: 9559625980,
+          },
+        ],
+        homepage:
+          'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
+        baseModel: 'SVD 1.0',
+      },
+    ],
+  },
   // {
   //   name: 'Stable Diffusion XL ReVision',
   //   type: ModelType.CLIP_VISION,
