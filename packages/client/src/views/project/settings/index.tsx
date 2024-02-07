@@ -2,14 +2,15 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { runInAction, toJS } from 'mobx';
 import { VarUI } from 'react-var-ui';
-
-import styles from './index.module.scss';
 import {
   BsWrench,
   BsRecordCircle,
   BsGearWideConnected,
   BsFullscreen,
+  BsPlugFill,
 } from 'react-icons/bs';
+
+import styles from './index.module.scss';
 
 import { mainStore } from '../../../stores/MainStore';
 import { fixSettings, validateProject } from '../../../helpers';
@@ -18,6 +19,7 @@ import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
 import { Upscale } from './sections/Upscale';
 import { Tab, TabPanel, TabView, Tabs } from '../../../components';
+import { IPAdapters } from './sections/IPAdapters';
 
 interface SettingsProps {
   actions?: JSX.Element;
@@ -42,6 +44,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
           title="Controlnets"
           icon={<BsGearWideConnected />}
         />
+        <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
         <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
       </Tabs>
       <div className={styles.actions}>{!error && actions}</div>
@@ -63,6 +66,9 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         </TabPanel>
         <TabPanel id="controlnets">
           <Controlnets />
+        </TabPanel>
+        <TabPanel id="ipadapters">
+          <IPAdapters />
         </TabPanel>
         <TabPanel id="upscale">
           <Upscale />

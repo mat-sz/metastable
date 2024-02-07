@@ -367,9 +367,9 @@ export const downloadable: DownloadableModelGroup[] = [
         downloads: [
           {
             type: ModelType.IPADAPTER,
-            name: 'ipadapter_plus_sd15.bin',
-            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus_sd15.bin',
-            size: 158033179,
+            name: 'ipadapter_plus_sd15.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus_sd15.safetensors',
+            size: 98183288,
           },
           {
             type: ModelType.CLIP_VISION,
