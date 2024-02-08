@@ -6,6 +6,9 @@ export const WebAPI: API = {
     async info() {
       return await httpGet('/instance/info');
     },
+    async restart() {
+      return await httpPost('/instance/restart');
+    },
   },
   config: {
     async all() {

@@ -7,6 +7,10 @@ export function routesInstance(metastable: Metastable) {
       return await metastable.info();
     });
 
+    fastify.post('/restart', async () => {
+      return await metastable.restartComfy();
+    });
+
     fastify.get('/config', async () => {
       return await metastable.storage.config.all();
     });

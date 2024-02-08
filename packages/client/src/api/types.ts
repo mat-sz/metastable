@@ -13,6 +13,7 @@ import {
 export interface API {
   instance: {
     info(): Promise<InstanceInfo>;
+    restart(): Promise<void>;
   };
   config: {
     all(): Promise<ConfigType>;

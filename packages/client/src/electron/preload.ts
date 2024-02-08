@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   ready: () => ipcRenderer.send('ready'),
   instance: {
     info: () => ipcRenderer.invoke('instance:info'),
+    restart: () => ipcRenderer.invoke('instance:restart'),
   },
   config: {
     all: () => ipcRenderer.invoke('config:all'),

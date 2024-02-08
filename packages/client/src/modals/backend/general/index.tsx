@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
-import { BsClipboard } from 'react-icons/bs';
+import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
 import { copy, filesize } from '../../../helpers';
 import { IconButton } from '../../../components';
+import { API } from '../../../api';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.torchInfo;
@@ -24,6 +25,12 @@ export const General: React.FC = observer(() => {
 
   return (
     <>
+      <div className={styles.actions}>
+        <button onClick={() => API.instance.restart()}>
+          <BsArrowClockwise />
+          <span>Restart backend</span>
+        </button>
+      </div>
       {torchInfo && (
         <table>
           <tbody>
