@@ -211,7 +211,7 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
-        baseModel: 'SVD 1.0',
+        baseModel: 'SVD',
       },
       {
         name: 'Stable Video Diffusion XT',
@@ -228,7 +228,7 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
-        baseModel: 'SVD 1.0',
+        baseModel: 'SVD XT',
       },
     ],
   },
@@ -401,7 +401,7 @@ export const downloadable: DownloadableModelGroup[] = [
     type: ModelType.IPADAPTER,
     models: [
       {
-        name: 'IPAdapter Plus - SD 1.5',
+        name: 'IPAdapter Plus - SD 1.5 (ViT-H)',
         source: 'huggingface',
         type: ModelType.IPADAPTER,
         downloads: [
@@ -411,18 +411,12 @@ export const downloadable: DownloadableModelGroup[] = [
             url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus_sd15.safetensors',
             size: 98183288,
           },
-          {
-            type: ModelType.CLIP_VISION,
-            name: 'ipadapter_clipvision_sd15.safetensors',
-            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors',
-            size: 2528373448,
-          },
         ],
         homepage: 'https://huggingface.co/h94/IP-Adapter',
         baseModel: 'SD 1.5',
       },
       {
-        name: 'IPAdapter Plus - SDXL 1.0',
+        name: 'IPAdapter Plus - SDXL 1.0 (ViT-H)',
         source: 'huggingface',
         type: ModelType.IPADAPTER,
         downloads: [
@@ -432,15 +426,37 @@ export const downloadable: DownloadableModelGroup[] = [
             url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors',
             size: 847517512,
           },
+        ],
+        homepage: 'https://huggingface.co/h94/IP-Adapter',
+        baseModel: 'SDXL 1.0',
+      },
+      {
+        name: 'IPAdapter CLIP Vision - ViT-H',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
           {
             type: ModelType.CLIP_VISION,
-            name: 'ipadapter_clipvision_sdxl.safetensors',
+            name: 'ipadapter_clipvision_vit-h.safetensors',
+            url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors',
+            size: 2528373448,
+          },
+        ],
+        homepage: 'https://huggingface.co/h94/IP-Adapter',
+      },
+      {
+        name: 'IPAdapter CLIP Vision - ViT-G',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'ipadapter_clipvision_vit-g.safetensors',
             url: 'https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/image_encoder/model.safetensors',
             size: 3689912664,
           },
         ],
         homepage: 'https://huggingface.co/h94/IP-Adapter',
-        baseModel: 'SDXL 1.0',
       },
     ],
   },
