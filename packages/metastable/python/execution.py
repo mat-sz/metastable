@@ -299,6 +299,8 @@ def execute_prompt(prompt):
     models_settings = prompt["models"]
     (model, clip, vae, _) = load_checkpoint_cached(models_settings["base"])
     tiling = prompt["sampler"]["tiling"]
+    
+    comfy.model_management.cleanup_models()
 
     if "loras" in models_settings:
         for lora_settings in models_settings["loras"]:
