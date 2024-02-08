@@ -2,18 +2,11 @@ import path from 'path';
 import fs from 'fs/promises';
 import { createWriteStream } from 'fs';
 import axios from 'axios';
-import { DownloadSettings, TaskState } from '@metastable/types';
+import { DownloadSettings, TaskState, DownloadData } from '@metastable/types';
 
 import { exists } from '../helpers/fs.js';
 import { BaseTask } from '../tasks/task.js';
 import { WrappedPromise } from '../helpers/promise.js';
-
-interface DownloadData {
-  offset: number;
-  size: number;
-  name: string;
-  url: string;
-}
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;
@@ -28,7 +21,13 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     public savePath: string,
     public headers: Record<string, string> = {},
   ) {
-    super(type, { offset: 0, size: 0, url, name: path.basename(savePath) });
+    super(type, {
+      offset: 0,
+      size: 0,
+      url,
+      name: path.basename(savePath),
+      speed: 0,
+    });
     this.created();
   }
 
@@ -62,6 +61,9 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       this.data = {
         ...this.data,
         offset: this.#offset,
+        speed: this.startedAt
+          ? this.#offset / ((new Date().getTime() - this.startedAt) / 1000)
+          : 0,
       };
       this.progress = this.data.offset / this.data.size;
     }
@@ -81,6 +83,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
 
     const onClose = async () => {
       writer.close();
+      this.emitProgress();
       if (this.cancellationPending) {
         await fs.unlink(partPath);
         wrapped.resolve(TaskState.CANCELLED);

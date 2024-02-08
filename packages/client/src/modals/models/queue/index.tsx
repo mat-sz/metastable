@@ -15,8 +15,7 @@ export const Queue: React.FC = observer(() => {
         const percent = (download.progress || 0) * 100;
         const speed =
           download.startedAt && download.state === TaskState.RUNNING
-            ? (download.data.offset || 0) /
-              ((new Date().getTime() - download.startedAt) / 1000)
+            ? download.data.speed
             : undefined;
 
         return (

@@ -3,6 +3,7 @@ import { ModelInfo } from './model.js';
 export interface DownloadData {
   offset: number;
   size: number;
+  speed: number;
   name: string;
   url: string;
 }
