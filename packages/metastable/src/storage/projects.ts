@@ -57,9 +57,31 @@ export class Projects {
     return project;
   }
 
+  async upload(id: Project['id'], file: Buffer, ext: string) {
+    const inputs = await this.inputs(id);
+    let num = 1;
+    for (const input of inputs) {
+      const split = input.split('.');
+      const current = parseInt(split[0]);
+      if (!isNaN(current) && current >= num) {
+        num = current + 1;
+      }
+    }
+
+    const filename = `${num.toString().padStart(5, '0')}.${ext}`;
+    await fs.writeFile(this.path(id, 'input', filename), file);
+    return [filename];
+  }
+
+  async inputs(id: Project['id']) {
+    return (await this.filenames(id, 'input')).filter(
+      name => !name.endsWith('.json'),
+    );
+  }
+
   async outputs(id: Project['id']) {
-    return (await this.filenames(id, 'output')).filter(name =>
-      name.endsWith('.png'),
+    return (await this.filenames(id, 'output')).filter(
+      name => !name.endsWith('.json'),
     );
   }
 

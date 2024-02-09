@@ -36,6 +36,14 @@ export const WebAPI: API = {
     async get(id) {
       return await httpGet(`/projects/${encodeURIComponent(id)}`);
     },
+    async inputs(id) {
+      return await httpGet(`/projects/${encodeURIComponent(id)}/inputs`);
+    },
+    async upload(id, file: File) {
+      return await httpPost(`/projects/${encodeURIComponent(id)}/inputs`, {
+        file,
+      });
+    },
     async outputs(id) {
       return await httpGet(`/projects/${encodeURIComponent(id)}/outputs`);
     },

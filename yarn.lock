@@ -591,6 +591,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^1.0.0":
+  version: 1.2.1
+  resolution: "@fastify/busboy@npm:1.2.1"
+  dependencies:
+    text-decoding: "npm:^1.0.0"
+  checksum: fe13effa7a7a2aa270ef62586cd8d04339036b10ffa1d3d6a883e502fcc1bdc6d8de1bd7ac9d46ef7718bed3b1202cac058e281f5053dee262af7538243cb780
+  languageName: node
+  linkType: hard
+
 "@fastify/busboy@npm:^2.0.0":
   version: 2.1.0
   resolution: "@fastify/busboy@npm:2.1.0"
@@ -656,6 +665,20 @@ __metadata:
     fastify-plugin: "npm:^4.5.0"
     ws: "npm:^8.4.2"
   checksum: c8f7fe380580f53059f676ca5b2bbdb1eef0a2d3dce28568e8932aeedb992efdc5fc40dae41b6d52f2f0ce14036af182664d0276ea9366e31fd920a119e7a03a
+  languageName: node
+  linkType: hard
+
+"@fastify/multipart@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "@fastify/multipart@npm:8.1.0"
+  dependencies:
+    "@fastify/busboy": "npm:^1.0.0"
+    "@fastify/deepmerge": "npm:^1.0.0"
+    "@fastify/error": "npm:^3.0.0"
+    fastify-plugin: "npm:^4.0.0"
+    secure-json-parse: "npm:^2.4.0"
+    stream-wormhole: "npm:^1.1.0"
+  checksum: dacbb13672db5ad71933fb951a038e53227a0304fbd37e50f52ae1d951142cae0b39bf9430f296b030edd24862393129cfd043b325b5052fdbad5f6b6902d2f5
   languageName: node
   linkType: hard
 
@@ -893,6 +916,7 @@ __metadata:
     "@fastify/compress": "npm:^6.5.0"
     "@fastify/cors": "npm:^8.4.2"
     "@fastify/http-proxy": "npm:^9.3.0"
+    "@fastify/multipart": "npm:^8.1.0"
     "@fastify/static": "npm:^6.12.0"
     "@fastify/websocket": "npm:^8.2.0"
     "@metastable/metastable": "npm:*"
@@ -5698,7 +5722,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"secure-json-parse@npm:^2.7.0":
+"secure-json-parse@npm:^2.4.0, secure-json-parse@npm:^2.7.0":
   version: 2.7.0
   resolution: "secure-json-parse@npm:2.7.0"
   checksum: f57eb6a44a38a3eeaf3548228585d769d788f59007454214fab9ed7f01fbf2e0f1929111da6db28cf0bcc1a2e89db5219a59e83eeaec3a54e413a0197ce879e4
@@ -5946,6 +5970,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stream-wormhole@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "stream-wormhole@npm:1.1.0"
+  checksum: 50800bcc919c01085b0bafa175c61a0c0bec27987dcc20aec92f8125bdc8b191102a030e114760d2ac86265eea65627d0145eea3adb8cb4453b3295e4468661a
+  languageName: node
+  linkType: hard
+
 "string-argv@npm:0.3.2":
   version: 0.3.2
   resolution: "string-argv@npm:0.3.2"
@@ -6119,6 +6150,13 @@ __metadata:
     async-exit-hook: "npm:^2.0.1"
     fs-extra: "npm:^10.0.0"
   checksum: 70e441909097346a930ae02278df9b0133cd02dddf0b49e5ddaade735fef1410a50a448a2a812106f97c045294c99cc19f26943eb88f1d728d41fbc445a40298
+  languageName: node
+  linkType: hard
+
+"text-decoding@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "text-decoding@npm:1.0.0"
+  checksum: 290dbd6111f39a4020b3e2384de614f90051eff3cd11176329fda0a40ac0b0a07e6820b9aeb4b0b7c2cc7869b62cd3b25944c71e9e16b628bcf57299ab84e311
   languageName: node
   linkType: hard
 

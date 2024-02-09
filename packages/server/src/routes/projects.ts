@@ -63,6 +63,26 @@ export function routesProjects(metastable: Metastable) {
       return { ok: true };
     });
 
+    fastify.get('/:id/inputs', async request => {
+      const projectId = (request.params as any)?.id;
+      return await metastable.storage.projects.inputs(projectId);
+    });
+
+    fastify.post('/:id/inputs', async request => {
+      const projectId = (request.params as any)?.id;
+      const file = await request.file();
+      if (!file) {
+        return;
+      }
+
+      const split = file.filename.split('.');
+      return await metastable.storage.projects.upload(
+        projectId,
+        await file.toBuffer(),
+        split[split.length - 1],
+      );
+    });
+
     fastify.get('/:id/outputs', async request => {
       const projectId = (request.params as any)?.id;
       return await metastable.storage.projects.outputs(projectId);

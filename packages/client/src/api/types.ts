@@ -27,6 +27,8 @@ export interface API {
   projects: {
     all(): Promise<Project[]>;
     get(id: Project['id']): Promise<Project>;
+    inputs(id: Project['id']): Promise<string[]>;
+    upload(id: Project['id'], file: File): Promise<string[]>;
     outputs(id: Project['id']): Promise<string[]>;
     create(data: Pick<Project, 'name' | 'settings'>): Promise<Project>;
     update(

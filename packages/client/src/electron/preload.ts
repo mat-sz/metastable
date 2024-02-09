@@ -21,6 +21,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   projects: {
     all: () => ipcRenderer.invoke('projects:all'),
     get: (id: Project['id']) => ipcRenderer.invoke('projects:get', id),
+    inputs: (id: Project['id']) => ipcRenderer.invoke('projects:inputs', id),
+    upload: async (id: Project['id'], file: File) =>
+      ipcRenderer.invoke(
+        'projects:upload',
+        id,
+        Buffer.from(await file.arrayBuffer()),
+        file.name.split('.').pop() || '',
+      ),
     outputs: (id: Project['id']) => ipcRenderer.invoke('projects:outputs', id),
     create: (data: any) => ipcRenderer.invoke('projects:create', data),
     update: (id: Project['id'], data: any) =>

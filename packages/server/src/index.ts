@@ -3,6 +3,7 @@ import Fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
+import fastifyMultipart from '@fastify/multipart';
 import { Metastable } from '@metastable/metastable';
 
 import {
@@ -76,6 +77,7 @@ metastable.on('event', event => {
   clientManager.broadcast(event);
 });
 
+app.register(fastifyMultipart);
 app.register(fastifyWebsocket);
 app.register(async function (fastify) {
   fastify.get('/ws', { websocket: true }, connection => {
