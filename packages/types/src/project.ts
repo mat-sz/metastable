@@ -65,6 +65,7 @@ export interface ProjectSettings {
 export interface Project {
   id: string;
   name: string;
+  type: string;
   settings: string;
   lastOutput?: string;
 }

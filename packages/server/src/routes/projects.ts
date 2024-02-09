@@ -6,13 +6,14 @@ const projectBody = {
   type: 'object',
   properties: {
     name: { type: 'string' },
+    type: { type: 'string' },
     settings: { type: 'string' },
   },
 } as const satisfies JSONSchema;
 
 const projectBodyCreate = {
   ...projectBody,
-  required: ['name', 'settings'],
+  required: ['name', 'settings', 'type'],
 } as const satisfies JSONSchema;
 
 export function routesProjects(metastable: Metastable) {

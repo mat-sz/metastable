@@ -57,7 +57,7 @@ export class ProjectStore {
     );
   }
 
-  async create(name: string) {
+  async create(name: string, type = 'simple') {
     if (!name.trim()) {
       return;
     }
@@ -65,6 +65,7 @@ export class ProjectStore {
     const settings = defaultProjectSettings();
     const project = {
       name,
+      type,
       settings: JSON.stringify(settings),
     };
 

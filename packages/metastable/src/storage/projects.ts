@@ -41,7 +41,7 @@ export class Projects {
     return projects;
   }
 
-  async create(data: Pick<Project, 'name' | 'settings'>) {
+  async create(data: Pick<Project, 'name' | 'settings' | 'type'>) {
     data.name = data.name.trim();
     if (!data.name) {
       throw new Error('Empty project name');
@@ -67,13 +67,14 @@ export class Projects {
     id: Project['id'],
   ): Promise<Omit<Project, 'settings'> | undefined> {
     const projectFile = this.projectFile(id);
-    const data = await projectFile.readJson();
+    const data = (await projectFile.readJson()) as any;
     if (!data) {
       return undefined;
     }
 
     const outputs = await this.outputs(id);
     return {
+      type: 'simple',
       ...data,
       id,
       name: id,
@@ -146,7 +147,7 @@ export class Projects {
     }
 
     const projectFile = this.projectFile(id);
-    await projectFile.writeJson(data);
+    await projectFile.writeJson({ type: 'simple', ...data });
 
     if (project.settings) {
       const settingsFile = this.settingsFile(id);
