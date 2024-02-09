@@ -197,7 +197,7 @@ export class Metastable extends EventEmitter {
     const id = nanoid();
     this.settingsCache[id] = JSON.stringify(settings);
 
-    settings.models.base.path = this.storage.models.path(
+    settings.models.base.path ||= this.storage.models.path(
       'checkpoints',
       settings.models.base.name,
     );
@@ -212,7 +212,7 @@ export class Metastable extends EventEmitter {
         .filter(model => model.enabled && model.name)
         .map(model => ({
           ...model,
-          path: this.storage.models.path('loras', model.name!),
+          path: model.path || this.storage.models.path('loras', model.name!),
         }));
     }
 
@@ -221,12 +221,13 @@ export class Metastable extends EventEmitter {
         .filter(model => model.enabled && model.name)
         .map(model => ({
           ...model,
-          path: this.storage.models.path('controlnet', model.name!),
+          path:
+            model.path || this.storage.models.path('controlnet', model.name!),
         }));
     }
 
     if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
-      settings.models.upscale.path = this.storage.models.path(
+      settings.models.upscale.path ||= this.storage.models.path(
         'upscale_models',
         settings.models.upscale.name,
       );
@@ -245,11 +246,11 @@ export class Metastable extends EventEmitter {
         )
         .map(model => ({
           ...model,
-          path: this.storage.models.path('ipadapters', model.name!),
-          clip_vision_path: this.storage.models.path(
-            'clip_vision',
-            model.clip_vision_name!,
-          ),
+          path:
+            model.path || this.storage.models.path('ipadapters', model.name!),
+          clip_vision_path:
+            model.path ||
+            this.storage.models.path('clip_vision', model.clip_vision_name!),
         }));
     }
 
