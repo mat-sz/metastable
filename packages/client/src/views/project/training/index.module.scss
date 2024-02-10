@@ -1,0 +1,41 @@
+.project {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  grid-template-rows: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.modes {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background: var(--color-bg-panel-dark);
+
+  li {
+    text-transform: uppercase;
+    font-size: 0;
+    padding: 0.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-fg-soft);
+
+    svg {
+      font-size: 1.5rem;
+    }
+
+    &.active {
+      background: var(--color-bg-panel);
+      color: var(--color-fg);
+    }
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
+}

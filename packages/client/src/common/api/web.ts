@@ -40,9 +40,12 @@ export const WebAPI: API = {
       return await httpGet(`/projects/${encodeURIComponent(id)}/inputs`);
     },
     async upload(id, file: File) {
-      return await httpPost(`/projects/${encodeURIComponent(id)}/inputs`, {
-        file,
-      });
+      const formData = new FormData();
+      formData.set('file', file);
+      return await httpPost(
+        `/projects/${encodeURIComponent(id)}/inputs`,
+        formData,
+      );
     },
     async outputs(id) {
       return await httpGet(`/projects/${encodeURIComponent(id)}/outputs`);

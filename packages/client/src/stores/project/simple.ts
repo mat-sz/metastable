@@ -38,7 +38,7 @@ export function defaultSettings(): ProjectSettings {
   };
 }
 
-export class SimpleProject extends BaseProject {
+export class SimpleProject extends BaseProject<ProjectSettings> {
   editor = new Editor();
   addOutputToEditor: Point | undefined = undefined;
 

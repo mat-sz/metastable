@@ -14,17 +14,22 @@ export async function httpGet(path: string): Promise<any> {
 }
 
 export async function httpPost(path: string, data?: any): Promise<any> {
-  const res = await fetch(getUrl(path), {
+  let req: RequestInit = {
     method: 'POST',
-    ...(typeof data === 'undefined'
-      ? {}
-      : {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        }),
-  });
+  };
+
+  if (typeof data === 'object') {
+    if (data instanceof FormData) {
+      req.body = data;
+    } else {
+      req.headers = {
+        'Content-Type': 'application/json',
+      };
+      req.body = JSON.stringify(data);
+    }
+  }
+
+  const res = await fetch(getUrl(path), req);
   return await httpJson(res);
 }
 

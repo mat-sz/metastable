@@ -1,11 +1,12 @@
-import { action, makeObservable, observable, toJS } from 'mobx';
-import { ProjectSettings, Project as APIProject } from '@metastable/types';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { Project as APIProject } from '@metastable/types';
 
 import { API } from '@api';
 import { getStaticUrl } from '@utils/url';
 
-export class BaseProject {
+export class BaseProject<T = any> {
   outputFilenames: string[] = [];
+  allInputs: string[] = [];
   allOutputs: string[] = [];
   mode: string = 'images';
   id;
@@ -14,16 +15,18 @@ export class BaseProject {
 
   constructor(
     data: APIProject,
-    public settings: ProjectSettings,
+    public settings: T,
   ) {
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
     this.outputFilenames = data.lastOutput ? [data.lastOutput] : [];
 
+    this.refreshInputs();
     this.refreshOutputs();
     makeObservable(this, {
       outputFilenames: observable,
+      allInputs: observable,
       allOutputs: observable,
       mode: observable,
       id: observable,
@@ -32,6 +35,7 @@ export class BaseProject {
       settings: observable,
       rename: action,
       save: action,
+      refreshInputs: action,
       refreshOutputs: action,
       triggerAutosave: action,
     });
@@ -51,11 +55,24 @@ export class BaseProject {
     });
   }
 
+  async refreshInputs() {
+    const inputs = await API.projects.inputs(this.id);
+    console.log(inputs);
+
+    if (inputs) {
+      runInAction(() => {
+        this.allInputs = inputs;
+      });
+    }
+  }
+
   async refreshOutputs() {
     const outputs = await API.projects.outputs(this.id);
 
     if (outputs) {
-      this.allOutputs = outputs;
+      runInAction(() => {
+        this.allOutputs = outputs;
+      });
     }
   }
 

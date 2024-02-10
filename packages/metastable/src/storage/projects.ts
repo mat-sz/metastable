@@ -58,17 +58,7 @@ export class Projects {
   }
 
   async upload(id: Project['id'], file: Buffer, ext: string) {
-    const inputs = await this.inputs(id);
-    let num = 1;
-    for (const input of inputs) {
-      const split = input.split('.');
-      const current = parseInt(split[0]);
-      if (!isNaN(current) && current >= num) {
-        num = current + 1;
-      }
-    }
-
-    const filename = `${num.toString().padStart(5, '0')}.${ext}`;
+    const filename = `${new Date().getTime()}.${ext}`;
     await fs.writeFile(this.path(id, 'input', filename), file);
     return [filename];
   }

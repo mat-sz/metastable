@@ -87,12 +87,6 @@ export class ProjectStore {
     const settings = json.settings
       ? JSON.parse(json.settings)
       : defaultSettings();
-    if (!settings.models.loras) {
-      settings.models.loras = [];
-    }
-    if (!settings.models.controlnets) {
-      settings.models.controlnets = [];
-    }
 
     const project = createProject(json, settings);
     runInAction(() => {

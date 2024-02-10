@@ -70,7 +70,11 @@ export function routesProjects(metastable: Metastable) {
 
     fastify.post('/:id/inputs', async request => {
       const projectId = (request.params as any)?.id;
-      const file = await request.file();
+      const file = await request.file({
+        limits: {
+          fileSize: 100 * 1024 * 1024,
+        },
+      });
       if (!file) {
         return;
       }
