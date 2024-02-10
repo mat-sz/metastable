@@ -8,6 +8,7 @@ import checkDiskSpace from 'check-disk-space';
 import {
   AnyEvent,
   DownloadSettings,
+  ModelType,
   Project,
   ProjectSettings,
   UtilizationEvent,
@@ -198,11 +199,11 @@ export class Metastable extends EventEmitter {
     this.settingsCache[id] = JSON.stringify(settings);
 
     settings.models.base.path ||= this.storage.models.path(
-      'checkpoints',
+      ModelType.CHECKPOINT,
       settings.models.base.name,
     );
 
-    const embeddingsDir = this.storage.models.dir('embeddings');
+    const embeddingsDir = this.storage.models.dir(ModelType.EMBEDDING);
     if (await exists(embeddingsDir)) {
       settings.models.base.embeddings_path = embeddingsDir;
     }
@@ -212,7 +213,8 @@ export class Metastable extends EventEmitter {
         .filter(model => model.enabled && model.name)
         .map(model => ({
           ...model,
-          path: model.path || this.storage.models.path('loras', model.name!),
+          path:
+            model.path || this.storage.models.path(ModelType.LORA, model.name!),
         }));
     }
 
@@ -222,13 +224,14 @@ export class Metastable extends EventEmitter {
         .map(model => ({
           ...model,
           path:
-            model.path || this.storage.models.path('controlnet', model.name!),
+            model.path ||
+            this.storage.models.path(ModelType.CONTROLNET, model.name!),
         }));
     }
 
     if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
       settings.models.upscale.path ||= this.storage.models.path(
-        'upscale_models',
+        ModelType.UPSCALE_MODEL,
         settings.models.upscale.name,
       );
     } else {
@@ -247,15 +250,19 @@ export class Metastable extends EventEmitter {
         .map(model => ({
           ...model,
           path:
-            model.path || this.storage.models.path('ipadapters', model.name!),
+            model.path ||
+            this.storage.models.path(ModelType.IPADAPTER, model.name!),
           clip_vision_path:
             model.path ||
-            this.storage.models.path('clip_vision', model.clip_vision_name!),
+            this.storage.models.path(
+              ModelType.CLIP_VISION,
+              model.clip_vision_name!,
+            ),
         }));
     }
 
     if (settings.sampler.preview?.method === 'taesd') {
-      const list = await this.storage.models.type('vae_approx');
+      const list = await this.storage.models.type(ModelType.VAE_APPROX);
       settings.sampler.preview.taesd = {
         taesd_decoder: await this.storage.models.find(list, 'taesd_decoder'),
         taesdxl_decoder: await this.storage.models.find(

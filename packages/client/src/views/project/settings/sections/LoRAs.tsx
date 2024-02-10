@@ -19,7 +19,7 @@ import { VarModel } from '../components/VarModel';
 export const LoRAs: React.FC = observer(() => {
   const { showModal } = useUI();
   const project = mainStore.project!;
-  const loras = mainStore.info.models.loras;
+  const defaultModel = mainStore.defaultModelName(ModelType.LORA);
 
   return (
     <>
@@ -41,7 +41,7 @@ export const LoRAs: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType="loras" />
+            <VarModel path="name" modelType={ModelType.LORA} />
             <VarSlider
               label="Strength"
               path="strength"
@@ -54,11 +54,11 @@ export const LoRAs: React.FC = observer(() => {
           </VarCategory>
         )}
       </VarArray>
-      {loras?.[0] ? (
+      {defaultModel ? (
         <VarButton
           buttonLabel="Add LoRA"
           onClick={() => {
-            project.addLora(mainStore.defaultModelName(ModelType.LORA));
+            project.addLora(defaultModel);
           }}
         />
       ) : (

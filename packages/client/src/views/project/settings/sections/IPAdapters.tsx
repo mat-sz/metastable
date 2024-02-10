@@ -10,6 +10,7 @@ import {
   VarToggle,
 } from 'react-var-ui';
 import { BsX } from 'react-icons/bs';
+import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { IconButton } from '../../../../components';
@@ -19,7 +20,7 @@ import { VarModel } from '../components/VarModel';
 
 export const IPAdapters: React.FC = observer(() => {
   const project = mainStore.project!;
-  const ipadapters = mainStore.info.models.ipadapters;
+  const defaultModel = mainStore.defaultModelName(ModelType.IPADAPTER);
   const { showModal } = useUI();
 
   return (
@@ -42,8 +43,11 @@ export const IPAdapters: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType="ipadapters" />
-            <VarModel path="clip_vision_name" modelType="clip_vision" />
+            <VarModel path="name" modelType={ModelType.IPADAPTER} />
+            <VarModel
+              path="clip_vision_name"
+              modelType={ModelType.CLIP_VISION}
+            />
             <VarSlider
               label="Weight"
               path="weight"
@@ -67,7 +71,7 @@ export const IPAdapters: React.FC = observer(() => {
           </VarCategory>
         )}
       </VarArray>
-      {ipadapters?.[0] ? (
+      {defaultModel ? (
         <VarButton
           buttonLabel="Add IPAdapter"
           onClick={() => {

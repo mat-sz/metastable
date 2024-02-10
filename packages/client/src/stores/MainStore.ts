@@ -251,8 +251,12 @@ class MainStore {
     return undefined;
   }
 
+  get hasCheckpoint() {
+    return !this.info.models[ModelType.CHECKPOINT]?.[0];
+  }
+
   defaultModelName(type: ModelType) {
-    return mainStore.info.models[type]?.[0]?.file.name;
+    return this.info.models[type]?.[0]?.file.name;
   }
 }
 

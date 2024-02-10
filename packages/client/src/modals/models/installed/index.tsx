@@ -1,5 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
+import { ModelType } from '@metastable/types';
 
 import styles from './index.module.scss';
 import { mainStore } from '../../../stores/MainStore';
@@ -11,7 +12,7 @@ export const InstalledModels: React.FC = observer(() => {
     .filter(entry => entry[1].length > 0)
     .map(entry => entry[0]);
 
-  const firstKey = types[0] || 'checkpoints';
+  const firstKey = types[0] || ModelType.CHECKPOINT;
 
   return (
     <TabView defaultTab={firstKey} direction="vertical" className={styles.view}>

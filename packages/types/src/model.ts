@@ -2,18 +2,18 @@ import { FileInfo } from './file.js';
 import { ProjectSettings } from './project.js';
 
 export enum ModelType {
-  CHECKPOINT = 'checkpoints',
+  CHECKPOINT = 'checkpoint',
   CLIP = 'clip',
   CLIP_VISION = 'clip_vision',
   CONTROLNET = 'controlnet',
-  DIFFUSER = 'diffusers',
-  EMBEDDING = 'embeddings',
+  DIFFUSER = 'diffuser',
+  EMBEDDING = 'embedding',
   GLIGEN = 'gligen',
-  HYPERNETWORK = 'hypernetworks',
-  IPADAPTER = 'ipadapters',
-  LORA = 'loras',
-  STYLE_MODEL = 'style_models',
-  UPSCALE_MODEL = 'upscale_models',
+  HYPERNETWORK = 'hypernetwork',
+  IPADAPTER = 'ipadapter',
+  LORA = 'lora',
+  STYLE_MODEL = 'style_model',
+  UPSCALE_MODEL = 'upscale_model',
   VAE = 'vae',
   VAE_APPROX = 'vae_approx',
 }

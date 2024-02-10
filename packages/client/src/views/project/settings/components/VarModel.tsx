@@ -1,11 +1,12 @@
 import { IVarBaseInputProps, VarBase, useVarUIValue } from 'react-var-ui';
+import { ModelType } from '@metastable/types';
 
 import { ModelSelect } from '../../../../modals/modelSelect';
 import { useUI } from '../../../../contexts/ui';
 import { mainStore } from '../../../../stores/MainStore';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
-  modelType: string;
+  modelType: ModelType;
 }
 
 export const VarModel = ({

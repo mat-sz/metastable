@@ -9,6 +9,7 @@ import {
   VarString,
   VarToggle,
 } from 'react-var-ui';
+import { ModelType } from '@metastable/types';
 
 import { mainStore } from '../../../../stores/MainStore';
 import { VarModel } from '../components/VarModel';
@@ -19,7 +20,7 @@ export const General: React.FC = observer(() => {
   return (
     <>
       <VarCategory label="Checkpoint">
-        <VarModel path="models.base.name" modelType="checkpoints" />
+        <VarModel path="models.base.name" modelType={ModelType.CHECKPOINT} />
       </VarCategory>
       <VarCategory label="Conditioning">
         <VarString label="Positive" path="conditioning.positive" multiline />

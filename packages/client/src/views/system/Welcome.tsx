@@ -35,7 +35,7 @@ export const Welcome: React.FC = observer(() => {
         </div>
         <div className={styles.actions}>
           <h2>New</h2>
-          {mainStore.info.models.checkpoints?.[0] ? (
+          {mainStore.hasCheckpoint ? (
             <>
               <input
                 type="text"

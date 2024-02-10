@@ -19,7 +19,7 @@ export const Menu: React.FC<Props> = observer(({ className }) => {
     <div className={className}>
       <button
         onClick={() => showModal(<NewProject />)}
-        disabled={!mainStore.info.models.checkpoints?.[0]}
+        disabled={!mainStore.hasCheckpoint}
       >
         New
       </button>

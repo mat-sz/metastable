@@ -20,7 +20,7 @@ import { VarModel } from '../components/VarModel';
 
 export const Controlnets: React.FC = observer(() => {
   const project = mainStore.project!;
-  const controlnets = mainStore.info.models.controlnet;
+  const defaultModel = mainStore.defaultModelName(ModelType.CONTROLNET);
   const { showModal } = useUI();
 
   return (
@@ -43,7 +43,7 @@ export const Controlnets: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType="controlnet" />
+            <VarModel path="name" modelType={ModelType.CONTROLNET} />
             <VarSlider
               label="Strength"
               path="strength"
@@ -67,13 +67,11 @@ export const Controlnets: React.FC = observer(() => {
           </VarCategory>
         )}
       </VarArray>
-      {controlnets?.[0] ? (
+      {defaultModel ? (
         <VarButton
           buttonLabel="Add Controlnet"
           onClick={() => {
-            project.addControlnet(
-              mainStore.defaultModelName(ModelType.CONTROLNET),
-            );
+            project.addControlnet(defaultModel);
           }}
         />
       ) : (

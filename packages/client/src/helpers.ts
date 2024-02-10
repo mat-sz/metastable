@@ -96,7 +96,6 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
 
 export function validateProject(project: Project): string | undefined {
   const checkpointName = project.settings.models.base.name;
-  const inputMode = project.settings.input.mode;
   if (!checkpointName) {
     return 'No checkpoint selected.';
   } else if (
@@ -105,8 +104,9 @@ export function validateProject(project: Project): string | undefined {
     return 'Selected checkpoint does not exist.';
   }
 
-  if (project.settings.models.loras?.length) {
-    for (const lora of project.settings.models.loras) {
+  const loras = project.settings.models.loras;
+  if (loras?.length) {
+    for (const lora of loras) {
       if (!lora.enabled) {
         continue;
       }
@@ -121,8 +121,9 @@ export function validateProject(project: Project): string | undefined {
     }
   }
 
-  if (project.settings.models.controlnets?.length) {
-    for (const controlnet of project.settings.models.controlnets) {
+  const controlnets = project.settings.models.controlnets;
+  if (controlnets?.length) {
+    for (const controlnet of controlnets) {
       if (!controlnet.enabled) {
         continue;
       }
@@ -140,9 +141,10 @@ export function validateProject(project: Project): string | undefined {
     }
   }
 
+  const input = project.settings.input;
   if (
-    (inputMode === 'image' || inputMode === 'image_masked') &&
-    !project.settings.input.image
+    (input.mode === 'image' || input.mode === 'image_masked') &&
+    !input.image
   ) {
     return 'No input image selected.';
   }

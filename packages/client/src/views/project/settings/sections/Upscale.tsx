@@ -10,14 +10,14 @@ import { VarModel } from '../components/VarModel';
 
 export const Upscale: React.FC = observer(() => {
   const project = mainStore.project!;
-  const upscale_models = mainStore.info.models.upscale_models;
+  const defaultModel = mainStore.defaultModelName(ModelType.UPSCALE_MODEL);
   const { showModal } = useUI();
 
   const enabled = !!project.settings.models.upscale?.name;
 
   return (
     <VarCategory label="Upscale">
-      {upscale_models?.[0] ? (
+      {defaultModel ? (
         <VarToggle
           label="Enable"
           path="models.upscale.enabled"
@@ -26,7 +26,7 @@ export const Upscale: React.FC = observer(() => {
             if (value && !project.settings.models.upscale?.name) {
               project.settings.models.upscale = {
                 enabled: true,
-                name: mainStore.defaultModelName(ModelType.UPSCALE_MODEL),
+                name: defaultModel,
               };
             }
           }}
@@ -38,7 +38,10 @@ export const Upscale: React.FC = observer(() => {
         />
       )}
       {enabled && (
-        <VarModel path="models.upscale.name" modelType="upscale_models" />
+        <VarModel
+          path="models.upscale.name"
+          modelType={ModelType.UPSCALE_MODEL}
+        />
       )}
     </VarCategory>
   );
