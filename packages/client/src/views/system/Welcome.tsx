@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { Card, List } from '@components/list';
+import { useUI } from '@components/ui';
+import { mainStore } from '@stores/MainStore';
 import styles from './Welcome.module.scss';
-import { mainStore } from '../../stores/MainStore';
 import { ModelManager } from '../../modals/models';
-import { useUI } from '../../contexts/ui';
-import { Card, List } from '../../components/list';
 
 export const Welcome: React.FC = observer(() => {
   const { showModal } = useUI();

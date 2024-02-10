@@ -1,11 +1,12 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { Project as APIProject } from '@metastable/types';
 
+import { API } from '@api';
+import { arrayMove } from '@utils/array';
+import { tryParse } from '@utils/json';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
-import { arrayMove, defaultProjectSettings } from '../helpers';
-import { API } from '../api';
-import { tryParse } from '../utils/json';
+import { defaultSettings } from './project/simple';
 
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 6;
@@ -63,7 +64,7 @@ export class ProjectStore {
       return;
     }
 
-    const settings = defaultProjectSettings();
+    const settings = defaultSettings();
     const project = {
       name,
       type,
@@ -85,7 +86,7 @@ export class ProjectStore {
     const json = await API.projects.get(id);
     const settings = json.settings
       ? JSON.parse(json.settings)
-      : defaultProjectSettings();
+      : defaultSettings();
     if (!settings.models.loras) {
       settings.models.loras = [];
     }

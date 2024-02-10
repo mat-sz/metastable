@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsBoxFill } from 'react-icons/bs';
-
-import { Item } from '../components/Item';
-import { Checkbox } from '../../../components/checkbox';
-import { ModelList } from '../../../components/modelList';
-import { mainStore } from '../../../stores/MainStore';
 import { runInAction } from 'mobx';
+
+import { Checkbox } from '@components/checkbox';
+import { ModelList } from '@components/modelList';
+import { mainStore } from '@stores/MainStore';
+import { Item } from '../components/Item';
 import { DownloadableModel } from '../../../types/model';
 
 interface ModelCheckboxProps {

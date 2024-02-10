@@ -1,13 +1,7 @@
 import React from 'react';
 
-import {
-  Modal,
-  Tab,
-  TabContent,
-  TabPanel,
-  TabView,
-  Tabs,
-} from '../../components';
+import { Modal } from '@components/modal';
+import { Tab, TabContent, TabPanel, TabView, Tabs } from '@components/tabs';
 import { Queue } from './queue';
 import { Recommended } from './recommended';
 import { CivitAI } from './civitai';

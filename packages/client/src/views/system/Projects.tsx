@@ -4,9 +4,9 @@ import { useDrag, useDrop } from 'react-dnd';
 import clsx from 'clsx';
 import { BsX } from 'react-icons/bs';
 
+import { mainStore } from '@stores/MainStore';
+import type { BaseProject } from '@stores/project';
 import styles from './Projects.module.scss';
-import type { BaseProject } from '../../stores/project/base';
-import { mainStore } from '../../stores/MainStore';
 
 const TAB_ITEM = 'project_tab';
 

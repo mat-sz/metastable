@@ -1,12 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { Modal, useModal } from '@components/modal';
+import { Card, List } from '@components/list';
+import { mainStore } from '@stores/MainStore';
+import { fuzzy } from '@utils/fuzzy';
 import styles from './index.module.scss';
-import { mainStore } from '../../stores/MainStore';
-import { Modal } from '../../components';
-import { Card, List } from '../../components/list';
-import { useModal } from '../../contexts/modal';
-import { fuzzy } from '../../utils/fuzzy';
 
 export const OpenProject: React.FC = observer(() => {
   const { close } = useModal();

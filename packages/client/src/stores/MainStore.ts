@@ -12,10 +12,11 @@ import {
   UtilizationEvent,
 } from '@metastable/types';
 
-import { IS_ELECTRON, getStaticUrl, getUrl } from '../config';
+import { API } from '@api';
+import { IS_ELECTRON } from '@utils/config';
+import { getStaticUrl, getUrl } from '@utils/url';
 import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
-import { API } from '../api';
 import { TaskStore } from './TaskStore';
 import { ConfigStore } from './ConfigStore';
 

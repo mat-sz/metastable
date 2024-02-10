@@ -5,10 +5,10 @@ import Ansi from 'ansi-to-react';
 import { FaPython } from 'react-icons/fa';
 import { TaskState } from '@metastable/types';
 
+import { Loading } from '@components/loading';
+import { mainStore } from '@stores/MainStore';
 import styles from './index.module.scss';
-import { mainStore } from '../../stores/MainStore';
 import { List } from './components/List';
-import { Loading } from '../../components';
 import { Item } from './components/Item';
 
 const TASK_ICONS: Record<string, React.ReactNode> = {

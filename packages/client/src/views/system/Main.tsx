@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { useMediaQuery } from '@utils/useMediaQuery';
 import styles from './Main.module.scss';
 import { Header as DesktopHeader } from './desktop/Header';
 import { Header as MobileHeader } from './mobile/Header';
 import { Status } from './common/Status';
-import { useMediaQuery } from '../../utils/useMediaQuery';
 
 interface Props {
   showMenu?: boolean;

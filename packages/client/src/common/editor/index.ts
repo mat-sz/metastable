@@ -1,6 +1,7 @@
 import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 
+import { loadImage } from '@utils/image';
 import { MoveTool } from './tools/move';
 import { BrushTool } from './tools/brush';
 import {
@@ -13,7 +14,6 @@ import {
 } from './types';
 import { EraserTool } from './tools/eraser';
 import { SelectTool } from './tools/select';
-import { loadImage } from '../../../../../utils/image';
 import { PointerData, isVisible } from './helpers';
 import { FillTool } from './tools/fill';
 import { EyedropperTool } from './tools/eyedropper';

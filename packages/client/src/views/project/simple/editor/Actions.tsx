@@ -1,7 +1,7 @@
 import React from 'react';
 import { BsBrushFill, BsImages } from 'react-icons/bs';
 
-import { IconButton } from '../../../../components';
+import { IconButton } from '@components/iconButton';
 import { useEditor } from './context';
 import { useSimpleProject } from '../../context';
 

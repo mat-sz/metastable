@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { ConfigType } from '@metastable/types';
 
-import { API } from '../api';
+import { API } from '@api';
 
 export class ConfigStore {
   data?: ConfigType = undefined;

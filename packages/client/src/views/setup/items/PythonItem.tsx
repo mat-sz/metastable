@@ -3,11 +3,11 @@ import { runInAction } from 'mobx';
 import { FaPython } from 'react-icons/fa';
 import { observer } from 'mobx-react-lite';
 
+import { RequirementsTable } from '@components/requirementsTable';
+import { Toggle } from '@components/toggle';
+import { mainStore } from '@stores/MainStore';
 import styles from './PythonItem.module.scss';
-import { mainStore } from '../../../stores/MainStore';
 import { Item } from '../components/Item';
-import { RequirementsTable } from '../../../components/requirementsTable';
-import { Toggle } from '../../../components';
 
 export const PythonItem: React.FC = observer(() => {
   const item = mainStore.setup.python;

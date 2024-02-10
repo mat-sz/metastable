@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { mainStore } from '../../stores/MainStore';
-import { Modal } from '../../components';
+import { Modal } from '@components/modal';
+import { mainStore } from '@stores/MainStore';
 
 export const NewProject: React.FC = observer(() => {
   const [projectName, setProjectName] = useState('');

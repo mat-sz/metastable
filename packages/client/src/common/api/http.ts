@@ -1,4 +1,4 @@
-import { getUrl } from './config';
+import { getUrl } from '@utils/url';
 
 async function httpJson(res: Response) {
   try {

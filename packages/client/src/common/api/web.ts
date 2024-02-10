@@ -1,4 +1,4 @@
-import { httpDelete, httpGet, httpPost } from '../http';
+import { httpDelete, httpGet, httpPost } from './http';
 import { API } from './types';
 
 export const WebAPI: API = {

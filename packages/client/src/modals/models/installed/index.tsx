@@ -2,10 +2,10 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { ModelType } from '@metastable/types';
 
+import { Tab, TabContent, TabPanel, TabView, Tabs } from '@components/tabs';
+import { ModelBrowser } from '@components/modelBrowser';
+import { mainStore } from '@stores/MainStore';
 import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '../../../components';
-import { ModelBrowser } from '../../../components/modelBrowser';
 
 export const InstalledModels: React.FC = observer(() => {
   const types = Object.entries(mainStore.info.models)

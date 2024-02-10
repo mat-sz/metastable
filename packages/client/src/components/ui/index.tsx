@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { nanoid } from 'nanoid';
 
-import { IModal, IUIContext, UIContext } from '../../contexts/ui';
-import { ModalContext } from '../../contexts/modal';
+import { IModal, IUIContext, UIContext, useUI } from './context';
+import { ModalContext } from '@components/modal/context';
 
 export const UI: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [modals, setModals] = useState<IModal[]>([]);
@@ -33,3 +33,5 @@ export const UI: React.FC<React.PropsWithChildren> = ({ children }) => {
     </UIContext.Provider>
   );
 };
+
+export { useUI };

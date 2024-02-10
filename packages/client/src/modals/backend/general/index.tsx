@@ -3,11 +3,12 @@ import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
 
+import { API } from '@api';
+import { IconButton } from '@components/iconButton';
+import { mainStore } from '@stores/MainStore';
+import { copy } from '@utils/clipboard';
+import { filesize } from '@utils/file';
 import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { copy, filesize } from '../../../helpers';
-import { IconButton } from '../../../components';
-import { API } from '../../../api';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.torchInfo;

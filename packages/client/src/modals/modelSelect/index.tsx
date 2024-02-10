@@ -1,8 +1,7 @@
 import React from 'react';
 import { Model } from '@metastable/types';
 
-import { Modal } from '../../components';
-import { useModal } from '../../contexts/modal';
+import { Modal, useModal } from '@components/modal';
 import { ModelBrowser } from '../../components/modelBrowser';
 
 interface Props {

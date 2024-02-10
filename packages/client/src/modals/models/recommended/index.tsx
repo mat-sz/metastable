@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { ModelList } from '@components/modelList';
 import { DownloadButton } from '../DownloadButton';
-import { ModelList } from '../../../components/modelList';
 
 export const Recommended: React.FC = () => {
   return (

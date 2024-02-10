@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { BsX } from 'react-icons/bs';
 
 import styles from './index.module.scss';
-import { useModal } from '../../contexts/modal';
+import { useModal } from './context';
 
 export interface ModalProps {
   title: string;
@@ -49,3 +49,5 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
     </dialog>
   );
 };
+
+export { useModal };

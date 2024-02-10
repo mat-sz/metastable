@@ -1,9 +1,9 @@
 import React from 'react';
 import { BsFillFloppy2Fill } from 'react-icons/bs';
 
+import { IconButton } from '@components/iconButton';
 import styles from './index.module.scss';
 import { useEditor } from './context';
-import { IconButton } from '../../../../components';
 import { useSimpleProject } from '../../context';
 
 export const ProjectActions: React.FC = () => {

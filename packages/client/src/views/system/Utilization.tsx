@@ -1,10 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { ProgressBar } from '@components/progressBar';
+import { mainStore } from '@stores/MainStore';
+import { filesize } from '@utils/file';
 import styles from './Utilization.module.scss';
-import { mainStore } from '../../stores/MainStore';
-import { ProgressBar } from '../../components/progressBar';
-import { filesize } from '../../helpers';
 
 const MB = 1024 * 1024;
 

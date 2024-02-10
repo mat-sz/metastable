@@ -2,10 +2,10 @@ import React from 'react';
 import { BsChevronRight } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 
+import { Loading } from '@components/loading';
+import { mainStore } from '@stores/MainStore';
 import styles from './index.module.scss';
-import { mainStore } from '../../stores/MainStore';
 import { List } from './components/List';
-import { Loading } from '../../components';
 import { OSItem } from './items/OSItem';
 import { HardwareItem } from './items/HardwareItem';
 import { PythonItem } from './items/PythonItem';

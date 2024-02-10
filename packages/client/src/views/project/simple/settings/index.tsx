@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { runInAction, toJS } from 'mobx';
+import { toJS } from 'mobx';
 import { VarUI } from 'react-var-ui';
 import {
   BsWrench,
@@ -12,12 +12,11 @@ import {
 
 import styles from './index.module.scss';
 
-import { fixSettings, validateProject } from '../../../../helpers';
+import { Tab, TabPanel, TabView, Tabs } from '@components/tabs';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
 import { Upscale } from './sections/Upscale';
-import { Tab, TabPanel, TabView, Tabs } from '../../../../components';
 import { IPAdapters } from './sections/IPAdapters';
 import { useSimpleProject } from '../../context';
 
@@ -28,7 +27,7 @@ interface SettingsProps {
 export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
   const project = useSimpleProject();
 
-  const error = validateProject(project.settings);
+  const error = project.validate();
 
   return (
     <TabView
@@ -51,9 +50,7 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
       <VarUI
         className={styles.prompt}
         onChange={values => {
-          runInAction(() => {
-            project.settings = fixSettings(values);
-          });
+          project.setSettings(values);
         }}
         values={toJS(project.settings)}
       >

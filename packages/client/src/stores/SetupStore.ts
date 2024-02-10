@@ -7,8 +7,8 @@ import {
   SetupStatus,
 } from '@metastable/types';
 
-import { API } from '../api';
-import { filesize } from '../helpers';
+import { API } from '@api';
+import { filesize } from '@utils/file';
 
 const GB = 1024 * 1024 * 1024;
 const VRAM_MIN = 2 * GB;

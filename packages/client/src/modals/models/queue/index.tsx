@@ -2,10 +2,10 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { TaskState } from '@metastable/types';
 
+import { ProgressBar } from '@components/progressBar';
+import { mainStore } from '@stores/MainStore';
+import { filesize } from '@utils/file';
 import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { filesize } from '../../../helpers';
-import { ProgressBar } from '../../../components/progressBar';
 
 export const Queue: React.FC = observer(() => {
   const downloads = mainStore.tasks.downloads;

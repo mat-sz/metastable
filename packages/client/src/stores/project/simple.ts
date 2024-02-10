@@ -1,18 +1,48 @@
 import { action, makeObservable, observable, toJS } from 'mobx';
-import { ProjectSettings, Project as APIProject } from '@metastable/types';
+import {
+  ProjectSettings,
+  Project as APIProject,
+  ModelType,
+} from '@metastable/types';
 
-import { randomSeed } from '../../helpers';
-import { Editor } from '../../views/project/simple/editor/src';
-import { Point } from '../../views/project/simple/editor/src/types';
-import { API } from '../../api';
-import { base64ify, loadImage, prepareImage } from '../../utils/image';
+import { API } from '@api';
+import { Editor } from '@editor';
+import { Point } from '@editor/types';
+import { randomSeed } from '@utils/comfy';
+import { base64ify, loadImage, prepareImage } from '@utils/image';
 import { BaseProject } from './base';
+import { mainStore } from '../MainStore';
+
+export function defaultSettings(): ProjectSettings {
+  return {
+    input: { mode: 'empty', batch_size: 1, width: 512, height: 512 },
+    models: {
+      base: { name: mainStore.defaultModelName(ModelType.CHECKPOINT) },
+      loras: [],
+      controlnets: [],
+    },
+    conditioning: {
+      positive: 'an image of a banana',
+      negative: 'bad quality',
+    },
+    sampler: {
+      seed: randomSeed(),
+      seed_randomize: true,
+      steps: 20,
+      cfg: 8.0,
+      denoise: 1,
+      sampler: 'dpm_2',
+      scheduler: 'karras',
+      tiling: false,
+    },
+  };
+}
 
 export class SimpleProject extends BaseProject {
   editor = new Editor();
   addOutputToEditor: Point | undefined = undefined;
 
-  constructor(data: APIProject, settings: ProjectSettings) {
+  constructor(data: APIProject, settings: ProjectSettings = defaultSettings()) {
     super(data, settings);
     makeObservable(this, {
       editor: observable,
@@ -24,7 +54,84 @@ export class SimpleProject extends BaseProject {
       removeControlnet: action,
       removeIPAdapter: action,
       onPromptDone: action,
+      setSettings: action,
     });
+  }
+
+  setSettings(settings: ProjectSettings) {
+    if (settings.input.mode === 'empty') {
+      settings.input.height ||= 512;
+      settings.input.width ||= 512;
+      settings.input.batch_size ||= 1;
+    }
+
+    settings.models.base.name ||= mainStore.defaultModelName(
+      ModelType.CHECKPOINT,
+    );
+    this.settings = settings;
+  }
+
+  validate() {
+    const settings = this.settings;
+    const checkpointName = settings.models.base.name;
+    if (!checkpointName) {
+      return 'No checkpoint selected.';
+    } else if (
+      mainStore.hasFile(ModelType.CHECKPOINT, checkpointName) !== 'downloaded'
+    ) {
+      return 'Selected checkpoint does not exist.';
+    }
+
+    const loras = settings.models.loras;
+    if (loras?.length) {
+      for (const lora of loras) {
+        if (!lora.enabled) {
+          continue;
+        }
+
+        if (!lora.name) {
+          return 'No LoRA selected.';
+        } else if (
+          mainStore.hasFile(ModelType.LORA, lora.name) !== 'downloaded'
+        ) {
+          return 'Selected LoRA does not exist.';
+        }
+      }
+    }
+
+    const controlnets = settings.models.controlnets;
+    if (controlnets?.length) {
+      for (const controlnet of controlnets) {
+        if (!controlnet.enabled) {
+          continue;
+        }
+
+        if (!controlnet.name) {
+          return 'No ControlNet selected.';
+        } else if (
+          mainStore.hasFile(ModelType.CONTROLNET, controlnet.name) !==
+          'downloaded'
+        ) {
+          return 'Selected ControlNet does not exist.';
+        } else if (!controlnet.image) {
+          return 'No image input for ControlNet selected.';
+        }
+      }
+    }
+
+    const input = settings.input;
+    if (
+      (input.mode === 'image' || input.mode === 'image_masked') &&
+      !input.image
+    ) {
+      return 'No input image selected.';
+    }
+
+    if (mainStore.status !== 'ready') {
+      return 'Backend is not ready.';
+    }
+
+    return undefined;
   }
 
   async request() {

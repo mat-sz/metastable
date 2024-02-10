@@ -6,22 +6,12 @@ import {
   BsHeartFill,
 } from 'react-icons/bs';
 
+import { IconButton } from '@components/iconButton';
+import { Tab, TabPanel, TabView, Tabs, TabContent } from '@components/tabs';
+import { Rating } from '@components/rating';
+import { Carousel } from '@components/carousel';
 import styles from './Model.module.scss';
-import {
-  CivitAIModel,
-  CivitAIModelVersion,
-  CivitAITypeMap,
-} from '../../../types/civitai';
-import {
-  IconButton,
-  Tab,
-  TabPanel,
-  TabView,
-  Tabs,
-  Rating,
-  Carousel,
-  TabContent,
-} from '../../../components';
+import { CivitAIModel, CivitAIModelVersion, CivitAITypeMap } from './types';
 import { DownloadButton } from '../DownloadButton';
 
 interface ModelVersionProps {

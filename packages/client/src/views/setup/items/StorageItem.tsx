@@ -2,10 +2,10 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsHddFill } from 'react-icons/bs';
 
+import { AvailableStorage } from '@components/availableStorage';
+import { mainStore } from '@stores/MainStore';
+import { filesize } from '@utils/file';
 import styles from './StorageItem.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { filesize } from '../../../helpers';
-import { AvailableStorage } from '../../../components/availableStorage';
 import { Item } from '../components/Item';
 
 export const StorageItem: React.FC = observer(() => {

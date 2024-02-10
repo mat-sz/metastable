@@ -3,8 +3,8 @@ import { FaWindows, FaApple, FaLinux } from 'react-icons/fa';
 import { BsQuestion } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 
-import { mainStore } from '../../../stores/MainStore';
-import { RequirementsTable } from '../../../components/requirementsTable';
+import { RequirementsTable } from '@components/requirementsTable';
+import { mainStore } from '@stores/MainStore';
 import { Item } from '../components/Item';
 
 const ICONS: Record<string, React.ReactNode> = {

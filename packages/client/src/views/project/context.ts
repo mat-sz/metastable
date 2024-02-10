@@ -1,6 +1,6 @@
 import React from 'react';
-import { BaseProject } from '../../stores/project/base';
-import { SimpleProject } from '../../stores/project/simple';
+
+import type { BaseProject, SimpleProject } from '@stores/project';
 
 export const ProjectContext = React.createContext<BaseProject>(
   undefined as any,

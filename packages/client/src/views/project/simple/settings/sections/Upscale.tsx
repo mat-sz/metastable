@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
-import { mainStore } from '../../../../../stores/MainStore';
-import { useUI } from '../../../../../contexts/ui';
-import { ModelManager } from '../../../../../modals/models';
+import { useUI } from '@components/ui';
+import { ModelManager } from '@modals/models';
+import { mainStore } from '@stores/MainStore';
 import { VarModel } from '../components/VarModel';
 import { useSimpleProject } from '../../../context';
 

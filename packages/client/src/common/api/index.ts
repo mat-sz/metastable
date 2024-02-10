@@ -1,4 +1,4 @@
-import { IS_ELECTRON } from '../config';
+import { IS_ELECTRON } from '@utils/config';
 import { ElectronAPI } from './electron';
 import { WebAPI } from './web';
 

@@ -7,10 +7,10 @@ import {
 } from 'react-icons/vsc';
 import { observer } from 'mobx-react-lite';
 
+import { ElectronWindow } from '@api/electron';
+import { mainStore } from '@stores/MainStore';
+import { IS_ELECTRON, IS_MAC } from '@utils/config';
 import styles from './Header.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { IS_ELECTRON, IS_MAC } from '../../../config';
-import { ElectronWindow } from '../../../api/electron';
 import { Menu } from '../common/Menu';
 
 interface Props {

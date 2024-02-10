@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { filesize } from '@utils/file';
 import styles from './index.module.scss';
-import { filesize } from '../../helpers';
 
 interface Props {
   path?: string;
