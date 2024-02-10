@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { Project as APIProject } from '@metastable/types';
 
-import { Project } from './project';
+import { createProject } from './project';
+import { BaseProject } from './project/base';
 import { arrayMove, defaultProjectSettings } from '../helpers';
 import { API } from '../api';
 import { tryParse } from '../utils/json';
@@ -9,7 +10,7 @@ import { tryParse } from '../utils/json';
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 6;
 export class ProjectStore {
-  projects: Project[] = [];
+  projects: BaseProject[] = [];
   currentId: APIProject['id'] | undefined = undefined;
   recent: APIProject[] = [];
   all: APIProject[] = [];
@@ -72,7 +73,7 @@ export class ProjectStore {
     const json = await API.projects.create(project);
 
     runInAction(() => {
-      this.projects.push(new Project(json, settings));
+      this.projects.push(createProject(json, settings));
       this.select(json.id);
     });
 
@@ -92,7 +93,7 @@ export class ProjectStore {
       settings.models.controlnets = [];
     }
 
-    const project = new Project(json, settings);
+    const project = createProject(json, settings);
     runInAction(() => {
       this.projects = [
         ...this.projects.filter(project => project.id !== id),

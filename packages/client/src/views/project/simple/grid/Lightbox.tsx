@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import styles from './Lightbox.module.scss';
 import {
@@ -8,8 +9,7 @@ import {
   BsDownload,
   BsXLg,
 } from 'react-icons/bs';
-import { IconButton, ImagePreview } from '../../../components';
-import { useHotkeys } from 'react-hotkeys-hook';
+import { IconButton, ImagePreview } from '../../../../components';
 
 interface Props {
   images: string[];

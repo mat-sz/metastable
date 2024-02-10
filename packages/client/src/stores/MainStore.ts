@@ -252,7 +252,7 @@ class MainStore {
   }
 
   get hasCheckpoint() {
-    return !this.info.models[ModelType.CHECKPOINT]?.[0];
+    return this.info.models[ModelType.CHECKPOINT]?.[0];
   }
 
   defaultModelName(type: ModelType) {

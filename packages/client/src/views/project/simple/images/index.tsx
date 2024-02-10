@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-
-import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
-import { Settings } from '../settings';
-import { IconButton, ImagePreview } from '../../../components';
 import { BsPlay } from 'react-icons/bs';
 
+import styles from './index.module.scss';
+import { Settings } from '../settings';
+import { IconButton, ImagePreview } from '../../../../components';
+import { useSimpleProject } from '../../context';
+
 export const Images: React.FC = observer(() => {
-  const project = mainStore.project!;
+  const project = useSimpleProject();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const filenames = project.outputFilenames;
 

@@ -3,11 +3,12 @@ import { BsFillFloppy2Fill } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import { useEditor } from './context';
-import { IconButton } from '../../../components';
-import { mainStore } from '../../../stores/MainStore';
+import { IconButton } from '../../../../components';
+import { useSimpleProject } from '../../context';
 
 export const ProjectActions: React.FC = () => {
   const editor = useEditor();
+  const project = useSimpleProject();
 
   return (
     <div className={styles.projectActions}>
@@ -19,7 +20,7 @@ export const ProjectActions: React.FC = () => {
           element.setAttribute('href', url);
           element.setAttribute(
             'download',
-            `${mainStore.project?.name || 'metastable'}.png`,
+            `${project.name || 'metastable'}.png`,
           );
 
           element.style.display = 'none';

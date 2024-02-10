@@ -5,7 +5,7 @@ import { useContextMenu, ContextMenuItem } from 'use-context-menu';
 
 import styles from './index.module.scss';
 import type { Layer } from './src/types';
-import { IconButton } from '../../../components';
+import { IconButton } from '../../../../components';
 import { useEditor } from './context';
 
 export interface LayerProps {

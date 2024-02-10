@@ -3,13 +3,14 @@ import { observer } from 'mobx-react-lite';
 import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
-import { mainStore } from '../../../../stores/MainStore';
-import { useUI } from '../../../../contexts/ui';
-import { ModelManager } from '../../../../modals/models';
+import { mainStore } from '../../../../../stores/MainStore';
+import { useUI } from '../../../../../contexts/ui';
+import { ModelManager } from '../../../../../modals/models';
 import { VarModel } from '../components/VarModel';
+import { useSimpleProject } from '../../../context';
 
 export const Upscale: React.FC = observer(() => {
-  const project = mainStore.project!;
+  const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.UPSCALE_MODEL);
   const { showModal } = useUI();
 

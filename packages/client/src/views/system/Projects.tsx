@@ -5,13 +5,13 @@ import clsx from 'clsx';
 import { BsX } from 'react-icons/bs';
 
 import styles from './Projects.module.scss';
-import { Project } from '../../stores/project';
+import type { BaseProject } from '../../stores/project/base';
 import { mainStore } from '../../stores/MainStore';
 
 const TAB_ITEM = 'project_tab';
 
 interface TabProps {
-  project: Project;
+  project: BaseProject;
 }
 
 export const Tab: React.FC<TabProps> = observer(({ project }) => {
@@ -27,7 +27,7 @@ export const Tab: React.FC<TabProps> = observer(({ project }) => {
   const [, drop] = useDrop(
     () => ({
       accept: TAB_ITEM,
-      drop: (item: Project) => {
+      drop: (item: BaseProject) => {
         mainStore.projects.move(item.id, project.id);
       },
     }),
@@ -64,7 +64,7 @@ export const Projects: React.FC = observer(() => {
   const [, drop] = useDrop(
     () => ({
       accept: TAB_ITEM,
-      drop: (item: Project, monitor) => {
+      drop: (item: BaseProject, monitor) => {
         if (!monitor.isOver()) {
           return;
         }

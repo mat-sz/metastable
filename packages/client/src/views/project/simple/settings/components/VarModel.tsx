@@ -1,9 +1,9 @@
 import { IVarBaseInputProps, VarBase, useVarUIValue } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
-import { ModelSelect } from '../../../../modals/modelSelect';
-import { useUI } from '../../../../contexts/ui';
-import { mainStore } from '../../../../stores/MainStore';
+import { ModelSelect } from '../../../../../modals/modelSelect';
+import { useUI } from '../../../../../contexts/ui';
+import { useSimpleProject } from '../../../context';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;
@@ -21,6 +21,7 @@ export const VarModel = ({
   modelType,
 }: IVarModelProps): JSX.Element => {
   const { showModal } = useUI();
+  const project = useSimpleProject();
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
     fallbackValue: value,
@@ -46,9 +47,9 @@ export const VarModel = ({
                 onSelect={model => {
                   setCurrentValue(model.file.name);
 
-                  if (model.samplerSettings && mainStore.project) {
-                    mainStore.project.settings.sampler = {
-                      ...mainStore.project.settings.sampler,
+                  if (model.samplerSettings) {
+                    project.settings.sampler = {
+                      ...project.settings.sampler,
                       ...model.samplerSettings,
                     };
                   }

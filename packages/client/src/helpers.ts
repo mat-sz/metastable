@@ -1,9 +1,7 @@
 import * as fsize from 'filesize';
 import { ModelType, ProjectSettings } from '@metastable/types';
-import { glueIsSourceLoaded } from 'fxglue';
 
 import { mainStore } from './stores/MainStore';
-import type { Project } from './stores/project';
 
 export function randomSeed() {
   const min = 0;
@@ -48,22 +46,6 @@ export function defaultProjectSettings(): ProjectSettings {
   };
 }
 
-export async function imageUrlToBase64(url: string): Promise<string> {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((onSuccess, onError) => {
-    try {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onSuccess((reader.result as string).split(',')[1]);
-      };
-      reader.readAsDataURL(blob);
-    } catch (e) {
-      onError(e);
-    }
-  });
-}
-
 export function fixSettings(settings: ProjectSettings) {
   if (settings.input.mode === 'empty') {
     settings.input.height ||= 512;
@@ -77,25 +59,8 @@ export function fixSettings(settings: ProjectSettings) {
   return settings;
 }
 
-export function loadImage(url: string): Promise<HTMLImageElement> {
-  const source = new Image();
-  source.src = url;
-
-  return new Promise(resolve => {
-    const onload = () => {
-      resolve(source);
-    };
-
-    if (glueIsSourceLoaded(source)) {
-      onload();
-    } else {
-      source.onload = onload;
-    }
-  });
-}
-
-export function validateProject(project: Project): string | undefined {
-  const checkpointName = project.settings.models.base.name;
+export function validateProject(settings: ProjectSettings): string | undefined {
+  const checkpointName = settings.models.base.name;
   if (!checkpointName) {
     return 'No checkpoint selected.';
   } else if (
@@ -104,7 +69,7 @@ export function validateProject(project: Project): string | undefined {
     return 'Selected checkpoint does not exist.';
   }
 
-  const loras = project.settings.models.loras;
+  const loras = settings.models.loras;
   if (loras?.length) {
     for (const lora of loras) {
       if (!lora.enabled) {
@@ -121,7 +86,7 @@ export function validateProject(project: Project): string | undefined {
     }
   }
 
-  const controlnets = project.settings.models.controlnets;
+  const controlnets = settings.models.controlnets;
   if (controlnets?.length) {
     for (const controlnet of controlnets) {
       if (!controlnet.enabled) {
@@ -141,7 +106,7 @@ export function validateProject(project: Project): string | undefined {
     }
   }
 
-  const input = project.settings.input;
+  const input = settings.input;
   if (
     (input.mode === 'image' || input.mode === 'image_masked') &&
     !input.image

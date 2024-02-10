@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
 import { Lightbox } from './Lightbox';
+import { useSimpleProject } from '../../context';
 
 export const Grid: React.FC = observer(() => {
-  const project = mainStore.project!;
+  const project = useSimpleProject();
   const outputs = [...project.allOutputs].reverse();
   const [current, setCurrent] = useState(0);
   const [open, setOpen] = useState(false);

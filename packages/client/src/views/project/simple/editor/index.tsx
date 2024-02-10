@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import styles from './index.module.scss';
-import { mainStore } from '../../../stores/MainStore';
 import { Settings } from '../settings';
 import { Tools } from './Tools';
 import { Layers } from './Layers';
@@ -10,10 +9,12 @@ import { Actions } from './Actions';
 import { ToolSettings } from './ToolSettings';
 import { EditorContext } from './context';
 import { ProjectActions } from './ProjectActions';
+import { useSimpleProject } from '../../context';
 
 export const ImageEditor: React.FC = observer(() => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const editor = mainStore.project!.editor;
+  const project = useSimpleProject();
+  const editor = project.editor;
 
   useEffect(() => {
     const wrapper = wrapperRef.current;

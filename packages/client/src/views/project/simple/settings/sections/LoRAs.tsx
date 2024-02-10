@@ -10,15 +10,16 @@ import {
 import { BsX } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
-import { mainStore } from '../../../../stores/MainStore';
-import { IconButton } from '../../../../components';
-import { ModelManager } from '../../../../modals/models';
-import { useUI } from '../../../../contexts/ui';
+import { mainStore } from '../../../../../stores/MainStore';
+import { IconButton } from '../../../../../components';
+import { ModelManager } from '../../../../../modals/models';
+import { useUI } from '../../../../../contexts/ui';
 import { VarModel } from '../components/VarModel';
+import { useSimpleProject } from '../../../context';
 
 export const LoRAs: React.FC = observer(() => {
   const { showModal } = useUI();
-  const project = mainStore.project!;
+  const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.LORA);
 
   return (

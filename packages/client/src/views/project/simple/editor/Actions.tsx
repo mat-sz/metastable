@@ -1,12 +1,13 @@
 import React from 'react';
-
-import { mainStore } from '../../../stores/MainStore';
-import { IconButton } from '../../../components';
-import { useEditor } from './context';
 import { BsBrushFill, BsImages } from 'react-icons/bs';
+
+import { IconButton } from '../../../../components';
+import { useEditor } from './context';
+import { useSimpleProject } from '../../context';
 
 export const Actions: React.FC = () => {
   const editor = useEditor();
+  const project = useSimpleProject();
 
   return (
     <>
@@ -14,12 +15,12 @@ export const Actions: React.FC = () => {
         title="Run img2img"
         onClick={() => {
           const url = editor.renderSelection();
-          mainStore.project!.addOutputToEditor = editor.selection.offset;
-          mainStore.project!.settings.input = {
+          project.addOutputToEditor = editor.selection.offset;
+          project.settings.input = {
             mode: 'image',
             image: url,
           };
-          mainStore.project!.request();
+          project.request();
         }}
       >
         <BsImages />
@@ -28,12 +29,12 @@ export const Actions: React.FC = () => {
         title="Run inpainting"
         onClick={() => {
           const url = editor.renderSelection();
-          mainStore.project!.addOutputToEditor = editor.selection.offset;
-          mainStore.project!.settings.input = {
+          project.addOutputToEditor = editor.selection.offset;
+          project.settings.input = {
             mode: 'image_masked',
             image: url,
           };
-          mainStore.project!.request();
+          project.request();
         }}
       >
         <BsBrushFill />

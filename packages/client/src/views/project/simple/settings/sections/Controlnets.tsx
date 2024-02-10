@@ -12,29 +12,30 @@ import {
 import { BsX } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
-import { mainStore } from '../../../../stores/MainStore';
-import { IconButton } from '../../../../components';
-import { useUI } from '../../../../contexts/ui';
-import { ModelManager } from '../../../../modals/models';
+import { mainStore } from '../../../../../stores/MainStore';
+import { IconButton } from '../../../../../components';
+import { useUI } from '../../../../../contexts/ui';
+import { ModelManager } from '../../../../../modals/models';
 import { VarModel } from '../components/VarModel';
+import { useSimpleProject } from '../../../context';
 
-export const IPAdapters: React.FC = observer(() => {
-  const project = mainStore.project!;
-  const defaultModel = mainStore.defaultModelName(ModelType.IPADAPTER);
+export const Controlnets: React.FC = observer(() => {
+  const project = useSimpleProject();
+  const defaultModel = mainStore.defaultModelName(ModelType.CONTROLNET);
   const { showModal } = useUI();
 
   return (
     <>
-      <VarArray path="models.ipadapters">
+      <VarArray path="models.controlnets">
         {(_, i) => (
           <VarCategory
             label={
               <>
-                <span>IPAdapter</span>
+                <span>Controlnet</span>
                 <IconButton
                   title="Delete"
                   onClick={() => {
-                    project.removeIPAdapter(i);
+                    project.removeControlnet(i);
                   }}
                 >
                   <BsX />
@@ -43,16 +44,12 @@ export const IPAdapters: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType={ModelType.IPADAPTER} />
-            <VarModel
-              path="clip_vision_name"
-              modelType={ModelType.CLIP_VISION}
-            />
+            <VarModel path="name" modelType={ModelType.CONTROLNET} />
             <VarSlider
-              label="Weight"
-              path="weight"
+              label="Strength"
+              path="strength"
               min={0}
-              max={1}
+              max={2}
               step={0.01}
               defaultValue={1}
               showInput
@@ -73,9 +70,9 @@ export const IPAdapters: React.FC = observer(() => {
       </VarArray>
       {defaultModel ? (
         <VarButton
-          buttonLabel="Add IPAdapter"
+          buttonLabel="Add Controlnet"
           onClick={() => {
-            project.addIPAdapter();
+            project.addControlnet(defaultModel);
           }}
         />
       ) : (

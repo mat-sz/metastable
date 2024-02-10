@@ -12,23 +12,23 @@ import {
 
 import styles from './index.module.scss';
 
-import { mainStore } from '../../../stores/MainStore';
-import { fixSettings, validateProject } from '../../../helpers';
+import { fixSettings, validateProject } from '../../../../helpers';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
 import { Upscale } from './sections/Upscale';
-import { Tab, TabPanel, TabView, Tabs } from '../../../components';
+import { Tab, TabPanel, TabView, Tabs } from '../../../../components';
 import { IPAdapters } from './sections/IPAdapters';
+import { useSimpleProject } from '../../context';
 
 interface SettingsProps {
   actions?: JSX.Element;
 }
 
 export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
-  const project = mainStore.project!;
+  const project = useSimpleProject();
 
-  const error = validateProject(project);
+  const error = validateProject(project.settings);
 
   return (
     <TabView
