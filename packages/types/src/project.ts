@@ -67,10 +67,15 @@ export interface ProjectSettings {
   };
 }
 
-export interface Project {
+export interface ProjectInfo {
+  type: string;
+}
+
+export interface Project extends ProjectInfo {
   id: string;
   name: string;
-  type: string;
   settings: string;
   lastOutput?: string;
+  outputs?: number;
+  size?: number;
 }

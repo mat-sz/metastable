@@ -1,9 +1,15 @@
 import path from 'path';
 import fs from 'fs/promises';
 import { rimraf } from 'rimraf';
-import { Project } from '@metastable/types';
+import { Project, ProjectInfo } from '@metastable/types';
 
-import { freeDirName, filenames, JSONFile, TextFile } from '../helpers/fs.js';
+import {
+  freeDirName,
+  filenames,
+  JSONFile,
+  TextFile,
+  directorySize,
+} from '../helpers/fs.js';
 import { IMAGE_EXTENSIONS } from './consts.js';
 
 export class Projects {
@@ -94,6 +100,8 @@ export class Projects {
       id,
       name: id,
       lastOutput: outputs[outputs.length - 1],
+      outputs: outputs.length,
+      size: await directorySize(this.path(id)),
     };
   }
 
@@ -110,7 +118,7 @@ export class Projects {
     };
   }
 
-  async update(id: Project['id'], data: Partial<Omit<Project, 'id'>>) {
+  async update(id: Project['id'], data: Partial<ProjectInfo>) {
     const project = await this.getMetadata(id);
     if (!project) {
       return;

@@ -3,6 +3,7 @@ import {
   DownloadSettings,
   InstanceInfo,
   Project,
+  ProjectInfo,
   ProjectSettings,
   SetupDetails,
   SetupSettings,
@@ -30,10 +31,10 @@ export interface API {
     inputs(id: Project['id']): Promise<string[]>;
     upload(id: Project['id'], file: File): Promise<string[]>;
     outputs(id: Project['id']): Promise<string[]>;
-    create(data: Pick<Project, 'name' | 'settings'>): Promise<Project>;
+    create(data: ProjectInfo): Promise<Project>;
     update(
       id: Project['id'],
-      data: Partial<Omit<Project, 'id'>>,
+      data: Partial<ProjectInfo & { name: string; settings: string }>,
     ): Promise<Project>;
   };
   downloads: {

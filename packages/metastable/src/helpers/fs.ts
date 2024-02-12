@@ -69,6 +69,36 @@ export async function walk(
   return output;
 }
 
+export async function fileSize(filePath: string) {
+  const stat = await fs.lstat(filePath);
+  return stat.size;
+}
+
+export async function directorySize(currentPath: string) {
+  const files = await fs.readdir(currentPath, {
+    withFileTypes: true,
+  });
+
+  const promises: Promise<number>[] = [];
+  for (const file of files) {
+    const filePath = path.join(currentPath, file.name);
+    if (file.isFile()) {
+      if (file.name.startsWith('.')) {
+        continue;
+      }
+
+      promises.push(fileSize(filePath));
+    } else if (file.isDirectory()) {
+      promises.push(directorySize(filePath));
+    }
+  }
+
+  return (await Promise.all(promises)).reduce(
+    (prev, current) => prev + current,
+    0,
+  );
+}
+
 export function resolveConfigPath(
   value: string | undefined,
   basePath: string,
