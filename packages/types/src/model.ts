@@ -30,6 +30,7 @@ export interface ModelInfo {
 }
 
 export interface Model extends ModelInfo {
+  name: string;
   file: FileInfo;
   image?: string;
 }

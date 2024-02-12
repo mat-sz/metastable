@@ -1,4 +1,4 @@
-import path from 'path';
+import path, { basename } from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Model, ModelType } from '@metastable/types';
 
@@ -19,7 +19,9 @@ export class Models {
     type: string,
     filename: string,
   ): JSONFile<Omit<Model, 'file' | 'image'>> {
-    return new JSONFile(this.path(type, `${filename}.json`), {});
+    return new JSONFile(this.path(type, `${filename}.json`), {
+      name: filename,
+    });
   }
 
   async init() {
@@ -57,11 +59,16 @@ export class Models {
             continue;
           }
 
-          let data: Partial<Model> = {};
+          let data: Partial<Model> & { name: string } = {
+            name: basename(file.name),
+          };
 
           if (fileNames.includes(`${name}.json`)) {
             const modelFile = this.modelFile(dir.name, name);
-            data = await modelFile.readJson();
+            data = {
+              ...data,
+              ...(await modelFile.readJson()),
+            };
           }
 
           for (const extension of IMAGE_EXTENSIONS) {

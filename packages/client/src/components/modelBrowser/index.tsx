@@ -87,7 +87,7 @@ export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
             />
           ) : (
             <Card
-              name={item.name || removeFileExtension(item.file.name)}
+              name={item.name}
               key={item.file.name}
               imageUrl={
                 item.image
