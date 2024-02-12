@@ -19,6 +19,8 @@ import { Controlnets } from './sections/Controlnets';
 import { Upscale } from './sections/Upscale';
 import { IPAdapters } from './sections/IPAdapters';
 import { useSimpleProject } from '../../context';
+import { ProgressBar } from '@/components/progressBar';
+import { mainStore } from '@/stores/MainStore';
 
 interface SettingsProps {
   actions?: JSX.Element;
@@ -28,6 +30,9 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
   const project = useSimpleProject();
 
   const error = project.validate();
+  const firstPrompt = mainStore.promptQueue.find(
+    prompt => prompt.projectId === project.id,
+  );
 
   return (
     <TabView
@@ -46,7 +51,18 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
         <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
       </Tabs>
-      <div className={styles.actions}>{!error && actions}</div>
+      <div className={styles.actions}>
+        {!!firstPrompt && (
+          <div className={styles.progress}>
+            <ProgressBar
+              value={firstPrompt.value}
+              max={firstPrompt.max}
+              marquee={!firstPrompt.max}
+            />
+          </div>
+        )}
+        {!error && actions}
+      </div>
       <VarUI
         className={styles.prompt}
         onChange={values => {

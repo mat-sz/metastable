@@ -42,6 +42,8 @@ class MainStore {
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
+  promptQueue: { id: string; projectId: string; value: number; max: number }[] =
+    [];
 
   backendStatus: ComfyStatus = 'starting';
   backendLog: ComfyLogItem[] = [];
@@ -179,13 +181,28 @@ class MainStore {
       case 'prompt.progress':
         this.promptValue = message.data.value;
         this.promptMax = message.data.max;
+        const prompt = this.promptQueue.find(
+          prompt => prompt.id === message.data.id,
+        );
+        if (prompt) {
+          prompt.value = message.data.value;
+          prompt.max = message.data.max;
+        }
         break;
       case 'prompt.end':
+        this.promptQueue = this.promptQueue.filter(
+          prompt => prompt.id !== message.data.id,
+        );
         for (const project of this.projects.projects) {
           if (project.id === message.data.project_id) {
             project.onPromptDone(message.data.output_filenames);
           }
         }
+        break;
+      case 'prompt.error':
+        this.promptQueue = this.promptQueue.filter(
+          prompt => prompt.id !== message.data.id,
+        );
         break;
       case 'models.changed':
         this.refresh();

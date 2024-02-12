@@ -20,6 +20,8 @@ import custom
 from helpers import jsonout, get_torch_info
 from comfy.cli_args import args
 
+import progress_hook
+
 if os.name == "nt":
     import logging
     logging.getLogger("xformers").addFilter(lambda record: 'A matching Triton is not available' not in record.getMessage())
@@ -74,14 +76,6 @@ async def run(prompt_queue):
         except:
             pass
 
-def hijack_progress():
-    def hook(value, total, preview_image):
-        comfy.model_management.throw_exception_if_processing_interrupted()
-        jsonout("prompt.progress", { "value": value, "max": total })
-        # if preview_image is not None:
-        #    server.send_sync(BinaryEventTypes.UNENCODED_PREVIEW_IMAGE, preview_image, server.client_id)
-    comfy.utils.set_progress_bar_global_hook(hook)
-
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -89,7 +83,7 @@ if __name__ == "__main__":
 
     cuda_malloc_warning()
 
-    hijack_progress()
+    progress_hook.reset()
 
     threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue,)).start()
 

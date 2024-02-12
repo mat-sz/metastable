@@ -24,9 +24,19 @@
   top: 0;
   right: 0;
   z-index: 999999;
-  display: block;
   background: var(--color-bg-panel-dark);
   display: flex;
+
+  .progress {
+    display: flex;
+    align-items: center;
+    width: 8rem;
+    margin-right: 0.5rem;
+
+    & > div {
+      height: 1.5rem;
+    }
+  }
 
   @media screen and (min-width: 960px) {
     top: -2.4rem;

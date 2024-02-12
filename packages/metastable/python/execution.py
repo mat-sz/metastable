@@ -31,6 +31,7 @@ import custom
 import latent_preview
 from helpers import jsonout, get_save_image_counter
 import ipadapter
+import progress_hook
 
 def load_image(img):
     i = Image.open(BytesIO(base64.b64decode(img)))
@@ -377,6 +378,8 @@ class PromptExecutor:
             "project_id": project_id
         })
 
+        progress_hook.use(prompt_id, project_id)
+
         try:
             output_filenames = []
             with torch.inference_mode():
@@ -396,6 +399,8 @@ class PromptExecutor:
                 "description": str(error)
             })
             traceback.print_exc()
+        
+        progress_hook.reset()
 
 class PromptQueue:
     def __init__(self):

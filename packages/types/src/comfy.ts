@@ -42,6 +42,8 @@ export interface PromptQueueEvent {
 export interface PromptProgressEvent {
   event: 'prompt.progress';
   data: {
+    id: string;
+    project_id: string;
     max: number;
     value: number;
   };
