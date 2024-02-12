@@ -3,9 +3,9 @@ import fs from 'fs/promises';
 import { FileInfo, Model, ModelType } from '@metastable/types';
 
 import { tryUnlink, walk, JSONFile } from '../helpers/fs.js';
+import { IMAGE_EXTENSIONS } from './consts.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
-const IMAGE_EXTENSIONS = ['png', 'jpeg', 'jpg', 'gif', 'webp', 'heif', 'avif'];
 const MODEL_TYPES = Object.values(ModelType);
 
 function isModel(name: string) {

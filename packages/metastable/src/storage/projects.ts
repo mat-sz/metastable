@@ -4,6 +4,7 @@ import { rimraf } from 'rimraf';
 import { Project } from '@metastable/types';
 
 import { freeDirName, filenames, JSONFile, TextFile } from '../helpers/fs.js';
+import { IMAGE_EXTENSIONS } from './consts.js';
 
 export class Projects {
   constructor(private projectsDir: string) {}
@@ -64,15 +65,17 @@ export class Projects {
   }
 
   async inputs(id: Project['id']) {
-    return (await this.filenames(id, 'input')).filter(
-      name => !name.endsWith('.json'),
-    );
+    return (await this.filenames(id, 'input')).filter(name => {
+      const split = name.split('.');
+      return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
+    });
   }
 
   async outputs(id: Project['id']) {
-    return (await this.filenames(id, 'output')).filter(
-      name => !name.endsWith('.json'),
-    );
+    return (await this.filenames(id, 'output')).filter(name => {
+      const split = name.split('.');
+      return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
+    });
   }
 
   async getMetadata(
