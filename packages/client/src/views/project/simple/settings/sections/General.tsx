@@ -22,6 +22,14 @@ export const General: React.FC = observer(() => {
     <>
       <VarCategory label="Checkpoint">
         <VarModel path="models.base.name" modelType={ModelType.CHECKPOINT} />
+        <VarSlider
+          label="CLIP skip last layers"
+          path="models.base.clip_skip"
+          min={0}
+          max={12}
+          step={1}
+          defaultValue={0}
+        />
       </VarCategory>
       <VarCategory label="Conditioning">
         <VarString label="Positive" path="conditioning.positive" multiline />

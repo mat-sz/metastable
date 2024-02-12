@@ -15,7 +15,12 @@ export type ProjectInput = ProjectInputEmpty | ProjectInputImage;
 export interface ProjectSettings {
   input: ProjectInput;
   models: {
-    base: { name: string; path?: string; embeddings_path?: string };
+    base: {
+      name: string;
+      path?: string;
+      embeddings_path?: string;
+      clip_skip?: number;
+    };
     loras?: {
       enabled: boolean;
       name?: string;

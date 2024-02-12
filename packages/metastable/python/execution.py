@@ -298,7 +298,18 @@ def load_clip_vision(path):
 
 def execute_prompt(prompt):
     models_settings = prompt["models"]
-    (model, clip, vae, _) = load_checkpoint_cached(models_settings["base"])
+    base_settings = models_settings["base"]
+    (model, clip, vae, _) = load_checkpoint_cached(base_settings)
+    
+    if "clip_skip" in base_settings:
+        clip_skip = models_settings["base"]["clip_skip"]
+        if clip_skip == None or clip_skip == 0:
+            clip.clip_layer(None)
+        else:
+            clip.clip_layer(clip_skip * -1)
+    else:
+        clip.clip_layer(None)
+
     tiling = prompt["sampler"]["tiling"]
     
     comfy.model_management.cleanup_models()
