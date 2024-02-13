@@ -4,6 +4,13 @@ A project-based Stable Diffusion Web UI, for easier organization of generated im
 
 The backend is based on [ComfyUI's backend](https://github.com/comfyanonymous/ComfyUI).
 
+## Credits
+
+Metastable uses code from:
+
+- [comfyanonymous/ComfyUI](https://github.com/comfyanonymous/ComfyUI)
+- [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts)
+
 ## Manual installation
 
 ### Requirements

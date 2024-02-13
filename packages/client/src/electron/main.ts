@@ -190,6 +190,22 @@ async function createWindow() {
     return await metastable.storage.projects.inputs(id);
   });
   ipcMain.handle(
+    'projects:inputs:getMetadata',
+    async (_, id: Project['id'], name: string) => {
+      return await metastable.storage.projects.getInputMetadata(id, name);
+    },
+  );
+  ipcMain.handle(
+    'projects:inputs:setMetadata',
+    async (_, id: Project['id'], name: string, metadata: any) => {
+      return await metastable.storage.projects.setInputMetadata(
+        id,
+        name,
+        metadata,
+      );
+    },
+  );
+  ipcMain.handle(
     'projects:upload',
     async (_, id: Project['id'], buffer: Buffer, ext: string) => {
       return await metastable.storage.projects.upload(id, buffer, ext);

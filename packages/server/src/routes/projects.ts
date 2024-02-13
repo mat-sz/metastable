@@ -87,9 +87,33 @@ export function routesProjects(metastable: Metastable) {
       );
     });
 
+    fastify.get('/:id/inputs/:name/metadata', async request => {
+      const projectId = (request.params as any)?.id;
+      const inputName = (request.params as any)?.name;
+      return await metastable.storage.projects.getInputMetadata(
+        projectId,
+        inputName,
+      );
+    });
+
+    fastify.post('/:id/inputs/:name/metadata', async request => {
+      const projectId = (request.params as any)?.id;
+      const inputName = (request.params as any)?.name;
+      return await metastable.storage.projects.setInputMetadata(
+        projectId,
+        inputName,
+        request.body as any,
+      );
+    });
+
     fastify.get('/:id/outputs', async request => {
       const projectId = (request.params as any)?.id;
       return await metastable.storage.projects.outputs(projectId);
+    });
+
+    fastify.post('/:id/train', async request => {
+      const projectId = (request.params as any)?.id;
+      return await metastable.train(projectId, request.body as any);
     });
   };
 }

@@ -1,15 +1,59 @@
-import { action, makeObservable, observable, runInAction } from 'mobx';
-import { ProjectSettings, Project as APIProject } from '@metastable/types';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import {
+  Project as APIProject,
+  ProjectTrainingSettings,
+  ModelType,
+} from '@metastable/types';
 
 import { API } from '@api';
 import { BaseProject } from './base';
+import { mainStore } from '../MainStore';
 
-interface TrainingProjectSettings {}
+export function defaultSettings(): ProjectTrainingSettings {
+  return {
+    mode: 'lora',
+    bucketing: false,
+    base: {
+      name: mainStore.defaultModelName(ModelType.CHECKPOINT),
+      sdxl: false,
+    },
+    resolution: { width: 512, height: 512 },
+    network: {
+      alpha: 8,
+      dimensions: 16,
+    },
+    learningRates: {
+      network: 0.0003,
+      unet: 5e-4,
+      textEncoder: 1e-4,
+    },
+    learningRateScheduler: {
+      name: 'cosine_with_restarts',
+      number: 3,
+      warmupRatio: 0.05,
+      minSnrGamma: true,
+    },
+    dataset: {
+      activationTags: [],
+      shuffleTags: true,
+      repeats: 10,
+    },
+    limits: {
+      trainingEpochs: 10,
+      saveEveryXEpochs: 1,
+      keepOnlyXEpochs: 1,
+      batchSize: 2,
+    },
+  };
+}
 
-export class TrainingProject extends BaseProject<TrainingProjectSettings> {
+export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   uploadQueue: File[] = [];
 
-  constructor(data: APIProject, settings: TrainingProjectSettings = {}) {
+  constructor(
+    data: APIProject,
+    settings: ProjectTrainingSettings = defaultSettings(),
+  ) {
     super(data, settings);
     makeObservable(this, {
       uploadQueue: observable,
@@ -41,9 +85,14 @@ export class TrainingProject extends BaseProject<TrainingProjectSettings> {
     }
   }
 
-  setSettings(settings: ProjectSettings) {
+  setSettings(settings: ProjectTrainingSettings) {
     this.settings = settings;
   }
 
-  async request() {}
+  async request() {
+    const settings = toJS(this.settings);
+    this.save();
+    mainStore.trainingQueue.push({ id: this.id });
+    await API.projects.train(this.id, settings);
+  }
 }

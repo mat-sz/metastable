@@ -44,6 +44,7 @@ class MainStore {
   promptMax = 0;
   promptQueue: { id: string; projectId: string; value: number; max: number }[] =
     [];
+  trainingQueue: { id: string }[] = [];
 
   backendStatus: ComfyStatus = 'starting';
   backendLog: ComfyLogItem[] = [];
@@ -198,6 +199,11 @@ class MainStore {
             project.onPromptDone(message.data.output_filenames);
           }
         }
+        break;
+      case 'training.end':
+        this.trainingQueue = this.trainingQueue.filter(
+          item => item.id !== message.data.projectId,
+        );
         break;
       case 'prompt.error':
         this.promptQueue = this.promptQueue.filter(

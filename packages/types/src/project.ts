@@ -67,6 +67,44 @@ export interface ProjectSettings {
   };
 }
 
+export interface ProjectTrainingInputMetadata {
+  crop?: [x: number, y: number, width: number, height: number];
+  tags: string;
+}
+
+export interface ProjectTrainingSettings {
+  mode: 'lora';
+  bucketing: boolean;
+  base: { name: string; path?: string; sdxl: boolean };
+  resolution: { width: number; height: number };
+  network: {
+    dimensions: number;
+    alpha: number;
+  };
+  learningRates: {
+    network: number;
+    unet: number;
+    textEncoder: number;
+  };
+  learningRateScheduler: {
+    name: string;
+    number: number;
+    warmupRatio: number;
+    minSnrGamma: boolean;
+  };
+  dataset: {
+    activationTags: string[];
+    shuffleTags: boolean;
+    repeats: number;
+  };
+  limits: {
+    trainingEpochs: number;
+    saveEveryXEpochs: number;
+    keepOnlyXEpochs: number;
+    batchSize: number;
+  };
+}
+
 export interface ProjectInfo {
   type: string;
 }

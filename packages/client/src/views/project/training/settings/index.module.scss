@@ -1,0 +1,57 @@
+.settings {
+  position: relative;
+}
+
+.prompt {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-panel);
+  overflow-y: auto;
+}
+
+.error {
+  margin: 0.5rem 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  color: var(--color-fg-error);
+  background: var(--color-bg-error);
+  font-weight: bold;
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999999;
+  display: block;
+  background: var(--color-bg-panel-dark);
+  display: flex;
+
+  @media screen and (min-width: 960px) {
+    top: -2.4rem;
+  }
+
+  button {
+    padding: 0.5rem;
+    border-radius: 0;
+
+    svg {
+      font-size: 1.4rem;
+    }
+
+    &:hover {
+      background: var(--color-bg-interactive);
+    }
+  }
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+
+  & > *:first-child {
+    flex: 1;
+    border: none;
+  }
+}

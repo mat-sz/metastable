@@ -77,6 +77,22 @@ export class Projects {
     });
   }
 
+  async getInputMetadata(id: Project['id'], inputName: string) {
+    const metadataFile = new JSONFile<any>(
+      this.path(id, `${inputName}.json`),
+      {},
+    );
+    return await metadataFile.readJson();
+  }
+
+  async setInputMetadata(id: Project['id'], inputName: string, metadata: any) {
+    const metadataFile = new JSONFile<any>(
+      this.path(id, `${inputName}.json`),
+      {},
+    );
+    return await metadataFile.writeJson(metadata);
+  }
+
   async outputs(id: Project['id']) {
     return (await this.filenames(id, 'output')).filter(name => {
       const split = name.split('.');

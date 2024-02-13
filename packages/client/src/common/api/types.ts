@@ -5,6 +5,7 @@ import {
   Project,
   ProjectInfo,
   ProjectSettings,
+  ProjectTrainingSettings,
   SetupDetails,
   SetupSettings,
   SetupStatus,
@@ -29,6 +30,12 @@ export interface API {
     all(): Promise<Project[]>;
     get(id: Project['id']): Promise<Project>;
     inputs(id: Project['id']): Promise<string[]>;
+    getInputMetadata(id: Project['id'], name: string): Promise<any>;
+    setInputMetadata(
+      id: Project['id'],
+      name: string,
+      metadata: any,
+    ): Promise<void>;
     upload(id: Project['id'], file: File): Promise<string[]>;
     outputs(id: Project['id']): Promise<string[]>;
     create(data: ProjectInfo): Promise<Project>;
@@ -36,6 +43,7 @@ export interface API {
       id: Project['id'],
       data: Partial<ProjectInfo & { name: string; settings: string }>,
     ): Promise<Project>;
+    train(id: Project['id'], settings: ProjectTrainingSettings): Promise<void>;
   };
   downloads: {
     create(data: DownloadSettings): Promise<void>;

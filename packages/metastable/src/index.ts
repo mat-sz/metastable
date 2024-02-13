@@ -11,6 +11,7 @@ import {
   ModelType,
   Project,
   ProjectSettings,
+  ProjectTrainingSettings,
   UtilizationEvent,
 } from '@metastable/types';
 
@@ -21,6 +22,7 @@ import { Storage } from './storage/index.js';
 import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
+import { Kohya } from './kohya/index.js';
 
 const require = createRequire(import.meta.url);
 const chokidar = require('chokidar');
@@ -282,6 +284,23 @@ export class Metastable extends EventEmitter {
     });
 
     return { id };
+  }
+
+  async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
+    settings.base.path ||= this.storage.models.path(
+      ModelType.CHECKPOINT,
+      settings.base.name,
+    );
+
+    const kohya = new Kohya(this.python!);
+    kohya.on('event', this.onEvent);
+    await kohya.train(
+      projectId,
+      settings,
+      this.storage.projects.path(projectId, 'input'),
+      this.storage.projects.path(projectId, 'output'),
+      this.storage.projects.path(projectId, 'temp'),
+    );
   }
 
   async downloadModel(data: DownloadSettings) {

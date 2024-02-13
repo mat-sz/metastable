@@ -39,6 +39,21 @@ export const WebAPI: API = {
     async inputs(id) {
       return await httpGet(`/projects/${encodeURIComponent(id)}/inputs`);
     },
+    async getInputMetadata(id, name) {
+      return await httpGet(
+        `/projects/${encodeURIComponent(id)}/inputs/${encodeURIComponent(
+          name,
+        )}`,
+      );
+    },
+    async setInputMetadata(id, name, metadata) {
+      return await httpPost(
+        `/projects/${encodeURIComponent(id)}/inputs/${encodeURIComponent(
+          name,
+        )}`,
+        metadata,
+      );
+    },
     async upload(id, file: File) {
       const formData = new FormData();
       formData.set('file', file);
@@ -55,6 +70,12 @@ export const WebAPI: API = {
     },
     async update(id, data) {
       return await httpPost(`/projects/${encodeURIComponent(id)}`, data);
+    },
+    async train(id, settings) {
+      return await httpPost(
+        `/projects/${encodeURIComponent(id)}/train`,
+        settings,
+      );
     },
   },
   downloads: {
