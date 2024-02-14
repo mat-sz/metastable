@@ -18,9 +18,16 @@ export class ConfigurePythonTask extends BaseTask {
 
   async execute() {
     let collecting: string[] = [];
-    let required: string[] = requiredPackages.map(pkg =>
-      pkg.version ? `${pkg.name}${pkg.version}` : `${pkg.name}`,
-    );
+    let required: string[] = requiredPackages.map(pkg => {
+      let dependency = pkg.name;
+      if (pkg.extra) {
+        dependency += `[${pkg.extra}]`;
+      }
+      if (pkg.version) {
+        dependency += pkg.version;
+      }
+      return dependency;
+    });
 
     const python = this.pythonHome
       ? await PythonInstance.fromDirectory(this.pythonHome)

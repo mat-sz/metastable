@@ -21,7 +21,7 @@ export const requiredPackages: PipDependency[] = [
   { name: 'torchaudio' },
   { name: 'torchsde' },
   { name: 'einops' },
-  { name: 'transformers' },
+  { name: 'transformers', version: '==4.36.2' },
   { name: 'safetensors' },
   { name: 'accelerate' },
   { name: 'pyyaml' },
@@ -29,6 +29,8 @@ export const requiredPackages: PipDependency[] = [
   { name: 'scipy' },
   { name: 'tqdm' },
   { name: 'psutil' },
+  { name: 'diffusers', extra: 'torch' },
+  { name: 'voluptuous' },
 ];
 
 export const REQUIRED_PYTHON_VERSION = '3.8.0 - 3.11.x';
@@ -118,7 +120,7 @@ export async function getPython(python?: PythonInstance): Promise<SetupPython> {
         actual: version || 'Not installed',
         satisfied: version
           ? pkg.version
-            ? semver.satisfies(version, pkg.version)
+            ? semver.satisfies(version, pkg.version.replace('==', ''))
             : true
           : false,
       });
