@@ -15,14 +15,17 @@ export const Grid: React.FC = observer(() => {
     return <div className={styles.info}>No project output images found.</div>;
   }
 
-  const urls = outputs.map(filename => project.view('output', filename));
+  const urls: [string, string][] = outputs.map(filename => [
+    project.view('output', filename),
+    project.thumb('output', filename),
+  ]);
 
   return (
     <>
       <div className={styles.grid}>
         {urls.map((url, i) => (
           <a
-            href={url}
+            href={url[0]}
             target="_blank"
             rel="noopener noreferrer"
             key={i}
@@ -34,7 +37,7 @@ export const Grid: React.FC = observer(() => {
               }
             }}
           >
-            <img src={url} />
+            <img src={url[1]} />
           </a>
         ))}
       </div>

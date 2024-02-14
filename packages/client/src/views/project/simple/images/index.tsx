@@ -33,7 +33,7 @@ export const Images: React.FC = observer(() => {
             {filenames.map((filename, i) => (
               <img
                 className={selectedIndex === i ? styles.selected : undefined}
-                src={project.view('output', filename)}
+                src={project.thumb('output', filename)}
                 key={i}
                 onClick={() => setSelectedIndex(i)}
               />

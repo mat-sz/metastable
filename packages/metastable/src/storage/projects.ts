@@ -9,8 +9,10 @@ import {
   JSONFile,
   TextFile,
   directorySize,
+  exists,
 } from '../helpers/fs.js';
 import { IMAGE_EXTENSIONS } from './consts.js';
+import sharp from 'sharp';
 
 export class Projects {
   constructor(private projectsDir: string) {}
@@ -30,6 +32,7 @@ export class Projects {
 
   async init() {
     await fs.mkdir(this.projectsDir, { recursive: true });
+    this.generateAllThumbnails();
   }
 
   async all() {
@@ -66,15 +69,25 @@ export class Projects {
 
   async upload(id: Project['id'], file: Buffer, ext: string) {
     const filename = `${new Date().getTime()}.${ext}`;
-    await fs.writeFile(this.path(id, 'input', filename), file);
+    const filePath = this.path(id, 'input', filename);
+    await fs.writeFile(filePath, file);
+    await this.generateThumbnail(filePath);
     return [filename];
   }
 
-  async inputs(id: Project['id']) {
-    return (await this.filenames(id, 'input')).filter(name => {
+  private async imageFilenames(id: Project['id'], ...paths: string[]) {
+    return (await this.filenames(id, ...paths)).filter(name => {
+      if (name.includes('thumb')) {
+        return false;
+      }
+
       const split = name.split('.');
       return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
     });
+  }
+
+  async inputs(id: Project['id']) {
+    return this.imageFilenames(id, 'input');
   }
 
   async getInputMetadata(id: Project['id'], inputName: string) {
@@ -94,10 +107,58 @@ export class Projects {
   }
 
   async outputs(id: Project['id']) {
-    return (await this.filenames(id, 'output')).filter(name => {
-      const split = name.split('.');
-      return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
-    });
+    return this.imageFilenames(id, 'output');
+  }
+
+  thumbPath(filePath: string) {
+    const name = path.basename(filePath);
+    const dirName = path.dirname(filePath);
+    const split = name.split('.');
+    if (split.length > 1) {
+      split.pop();
+      const thumbName = split.join('.') + '.thumb.jpg';
+      return path.join(dirName, thumbName);
+    }
+
+    return undefined;
+  }
+
+  async generateThumbnail(filePath: string) {
+    const thumbPath = this.thumbPath(filePath);
+
+    if (thumbPath) {
+      if (await exists(thumbPath)) {
+        return;
+      }
+
+      await sharp(filePath)
+        .resize(250, 250, { fit: 'inside' })
+        .toFile(thumbPath);
+    }
+  }
+
+  async generateThumbnails(id: Project['id']) {
+    const inputs = await this.inputs(id);
+    const outputs = await this.outputs(id);
+
+    for (const input of inputs) {
+      const imagePath = this.path(id, 'input', input);
+      await this.generateThumbnail(imagePath);
+    }
+    for (const output of outputs) {
+      const imagePath = this.path(id, 'output', output);
+      await this.generateThumbnail(imagePath);
+    }
+  }
+
+  async generateAllThumbnails() {
+    const items = await fs.readdir(this.projectsDir, { withFileTypes: true });
+
+    for (const item of items) {
+      if (item.isDirectory()) {
+        this.generateThumbnails(item.name);
+      }
+    }
   }
 
   async getMetadata(

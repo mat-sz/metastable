@@ -19,7 +19,9 @@ export async function exists(path: string) {
 
 export async function filenames(dirPath: string) {
   try {
-    return await fs.readdir(dirPath);
+    return (await fs.readdir(dirPath, { withFileTypes: true }))
+      .filter(file => file.isFile())
+      .map(file => file.name);
   } catch {
     return [];
   }

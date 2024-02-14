@@ -13,7 +13,7 @@ import { ImagePreview } from '@components/imagePreview';
 import styles from './Lightbox.module.scss';
 
 interface Props {
-  images: string[];
+  images: [url: string, thumb: string][];
   current?: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -26,7 +26,7 @@ export const Lightbox: React.FC<Props> = ({
   onClose,
 }) => {
   const currentUrl = images[current];
-  const filename = currentUrl.split('/').slice(-1)[0];
+  const filename = currentUrl[0].split('/').slice(-1)[0];
 
   const previous = useCallback(
     () => onChange(current === 0 ? images.length - 1 : current - 1),
@@ -49,10 +49,10 @@ export const Lightbox: React.FC<Props> = ({
         </div>
         <div>{filename}</div>
         <div>
-          <IconButton href={currentUrl} download={filename}>
+          <IconButton href={currentUrl[0]} download={filename}>
             <BsDownload />
           </IconButton>
-          <IconButton href={currentUrl}>
+          <IconButton href={currentUrl[0]}>
             <BsArrowUpRightSquare />
           </IconButton>
           <IconButton onClick={onClose}>
@@ -69,7 +69,7 @@ export const Lightbox: React.FC<Props> = ({
         >
           <BsArrowLeft />
         </button>
-        <ImagePreview url={currentUrl} />
+        <ImagePreview url={currentUrl[0]} />
         <button
           onClick={e => {
             e.stopPropagation();
@@ -87,7 +87,7 @@ export const Lightbox: React.FC<Props> = ({
 
           return (
             <img
-              src={url}
+              src={url[1]}
               key={i}
               onClick={() => onChange(i)}
               className={i === current ? styles.active : undefined}

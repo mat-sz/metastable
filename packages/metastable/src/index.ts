@@ -37,11 +37,13 @@ export class Metastable extends EventEmitter {
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
-    this.emit('event', event);
 
     if (event.event === 'prompt.end') {
       const settings = this.settingsCache[event.data.id];
       for (const filename of event.data.output_filenames) {
+        await this.storage.projects.generateThumbnail(
+          this.storage.projects.path(event.data.project_id, 'output', filename),
+        );
         const settingsPath = this.storage.projects.path(
           event.data.project_id,
           'output',
@@ -53,6 +55,7 @@ export class Metastable extends EventEmitter {
     } else if (event.event === 'prompt.error') {
       delete this.settingsCache[event.data.id];
     }
+    this.emit('event', event);
   };
 
   constructor(

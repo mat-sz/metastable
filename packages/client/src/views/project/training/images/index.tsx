@@ -10,7 +10,7 @@ export const Images: React.FC = observer(() => {
   const inputs = [...project.allInputs].reverse();
   const [files, setFiles] = useState<File[]>([]);
 
-  const urls = inputs.map(filename => project.view('input', filename));
+  const urls = inputs.map(filename => project.thumb('input', filename));
 
   return (
     <div className={styles.main}>

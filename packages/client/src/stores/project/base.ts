@@ -86,6 +86,15 @@ export class BaseProject<T = any> {
     return getStaticUrl(`/projects/${this.id}/${type}/${filename}`);
   }
 
+  thumb(type: string, filename: string) {
+    const split = filename.split('.');
+    if (split.length > 1) {
+      split.pop();
+      split.push('thumb', 'jpg');
+    }
+    return getStaticUrl(`/projects/${this.id}/${type}/${split.join('.')}`);
+  }
+
   onPromptDone(outputFilenames: string[]) {
     this.outputFilenames = outputFilenames;
     this.allOutputs.push(...outputFilenames);

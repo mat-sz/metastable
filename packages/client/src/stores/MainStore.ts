@@ -153,8 +153,17 @@ class MainStore {
     return this.backendStatus;
   }
 
-  view(project_id: APIProject['id'], type: string, filename: string) {
-    return getStaticUrl(`/projects/${project_id}/${type}/${filename}`);
+  view(projectId: APIProject['id'], type: string, filename: string) {
+    return getStaticUrl(`/projects/${projectId}/${type}/${filename}`);
+  }
+
+  thumb(projectId: APIProject['id'], type: string, filename: string) {
+    const split = filename.split('.');
+    if (split.length > 1) {
+      split.pop();
+      split.push('thumb', 'jpg');
+    }
+    return getStaticUrl(`/projects/${projectId}/${type}/${split.join('.')}`);
   }
 
   pushLog(item: ComfyLogItem) {

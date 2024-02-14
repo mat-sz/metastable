@@ -23,7 +23,7 @@ export const Welcome: React.FC = observer(() => {
                 key={item.id}
                 imageUrl={
                   item.lastOutput
-                    ? mainStore.view(item.id, 'output', item.lastOutput)
+                    ? mainStore.thumb(item.id, 'output', item.lastOutput)
                     : undefined
                 }
                 onClick={() => {
