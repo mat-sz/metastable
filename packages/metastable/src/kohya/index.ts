@@ -2,11 +2,13 @@ import EventEmitter from 'events';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ComfyLogItem, ProjectTrainingSettings } from '@metastable/types';
+import { rimraf } from 'rimraf';
+import fs from 'fs/promises';
+import { ChildProcess } from 'child_process';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
-import { JSONFile, TextFile } from '../helpers/fs.js';
-import { ChildProcess } from 'child_process';
+import { JSONFile } from '../helpers/fs.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -44,6 +46,12 @@ export class Kohya extends EventEmitter {
     tempPath: string,
   ) {
     this.stop(projectId);
+
+    try {
+      await rimraf(tempPath);
+    } catch {}
+
+    await fs.mkdir(tempPath, { recursive: true });
 
     const mainPath = path.join(
       baseDir,
