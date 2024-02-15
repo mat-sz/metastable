@@ -180,3 +180,9 @@ export class JSONFile<T> extends TextFile {
     await this.write(JSON.stringify(data));
   }
 }
+
+export function removeFileExtension(string: string): string {
+  const split = string.split('.');
+  split.pop();
+  return split.join('.');
+}

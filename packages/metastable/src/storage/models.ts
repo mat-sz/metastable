@@ -2,7 +2,12 @@ import path, { basename } from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Model, ModelType } from '@metastable/types';
 
-import { tryUnlink, walk, JSONFile } from '../helpers/fs.js';
+import {
+  tryUnlink,
+  walk,
+  JSONFile,
+  removeFileExtension,
+} from '../helpers/fs.js';
 import { IMAGE_EXTENSIONS } from './consts.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
@@ -60,7 +65,7 @@ export class Models {
           }
 
           let data: Partial<Model> & { name: string } = {
-            name: basename(file.name),
+            name: removeFileExtension(basename(file.name)),
           };
 
           if (fileNames.includes(`${name}.json`)) {
