@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@components/breadcrumbs';
 import { mainStore } from '@stores/MainStore';
 import { getStaticUrl } from '@utils/url';
 import { fuzzy } from '@utils/fuzzy';
-import { removeFileExtension } from '@utils/string';
+import { removeFileExtension, stringToColor } from '@utils/string';
 
 interface Props {
   type: string;
@@ -89,6 +89,7 @@ export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
             <Card
               name={item.name}
               key={item.file.name}
+              color={stringToColor(removeFileExtension(item.file.name))}
               imageUrl={
                 item.image
                   ? getStaticUrl(`/models/${type}/${item.image}`)

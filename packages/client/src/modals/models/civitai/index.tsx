@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
+import { MdNoPhotography } from 'react-icons/md';
 import useSWR from 'swr';
 
 import { Card, CardTag, CardTags, List } from '@components/list';
@@ -140,6 +141,7 @@ export const CivitAI: React.FC = observer(() => {
                 imageUrl={item.modelVersions?.[0]?.images[0]?.url}
                 onClick={() => setItem(item)}
                 key={item.id}
+                icon={<MdNoPhotography />}
               >
                 <CardTags>
                   <CardTag

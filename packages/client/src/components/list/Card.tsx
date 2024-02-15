@@ -1,5 +1,4 @@
 import React from 'react';
-import { MdNoPhotography } from 'react-icons/md';
 
 import styles from './index.module.scss';
 
@@ -8,6 +7,7 @@ interface CardProps {
   imageUrl?: string;
   icon?: React.ReactNode;
   onClick?: () => void;
+  color?: string;
 }
 
 export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
@@ -16,6 +16,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   name,
   icon,
   onClick,
+  color,
 }) => {
   return (
     <div className={styles.card} onClick={onClick}>
@@ -26,7 +27,9 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
           src={imageUrl}
         />
       ) : (
-        <div className={styles.noPhotos}>{icon || <MdNoPhotography />}</div>
+        <div className={styles.icon} style={{ backgroundColor: color }}>
+          {icon}
+        </div>
       )}
       <div className={styles.details}>
         <div className={styles.info}>{children}</div>
