@@ -34,6 +34,7 @@ export class Metastable extends EventEmitter {
   settingsCache: Record<Project['id'], string> = {};
   setup = new Setup(this);
   tasks = new Tasks();
+  kohya?: Kohya;
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
@@ -117,17 +118,20 @@ export class Metastable extends EventEmitter {
 
   async init() {
     await this.storage.init();
-    await this.restartComfy();
+    await this.reload();
   }
 
   private resolvePath(value: string | undefined) {
     return resolveConfigPath(value, this.dataRoot);
   }
 
-  async restartComfy() {
-    this.comfy?.removeAllListeners();
-    this.comfy?.stop(true);
+  async reload() {
+    await this.reloadPython();
+    this.restartKohya();
+    this.restartComfy();
+  }
 
+  async reloadPython() {
     const config = await this.storage.config.all();
     if (!this.settings.skipPythonSetup && !config.python.configured) {
       this.python = await PythonInstance.fromSystem();
@@ -147,6 +151,31 @@ export class Metastable extends EventEmitter {
           this.resolvePath(config.python.pythonHome)!,
           this.resolvePath(config.python.packagesDir),
         );
+  }
+
+  restartKohya() {
+    if (!this.python) {
+      return;
+    }
+
+    this.kohya?.removeAllListeners();
+
+    this.kohya = new Kohya(this.python!);
+    this.kohya.on('event', this.onEvent);
+  }
+
+  async restartComfy() {
+    this.comfy?.removeAllListeners();
+    this.comfy?.stop(true);
+
+    const config = await this.storage.config.all();
+    if (
+      !this.python ||
+      (!this.settings.skipPythonSetup && !config.python.configured)
+    ) {
+      return;
+    }
+
     this.comfy = new Comfy(
       this.python,
       this.settings.comfyMainPath,
@@ -295,9 +324,7 @@ export class Metastable extends EventEmitter {
       settings.base.name,
     );
 
-    const kohya = new Kohya(this.python!);
-    kohya.on('event', this.onEvent);
-    await kohya.train(
+    return await this.kohya?.train(
       projectId,
       settings,
       this.storage.projects.path(projectId, 'input'),

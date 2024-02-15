@@ -98,7 +98,7 @@ export class Setup extends EventEmitter {
       });
     }
 
-    this.metastable.restartComfy();
+    this.metastable.reload();
   }
 
   async start(settings: SetupSettings) {
