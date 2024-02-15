@@ -115,5 +115,10 @@ export function routesProjects(metastable: Metastable) {
       const projectId = (request.params as any)?.id;
       return await metastable.train(projectId, request.body as any);
     });
+
+    fastify.delete('/:id/train', async request => {
+      const projectId = (request.params as any)?.id;
+      return metastable.stopTraining(projectId);
+    });
   };
 }

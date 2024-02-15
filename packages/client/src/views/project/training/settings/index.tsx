@@ -12,21 +12,40 @@ import {
   VarToggle,
   VarUI,
 } from 'react-var-ui';
-import { BsX } from 'react-icons/bs';
+import { BsPlay, BsX } from 'react-icons/bs';
 
+import { ModelType } from '@metastable/types';
+import { IconButton } from '@components/iconButton';
+import { mainStore } from '@stores/MainStore';
+import { ProgressBar } from '@components/progressBar';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { VarModel } from './components/VarModel';
-import { ModelType } from '@metastable/types';
-import { IconButton } from '@/components';
 
 export const Settings: React.FC = observer(() => {
   const project = useTraningProject();
 
+  const queueItem = mainStore.trainingQueue.find(
+    item => item.id === project.id,
+  );
+
   return (
     <div className={styles.settings}>
-      <div>
-        <button onClick={() => project.request()}>Train</button>
+      <div className={styles.actions}>
+        {!!queueItem && (
+          <div className={styles.progress}>
+            <ProgressBar marquee />
+          </div>
+        )}
+        {queueItem ? (
+          <IconButton title="Stop training" onClick={() => project.cancel()}>
+            <BsX />
+          </IconButton>
+        ) : (
+          <IconButton title="Start training" onClick={() => project.request()}>
+            <BsPlay />
+          </IconButton>
+        )}
       </div>
       <VarUI
         className={styles.prompt}

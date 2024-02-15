@@ -32,6 +32,17 @@
     top: -2.4rem;
   }
 
+  .progress {
+    display: flex;
+    align-items: center;
+    width: 8rem;
+    margin-right: 0.5rem;
+
+    & > div {
+      height: 1.5rem;
+    }
+  }
+
   button {
     padding: 0.5rem;
     border-radius: 0;

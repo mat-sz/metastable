@@ -6,6 +6,7 @@ import { ComfyLogItem, ProjectTrainingSettings } from '@metastable/types';
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
 import { JSONFile, TextFile } from '../helpers/fs.js';
+import { ChildProcess } from 'child_process';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -15,12 +16,24 @@ const baseDir = path.join(
 
 export class Kohya extends EventEmitter {
   logBuffer = new CircularBuffer<ComfyLogItem>(25);
+  processes: Record<string, ChildProcess> = {};
 
   constructor(
     public python: PythonInstance,
     private env: Record<string, string> = {},
   ) {
     super();
+  }
+
+  stopAll() {
+    for (const key of Object.keys(this.processes)) {
+      this.stop(key);
+    }
+  }
+
+  stop(projectId: string) {
+    this.processes[projectId]?.kill('SIGKILL');
+    delete this.processes[projectId];
   }
 
   async train(
@@ -30,6 +43,8 @@ export class Kohya extends EventEmitter {
     outputPath: string,
     tempPath: string,
   ) {
+    this.stop(projectId);
+
     const mainPath = path.join(
       baseDir,
       'python_kohya',
@@ -131,7 +146,10 @@ export class Kohya extends EventEmitter {
 
     proc.on('close', () => {
       this.emit('event', { event: 'training.end', data: { projectId } });
+      delete this.processes[projectId];
     });
+
+    this.processes[projectId] = proc;
   }
 
   private log(projectId: string, type: string, text: string) {

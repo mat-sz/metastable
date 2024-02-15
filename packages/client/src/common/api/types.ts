@@ -44,6 +44,7 @@ export interface API {
       data: Partial<ProjectInfo & { name: string; settings: string }>,
     ): Promise<Project>;
     train(id: Project['id'], settings: ProjectTrainingSettings): Promise<void>;
+    stopTraining(id: Project['id']): Promise<void>;
   };
   downloads: {
     create(data: DownloadSettings): Promise<void>;

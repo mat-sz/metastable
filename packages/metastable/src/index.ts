@@ -159,6 +159,7 @@ export class Metastable extends EventEmitter {
     }
 
     this.kohya?.removeAllListeners();
+    this.kohya?.stopAll();
 
     this.kohya = new Kohya(this.python!);
     this.kohya.on('event', this.onEvent);
@@ -331,6 +332,10 @@ export class Metastable extends EventEmitter {
       this.storage.projects.path(projectId, 'output'),
       this.storage.projects.path(projectId, 'temp'),
     );
+  }
+
+  stopTraining(projectId: Project['id']) {
+    return this.kohya?.stop(projectId);
   }
 
   async downloadModel(data: DownloadSettings) {

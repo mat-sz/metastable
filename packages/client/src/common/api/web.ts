@@ -77,6 +77,9 @@ export const WebAPI: API = {
         settings,
       );
     },
+    async stopTraining(id) {
+      return await httpDelete(`/projects/${encodeURIComponent(id)}/train`);
+    },
   },
   downloads: {
     async create(data) {

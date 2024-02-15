@@ -89,6 +89,10 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
     this.settings = settings;
   }
 
+  async cancel() {
+    await API.projects.stopTraining(this.id);
+  }
+
   async request() {
     const settings = toJS(this.settings);
     this.save();
