@@ -1,7 +1,11 @@
 import EventEmitter from 'events';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ComfyLogItem, ProjectTrainingSettings } from '@metastable/types';
+import {
+  ComfyLogItem,
+  ProjectTrainingInputMetadata,
+  ProjectTrainingSettings,
+} from '@metastable/types';
 import { rimraf } from 'rimraf';
 import fs from 'fs/promises';
 import { ChildProcess } from 'child_process';
@@ -16,6 +20,7 @@ import {
   imageFilenames,
   removeFileExtension,
 } from '../helpers/fs.js';
+import sharp from 'sharp';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -64,7 +69,7 @@ export class Kohya extends EventEmitter {
     const images = await imageFilenames(inputPath);
     for (const image of images) {
       const name = removeFileExtension(image);
-      const inputDataFile = new JSONFile<any>(
+      const inputDataFile = new JSONFile<ProjectTrainingInputMetadata>(
         path.join(inputPath, `${name}.json`),
         {},
       );
@@ -74,10 +79,21 @@ export class Kohya extends EventEmitter {
         const tempFile = new TextFile(path.join(tempInputPath, `${name}.txt`));
         await tempFile.write(inputData.caption);
 
-        await fs.copyFile(
-          path.join(inputPath, image),
-          path.join(tempInputPath, image),
-        );
+        const fromPath = path.join(inputPath, image);
+        const toPath = path.join(tempInputPath, image);
+
+        if (inputData.crop) {
+          await sharp(fromPath)
+            .extract({
+              left: inputData.crop[0],
+              top: inputData.crop[1],
+              width: inputData.crop[2],
+              height: inputData.crop[3],
+            })
+            .toFile(toPath);
+        } else {
+          await fs.copyFile(fromPath, toPath);
+        }
       }
     }
 

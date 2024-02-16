@@ -69,7 +69,7 @@ export interface ProjectSettings {
 
 export interface ProjectTrainingInputMetadata {
   crop?: [x: number, y: number, width: number, height: number];
-  tags: string;
+  caption?: string;
 }
 
 export interface ProjectTrainingSettings {
