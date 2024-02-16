@@ -2,6 +2,16 @@ import path from 'path';
 import fs from 'fs/promises';
 import { FileInfo } from '@metastable/types';
 
+export const IMAGE_EXTENSIONS = [
+  'png',
+  'jpeg',
+  'jpg',
+  'gif',
+  'webp',
+  'heif',
+  'avif',
+];
+
 export function isPathIn(parent: string, filePath: string) {
   const rel = path.relative(parent, filePath);
   return (
@@ -25,6 +35,17 @@ export async function filenames(dirPath: string) {
   } catch {
     return [];
   }
+}
+
+export async function imageFilenames(dirPath: string) {
+  return (await filenames(dirPath)).filter(name => {
+    if (name.includes('thumb')) {
+      return false;
+    }
+
+    const split = name.split('.');
+    return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
+  });
 }
 
 export async function tryUnlink(filePath: string) {

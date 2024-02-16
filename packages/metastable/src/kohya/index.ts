@@ -8,7 +8,14 @@ import { ChildProcess } from 'child_process';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
-import { JSONFile } from '../helpers/fs.js';
+import {
+  JSONFile,
+  TextFile,
+  exists,
+  filenames,
+  imageFilenames,
+  removeFileExtension,
+} from '../helpers/fs.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -51,7 +58,28 @@ export class Kohya extends EventEmitter {
       await rimraf(tempPath);
     } catch {}
 
-    await fs.mkdir(tempPath, { recursive: true });
+    const tempInputPath = path.join(tempPath, 'input');
+    await fs.mkdir(tempInputPath, { recursive: true });
+
+    const images = await imageFilenames(inputPath);
+    for (const image of images) {
+      const name = removeFileExtension(image);
+      const inputDataFile = new JSONFile<any>(
+        path.join(inputPath, `${name}.json`),
+        {},
+      );
+      const inputData = await inputDataFile.readJson();
+
+      if (inputData?.caption) {
+        const tempFile = new TextFile(path.join(tempInputPath, `${name}.txt`));
+        await tempFile.write(inputData.caption);
+
+        await fs.copyFile(
+          path.join(inputPath, image),
+          path.join(tempInputPath, image),
+        );
+      }
+    }
 
     const mainPath = path.join(
       baseDir,
@@ -102,7 +130,7 @@ export class Kohya extends EventEmitter {
           subsets: [
             {
               num_repeats: settings.dataset.repeats,
-              image_dir: inputPath,
+              image_dir: tempInputPath,
             },
           ],
         },
@@ -155,6 +183,7 @@ export class Kohya extends EventEmitter {
     proc.on('close', () => {
       this.emit('event', { event: 'training.end', data: { projectId } });
       delete this.processes[projectId];
+      rimraf(tempPath).catch(() => {});
     });
 
     this.processes[projectId] = proc;

@@ -2,17 +2,18 @@ import path from 'path';
 import fs from 'fs/promises';
 import { rimraf } from 'rimraf';
 import { Project, ProjectInfo } from '@metastable/types';
+import sharp from 'sharp';
 
 import {
   freeDirName,
   filenames,
+  imageFilenames,
   JSONFile,
   TextFile,
   directorySize,
   exists,
+  IMAGE_EXTENSIONS,
 } from '../helpers/fs.js';
-import { IMAGE_EXTENSIONS } from './consts.js';
-import sharp from 'sharp';
 
 export class Projects {
   constructor(private projectsDir: string) {}
@@ -76,14 +77,7 @@ export class Projects {
   }
 
   private async imageFilenames(id: Project['id'], ...paths: string[]) {
-    return (await this.filenames(id, ...paths)).filter(name => {
-      if (name.includes('thumb')) {
-        return false;
-      }
-
-      const split = name.split('.');
-      return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
-    });
+    return await imageFilenames(this.path(id, ...paths));
   }
 
   async inputs(id: Project['id']) {

@@ -7,8 +7,8 @@ import {
   walk,
   JSONFile,
   removeFileExtension,
+  IMAGE_EXTENSIONS,
 } from '../helpers/fs.js';
-import { IMAGE_EXTENSIONS } from './consts.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
 const MODEL_TYPES = Object.values(ModelType);
