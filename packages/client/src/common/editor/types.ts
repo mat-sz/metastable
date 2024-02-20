@@ -47,11 +47,6 @@ export interface Size {
   height: number;
 }
 
-export interface Rect extends Point {
-  w: number;
-  h: number;
-}
-
 export interface EditorState {
   layers: Layer[];
   currentLayerId?: string;

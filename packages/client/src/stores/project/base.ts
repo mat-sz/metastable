@@ -57,7 +57,6 @@ export class BaseProject<T = any> {
 
   async refreshInputs() {
     const inputs = await API.projects.inputs(this.id);
-    console.log(inputs);
 
     if (inputs) {
       runInAction(() => {
