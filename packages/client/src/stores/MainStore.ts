@@ -163,7 +163,9 @@ class MainStore {
       split.pop();
       split.push('thumb', 'jpg');
     }
-    return getStaticUrl(`/projects/${projectId}/${type}/${split.join('.')}`);
+    return getStaticUrl(
+      `/projects/${projectId}/${type}/.metastable/${split.join('.')}`,
+    );
   }
 
   pushLog(item: ComfyLogItem) {

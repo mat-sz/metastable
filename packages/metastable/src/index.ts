@@ -48,6 +48,7 @@ export class Metastable extends EventEmitter {
         const settingsPath = this.storage.projects.path(
           event.data.project_id,
           'output',
+          '.metastable',
           `${filename}.json`,
         );
         await fs.writeFile(settingsPath, settings);

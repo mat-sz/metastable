@@ -211,7 +211,13 @@ export class DownloadModelTask extends BaseDownloadTask {
           }
 
           if (ext) {
-            const writeStream = createWriteStream(`${this.savePath}.${ext}`);
+            const writeStream = createWriteStream(
+              path.join(
+                path.dirname(this.savePath),
+                '.metastable',
+                `${path.basename(this.savePath)}.${ext}`,
+              ),
+            );
             data.pipe(writeStream);
           }
         } catch {}

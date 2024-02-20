@@ -12,7 +12,7 @@ import {
   TextFile,
   directorySize,
   exists,
-  IMAGE_EXTENSIONS,
+  tryMkdir,
 } from '../helpers/fs.js';
 
 export class Projects {
@@ -86,7 +86,7 @@ export class Projects {
 
   async getInputMetadata(id: Project['id'], inputName: string) {
     const metadataFile = new JSONFile<any>(
-      this.path(id, `${inputName}.json`),
+      this.path(id, '.metastable', `${inputName}.json`),
       {},
     );
     return await metadataFile.readJson();
@@ -94,7 +94,7 @@ export class Projects {
 
   async setInputMetadata(id: Project['id'], inputName: string, metadata: any) {
     const metadataFile = new JSONFile<any>(
-      this.path(id, `${inputName}.json`),
+      this.path(id, '.metastable', `${inputName}.json`),
       {},
     );
     return await metadataFile.writeJson(metadata);
@@ -111,7 +111,7 @@ export class Projects {
     if (split.length > 1) {
       split.pop();
       const thumbName = split.join('.') + '.thumb.jpg';
-      return path.join(dirName, thumbName);
+      return path.join(dirName, '.metastable', thumbName);
     }
 
     return undefined;
@@ -122,6 +122,10 @@ export class Projects {
 
     if (thumbPath) {
       if (await exists(thumbPath)) {
+        return;
+      }
+
+      if (!(await tryMkdir(path.dirname(thumbPath)))) {
         return;
       }
 

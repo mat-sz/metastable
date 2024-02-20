@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs/promises';
+import fs, { mkdir } from 'fs/promises';
 import { FileInfo } from '@metastable/types';
 
 export const IMAGE_EXTENSIONS = [
@@ -206,4 +206,13 @@ export function removeFileExtension(string: string): string {
   const split = string.split('.');
   split.pop();
   return split.join('.');
+}
+
+export async function tryMkdir(path: string): Promise<boolean> {
+  try {
+    await mkdir(path, { recursive: true });
+    return true;
+  } catch {
+    return false;
+  }
 }

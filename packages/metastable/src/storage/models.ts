@@ -1,4 +1,4 @@
-import path, { basename } from 'path';
+import path from 'path';
 import fs from 'fs/promises';
 import { FileInfo, Model, ModelType } from '@metastable/types';
 
@@ -8,6 +8,7 @@ import {
   JSONFile,
   removeFileExtension,
   IMAGE_EXTENSIONS,
+  exists,
 } from '../helpers/fs.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
@@ -22,10 +23,12 @@ export class Models {
 
   private modelFile(
     type: string,
-    filename: string,
+    ...parts: string[]
   ): JSONFile<Omit<Model, 'file' | 'image'>> {
-    return new JSONFile(this.path(type, `${filename}.json`), {
-      name: filename,
+    const name = parts[parts.length - 1];
+    parts[parts.length - 1] += '.json';
+    return new JSONFile(this.metaPath(type, ...parts), {
+      name,
     });
   }
 
@@ -58,27 +61,28 @@ export class Models {
       if (files.length) {
         models[dir.name] = [];
         for (const file of files) {
-          const name = file.name;
-
-          if (!isModel(name)) {
+          const base = path.basename(file.name);
+          if (!isModel(base)) {
             continue;
           }
 
           let data: Partial<Model> & { name: string } = {
-            name: removeFileExtension(basename(file.name)),
+            name: removeFileExtension(base),
           };
 
-          if (fileNames.includes(`${name}.json`)) {
-            const modelFile = this.modelFile(dir.name, name);
-            data = {
-              ...data,
-              ...(await modelFile.readJson()),
-            };
-          }
+          const modelFile = this.modelFile(dir.name, ...file.parts, base);
+          data = {
+            ...data,
+            ...(await modelFile.readJson()),
+          };
 
           for (const extension of IMAGE_EXTENSIONS) {
-            if (fileNames.includes(`${name}.${extension}`)) {
-              data.image = `${name}.${extension}`;
+            if (
+              await exists(
+                this.metaPath(dir.name, ...file.parts, `${base}.${extension}`),
+              )
+            ) {
+              data.image = `${base}.${extension}`;
               break;
             }
           }
@@ -136,8 +140,14 @@ export class Models {
     return path.join(this.modelsDir, type);
   }
 
-  path(type: string, name: string) {
+  path(type: string, ...parts: string[]) {
     const modelsDir = this.modelsDir;
-    return path.join(modelsDir, type, name);
+    return path.join(modelsDir, type, ...parts);
+  }
+
+  metaPath(type: string, ...parts: string[]) {
+    const modelsDir = this.modelsDir;
+    const last = parts.pop()!;
+    return path.join(modelsDir, type, ...parts, '.metastable', last);
   }
 }

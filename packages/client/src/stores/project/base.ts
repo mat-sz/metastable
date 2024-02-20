@@ -91,7 +91,9 @@ export class BaseProject<T = any> {
       split.pop();
       split.push('thumb', 'jpg');
     }
-    return getStaticUrl(`/projects/${this.id}/${type}/${split.join('.')}`);
+    return getStaticUrl(
+      `/projects/${this.id}/${type}/.metastable/${split.join('.')}`,
+    );
   }
 
   onPromptDone(outputFilenames: string[]) {
