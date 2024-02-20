@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsPlus } from 'react-icons/bs';
+import { nanoid } from 'nanoid';
 
 import { FilePicker } from '@components/filePicker';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
 import { FileManager } from './fileManager';
+import { UploadQueue, UploadQueueItem } from './UploadQueue';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
   const inputs = [...project.allInputs].reverse();
-  const [files, setFiles] = useState<File[]>([]);
+  const [queue, setQueue] = useState<UploadQueueItem[]>([]);
 
   const items = inputs.map(filename => ({
     id: filename,
@@ -22,21 +24,32 @@ export const Images: React.FC = observer(() => {
   return (
     <div className={styles.main}>
       <div className={styles.images}>
-        <div className={styles.upload}>
-          <span>
-            {files.length} selected / {project.uploadQueue.length} queued
-          </span>
-          <button
-            onClick={() => {
-              for (const file of files) {
-                project.addInput(file);
+        {!!queue.length && (
+          <UploadQueue
+            items={queue.map(item => ({
+              ...item,
+              state: project.uploadQueue.includes(item.file)
+                ? 'uploading'
+                : item.state,
+            }))}
+            onStart={() => {
+              for (const item of queue) {
+                project.addInput(item.file);
+                URL.revokeObjectURL(item.url);
               }
-              setFiles([]);
+
+              setQueue(queue =>
+                queue.map(item => ({ ...item, state: 'done' })),
+              );
             }}
-          >
-            Upload
-          </button>
-        </div>
+            onReset={() => {
+              setQueue([]);
+            }}
+            onRemove={id => {
+              setQueue(queue => queue.filter(item => item.id !== id));
+            }}
+          />
+        )}
         <FileManager
           items={items}
           actions={
@@ -45,7 +58,16 @@ export const Images: React.FC = observer(() => {
                 dropzone
                 paste
                 onFiles={files => {
-                  setFiles(current => [...files, ...current]);
+                  setQueue(queue => [
+                    ...files
+                      .map(file => ({
+                        id: nanoid(),
+                        file,
+                        url: URL.createObjectURL(file),
+                      }))
+                      .reverse(),
+                    ...queue,
+                  ]);
                 }}
               >
                 {state => (
