@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { BsPlus } from 'react-icons/bs';
 
+import { FilePicker } from '@components/filePicker';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
@@ -21,16 +23,6 @@ export const Images: React.FC = observer(() => {
     <div className={styles.main}>
       <div className={styles.images}>
         <div className={styles.upload}>
-          <input
-            type="file"
-            multiple
-            onChange={e => {
-              if (e.target.files) {
-                setFiles([...e.target.files]);
-              }
-              e.target.value = '';
-            }}
-          />
           <span>
             {files.length} selected / {project.uploadQueue.length} queued
           </span>
@@ -45,7 +37,27 @@ export const Images: React.FC = observer(() => {
             Upload
           </button>
         </div>
-        <FileManager items={items} />
+        <FileManager
+          items={items}
+          actions={
+            <>
+              <FilePicker
+                dropzone
+                paste
+                onFiles={files => {
+                  setFiles(current => [...files, ...current]);
+                }}
+              >
+                {state => (
+                  <button onClick={state.open}>
+                    <BsPlus />
+                    <span>Add files</span>
+                  </button>
+                )}
+              </FilePicker>
+            </>
+          }
+        />
       </div>
       <Settings />
     </div>

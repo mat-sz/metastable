@@ -1,0 +1,17 @@
+.overlay {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+
+  .dropzone {
+    background: var(--color-bg-panel);
+    border: 3px dashed var(--color-bg-panel-dark);
+    max-width: 500px;
+    color: var(--color-fg-main);
+    overflow: hidden;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 0.5rem;
+  }
+}
