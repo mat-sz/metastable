@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useMediaQuery } from '@utils/useMediaQuery';
+import { useMediaQuery } from '@hooks/useMediaQuery';
 import styles from './Main.module.scss';
 import { Header as DesktopHeader } from './desktop/Header';
 import { Header as MobileHeader } from './mobile/Header';
