@@ -182,8 +182,18 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     }
 
     this.save();
-    const { id } = await API.prompts.create(this.id, settings);
-    mainStore.promptQueue.push({ projectId: this.id, id, value: 0, max: 0 });
+    const result = await API.project.prompt.mutate({
+      projectId: this.id,
+      settings,
+    });
+    if (result) {
+      mainStore.promptQueue.push({
+        projectId: this.id,
+        id: result.id,
+        value: 0,
+        max: 0,
+      });
+    }
   }
 
   addLora(name: string, strength = 1) {

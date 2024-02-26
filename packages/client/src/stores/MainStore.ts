@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { TypeSocket } from 'typesocket';
 import {
   ModelType,
   ComfyLogItem,
@@ -13,22 +12,15 @@ import {
 } from '@metastable/types';
 
 import { API } from '@api';
-import { IS_ELECTRON } from '@utils/config';
-import { getStaticUrl, getUrl } from '@utils/url';
+import { getStaticUrl } from '@utils/url';
 import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
 import { ConfigStore } from './ConfigStore';
 
-declare global {
-  // eslint-disable-next-line
-  var _socket: TypeSocket<any> | undefined;
-}
-
 class MainStore {
   projects = new ProjectStore();
   connected = false;
-  private socket;
   info: InstanceInfo = {
     samplers: [],
     schedulers: [],
@@ -63,33 +55,14 @@ class MainStore {
   constructor() {
     makeAutoObservable(this);
 
-    if (IS_ELECTRON) {
-      window.electronAPI.ready();
-      window.electronAPI.onEvent((event: any) => this.onMessage(event));
-      window.electronWindow.onMaximized((isMaximized: boolean) =>
-        runInAction(() => (this.isMaximized = isMaximized)),
-      );
-      this.connected = true;
-    } else {
-      this.socket = new TypeSocket<AnyEvent>(getUrl('/ws', 'ws'), {
-        maxRetries: 0,
-        retryOnClose: true,
-        retryTime: 1000,
-      });
-
-      // Make sure we don't have any lingering connections when the app reloads.
-      window._socket?.disconnect();
-      window._socket = this.socket;
-
-      this.socket.on('connected', () => this.onConnected());
-      this.socket.on('disconnected', () => this.onDisconnected());
-      this.socket.on('message', message => {
-        runInAction(() => {
-          this.onMessage(message);
-        });
-      });
-      this.socket.connect();
-    }
+    // if (IS_ELECTRON) {
+    //   window.electronAPI.ready();
+    //   window.electronAPI.onEvent((event: any) => this.onMessage(event));
+    //   window.electronWindow.onMaximized((isMaximized: boolean) =>
+    //     runInAction(() => (this.isMaximized = isMaximized)),
+    //   );
+    //   this.connected = true;
+    // }
 
     this.init();
   }
@@ -118,15 +91,34 @@ class MainStore {
     return this.projects.current;
   }
 
+  async subscribe() {
+    API.instance.onEvent.subscribe(undefined, {
+      onData: data => {
+        this.onMessage(data as any);
+      },
+      onStarted: () => {
+        runInAction(() => {
+          this.connected = true;
+        });
+      },
+      onStopped: () => {
+        runInAction(() => {
+          this.connected = false;
+        });
+      },
+    });
+  }
+
   async init() {
     await this.refresh();
+    this.subscribe();
     runInAction(() => {
       this.infoReady = true;
     });
   }
 
   async refresh() {
-    const data = await API.instance.info();
+    const data = await API.instance.info.query();
     runInAction(() => {
       this.info = data;
     });
@@ -237,9 +229,6 @@ class MainStore {
         for (const item of message.data) {
           this.pushLog(item);
         }
-        break;
-      case 'ping':
-        this.socket?.send({ event: 'ping', data: Date.now() });
         break;
       case 'info.torch':
         this.torchInfo = message.data;

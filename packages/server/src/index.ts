@@ -4,7 +4,17 @@ import fastifyWebsocket from '@fastify/websocket';
 import fastifyStatic from '@fastify/static';
 import fastifyCompress from '@fastify/compress';
 import fastifyMultipart from '@fastify/multipart';
-import { Metastable } from '@metastable/metastable';
+import {
+  fastifyTRPCPlugin,
+  FastifyTRPCPluginOptions,
+  CreateFastifyContextOptions,
+} from '@trpc/server/adapters/fastify';
+import {
+  initializeMetastable,
+  Metastable,
+  router,
+  Router,
+} from '@metastable/metastable';
 
 import {
   host,
@@ -14,21 +24,14 @@ import {
   dataRoot,
   skipPythonSetup,
 } from './config.js';
-import { routesProjects } from './routes/projects.js';
-import { routesModels } from './routes/models.js';
-import { routesPrompts } from './routes/prompts.js';
-import { routesDownloads } from './routes/downloads.js';
-import { routesInstance } from './routes/instance.js';
-import { routesSetup } from './routes/setup.js';
-import { ClientManager } from './ws.js';
-import { routesTasks } from './routes/tasks.js';
 
 const metastable = new Metastable(dataRoot, { skipPythonSetup });
-const clientManager = new ClientManager();
+
+initializeMetastable(metastable);
 
 await metastable.init();
 
-const app = Fastify();
+const app = Fastify({ maxParamLength: 5000 });
 app.register(fastifyCompress);
 
 const maxAge = 30 * 24 * 60 * 60 * 1000;
@@ -73,26 +76,25 @@ if (useProxy) {
   });
 }
 
-metastable.on('event', event => {
-  clientManager.broadcast(event);
-});
-
 app.register(fastifyMultipart);
 app.register(fastifyWebsocket);
-app.register(async function (fastify) {
-  fastify.get('/ws', { websocket: true }, connection => {
-    const client = clientManager.add(connection.socket);
-    metastable.replayEvents(event => client.send(event));
-  });
-});
 
-app.register(routesInstance(metastable), { prefix: '/instance' });
-app.register(routesSetup(metastable), { prefix: '/setup' });
-app.register(routesProjects(metastable), { prefix: '/projects' });
-app.register(routesModels(metastable), { prefix: '/models' });
-app.register(routesPrompts(metastable), { prefix: '/prompts' });
-app.register(routesDownloads(metastable), { prefix: '/downloads' });
-app.register(routesTasks(metastable), { prefix: '/tasks' });
+function createContext({ req, res }: CreateFastifyContextOptions) {
+  return { req, res };
+}
+
+app.register(fastifyTRPCPlugin, {
+  prefix: '/trpc',
+  useWSS: true,
+  trpcOptions: {
+    router: router,
+    createContext,
+    onError({ path, error }) {
+      // report to error monitoring
+      console.error(`Error in tRPC handler on path '${path}':`, error);
+    },
+  } satisfies FastifyTRPCPluginOptions<Router>['trpcOptions'],
+});
 
 app.listen({ host, port });
 

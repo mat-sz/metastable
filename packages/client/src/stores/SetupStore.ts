@@ -40,7 +40,7 @@ export class SetupStore {
   async init() {
     this.refresh();
 
-    const details = await API.setup.details();
+    const details = await API.setup.details.query();
     runInAction(() => {
       this.details = details;
       const gpus = [...this.details.graphics]
@@ -52,7 +52,7 @@ export class SetupStore {
   }
 
   async refresh() {
-    const status = await API.setup.status();
+    const status = await API.setup.status.query();
     runInAction(() => {
       this.status = status;
     });
@@ -70,7 +70,7 @@ export class SetupStore {
       }
     }
 
-    API.setup.start({
+    API.setup.start.mutate({
       pythonMode: this.pythonMode,
       downloads: this.downloads,
       torchMode,

@@ -29,8 +29,10 @@
   },
   "dependencies": {
     "@metastable/metastable": "*",
+    "@trpc/client": "^11.0.0-next-beta.294",
     "ansi-to-react": "^6.1.6",
     "clsx": "^2.0.0",
+    "electron-trpc": "^0.5.2",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
     "mobx": "^6.10.2",
@@ -46,7 +48,6 @@
     "react-var-ui": "^1.5.1",
     "sass": "^1.66.1",
     "swr": "^2.2.4",
-    "typesocket": "^1.1.0",
     "use-context-menu": "^0.4.13"
   },
   "devDependencies": {

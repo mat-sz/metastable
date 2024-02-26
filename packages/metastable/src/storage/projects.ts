@@ -38,7 +38,7 @@ export class Projects {
 
   async all() {
     const items = await fs.readdir(this.projectsDir, { withFileTypes: true });
-    const projects: Pick<Project, 'name' | 'lastOutput' | 'id'>[] = [];
+    const projects: Pick<Project, 'name' | 'type' | 'lastOutput' | 'id'>[] = [];
 
     for (const item of items) {
       if (item.isDirectory()) {

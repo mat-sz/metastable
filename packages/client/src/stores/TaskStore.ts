@@ -22,9 +22,9 @@ export class TaskStore {
   }
 
   async refresh() {
-    const queues = await API.tasks.all();
+    const queues = await API.task.all.query();
     runInAction(() => {
-      this.queues = queues;
+      this.queues = queues as any;
     });
   }
 
@@ -37,7 +37,7 @@ export class TaskStore {
   }
 
   async cancel(queueId: string, taskId: string) {
-    await API.tasks.cancel(queueId, taskId);
+    await API.task.cancel.mutate({ queueId, taskId });
   }
 
   get downloads(): Task<DownloadData>[] {
@@ -45,13 +45,13 @@ export class TaskStore {
   }
 
   async dismiss(queueId: string, taskId: string) {
-    await API.tasks.dismiss(queueId, taskId);
+    await API.task.dismiss.mutate({ queueId, taskId });
   }
 
   async download(settings: DownloadSettings) {
     this.waiting.add(settings.name);
 
-    await API.downloads.create(settings);
+    await API.download.create.mutate(settings);
     runInAction(() => {
       this.waiting.delete(settings.name);
     });

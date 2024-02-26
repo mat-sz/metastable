@@ -7,7 +7,7 @@ import {
 } from 'react-icons/vsc';
 import { observer } from 'mobx-react-lite';
 
-import { ElectronWindow } from '@api/electron';
+import { ElectronWindow } from '@api';
 import { mainStore } from '@stores/MainStore';
 import { IS_ELECTRON, IS_MAC } from '@utils/config';
 import styles from './Header.module.scss';

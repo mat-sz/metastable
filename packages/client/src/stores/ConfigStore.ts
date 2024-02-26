@@ -16,14 +16,14 @@ export class ConfigStore {
   }
 
   async refresh() {
-    const data = await API.config.all();
+    const data = await API.instance.config.get.query();
     runInAction(() => {
       this.data = data;
     });
   }
 
   async store(data: ConfigType) {
-    const newData = await API.config.store(data);
+    const newData = await API.instance.config.set.mutate(data);
     runInAction(() => {
       this.data = newData;
     });

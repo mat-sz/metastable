@@ -92,7 +92,7 @@ export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
               color={stringToColor(removeFileExtension(item.file.name))}
               imageUrl={
                 item.image
-                  ? getStaticUrl(`/models/${type}/${item.image}`)
+                  ? getStaticUrl(`/models/${type}/.metastable/${item.image}`)
                   : undefined
               }
               onClick={() => {

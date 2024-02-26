@@ -382,3 +382,5 @@ export class Metastable extends EventEmitter {
     };
   }
 }
+
+export * from './trpc.js';

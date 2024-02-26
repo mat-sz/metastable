@@ -1,60 +1,8 @@
-import { Project } from '@metastable/types';
+import { exposeElectronTRPC } from 'electron-trpc/main';
 import { contextBridge, ipcRenderer } from 'electron';
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  onEvent: (callback: (event: any) => void) =>
-    ipcRenderer.on('event', (_: any, value: any) => callback(value)),
-  ready: () => ipcRenderer.send('ready'),
-  instance: {
-    info: () => ipcRenderer.invoke('instance:info'),
-    restart: () => ipcRenderer.invoke('instance:restart'),
-  },
-  config: {
-    all: () => ipcRenderer.invoke('config:all'),
-    store: (config: any) => ipcRenderer.invoke('config:store', config),
-  },
-  setup: {
-    status: () => ipcRenderer.invoke('setup:status'),
-    details: () => ipcRenderer.invoke('setup:details'),
-    start: (settings: any) => ipcRenderer.invoke('setup:start', settings),
-  },
-  projects: {
-    all: () => ipcRenderer.invoke('projects:all'),
-    get: (id: Project['id']) => ipcRenderer.invoke('projects:get', id),
-    inputs: (id: Project['id']) => ipcRenderer.invoke('projects:inputs', id),
-    getInputMetadata: (id: Project['id'], name: string) =>
-      ipcRenderer.invoke('projects:inputs:getMetadata', id, name),
-    setInputMetadata: (id: Project['id'], name: string, metadata: any) =>
-      ipcRenderer.invoke('projects:inputs:setMetadata', id, name, metadata),
-    upload: async (id: Project['id'], file: File) =>
-      ipcRenderer.invoke(
-        'projects:upload',
-        id,
-        Buffer.from(await file.arrayBuffer()),
-        file.name.split('.').pop() || '',
-      ),
-    outputs: (id: Project['id']) => ipcRenderer.invoke('projects:outputs', id),
-    create: (data: any) => ipcRenderer.invoke('projects:create', data),
-    update: (id: Project['id'], data: any) =>
-      ipcRenderer.invoke('projects:update', id, data),
-  },
-  downloads: {
-    create: (data: any) => ipcRenderer.invoke('downloads:create', data),
-    cancel: (id: string) => ipcRenderer.invoke('downloads:cancel', id),
-  },
-  prompts: {
-    create: (projectId: Project['id'], settings: any) =>
-      ipcRenderer.invoke('prompts:create', projectId, settings),
-  },
-  tasks: {
-    all: () => ipcRenderer.invoke('tasks:all'),
-    queue: (queueId: string) => ipcRenderer.invoke('tasks:queue', queueId),
-    cancel: (queueId: string, taskId: string) =>
-      ipcRenderer.invoke('tasks:cancel', queueId, taskId),
-    dismiss: (queueId: string, taskId: string) =>
-      ipcRenderer.invoke('tasks:dismiss', queueId, taskId),
-  },
-  isMac: process.platform === 'darwin',
+process.once('loaded', async () => {
+  exposeElectronTRPC();
 });
 
 contextBridge.exposeInMainWorld('electronWindow', {

@@ -27,7 +27,7 @@ export const General: React.FC = observer(() => {
   return (
     <>
       <div className={styles.actions}>
-        <button onClick={() => API.instance.restart()}>
+        <button onClick={() => API.instance.restart.mutate()}>
           <BsArrowClockwise />
           <span>Restart backend</span>
         </button>

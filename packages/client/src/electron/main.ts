@@ -1,9 +1,13 @@
 import path from 'node:path';
-import url from 'node:url';
 import os from 'node:os';
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
-import { Project } from '@metastable/types';
-import { Metastable } from '@metastable/metastable';
+import { createIPCHandler } from 'electron-trpc/main';
+
+import {
+  initializeMetastable,
+  Metastable,
+  router,
+} from '@metastable/metastable';
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -95,6 +99,7 @@ async function createWindow() {
     'main.py',
   );
   const metastable = new Metastable(dataRoot, { comfyMainPath });
+  initializeMetastable(metastable);
   await metastable.init();
 
   const win = new BrowserWindow({
@@ -116,12 +121,9 @@ async function createWindow() {
     },
   });
 
-  metastable.on('event', async event => {
-    win.webContents.send('event', event);
-  });
+  createIPCHandler({ router, windows: [win] });
 
   ipcMain.on('ready', () => {
-    metastable.replayEvents(event => win.webContents.send('event', event));
     win.webContents.send('window:maximized', win.isMaximized());
   });
 
@@ -140,96 +142,6 @@ async function createWindow() {
   win.on('resize', () => {
     win.webContents.send('window:maximized', win.isMaximized());
   });
-
-  ipcMain.handle('instance:info', async () => {
-    return {
-      ...(await metastable.info()),
-      dataDir: url.pathToFileURL(dataRoot).toString(),
-    };
-  });
-  ipcMain.handle('instance:restart', async () => {
-    await metastable.restartComfy();
-  });
-
-  ipcMain.handle('config:all', async () => {
-    return await metastable.storage.config.all();
-  });
-  ipcMain.handle('config:store', async (_, config: any) => {
-    return await metastable.storage.config.store(config);
-  });
-
-  ipcMain.handle('setup:status', async () => {
-    return await metastable.setup.status();
-  });
-  ipcMain.handle('setup:details', async () => {
-    return await metastable.setup.details();
-  });
-  ipcMain.handle('setup:start', async (_, settings: any) => {
-    return await metastable.setup.start(settings);
-  });
-  ipcMain.handle(
-    'prompts:create',
-    async (_, id: Project['id'], settings: any) => {
-      return await metastable.prompt(id, settings);
-    },
-  );
-
-  ipcMain.handle('projects:all', async () => {
-    return await metastable.storage.projects.all();
-  });
-  ipcMain.handle('projects:create', async (_, data: any) => {
-    return await metastable.storage.projects.create(data);
-  });
-  ipcMain.handle('projects:get', async (_, id: Project['id']) => {
-    return await metastable.storage.projects.get(id);
-  });
-  ipcMain.handle('projects:update', async (_, id: Project['id'], data: any) => {
-    return await metastable.storage.projects.update(id, data);
-  });
-  ipcMain.handle('projects:inputs', async (_, id: Project['id']) => {
-    return await metastable.storage.projects.inputs(id);
-  });
-  ipcMain.handle(
-    'projects:inputs:getMetadata',
-    async (_, id: Project['id'], name: string) => {
-      return await metastable.storage.projects.getInputMetadata(id, name);
-    },
-  );
-  ipcMain.handle(
-    'projects:inputs:setMetadata',
-    async (_, id: Project['id'], name: string, metadata: any) => {
-      return await metastable.storage.projects.setInputMetadata(
-        id,
-        name,
-        metadata,
-      );
-    },
-  );
-  ipcMain.handle(
-    'projects:upload',
-    async (_, id: Project['id'], buffer: Buffer, ext: string) => {
-      return await metastable.storage.projects.upload(id, buffer, ext);
-    },
-  );
-  ipcMain.handle('projects:outputs', async (_, id: Project['id']) => {
-    return await metastable.storage.projects.outputs(id);
-  });
-
-  ipcMain.handle('tasks:all', async () => {
-    return metastable.tasks.all();
-  });
-  ipcMain.handle('tasks:queue', async (_, queueId: string) => {
-    return metastable.tasks.queue(queueId);
-  });
-  ipcMain.handle('tasks:cancel', async (_, queueId: string, taskId: string) => {
-    return metastable.tasks.cancel(queueId, taskId);
-  });
-  ipcMain.handle(
-    'tasks:dismiss',
-    async (_, queueId: string, taskId: string) => {
-      return metastable.tasks.dismiss(queueId, taskId);
-    },
-  );
 
   win.setMenu(null);
 

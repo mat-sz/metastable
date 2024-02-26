@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { action, makeObservable, observable, toJS } from 'mobx';
 import {
   Project as APIProject,
   ProjectTrainingSettings,
@@ -71,18 +71,18 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   }
 
   private async handleUploadQueue() {
-    const file = this.uploadQueue.pop();
-    if (file) {
-      try {
-        const names = await API.projects.upload(this.id, file);
-        if (names) {
-          runInAction(() => {
-            this.allInputs.push(...names);
-          });
-        }
-      } catch {}
-      this.handleUploadQueue();
-    }
+    // const file = this.uploadQueue.pop();
+    // if (file) {
+    //   try {
+    //     const names = await API.projects.upload(this.id, file);
+    //     if (names) {
+    //       runInAction(() => {
+    //         this.allInputs.push(...names);
+    //       });
+    //     }
+    //   } catch {}
+    //   this.handleUploadQueue();
+    // }
   }
 
   setSettings(settings: ProjectTrainingSettings) {
@@ -90,13 +90,13 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   }
 
   async cancel() {
-    await API.projects.stopTraining(this.id);
+    await API.project.training.stop.mutate({ projectId: this.id });
   }
 
   async request() {
     const settings = toJS(this.settings);
     this.save();
     mainStore.trainingQueue.push({ id: this.id });
-    await API.projects.train(this.id, settings);
+    await API.project.training.start.mutate({ projectId: this.id, settings });
   }
 }

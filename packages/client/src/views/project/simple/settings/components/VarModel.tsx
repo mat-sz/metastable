@@ -80,7 +80,9 @@ export const VarModel = observer(
                 >
                   {model.image && (
                     <img
-                      src={getStaticUrl(`/models/${modelType}/${model.image}`)}
+                      src={getStaticUrl(
+                        `/models/${modelType}/.metastable/${model.image}`,
+                      )}
                     />
                   )}
                 </div>

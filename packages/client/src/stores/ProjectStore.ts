@@ -30,9 +30,13 @@ export class ProjectStore {
   }
 
   async refresh() {
-    const json = await API.projects.all();
+    const json = await API.project.all.query();
+    if (!json) {
+      return;
+    }
+
     runInAction(() => {
-      this.all = json;
+      this.all = json as any;
 
       const recentArray = tryParse(localStorage.getItem(LS_RECENT)) || [];
       const recent: APIProject[] = Array.isArray(recentArray)
@@ -42,7 +46,7 @@ export class ProjectStore {
             .filter(item => !!item) as APIProject[])
         : [];
       this.recent =
-        recent.length > 0 ? recent : json.slice(0, MAX_RECENT_ITEMS);
+        recent.length > 0 ? recent : (json.slice(0, MAX_RECENT_ITEMS) as any);
     });
   }
 
@@ -71,7 +75,7 @@ export class ProjectStore {
       settings: JSON.stringify(settings),
     };
 
-    const json = await API.projects.create(project);
+    const json = await API.project.create.mutate(project);
 
     runInAction(() => {
       this.projects.push(createProject(json, settings));
@@ -83,12 +87,16 @@ export class ProjectStore {
   }
 
   async open(id: APIProject['id']) {
-    const json = await API.projects.get(id);
+    const json = await API.project.get.query({ projectId: id });
+    if (!json) {
+      return;
+    }
+
     const settings = json.settings
       ? JSON.parse(json.settings)
       : defaultSettings();
 
-    const project = createProject(json, settings);
+    const project = createProject(json as any, settings);
     runInAction(() => {
       this.projects = [
         ...this.projects.filter(project => project.id !== id),

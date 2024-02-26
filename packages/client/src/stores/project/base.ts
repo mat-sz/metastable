@@ -42,21 +42,26 @@ export class BaseProject<T = any> {
   }
 
   async rename(name: string) {
-    const json = await API.projects.update(this.id, { name });
-    this.id = json.id;
-    this.name = json.name;
+    const json = await API.project.update.mutate({ projectId: this.id, name });
+    if (json) {
+      runInAction(() => {
+        this.id = json.id;
+        this.name = json.name;
+      });
+    }
   }
 
   async save() {
     const settings = toJS(this.settings);
 
-    await API.projects.update(this.id, {
+    await API.project.update.mutate({
+      projectId: this.id,
       settings: JSON.stringify(settings),
     });
   }
 
   async refreshInputs() {
-    const inputs = await API.projects.inputs(this.id);
+    const inputs = await API.project.input.all.query({ projectId: this.id });
 
     if (inputs) {
       runInAction(() => {
@@ -66,7 +71,7 @@ export class BaseProject<T = any> {
   }
 
   async refreshOutputs() {
-    const outputs = await API.projects.outputs(this.id);
+    const outputs = await API.project.output.all.query({ projectId: this.id });
 
     if (outputs) {
       runInAction(() => {
