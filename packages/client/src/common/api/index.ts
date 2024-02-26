@@ -9,6 +9,8 @@ declare global {
   interface Window {
     electronWindow?: any;
     dataDir?: string;
+    wsOnOpen?: () => void;
+    wsOnClose?: () => void;
   }
 }
 
@@ -17,6 +19,12 @@ const link = IS_ELECTRON
   : wsLink({
       client: createWSClient({
         url: getUrl('/trpc', 'ws'),
+        onOpen: () => {
+          window.wsOnOpen?.();
+        },
+        onClose: () => {
+          window.wsOnClose?.();
+        },
       }),
     });
 

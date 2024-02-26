@@ -63,6 +63,21 @@ class MainStore {
     //   );
     //   this.connected = true;
     // }
+    window.wsOnOpen = () => {
+      runInAction(() => {
+        this.connected = true;
+      });
+    };
+    window.wsOnClose = () => {
+      runInAction(() => {
+        this.connected = false;
+      });
+    };
+    API.instance.onEvent.subscribe(undefined, {
+      onData: data => {
+        this.onMessage(data as any);
+      },
+    });
 
     this.init();
   }
@@ -91,27 +106,8 @@ class MainStore {
     return this.projects.current;
   }
 
-  async subscribe() {
-    API.instance.onEvent.subscribe(undefined, {
-      onData: data => {
-        this.onMessage(data as any);
-      },
-      onStarted: () => {
-        runInAction(() => {
-          this.connected = true;
-        });
-      },
-      onStopped: () => {
-        runInAction(() => {
-          this.connected = false;
-        });
-      },
-    });
-  }
-
   async init() {
     await this.refresh();
-    this.subscribe();
     runInAction(() => {
       this.infoReady = true;
     });
