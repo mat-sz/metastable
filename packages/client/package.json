@@ -3,7 +3,6 @@
   "displayName": "Metastable",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
     "dev": "vite",
@@ -32,7 +31,6 @@
     "@trpc/client": "^11.0.0-next-beta.294",
     "ansi-to-react": "^6.1.6",
     "clsx": "^2.0.0",
-    "electron-trpc": "^0.5.2",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
     "mobx": "^6.10.2",
@@ -48,6 +46,7 @@
     "react-var-ui": "^1.5.1",
     "sass": "^1.66.1",
     "swr": "^2.2.4",
+    "trpc-electron": "^0.1.0",
     "use-context-menu": "^0.4.13"
   },
   "devDependencies": {
@@ -57,8 +56,8 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
-    "electron": "^28.0.0",
-    "electron-builder": "24.9.1",
+    "electron": "^29.0.1",
+    "electron-builder": "24.12.0",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
@@ -69,7 +68,8 @@
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-bundle-visualizer": "^1.0.0",
-    "vite-plugin-electron": "^0.15.5",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "vite-plugin-electron": "^0.28.2",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-plugin-native": "^0.2.0"
   }
 }

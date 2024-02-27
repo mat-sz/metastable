@@ -17,6 +17,7 @@ import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
 import { ConfigStore } from './ConfigStore';
+import { IS_ELECTRON } from '@utils/config';
 
 class MainStore {
   projects = new ProjectStore();
@@ -55,24 +56,28 @@ class MainStore {
   constructor() {
     makeAutoObservable(this);
 
-    // if (IS_ELECTRON) {
-    //   window.electronAPI.ready();
-    //   window.electronAPI.onEvent((event: any) => this.onMessage(event));
-    //   window.electronWindow.onMaximized((isMaximized: boolean) =>
-    //     runInAction(() => (this.isMaximized = isMaximized)),
-    //   );
-    //   this.connected = true;
-    // }
-    window.wsOnOpen = () => {
-      runInAction(() => {
-        this.connected = true;
+    if (IS_ELECTRON) {
+      API.electron.window.onResize.subscribe(undefined, {
+        onData: ({ isMaximized }) => {
+          runInAction(() => {
+            this.isMaximized = isMaximized;
+          });
+        },
       });
-    };
-    window.wsOnClose = () => {
-      runInAction(() => {
-        this.connected = false;
-      });
-    };
+      this.connected = true;
+    } else {
+      window.wsOnOpen = () => {
+        runInAction(() => {
+          this.connected = true;
+        });
+      };
+      window.wsOnClose = () => {
+        runInAction(() => {
+          this.connected = false;
+        });
+      };
+    }
+
     API.instance.onEvent.subscribe(undefined, {
       onData: data => {
         this.onMessage(data as any);

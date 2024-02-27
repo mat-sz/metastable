@@ -1,13 +1,9 @@
 import path from 'node:path';
 import os from 'node:os';
-import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
-import { createIPCHandler } from 'electron-trpc/main';
+import { app, BrowserWindow, Menu, MenuItem } from 'electron';
+import { createIPCHandler } from 'trpc-electron/main';
 
-import {
-  initializeMetastable,
-  Metastable,
-  router,
-} from '@metastable/metastable';
+import { Metastable, router } from '@metastable/metastable';
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -99,7 +95,6 @@ async function createWindow() {
     'main.py',
   );
   const metastable = new Metastable(dataRoot, { comfyMainPath });
-  initializeMetastable(metastable);
   await metastable.init();
 
   const win = new BrowserWindow({
@@ -121,26 +116,12 @@ async function createWindow() {
     },
   });
 
-  createIPCHandler({ router, windows: [win] });
-
-  ipcMain.on('ready', () => {
-    win.webContents.send('window:maximized', win.isMaximized());
-  });
-
-  ipcMain.on('window:minimize', () => {
-    win.minimize();
-  });
-  ipcMain.on('window:maximize', () => {
-    win.maximize();
-  });
-  ipcMain.on('window:restore', () => {
-    win.unmaximize();
-  });
-  ipcMain.on('window:close', () => {
-    win.close();
-  });
-  win.on('resize', () => {
-    win.webContents.send('window:maximized', win.isMaximized());
+  createIPCHandler({
+    router,
+    windows: [win],
+    createContext: async () => {
+      return { metastable, win };
+    },
   });
 
   win.setMenu(null);

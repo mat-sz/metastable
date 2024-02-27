@@ -9,18 +9,16 @@ import {
 import { rimraf } from 'rimraf';
 import fs from 'fs/promises';
 import { ChildProcess } from 'child_process';
+import sharp from 'sharp';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
 import {
   JSONFile,
   TextFile,
-  exists,
-  filenames,
   imageFilenames,
   removeFileExtension,
 } from '../helpers/fs.js';
-import sharp from 'sharp';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

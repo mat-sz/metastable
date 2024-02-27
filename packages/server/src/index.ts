@@ -7,14 +7,8 @@ import fastifyMultipart from '@fastify/multipart';
 import {
   fastifyTRPCPlugin,
   FastifyTRPCPluginOptions,
-  CreateFastifyContextOptions,
 } from '@trpc/server/adapters/fastify';
-import {
-  initializeMetastable,
-  Metastable,
-  router,
-  Router,
-} from '@metastable/metastable';
+import { Metastable, router, Router } from '@metastable/metastable';
 
 import {
   host,
@@ -26,9 +20,6 @@ import {
 } from './config.js';
 
 const metastable = new Metastable(dataRoot, { skipPythonSetup });
-
-initializeMetastable(metastable);
-
 await metastable.init();
 
 const app = Fastify({ maxParamLength: 5000 });
@@ -79,16 +70,14 @@ if (useProxy) {
 app.register(fastifyMultipart);
 app.register(fastifyWebsocket);
 
-function createContext({ req, res }: CreateFastifyContextOptions) {
-  return { req, res };
-}
-
 app.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
   useWSS: true,
   trpcOptions: {
     router: router,
-    createContext,
+    createContext: () => {
+      return { metastable };
+    },
     onError({ path, error }) {
       // report to error monitoring
       console.error(`Error in tRPC handler on path '${path}':`, error);

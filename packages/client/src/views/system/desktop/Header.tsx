@@ -7,7 +7,7 @@ import {
 } from 'react-icons/vsc';
 import { observer } from 'mobx-react-lite';
 
-import { ElectronWindow } from '@api';
+import { API } from '@api';
 import { mainStore } from '@stores/MainStore';
 import { IS_ELECTRON, IS_MAC } from '@utils/config';
 import styles from './Header.module.scss';
@@ -26,19 +26,19 @@ export const Header: React.FC<Props> = observer(({ showMenu = !IS_MAC }) => {
       </div>
       {!IS_MAC && IS_ELECTRON && (
         <div className={styles.controls}>
-          <button onClick={() => ElectronWindow.minimize()}>
+          <button onClick={() => API.electron.window.minimize.mutate()}>
             <VscChromeMinimize />
           </button>
           {mainStore.isMaximized ? (
-            <button onClick={() => ElectronWindow.restore()}>
+            <button onClick={() => API.electron.window.restore.mutate()}>
               <VscChromeRestore />
             </button>
           ) : (
-            <button onClick={() => ElectronWindow.maximize()}>
+            <button onClick={() => API.electron.window.maximize.mutate()}>
               <VscChromeMaximize />
             </button>
           )}
-          <button onClick={() => ElectronWindow.close()}>
+          <button onClick={() => API.electron.window.close.mutate()}>
             <VscChromeClose />
           </button>
         </div>

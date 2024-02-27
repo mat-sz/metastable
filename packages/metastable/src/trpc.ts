@@ -1,17 +1,31 @@
-import { initTRPC } from '@trpc/server';
-import { z } from 'zod';
-
-import type { Metastable } from './index.js';
+import { TRPCError, initTRPC } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
+import { z } from 'zod';
+import type { BrowserWindow } from 'electron';
 import { AnyEvent } from '@metastable/types';
 
-let metastable: Metastable = undefined as any;
+import type { Metastable } from './index.js';
 
-export function initializeMetastable(newMetastable: Metastable) {
-  metastable = newMetastable;
+export interface TRPCContext {
+  metastable: Metastable;
+  win?: BrowserWindow;
 }
 
-const t = initTRPC.create();
+export const t = initTRPC.context<TRPCContext>().create();
+
+const electronProcedure = t.procedure.use(function isElectron(opts) {
+  const win = opts.ctx.win;
+  if (!win) {
+    throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+  }
+
+  return opts.next({
+    ctx: {
+      ...opts.ctx,
+      win: win,
+    },
+  });
+});
 
 export const router = t.router({
   download: {
@@ -25,16 +39,17 @@ export const router = t.router({
           info: z.any().optional(),
         }),
       )
-      .mutation(async opts => {
-        return await metastable.downloadModel(opts.input);
+      .mutation(async ({ input, ctx: { metastable } }) => {
+        return await metastable.downloadModel(input);
       }),
   },
   instance: {
-    onEvent: t.procedure.subscription(() => {
+    onEvent: t.procedure.subscription(({ ctx: { metastable } }) => {
       return observable<AnyEvent>(emit => {
         const onEvent = (data: AnyEvent) => {
           emit.next(data);
         };
+
         metastable.replayEvents(onEvent);
         metastable.on('event', onEvent);
 
@@ -43,26 +58,28 @@ export const router = t.router({
         };
       });
     }),
-    info: t.procedure.query(async () => {
+    info: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.info();
     }),
-    restart: t.procedure.mutation(async () => {
+    restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
     }),
     config: {
-      get: t.procedure.query(async () => {
+      get: t.procedure.query(async ({ ctx: { metastable } }) => {
         return await metastable.storage.config.all();
       }),
-      set: t.procedure.input(z.any()).mutation(async opts => {
-        if (typeof opts.input === 'object') {
-          await metastable.storage.config.store(opts.input);
-        }
-        return await metastable.storage.config.all();
-      }),
+      set: t.procedure
+        .input(z.any())
+        .mutation(async ({ ctx: { metastable }, input }) => {
+          if (typeof input === 'object') {
+            await metastable.storage.config.store(input);
+          }
+          return await metastable.storage.config.all();
+        }),
     },
   },
   model: {
-    all: t.procedure.query(async () => {
+    all: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.storage.models.all();
     }),
     update: t.procedure
@@ -77,10 +94,11 @@ export const router = t.router({
           nsfw: z.boolean(),
         }),
       )
-      .mutation(async opts => {
-        const { type, name, ...data } = opts.input;
-        return await metastable.storage.models.update(type, name, data);
-      }),
+      .mutation(
+        async ({ ctx: { metastable }, input: { type, name, ...data } }) => {
+          return await metastable.storage.models.update(type, name, data);
+        },
+      ),
     delete: t.procedure
       .input(
         z.object({
@@ -88,16 +106,15 @@ export const router = t.router({
           name: z.string(),
         }),
       )
-      .mutation(async opts => {
-        const { type, name } = opts.input;
+      .mutation(async ({ ctx: { metastable }, input: { type, name } }) => {
         await metastable.storage.models.delete(type, name);
       }),
   },
   setup: {
-    status: t.procedure.query(async () => {
+    status: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.status();
     }),
-    details: t.procedure.query(async () => {
+    details: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.details();
     }),
     start: t.procedure
@@ -110,12 +127,12 @@ export const router = t.router({
           torchMode: z.string(),
         }),
       )
-      .mutation(async opts => {
-        return await metastable.setup.start(opts.input as any);
+      .mutation(async ({ ctx: { metastable }, input }) => {
+        return await metastable.setup.start(input as any);
       }),
   },
   project: {
-    all: t.procedure.query(async () => {
+    all: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.storage.projects.all();
     }),
     create: t.procedure
@@ -126,13 +143,13 @@ export const router = t.router({
           settings: z.string(),
         }),
       )
-      .mutation(async opts => {
-        return await metastable.storage.projects.create(opts.input);
+      .mutation(async ({ ctx: { metastable }, input }) => {
+        return await metastable.storage.projects.create(input);
       }),
     get: t.procedure
       .input(z.object({ projectId: z.string() }))
-      .query(async opts => {
-        return await metastable.storage.projects.get(opts.input.projectId);
+      .query(async ({ ctx: { metastable }, input: { projectId } }) => {
+        return await metastable.storage.projects.get(projectId);
       }),
     update: t.procedure
       .input(
@@ -143,67 +160,96 @@ export const router = t.router({
           settings: z.string().optional(),
         }),
       )
-      .mutation(async opts => {
-        const { projectId, ...data } = opts.input;
-        return await metastable.storage.projects.update(projectId, data);
-      }),
+      .mutation(
+        async ({ ctx: { metastable }, input: { projectId, ...data } }) => {
+          return await metastable.storage.projects.update(projectId, data);
+        },
+      ),
     prompt: t.procedure
       .input(z.object({ projectId: z.string(), settings: z.any() }))
-      .mutation(async opts => {
-        return await metastable.prompt(
-          opts.input.projectId,
-          opts.input.settings,
-        );
-      }),
+      .mutation(
+        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
+          return await metastable.prompt(projectId, settings);
+        },
+      ),
     input: {
       all: t.procedure
         .input(z.object({ projectId: z.string() }))
-        .query(async opts => {
-          return await metastable.storage.projects.inputs(opts.input.projectId);
+        .query(async ({ ctx: { metastable }, input: { projectId } }) => {
+          return await metastable.storage.projects.inputs(projectId);
         }),
     },
     output: {
       all: t.procedure
         .input(z.object({ projectId: z.string() }))
-        .query(async opts => {
-          return await metastable.storage.projects.outputs(
-            opts.input.projectId,
-          );
+        .query(async ({ ctx: { metastable }, input: { projectId } }) => {
+          return await metastable.storage.projects.outputs(projectId);
         }),
     },
     training: {
       start: t.procedure
         .input(z.object({ projectId: z.string(), settings: z.any() }))
-        .mutation(async opts => {
-          return await metastable.train(
-            opts.input.projectId,
-            opts.input.settings,
-          );
-        }),
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, settings } }) => {
+            return await metastable.train(projectId, settings);
+          },
+        ),
       stop: t.procedure
         .input(z.object({ projectId: z.string() }))
-        .mutation(async opts => {
-          return await metastable.stopTraining(opts.input.projectId);
+        .mutation(async ({ ctx: { metastable }, input: { projectId } }) => {
+          return await metastable.stopTraining(projectId);
         }),
     },
   },
   task: {
-    all: t.procedure.query(() => {
+    all: t.procedure.query(({ ctx: { metastable } }) => {
       return metastable.tasks.all();
     }),
-    queue: t.procedure.input(z.object({ queueId: z.string() })).query(opts => {
-      metastable.tasks.queue(opts.input.queueId);
-    }),
+    queue: t.procedure
+      .input(z.object({ queueId: z.string() }))
+      .query(({ ctx: { metastable }, input: { queueId } }) => {
+        metastable.tasks.queue(queueId);
+      }),
     cancel: t.procedure
       .input(z.object({ queueId: z.string(), taskId: z.string() }))
-      .mutation(opts => {
-        metastable.tasks.cancel(opts.input.queueId, opts.input.taskId);
+      .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
+        metastable.tasks.cancel(queueId, taskId);
       }),
     dismiss: t.procedure
       .input(z.object({ queueId: z.string(), taskId: z.string() }))
-      .mutation(opts => {
-        metastable.tasks.dismiss(opts.input.queueId, opts.input.taskId);
+      .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
+        metastable.tasks.dismiss(queueId, taskId);
       }),
+  },
+  electron: {
+    window: {
+      onResize: electronProcedure.subscription(({ ctx: { win } }) => {
+        return observable<{ isMaximized: boolean }>(emit => {
+          const refresh = () => {
+            emit.next({ isMaximized: win.isMaximized() });
+          };
+
+          refresh();
+          win.on('resize', refresh);
+
+          return () => {
+            win.off('resize', refresh);
+          };
+        });
+      }),
+      minimize: electronProcedure.mutation(({ ctx: { win } }) => {
+        win.minimize();
+      }),
+      maximize: electronProcedure.mutation(({ ctx: { win } }) => {
+        win.maximize();
+      }),
+      restore: electronProcedure.mutation(({ ctx: { win } }) => {
+        win.unmaximize();
+      }),
+      close: electronProcedure.mutation(({ ctx: { win } }) => {
+        win.close();
+      }),
+    },
   },
 });
 

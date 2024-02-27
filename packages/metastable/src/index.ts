@@ -14,6 +14,7 @@ import {
   ProjectTrainingSettings,
   UtilizationEvent,
 } from '@metastable/types';
+import chokidar from 'chokidar';
 
 import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
@@ -23,9 +24,6 @@ import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 import { Kohya } from './kohya/index.js';
-
-const require = createRequire(import.meta.url);
-const chokidar = require('chokidar');
 
 export class Metastable extends EventEmitter {
   storage;
