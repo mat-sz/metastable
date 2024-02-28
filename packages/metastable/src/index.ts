@@ -24,6 +24,8 @@ import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 import { Kohya } from './kohya/index.js';
+import { ProjectEntity } from './data/project.js';
+import { EntityRepository } from './data/common.js';
 
 export class Metastable extends EventEmitter {
   storage;
@@ -33,6 +35,7 @@ export class Metastable extends EventEmitter {
   setup = new Setup(this);
   tasks = new Tasks();
   kohya?: Kohya;
+  project: EntityRepository<ProjectEntity>;
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
@@ -68,6 +71,10 @@ export class Metastable extends EventEmitter {
     super();
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.storage = new Storage(dataRoot);
+    this.project = new EntityRepository(
+      this.storage.projectsDir,
+      ProjectEntity,
+    );
     this.setup.on('event', this.onEvent);
     this.tasks.on('event', this.onEvent);
 

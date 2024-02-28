@@ -2,7 +2,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
 import { z } from 'zod';
 import type { BrowserWindow } from 'electron';
-import { AnyEvent } from '@metastable/types';
+import { AnyEvent, Project } from '@metastable/types';
 
 import type { Metastable } from './index.js';
 
@@ -133,7 +133,8 @@ export const router = t.router({
   },
   project: {
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
-      return await metastable.storage.projects.all();
+      const projects = await metastable.project.all();
+      return await Promise.all(projects.map(project => project.json()));
     }),
     create: t.procedure
       .input(
@@ -149,7 +150,12 @@ export const router = t.router({
     get: t.procedure
       .input(z.object({ projectId: z.string() }))
       .query(async ({ ctx: { metastable }, input: { projectId } }) => {
-        return await metastable.storage.projects.get(projectId);
+        const project = await metastable.project.get(projectId);
+
+        return {
+          ...(await project.json()),
+          settings: await project.settings.get(),
+        } as Project;
       }),
     update: t.procedure
       .input(

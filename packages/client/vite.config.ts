@@ -42,6 +42,9 @@ export default defineConfig(({ mode }) => {
               },
               {
                 entry: 'src/electron/preload.ts',
+                onstart: args => {
+                  args.reload();
+                },
               },
             ]),
             renderer(),

@@ -14,7 +14,7 @@ declare global {
 }
 
 const link = IS_ELECTRON
-  ? ipcLink({})
+  ? ipcLink()
   : wsLink({
       client: createWSClient({
         url: getUrl('/trpc', 'ws'),
