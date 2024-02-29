@@ -1,7 +1,5 @@
 import EventEmitter from 'events';
-import { createRequire } from 'module';
 import path from 'path';
-import fs from 'fs/promises';
 import { nanoid } from 'nanoid/non-secure';
 import si from 'systeminformation';
 import checkDiskSpace from 'check-disk-space';
@@ -31,29 +29,24 @@ export class Metastable extends EventEmitter {
   storage;
   python?: PythonInstance;
   comfy?: Comfy;
-  settingsCache: Record<Project['id'], string> = {};
+  settingsCache: Record<Project['id'], any> = {};
   setup = new Setup(this);
   tasks = new Tasks();
   kohya?: Kohya;
-  project: EntityRepository<ProjectEntity>;
+  project;
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
 
     if (event.event === 'prompt.end') {
       const settings = this.settingsCache[event.data.id];
-      for (const filename of event.data.output_filenames) {
-        await this.storage.projects.generateThumbnail(
-          this.storage.projects.path(event.data.project_id, 'output', filename),
-        );
-        const settingsPath = this.storage.projects.path(
-          event.data.project_id,
-          'output',
-          '.metastable',
-          `${filename}.json`,
-        );
-        await fs.writeFile(settingsPath, settings);
-      }
+      try {
+        const project = await this.project.get(event.data.project_id);
+        for (const filename of event.data.output_filenames) {
+          const output = await project.output.get(filename);
+          await output.data.set(settings);
+        }
+      } catch {}
       delete this.settingsCache[event.data.id];
     } else if (event.event === 'prompt.error') {
       delete this.settingsCache[event.data.id];
@@ -72,7 +65,7 @@ export class Metastable extends EventEmitter {
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.storage = new Storage(dataRoot);
     this.project = new EntityRepository(
-      this.storage.projectsDir,
+      path.join(this.dataRoot, 'projects'),
       ProjectEntity,
     );
     this.setup.on('event', this.onEvent);
@@ -236,8 +229,9 @@ export class Metastable extends EventEmitter {
       return undefined;
     }
 
+    const project = await this.project.get(projectId);
     const id = nanoid();
-    this.settingsCache[id] = JSON.stringify(settings);
+    this.settingsCache[id] = settings;
 
     settings.models.base.path ||= this.storage.models.path(
       ModelType.CHECKPOINT,
@@ -319,25 +313,20 @@ export class Metastable extends EventEmitter {
       ...settings,
       id: id,
       project_id: projectId,
-      output_path: this.storage.projects.path(projectId, 'output'),
+      output_path: project.output.path,
     });
 
     return { id };
   }
 
   async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
+    const project = await this.project.get(projectId);
     settings.base.path ||= this.storage.models.path(
       ModelType.CHECKPOINT,
       settings.base.name,
     );
 
-    return await this.kohya?.train(
-      projectId,
-      settings,
-      this.storage.projects.path(projectId, 'input'),
-      this.storage.projects.path(projectId, 'output'),
-      this.storage.projects.path(projectId, 'temp'),
-    );
+    return await this.kohya?.train(project, settings);
   }
 
   stopTraining(projectId: Project['id']) {

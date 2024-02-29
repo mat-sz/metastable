@@ -1,8 +1,20 @@
 import { Dirent } from 'fs';
-import fs from 'fs/promises';
+import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 
-import { IMAGE_EXTENSIONS, removeFileExtension } from '../helpers/fs.js';
+import {
+  IMAGE_EXTENSIONS,
+  freeDirName,
+  getMetadataDirectory,
+} from '../helpers/fs.js';
+import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
+
+export type EntityClass<T extends BaseEntity> = {
+  new (...args: any[]): T;
+  fromDirent: (dirent: Dirent) => Promise<T>;
+  fromPath: (filePath: string) => Promise<T>;
+  create: (filePath: string) => Promise<T>;
+};
 
 export class Metadata<T> {
   private _json: T | undefined;
@@ -57,13 +69,6 @@ export class Metadata<T> {
     await this.get();
   }
 }
-
-export type EntityClass<T extends BaseEntity> = {
-  new (...args: any[]): T;
-  fromDirent: (dirent: Dirent) => Promise<T>;
-  fromPath: (filePath: string) => Promise<T>;
-};
-
 export class BaseEntity {
   baseDir;
   name;
@@ -98,6 +103,13 @@ export class BaseEntity {
     await asset.load();
     return asset;
   }
+
+  static async create<T extends BaseEntity>(
+    this: EntityClass<T>,
+    filePath: string,
+  ): Promise<T> {
+    return new this(filePath);
+  }
 }
 
 export class FileEntity extends BaseEntity {
@@ -107,7 +119,7 @@ export class FileEntity extends BaseEntity {
     super(_path);
 
     this.data = new Metadata(
-      path.join(this.baseDir, '.metastable', `${this.name}.json`),
+      path.join(getMetadataDirectory(this.path), `${this.name}.json`),
       {},
     );
   }
@@ -129,16 +141,12 @@ export class FileEntity extends BaseEntity {
 }
 
 export class ImageEntity extends FileEntity {
-  thumbnailPath;
-
   constructor(_path: string) {
     super(_path);
+  }
 
-    this.thumbnailPath = path.join(
-      this.baseDir,
-      '.metastable',
-      `${removeFileExtension(this.name)}.thumb.jpg`,
-    );
+  get thumbnailPath() {
+    return getThumbnailPath(this.path);
   }
 
   static async fromPath<T extends BaseEntity>(
@@ -156,13 +164,17 @@ export class ImageEntity extends FileEntity {
       throw new Error(`Not a valid image.`);
     }
 
+    await generateThumbnail(filePath);
+
     return await super.fromPath<T>(filePath);
   }
 }
 
+type EntityType<T> = T extends new (...args: any[]) => infer A ? A : never;
+
 export class EntityRepository<
-  TEntity extends BaseEntity,
-  TClass extends EntityClass<TEntity> = EntityClass<TEntity>,
+  TClass extends EntityClass<BaseEntity>,
+  TEntity = EntityType<TClass>,
 > {
   constructor(
     private baseDir: string,
@@ -174,6 +186,8 @@ export class EntityRepository<
   }
 
   async all(): Promise<TEntity[]> {
+    await mkdir(this.path, { recursive: true });
+
     const items = await fs.readdir(this.baseDir, { withFileTypes: true });
 
     const promises = items.map(async item => {
@@ -190,6 +204,15 @@ export class EntityRepository<
   }
 
   async get(name: string): Promise<TEntity> {
-    return await this.assetClass.fromPath(path.join(this.baseDir, name));
+    return (await this.assetClass.fromPath(
+      path.join(this.baseDir, name),
+    )) as TEntity;
+  }
+
+  async create(name: string): Promise<TEntity> {
+    await mkdir(this.path, { recursive: true });
+
+    const newName = await freeDirName(this.baseDir, name);
+    return new this.assetClass(path.join(this.baseDir, newName)) as TEntity;
   }
 }

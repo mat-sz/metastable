@@ -112,7 +112,7 @@ export interface ProjectInfo {
 export interface Project extends ProjectInfo {
   id: string;
   name: string;
-  settings: string;
+  settings: any;
   lastOutput?: string;
   outputs?: number;
   size?: number;

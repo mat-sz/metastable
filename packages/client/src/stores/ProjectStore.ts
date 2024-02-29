@@ -72,13 +72,13 @@ export class ProjectStore {
     const project = {
       name,
       type,
-      settings: JSON.stringify(settings),
+      settings,
     };
 
     const json = await API.project.create.mutate(project);
 
     runInAction(() => {
-      this.projects.push(createProject(json, settings));
+      this.projects.push(createProject(json as any, settings));
       this.select(json.id);
     });
 
@@ -92,9 +92,7 @@ export class ProjectStore {
       return;
     }
 
-    const settings = json.settings
-      ? JSON.parse(json.settings)
-      : defaultSettings();
+    const settings = json.settings ?? defaultSettings();
 
     const project = createProject(json as any, settings);
     runInAction(() => {

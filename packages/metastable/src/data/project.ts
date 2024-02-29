@@ -1,6 +1,8 @@
 import { Dirent } from 'fs';
 import path from 'path';
 import { Project } from '@metastable/types';
+import { mkdir } from 'fs/promises';
+import { rimraf } from 'rimraf';
 
 import { directorySize } from '../helpers/fs.js';
 import {
@@ -17,22 +19,36 @@ export class ProjectEntity extends BaseEntity {
 
   input = new EntityRepository(path.join(this._path, 'input'), ImageEntity);
   output = new EntityRepository(path.join(this._path, 'output'), ImageEntity);
+  tempPath = path.join(this._path, 'temp');
 
   constructor(_path: string) {
     super(_path);
   }
 
-  assign(data: any): void {}
-
   async load(): Promise<void> {
     await this.data.get();
+    await mkdir(this.input.path, { recursive: true });
+    await mkdir(this.output.path, { recursive: true });
   }
 
-  async json(): Promise<Omit<Project, 'settings'>> {
+  async cleanup() {
+    await rimraf(this.tempPath);
+  }
+
+  async resetTemp() {
+    await rimraf(this.tempPath);
+    await mkdir(this.tempPath, { recursive: true });
+  }
+
+  async json(withSettings: true): Promise<Project>;
+  async json(withSettings?: false): Promise<Omit<Project, 'settings'>>;
+  async json(
+    withSettings = false,
+  ): Promise<Project | Omit<Project, 'settings'>> {
     await this.load();
     const outputs = await this.output.all();
 
-    return {
+    const json: any = {
       type: 'simple',
       ...this.data.json!,
       id: this.name,
@@ -41,11 +57,13 @@ export class ProjectEntity extends BaseEntity {
       outputs: outputs.length,
       size: await directorySize(this._path),
     };
+
+    if (withSettings) {
+      json.settings = await this.settings.get();
+    }
+
+    return json;
   }
-
-  async save(): Promise<void> {}
-
-  async remove(): Promise<void> {}
 
   static async fromDirent<T extends BaseEntity>(
     this: EntityClass<T>,
@@ -56,5 +74,14 @@ export class ProjectEntity extends BaseEntity {
     }
 
     return await super.fromDirent<T>(dirent);
+  }
+
+  static async create<T extends BaseEntity>(
+    this: EntityClass<T>,
+    filePath: string,
+  ): Promise<T> {
+    const project = await super.create<T>(filePath);
+    await mkdir(project.path, { recursive: true });
+    return project;
   }
 }

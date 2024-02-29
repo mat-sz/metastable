@@ -56,7 +56,7 @@ export class BaseProject<T = any> {
 
     await API.project.update.mutate({
       projectId: this.id,
-      settings: JSON.stringify(settings),
+      settings,
     });
   }
 

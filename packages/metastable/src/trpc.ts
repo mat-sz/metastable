@@ -141,21 +141,20 @@ export const router = t.router({
         z.object({
           name: z.string(),
           type: z.string(),
-          settings: z.string(),
+          settings: z.any(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input }) => {
-        return await metastable.storage.projects.create(input);
+        const project = await metastable.project.create(input.name);
+        await project.data.set({ type: input.type });
+        await project.settings.set(input.settings);
+        return await project.json(true);
       }),
     get: t.procedure
       .input(z.object({ projectId: z.string() }))
       .query(async ({ ctx: { metastable }, input: { projectId } }) => {
         const project = await metastable.project.get(projectId);
-
-        return {
-          ...(await project.json()),
-          settings: await project.settings.get(),
-        } as Project;
+        return await project.json(true);
       }),
     update: t.procedure
       .input(
@@ -163,12 +162,29 @@ export const router = t.router({
           projectId: z.string(),
           name: z.string().optional(),
           type: z.string().optional(),
-          settings: z.string().optional(),
+          settings: z.any().optional(),
         }),
       )
       .mutation(
-        async ({ ctx: { metastable }, input: { projectId, ...data } }) => {
-          return await metastable.storage.projects.update(projectId, data);
+        async ({
+          ctx: { metastable },
+          input: { projectId, settings, name, ...data },
+        }) => {
+          const project = await metastable.project.get(projectId);
+
+          if (name) {
+            // TODO: rename project
+          }
+
+          if (data) {
+            await project.data.update(data);
+          }
+
+          if (settings) {
+            await project.settings.set(settings);
+          }
+
+          return await project.json(true);
         },
       ),
     prompt: t.procedure
@@ -182,14 +198,20 @@ export const router = t.router({
       all: t.procedure
         .input(z.object({ projectId: z.string() }))
         .query(async ({ ctx: { metastable }, input: { projectId } }) => {
-          return await metastable.storage.projects.inputs(projectId);
+          const project = await metastable.project.get(projectId);
+          const inputs = await project.input.all();
+
+          return inputs.map(input => input.name);
         }),
     },
     output: {
       all: t.procedure
         .input(z.object({ projectId: z.string() }))
         .query(async ({ ctx: { metastable }, input: { projectId } }) => {
-          return await metastable.storage.projects.outputs(projectId);
+          const project = await metastable.project.get(projectId);
+          const outputs = await project.output.all();
+
+          return outputs.map(output => output.name);
         }),
     },
     training: {

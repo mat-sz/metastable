@@ -216,3 +216,14 @@ export async function tryMkdir(path: string): Promise<boolean> {
     return false;
   }
 }
+
+const METADATA_DIRECTORY_NAME = '.metastable';
+
+export function getMetadataDirectory(filePath: string) {
+  const dirName = path.dirname(filePath);
+  if (dirName.includes(METADATA_DIRECTORY_NAME)) {
+    return dirName;
+  }
+
+  return path.join(dirName, METADATA_DIRECTORY_NAME);
+}

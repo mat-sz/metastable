@@ -19,6 +19,7 @@ import {
   imageFilenames,
   removeFileExtension,
 } from '../helpers/fs.js';
+import type { ProjectEntity } from '../data/project.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -48,37 +49,25 @@ export class Kohya extends EventEmitter {
     delete this.processes[projectId];
   }
 
-  async train(
-    projectId: string,
-    settings: ProjectTrainingSettings,
-    inputPath: string,
-    outputPath: string,
-    tempPath: string,
-  ) {
-    this.stop(projectId);
+  async train(project: ProjectEntity, settings: ProjectTrainingSettings) {
+    this.stop(project.name);
+    await project.resetTemp();
 
-    try {
-      await rimraf(tempPath);
-    } catch {}
-
-    const tempInputPath = path.join(tempPath, 'input');
+    const tempInputPath = path.join(project.tempPath, 'input');
     await fs.mkdir(tempInputPath, { recursive: true });
 
-    const images = await imageFilenames(inputPath);
-    for (const image of images) {
-      const name = removeFileExtension(image);
-      const inputDataFile = new JSONFile<ProjectTrainingInputMetadata>(
-        path.join(inputPath, `${name}.json`),
-        {},
-      );
-      const inputData = await inputDataFile.readJson();
+    const inputs = await project.input.all();
+    for (const input of inputs) {
+      const name = removeFileExtension(input.name);
+      const inputData =
+        (await input.data.get()) as ProjectTrainingInputMetadata;
 
       if (inputData?.caption) {
         const tempFile = new TextFile(path.join(tempInputPath, `${name}.txt`));
         await tempFile.write(inputData.caption);
 
-        const fromPath = path.join(inputPath, image);
-        const toPath = path.join(tempInputPath, image);
+        const fromPath = input.path;
+        const toPath = path.join(tempInputPath, input.name);
 
         if (inputData.crop) {
           await sharp(fromPath)
@@ -122,7 +111,7 @@ export class Kohya extends EventEmitter {
       train_batch_size: settings.limits.batchSize,
 
       // Data
-      output_dir: outputPath,
+      output_dir: project.output.path,
       output_name: `${Date.now()}`,
 
       // Other
@@ -151,8 +140,8 @@ export class Kohya extends EventEmitter {
       ],
     };
 
-    const configPath = path.join(tempPath, 'training_config.json');
-    const datasetsPath = path.join(tempPath, 'datasets_config.json');
+    const configPath = path.join(project.tempPath, 'training_config.json');
+    const datasetsPath = path.join(project.tempPath, 'datasets_config.json');
     const configFile = new JSONFile(configPath, {});
     await configFile.writeJson(config);
     const datasetsFile = new JSONFile(datasetsPath, {});
@@ -166,7 +155,10 @@ export class Kohya extends EventEmitter {
     ];
 
     const proc = this.python.spawn([mainPath, ...args], this.env);
-    this.emit('event', { event: 'training.start', data: { projectId } });
+    this.emit('event', {
+      event: 'training.start',
+      data: { projectId: project.name },
+    });
 
     proc.stdin.setDefaultEncoding('utf-8');
     proc.stdout.setEncoding('utf-8');
@@ -181,26 +173,29 @@ export class Kohya extends EventEmitter {
 
         try {
           this.emit('event', {
-            projectId,
+            projectId: project.name,
             ...JSON.parse(item),
           });
         } catch {
-          this.log(projectId, 'stdout', item);
+          this.log(project.name, 'stdout', item);
         }
       }
     });
 
     proc.stderr.on('data', data => {
-      this.log(projectId, 'stderr', data);
+      this.log(project.name, 'stderr', data);
     });
 
     proc.on('close', () => {
-      this.emit('event', { event: 'training.end', data: { projectId } });
-      delete this.processes[projectId];
-      rimraf(tempPath).catch(() => {});
+      this.emit('event', {
+        event: 'training.end',
+        data: { projectId: project.name },
+      });
+      delete this.processes[project.name];
+      project.cleanup().catch(() => {});
     });
 
-    this.processes[projectId] = proc;
+    this.processes[project.name] = proc;
   }
 
   private log(projectId: string, type: string, text: string) {
