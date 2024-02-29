@@ -46,8 +46,8 @@ export const LoRAs: React.FC = observer(() => {
             <VarSlider
               label="Strength"
               path="strength"
-              min={0}
-              max={2}
+              min={-5}
+              max={5}
               step={0.01}
               defaultValue={1}
               showInput
