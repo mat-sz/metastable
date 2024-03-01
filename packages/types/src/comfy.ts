@@ -18,12 +18,6 @@ export interface ComfyTorchInfo {
 
 export type ComfyStatus = 'ready' | 'starting' | 'error';
 
-export interface ComfyLogItem {
-  timestamp: number;
-  type: string;
-  text: string;
-}
-
 export interface PromptStartEvent {
   event: 'prompt.start';
   data: {

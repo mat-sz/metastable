@@ -21,3 +21,24 @@ export interface ConfigType {
     apiKey?: string;
   };
 }
+
+export interface Utilization {
+  cpuUsage: number;
+  ramUsed: number;
+  ramTotal: number;
+  hddUsed: number;
+  hddTotal: number;
+  cpuTemperature?: number;
+
+  // Only available for NVIDIA.
+  gpuUsage?: number;
+  vramUsed?: number;
+  vramTotal?: number;
+  gpuTemperature?: number;
+}
+
+export interface LogItem {
+  timestamp: number;
+  type: string;
+  text: string;
+}

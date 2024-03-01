@@ -2,7 +2,8 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
 import { z } from 'zod';
 import type { BrowserWindow } from 'electron';
-import { AnyEvent, Project } from '@metastable/types';
+import { AnyEvent, LogItem, Utilization } from '@metastable/types';
+import { Base64 } from 'js-base64';
 
 import type { Metastable } from './index.js';
 
@@ -55,6 +56,37 @@ export const router = t.router({
 
         return () => {
           metastable.off('event', onEvent);
+        };
+      });
+    }),
+    onUtilization: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<Utilization>(emit => {
+        const onEvent = (data: Utilization) => {
+          emit.next(data);
+        };
+
+        metastable.on('utilization', onEvent);
+
+        return () => {
+          metastable.off('utilization', onEvent);
+        };
+      });
+    }),
+    onBackendLog: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<LogItem[]>(emit => {
+        const onEvent = (data: LogItem[]) => {
+          emit.next(data);
+        };
+
+        const logItems = metastable.comfy?.logBuffer.items;
+        if (logItems?.length) {
+          onEvent(logItems);
+        }
+
+        metastable.on('backendLog', onEvent);
+
+        return () => {
+          metastable.off('backendLog', onEvent);
         };
       });
     }),
@@ -203,6 +235,22 @@ export const router = t.router({
 
           return inputs.map(input => input.name);
         }),
+      save: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            data: z.string(),
+            name: z.string(),
+          }),
+        )
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, data, name } }) => {
+            const project = await metastable.project.get(projectId);
+            const input = await project.input.create(name);
+
+            return await input.write(Base64.toUint8Array(data));
+          },
+        ),
     },
     output: {
       all: t.procedure

@@ -2,10 +2,16 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 import EventEmitter from 'events';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ComfyLogItem, ComfyTorchInfo, ComfyStatus } from '@metastable/types';
+import {
+  LogItem,
+  ComfyTorchInfo,
+  ComfyStatus,
+  AnyEvent,
+} from '@metastable/types';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
+import { TypedEventEmitter } from '../types.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -13,13 +19,21 @@ const baseDir = path.join(
   '..',
 );
 
-export class Comfy extends EventEmitter {
+type MetastableEvents = {
+  event: (event: AnyEvent) => void;
+  log: (data: LogItem[]) => void;
+  reset: () => void;
+};
+
+export class Comfy extends (EventEmitter as {
+  new (): TypedEventEmitter<MetastableEvents>;
+}) {
   process?: ChildProcessWithoutNullStreams;
 
   samplers: string[] = [];
   schedulers: string[] = [];
   torchInfo?: ComfyTorchInfo = undefined;
-  logBuffer = new CircularBuffer<ComfyLogItem>(25);
+  logBuffer = new CircularBuffer<LogItem>(25);
 
   status: ComfyStatus = 'starting';
   queue_remaining = 0;
@@ -32,27 +46,29 @@ export class Comfy extends EventEmitter {
   ) {
     super();
 
-    this.on('event', e => {
-      switch (e.event) {
-        case 'info.torch':
-          this.torchInfo = e.data;
-          break;
-        case 'info.samplers':
-          this.samplers = e.data;
-          break;
-        case 'info.schedulers':
-          this.schedulers = e.data;
-          break;
-        case 'ready':
-          this.setStatus('ready');
-          break;
-        case 'prompt.queue':
-          this.queue_remaining = e.data.queue_remaining;
-          break;
-      }
-    });
-
     this.start();
+  }
+
+  handleJson(e: any) {
+    switch (e.event) {
+      case 'info.torch':
+        this.torchInfo = e.data;
+        break;
+      case 'info.samplers':
+        this.samplers = e.data;
+        break;
+      case 'info.schedulers':
+        this.schedulers = e.data;
+        break;
+      case 'ready':
+        this.setStatus('ready');
+        break;
+      case 'prompt.queue':
+        this.queue_remaining = e.data.queue_remaining;
+        break;
+    }
+
+    this.emit('event', e);
   }
 
   async start() {
@@ -78,7 +94,7 @@ export class Comfy extends EventEmitter {
         }
 
         try {
-          this.emit('event', JSON.parse(item));
+          this.handleJson(JSON.parse(item));
         } catch {
           this.log('stdout', item);
         }
@@ -103,10 +119,7 @@ export class Comfy extends EventEmitter {
       text: text.trimEnd(),
     };
     this.logBuffer.push(item);
-    this.emit('event', {
-      event: 'backend.log',
-      data: item,
-    });
+    this.emit('log', [item]);
   }
 
   reset() {

@@ -14,6 +14,8 @@ import {
 } from './common.js';
 
 export class ProjectEntity extends BaseEntity {
+  static readonly isDirectory = true;
+
   data = new Metadata(path.join(this._path, 'project.json'));
   settings = new Metadata(path.join(this._path, 'settings.json'));
 

@@ -4,13 +4,14 @@ import path from 'path';
 
 import {
   IMAGE_EXTENSIONS,
-  freeDirName,
   getMetadataDirectory,
+  getNewName,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
 
 export type EntityClass<T extends BaseEntity> = {
   new (...args: any[]): T;
+  readonly isDirectory: boolean;
   fromDirent: (dirent: Dirent) => Promise<T>;
   fromPath: (filePath: string) => Promise<T>;
   create: (filePath: string) => Promise<T>;
@@ -70,6 +71,7 @@ export class Metadata<T> {
   }
 }
 export class BaseEntity {
+  static readonly isDirectory: boolean = false;
   baseDir;
   name;
 
@@ -168,6 +170,12 @@ export class ImageEntity extends FileEntity {
 
     return await super.fromPath<T>(filePath);
   }
+
+  async write(data: Uint8Array) {
+    await fs.writeFile(this.path, data);
+    await generateThumbnail(this.path);
+    return { name: this.name };
+  }
 }
 
 type EntityType<T> = T extends new (...args: any[]) => infer A ? A : never;
@@ -212,7 +220,13 @@ export class EntityRepository<
   async create(name: string): Promise<TEntity> {
     await mkdir(this.path, { recursive: true });
 
-    const newName = await freeDirName(this.baseDir, name);
-    return new this.assetClass(path.join(this.baseDir, newName)) as TEntity;
+    const newName = await getNewName(
+      this.baseDir,
+      name,
+      this.assetClass.isDirectory,
+    );
+    return (await this.assetClass.create(
+      path.join(this.baseDir, newName),
+    )) as TEntity;
   }
 }

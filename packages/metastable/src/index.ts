@@ -5,12 +5,13 @@ import si from 'systeminformation';
 import checkDiskSpace from 'check-disk-space';
 import {
   AnyEvent,
+  LogItem,
   DownloadSettings,
   ModelType,
   Project,
   ProjectSettings,
   ProjectTrainingSettings,
-  UtilizationEvent,
+  Utilization,
 } from '@metastable/types';
 import chokidar from 'chokidar';
 
@@ -24,8 +25,17 @@ import { Tasks } from './tasks/index.js';
 import { Kohya } from './kohya/index.js';
 import { ProjectEntity } from './data/project.js';
 import { EntityRepository } from './data/common.js';
+import { TypedEventEmitter } from './types.js';
 
-export class Metastable extends EventEmitter {
+type MetastableEvents = {
+  event: (event: AnyEvent) => void;
+  utilization: (data: Utilization) => void;
+  backendLog: (data: LogItem[]) => void;
+};
+
+export class Metastable extends (EventEmitter as {
+  new (): TypedEventEmitter<MetastableEvents>;
+}) {
   storage;
   python?: PythonInstance;
   comfy?: Comfy;
@@ -97,21 +107,18 @@ export class Metastable extends EventEmitter {
         ]);
 
       const gpu = graphics.controllers[0];
-      this.emit('event', {
-        event: 'utilization',
-        data: {
-          cpuUsage: currentLoad.currentLoad,
-          hddTotal: usage.size,
-          hddUsed: usage.size - usage.free,
-          ramTotal: mem.total,
-          ramUsed: mem.used,
-          cpuTemperature: cpuTemperature.main,
-          gpuTemperature: gpu?.temperatureGpu,
-          gpuUsage: gpu?.utilizationGpu,
-          vramTotal: gpu?.memoryTotal,
-          vramUsed: gpu?.memoryUsed,
-        },
-      } as UtilizationEvent);
+      this.emit('utilization', {
+        cpuUsage: currentLoad.currentLoad,
+        hddTotal: usage.size,
+        hddUsed: usage.size - usage.free,
+        ramTotal: mem.total,
+        ramUsed: mem.used,
+        cpuTemperature: cpuTemperature.main,
+        gpuTemperature: gpu?.temperatureGpu,
+        gpuUsage: gpu?.utilizationGpu,
+        vramTotal: gpu?.memoryTotal,
+        vramUsed: gpu?.memoryUsed,
+      });
     }, 1000);
   }
 
@@ -194,6 +201,10 @@ export class Metastable extends EventEmitter {
         },
       });
     });
+
+    comfy.on('log', e => {
+      this.emit('backendLog', e);
+    });
   }
 
   replayEvents(onEvent: (event: any) => void) {
@@ -209,10 +220,6 @@ export class Metastable extends EventEmitter {
       onEvent({
         event: 'backend.status',
         data: comfy.status,
-      });
-      onEvent({
-        event: 'backend.logBuffer',
-        data: comfy.logBuffer.items,
       });
 
       if (comfy.torchInfo) {

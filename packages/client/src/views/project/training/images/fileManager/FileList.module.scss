@@ -1,12 +1,12 @@
 .files {
-  overflow-y: auto;
-  flex: 1;
   font-size: 0;
   padding: 5px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
   grid-gap: 10px;
   position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .file {
     display: inline-block;

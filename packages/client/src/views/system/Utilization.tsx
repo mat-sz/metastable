@@ -1,15 +1,27 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
 
 import { ProgressBar } from '@components/progressBar';
-import { mainStore } from '@stores/MainStore';
 import { filesize } from '@utils/file';
 import styles from './Utilization.module.scss';
+import { Utilization as UtilizationData } from '@metastable/types';
+import { TRPC } from '@api';
 
 const MB = 1024 * 1024;
 
-export const Utilization: React.FC = observer(() => {
-  const utilization = mainStore.utilization;
+export const Utilization: React.FC = () => {
+  const [utilization, setUtilization] = useState<UtilizationData>({
+    cpuUsage: 0,
+    hddTotal: 1,
+    hddUsed: 0,
+    ramTotal: 1,
+    ramUsed: 0,
+  });
+
+  TRPC.instance.onUtilization.useSubscription(undefined, {
+    onData: utilization => {
+      setUtilization(utilization);
+    },
+  });
 
   return (
     <div className={styles.utilization}>
@@ -78,4 +90,4 @@ export const Utilization: React.FC = observer(() => {
       </div>
     </div>
   );
-});
+};

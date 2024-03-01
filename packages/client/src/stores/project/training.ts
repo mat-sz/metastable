@@ -1,9 +1,10 @@
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import {
   Project as APIProject,
   ProjectTrainingSettings,
   ModelType,
 } from '@metastable/types';
+import { Base64 } from 'js-base64';
 
 import { API } from '@api';
 import { BaseProject } from './base';
@@ -71,18 +72,22 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   }
 
   private async handleUploadQueue() {
-    // const file = this.uploadQueue.pop();
-    // if (file) {
-    //   try {
-    //     const names = await API.projects.upload(this.id, file);
-    //     if (names) {
-    //       runInAction(() => {
-    //         this.allInputs.push(...names);
-    //       });
-    //     }
-    //   } catch {}
-    //   this.handleUploadQueue();
-    // }
+    const file = this.uploadQueue.pop();
+    if (file) {
+      try {
+        const result = await API.project.input.save.mutate({
+          projectId: this.id,
+          data: Base64.fromUint8Array(new Uint8Array(await file.arrayBuffer())),
+          name: file.name,
+        });
+        if (result?.name) {
+          runInAction(() => {
+            this.allInputs.push(result.name);
+          });
+        }
+      } catch {}
+      this.handleUploadQueue();
+    }
   }
 
   setSettings(settings: ProjectTrainingSettings) {

@@ -27,6 +27,14 @@ export async function exists(path: string) {
   }
 }
 
+export async function ls(dirPath: string) {
+  try {
+    return await fs.readdir(dirPath);
+  } catch {
+    return [];
+  }
+}
+
 export async function filenames(dirPath: string) {
   try {
     return (await fs.readdir(dirPath, { withFileTypes: true }))
@@ -137,29 +145,6 @@ export function resolveConfigPath(
   return path.resolve(basePath, value);
 }
 
-const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
-const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
-
-export async function freeDirName(parent: string, name: string) {
-  let dirName = name.replace(FILENAME_REPLACE, '_');
-  if (dirName.match(FILENAME_NEEDS_PREFIX)) {
-    dirName = `_${dirName}`;
-  }
-
-  let current = dirName;
-  let counter = 1;
-  while (true) {
-    if (!(await exists(path.join(parent, current)))) {
-      break;
-    }
-
-    counter++;
-    current = `${dirName} (${counter})`;
-  }
-
-  return current;
-}
-
 export class TextFile {
   constructor(protected path: string) {}
 
@@ -226,4 +211,36 @@ export function getMetadataDirectory(filePath: string) {
   }
 
   return path.join(dirName, METADATA_DIRECTORY_NAME);
+}
+
+const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
+const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+
+export async function getNewName(
+  parent: string,
+  name: string,
+  isDirectory = false,
+) {
+  name = name.replace(FILENAME_REPLACE, '_');
+  if (name.match(FILENAME_NEEDS_PREFIX)) {
+    name = `_${name}`;
+  }
+
+  const items = await ls(parent);
+  const split = name.split('.');
+  const extension = !isDirectory && split.length > 1 ? `.${split.pop()!}` : '';
+  const nameWithoutExtension = split.join('.');
+
+  let counter = 1;
+
+  while (true) {
+    if (!items.includes(name)) {
+      break;
+    }
+
+    counter++;
+    name = `${nameWithoutExtension} (${counter})${extension}`;
+  }
+
+  return name;
 }

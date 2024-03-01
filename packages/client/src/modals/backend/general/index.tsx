@@ -1,18 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
 
-import { API } from '@api';
+import { API, TRPC } from '@api';
 import { IconButton } from '@components/iconButton';
 import { mainStore } from '@stores/MainStore';
 import { copy } from '@utils/clipboard';
 import { filesize } from '@utils/file';
 import styles from './index.module.scss';
+import { LogItem } from '@metastable/types';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.torchInfo;
-  const log = mainStore.backendLog;
+  const [log, setLog] = useState<LogItem[]>([]);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +24,12 @@ export const General: React.FC = observer(() => {
 
     logEl.scroll({ top: logEl.scrollHeight, left: 0, behavior: 'smooth' });
   }, []);
+
+  TRPC.instance.onBackendLog.useSubscription(undefined, {
+    onData: items => {
+      setLog(current => [...current, ...items]);
+    },
+  });
 
   return (
     <>

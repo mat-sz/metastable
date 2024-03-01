@@ -2,23 +2,17 @@ import EventEmitter from 'events';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
-  ComfyLogItem,
+  LogItem,
   ProjectTrainingInputMetadata,
   ProjectTrainingSettings,
 } from '@metastable/types';
-import { rimraf } from 'rimraf';
 import fs from 'fs/promises';
 import { ChildProcess } from 'child_process';
 import sharp from 'sharp';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
-import {
-  JSONFile,
-  TextFile,
-  imageFilenames,
-  removeFileExtension,
-} from '../helpers/fs.js';
+import { JSONFile, TextFile, removeFileExtension } from '../helpers/fs.js';
 import type { ProjectEntity } from '../data/project.js';
 
 const baseDir = path.join(
@@ -28,7 +22,7 @@ const baseDir = path.join(
 );
 
 export class Kohya extends EventEmitter {
-  logBuffer = new CircularBuffer<ComfyLogItem>(25);
+  logBuffer = new CircularBuffer<LogItem>(25);
   processes: Record<string, ChildProcess> = {};
 
   constructor(
