@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsPlus, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
+import { Base64 } from 'js-base64';
 
+import { TRPC } from '@api';
 import { FilePicker } from '@components/filePicker';
 import { IconButton } from '@components/iconButton';
 import styles from './index.module.scss';
@@ -14,19 +16,28 @@ import { InputEditor } from './InputEditor';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
-  const inputs = [...project.allInputs].reverse();
+  const allInputsQuery = TRPC.project.input.all.useQuery({
+    projectId: project.id,
+  });
+  const createInputMutation = TRPC.project.input.create.useMutation();
+  const deleteInputMutation = TRPC.project.input.delete.useMutation();
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
   const [editing, setEditing] = useState<string>();
+
+  if (editing) {
+    return <InputEditor name={editing} onClose={() => setEditing(undefined)} />;
+  }
+
+  const inputs = allInputsQuery.data;
+  if (!inputs) {
+    return <div>Loading...</div>;
+  }
 
   const items = inputs.map(filename => ({
     id: filename,
     fileUrl: project.view('input', filename),
     thumbnailUrl: project.thumb('input', filename),
   }));
-
-  if (editing) {
-    return <InputEditor name={editing} onClose={() => setEditing(undefined)} />;
-  }
 
   return (
     <div className={styles.main}>
@@ -35,19 +46,32 @@ export const Images: React.FC = observer(() => {
           <UploadQueue
             items={queue.map(item => ({
               ...item,
-              state: project.uploadQueue.includes(item.file)
-                ? 'uploading'
-                : item.state,
             }))}
-            onStart={() => {
+            onStart={async () => {
               for (const item of queue) {
-                project.addInput(item.file);
+                setQueue(queue =>
+                  queue.map(queueItem =>
+                    queueItem.id === item.id
+                      ? { ...queueItem, state: 'uploading' }
+                      : queueItem,
+                  ),
+                );
+                await createInputMutation.mutateAsync({
+                  projectId: project.id,
+                  data: Base64.fromUint8Array(
+                    new Uint8Array(await item.file.arrayBuffer()),
+                  ),
+                  name: item.file.name,
+                });
                 URL.revokeObjectURL(item.url);
+                setQueue(queue =>
+                  queue.map(queueItem =>
+                    queueItem.id === item.id
+                      ? { ...queueItem, state: 'done' }
+                      : queueItem,
+                  ),
+                );
               }
-
-              setQueue(queue =>
-                queue.map(item => ({ ...item, state: 'done' })),
-              );
             }}
             onReset={() => {
               setQueue([]);
@@ -92,7 +116,10 @@ export const Images: React.FC = observer(() => {
               <IconButton
                 onClick={() => {
                   for (const item of selection) {
-                    project.deleteInput(item.id);
+                    deleteInputMutation.mutate({
+                      projectId: project.id,
+                      name: item.id,
+                    });
                   }
                 }}
               >

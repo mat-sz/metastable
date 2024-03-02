@@ -1,10 +1,9 @@
-import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { action, makeObservable, toJS } from 'mobx';
 import {
   Project as APIProject,
   ProjectTrainingSettings,
   ModelType,
 } from '@metastable/types';
-import { Base64 } from 'js-base64';
 
 import { API } from '@api';
 import { BaseProject } from './base';
@@ -49,52 +48,16 @@ export function defaultSettings(): ProjectTrainingSettings {
 }
 
 export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
-  uploadQueue: File[] = [];
-
   constructor(
     data: APIProject,
     settings: ProjectTrainingSettings = defaultSettings(),
   ) {
     super(data, settings);
     makeObservable(this, {
-      uploadQueue: observable,
       request: action,
       onPromptDone: action,
       setSettings: action,
     });
-  }
-
-  async addInput(file: File) {
-    this.uploadQueue.push(file);
-    if (this.uploadQueue.length === 1) {
-      this.handleUploadQueue();
-    }
-  }
-
-  async deleteInput(name: string) {
-    await API.project.input.delete.mutate({ projectId: this.id, name });
-    runInAction(() => {
-      this.allInputs = this.allInputs.filter(input => input !== name);
-    });
-  }
-
-  private async handleUploadQueue() {
-    const file = this.uploadQueue.pop();
-    if (file) {
-      try {
-        const result = await API.project.input.create.mutate({
-          projectId: this.id,
-          data: Base64.fromUint8Array(new Uint8Array(await file.arrayBuffer())),
-          name: file.name,
-        });
-        if (result?.name) {
-          runInAction(() => {
-            this.allInputs.push(result.name);
-          });
-        }
-      } catch {}
-      this.handleUploadQueue();
-    }
   }
 
   setSettings(settings: ProjectTrainingSettings) {

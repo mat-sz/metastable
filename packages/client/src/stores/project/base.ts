@@ -6,8 +6,6 @@ import { getStaticUrl } from '@utils/url';
 
 export class BaseProject<T = any> {
   outputFilenames: string[] = [];
-  allInputs: string[] = [];
-  allOutputs: string[] = [];
   mode: string = 'images';
   id;
   name;
@@ -22,12 +20,8 @@ export class BaseProject<T = any> {
     this.type = data.type;
     this.outputFilenames = data.lastOutput ? [data.lastOutput] : [];
 
-    this.refreshInputs();
-    this.refreshOutputs();
     makeObservable(this, {
       outputFilenames: observable,
-      allInputs: observable,
-      allOutputs: observable,
       mode: observable,
       id: observable,
       name: observable,
@@ -35,8 +29,6 @@ export class BaseProject<T = any> {
       settings: observable,
       rename: action,
       save: action,
-      refreshInputs: action,
-      refreshOutputs: action,
       triggerAutosave: action,
     });
   }
@@ -58,26 +50,6 @@ export class BaseProject<T = any> {
       projectId: this.id,
       settings,
     });
-  }
-
-  async refreshInputs() {
-    const inputs = await API.project.input.all.query({ projectId: this.id });
-
-    if (inputs) {
-      runInAction(() => {
-        this.allInputs = inputs;
-      });
-    }
-  }
-
-  async refreshOutputs() {
-    const outputs = await API.project.output.all.query({ projectId: this.id });
-
-    if (outputs) {
-      runInAction(() => {
-        this.allOutputs = outputs;
-      });
-    }
   }
 
   private _autosaveTimeout: number | undefined = undefined;
@@ -103,6 +75,5 @@ export class BaseProject<T = any> {
 
   onPromptDone(outputFilenames: string[]) {
     this.outputFilenames = outputFilenames;
-    this.allOutputs.push(...outputFilenames);
   }
 }

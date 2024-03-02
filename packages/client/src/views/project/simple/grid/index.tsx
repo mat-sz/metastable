@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { TRPC } from '@api';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
 
 export const Grid: React.FC = observer(() => {
   const project = useSimpleProject();
-  const outputs = [...project.allOutputs].reverse();
+  const allOutputsQuery = TRPC.project.output.all.useQuery({
+    projectId: project.id,
+  });
   const [current, setCurrent] = useState(0);
   const [open, setOpen] = useState(false);
+
+  const outputs = allOutputsQuery.data?.slice().reverse();
+
+  if (!outputs) {
+    return <div>Loading...</div>;
+  }
 
   if (!outputs.length) {
     return <div className={styles.info}>No project output images found.</div>;
