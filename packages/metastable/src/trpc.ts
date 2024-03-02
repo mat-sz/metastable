@@ -238,13 +238,11 @@ export const router = t.router({
             name: z.string(),
           }),
         )
-        .mutation(
-          async ({ ctx: { metastable }, input: { projectId, name } }) => {
-            const project = await metastable.project.get(projectId);
-            const input = await project.input.get(name);
-            return await input.json();
-          },
-        ),
+        .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
+          const project = await metastable.project.get(projectId);
+          const input = await project.input.get(name);
+          return await input.json();
+        }),
       create: t.procedure
         .input(
           z.object({
@@ -313,13 +311,11 @@ export const router = t.router({
             name: z.string(),
           }),
         )
-        .mutation(
-          async ({ ctx: { metastable }, input: { projectId, name } }) => {
-            const project = await metastable.project.get(projectId);
-            const output = await project.output.get(name);
-            return await output.json();
-          },
-        ),
+        .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
+          const project = await metastable.project.get(projectId);
+          const output = await project.output.get(name);
+          return await output.json();
+        }),
       delete: t.procedure
         .input(
           z.object({

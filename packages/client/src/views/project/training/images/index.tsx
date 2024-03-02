@@ -4,23 +4,29 @@ import { BsPlus, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
 
 import { FilePicker } from '@components/filePicker';
+import { IconButton } from '@components/iconButton';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
 import { FileManager } from './fileManager';
 import { UploadQueue, UploadQueueItem } from './UploadQueue';
-import { IconButton } from '@components/iconButton';
+import { InputEditor } from './InputEditor';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
   const inputs = [...project.allInputs].reverse();
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
+  const [editing, setEditing] = useState<string>();
 
   const items = inputs.map(filename => ({
     id: filename,
     fileUrl: project.view('input', filename),
     thumbnailUrl: project.thumb('input', filename),
   }));
+
+  if (editing) {
+    return <InputEditor name={editing} onClose={() => setEditing(undefined)} />;
+  }
 
   return (
     <div className={styles.main}>
@@ -53,6 +59,7 @@ export const Images: React.FC = observer(() => {
         )}
         <FileManager
           items={items}
+          onOpen={ids => setEditing(ids[0])}
           actions={
             <>
               <FilePicker

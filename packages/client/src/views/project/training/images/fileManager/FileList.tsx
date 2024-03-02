@@ -88,6 +88,7 @@ export const FileList: React.FC<Props> = ({
   items,
   selection = [],
   onSelect = () => {},
+  onOpen = () => {},
 }) => {
   const listRef = useRef<HTMLDivElement>(null);
   const selectionBoxRef = useRef<HTMLDivElement>(null);
@@ -218,6 +219,9 @@ export const FileList: React.FC<Props> = ({
             if (!e.shiftKey) {
               lastClickedIdRef.current = item.id;
             }
+          }}
+          onDoubleClick={() => {
+            onOpen([item.id]);
           }}
           data-id={item.id}
         >
