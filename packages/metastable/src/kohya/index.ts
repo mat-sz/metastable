@@ -54,7 +54,7 @@ export class Kohya extends EventEmitter {
     for (const input of inputs) {
       const name = removeFileExtension(input.name);
       const inputData =
-        (await input.data.get()) as ProjectTrainingInputMetadata;
+        (await input.metadata.get()) as ProjectTrainingInputMetadata;
 
       if (inputData?.caption) {
         const tempFile = new TextFile(path.join(tempInputPath, `${name}.txt`));

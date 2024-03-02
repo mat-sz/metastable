@@ -11,12 +11,13 @@ import {
   EntityRepository,
   ImageEntity,
   EntityClass,
+  DirectoryEntity,
 } from './common.js';
 
-export class ProjectEntity extends BaseEntity {
+export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
-  data = new Metadata(path.join(this._path, 'project.json'));
+  metadata = new Metadata(path.join(this._path, 'project.json'));
   settings = new Metadata(path.join(this._path, 'settings.json'));
 
   input = new EntityRepository(path.join(this._path, 'input'), ImageEntity);
@@ -28,7 +29,7 @@ export class ProjectEntity extends BaseEntity {
   }
 
   async load(): Promise<void> {
-    await this.data.get();
+    await this.metadata.get();
     await mkdir(this.input.path, { recursive: true });
     await mkdir(this.output.path, { recursive: true });
   }
@@ -52,7 +53,7 @@ export class ProjectEntity extends BaseEntity {
 
     const json: any = {
       type: 'simple',
-      ...this.data.json!,
+      ...this.metadata.json!,
       id: this.name,
       name: this.name,
       lastOutput: outputs[outputs.length - 1]?.name,
@@ -65,25 +66,5 @@ export class ProjectEntity extends BaseEntity {
     }
 
     return json;
-  }
-
-  static async fromDirent<T extends BaseEntity>(
-    this: EntityClass<T>,
-    dirent: Dirent,
-  ): Promise<T> {
-    if (!dirent.isDirectory()) {
-      throw new Error('Not a directory.');
-    }
-
-    return await super.fromDirent<T>(dirent);
-  }
-
-  static async create<T extends BaseEntity>(
-    this: EntityClass<T>,
-    filePath: string,
-  ): Promise<T> {
-    const project = await super.create<T>(filePath);
-    await mkdir(project.path, { recursive: true });
-    return project;
   }
 }

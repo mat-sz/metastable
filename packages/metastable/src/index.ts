@@ -54,7 +54,7 @@ export class Metastable extends (EventEmitter as {
         const project = await this.project.get(event.data.project_id);
         for (const filename of event.data.output_filenames) {
           const output = await project.output.get(filename);
-          await output.data.set(settings);
+          await output.metadata.set(settings);
         }
       } catch {}
       delete this.settingsCache[event.data.id];

@@ -178,7 +178,7 @@ export const router = t.router({
       )
       .mutation(async ({ ctx: { metastable }, input }) => {
         const project = await metastable.project.create(input.name);
-        await project.data.set({ type: input.type });
+        await project.metadata.set({ type: input.type });
         await project.settings.set(input.settings);
         return await project.json(true);
       }),
@@ -200,16 +200,12 @@ export const router = t.router({
       .mutation(
         async ({
           ctx: { metastable },
-          input: { projectId, settings, name, ...data },
+          input: { projectId, settings, name, ...metadata },
         }) => {
-          const project = await metastable.project.get(projectId);
+          const project = await metastable.project.getOrRename(projectId, name);
 
-          if (name) {
-            // TODO: rename project
-          }
-
-          if (data) {
-            await project.data.update(data);
+          if (metadata) {
+            await project.metadata.update(metadata);
           }
 
           if (settings) {
@@ -235,7 +231,21 @@ export const router = t.router({
 
           return inputs.map(input => input.name);
         }),
-      save: t.procedure
+      get: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            name: z.string(),
+          }),
+        )
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, name } }) => {
+            const project = await metastable.project.get(projectId);
+            const input = await project.input.get(name);
+            return await input.json();
+          },
+        ),
+      create: t.procedure
         .input(
           z.object({
             projectId: z.string(),
@@ -248,7 +258,42 @@ export const router = t.router({
             const project = await metastable.project.get(projectId);
             const input = await project.input.create(name);
 
-            return await input.write(Base64.toUint8Array(data));
+            await input.write(Base64.toUint8Array(data));
+            return await input.json();
+          },
+        ),
+      update: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            name: z.string(),
+            newName: z.string().optional(),
+            metadata: z.any().optional(),
+          }),
+        )
+        .mutation(
+          async ({
+            ctx: { metastable },
+            input: { projectId, name, newName, metadata },
+          }) => {
+            const project = await metastable.project.get(projectId);
+            const input = await project.input.getOrRename(name, newName);
+
+            await input.metadata.update(metadata);
+            return await input.json();
+          },
+        ),
+      delete: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            name: z.string(),
+          }),
+        )
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, name } }) => {
+            const project = await metastable.project.get(projectId);
+            await project.input.delete(name);
           },
         ),
     },
@@ -261,6 +306,33 @@ export const router = t.router({
 
           return outputs.map(output => output.name);
         }),
+      get: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            name: z.string(),
+          }),
+        )
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, name } }) => {
+            const project = await metastable.project.get(projectId);
+            const output = await project.output.get(name);
+            return await output.json();
+          },
+        ),
+      delete: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+            name: z.string(),
+          }),
+        )
+        .mutation(
+          async ({ ctx: { metastable }, input: { projectId, name } }) => {
+            const project = await metastable.project.get(projectId);
+            await project.output.delete(name);
+          },
+        ),
     },
     training: {
       start: t.procedure

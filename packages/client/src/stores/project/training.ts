@@ -71,11 +71,18 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
     }
   }
 
+  async deleteInput(name: string) {
+    await API.project.input.delete.mutate({ projectId: this.id, name });
+    runInAction(() => {
+      this.allInputs = this.allInputs.filter(input => input !== name);
+    });
+  }
+
   private async handleUploadQueue() {
     const file = this.uploadQueue.pop();
     if (file) {
       try {
-        const result = await API.project.input.save.mutate({
+        const result = await API.project.input.create.mutate({
           projectId: this.id,
           data: Base64.fromUint8Array(new Uint8Array(await file.arrayBuffer())),
           name: file.name,

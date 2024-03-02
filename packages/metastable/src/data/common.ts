@@ -1,13 +1,15 @@
 import { Dirent } from 'fs';
-import fs, { mkdir } from 'fs/promises';
+import fs, { mkdir, rm } from 'fs/promises';
 import path from 'path';
 
 import {
   IMAGE_EXTENSIONS,
   getMetadataDirectory,
-  getNewName,
+  getAvailableName,
+  tryUnlink,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
+import { rimraf } from 'rimraf';
 
 export type EntityClass<T extends BaseEntity> = {
   new (...args: any[]): T;
@@ -55,6 +57,7 @@ export class Metadata<T> {
   async set(data: T) {
     try {
       await fs.writeFile(this.path, JSON.stringify(data));
+      this._json = data;
     } catch {
       throw new Error(`Unable to write metadata to: ${this.path}`);
     }
@@ -68,6 +71,10 @@ export class Metadata<T> {
   async refresh() {
     this._json = undefined;
     await this.get();
+  }
+
+  async delete() {
+    await tryUnlink(this.path);
   }
 }
 export class BaseEntity {
@@ -89,6 +96,12 @@ export class BaseEntity {
   }
 
   async load(): Promise<void> {}
+
+  async json() {
+    return { name: this.name };
+  }
+
+  async delete(): Promise<void> {}
 
   static async fromDirent<T extends BaseEntity>(
     this: EntityClass<T>,
@@ -114,20 +127,67 @@ export class BaseEntity {
   }
 }
 
+export class DirectoryEntity extends BaseEntity {
+  static readonly isDirectory = true;
+
+  metadata = new Metadata(path.join(this._path, 'metadata.json'));
+
+  constructor(_path: string) {
+    super(_path);
+  }
+
+  async load(): Promise<void> {
+    await this.metadata.get();
+  }
+
+  static async fromDirent<T extends BaseEntity>(
+    this: EntityClass<T>,
+    dirent: Dirent,
+  ): Promise<T> {
+    if (!dirent.isDirectory()) {
+      throw new Error('Not a directory.');
+    }
+
+    return await super.fromDirent<T>(dirent);
+  }
+
+  static async create<T extends BaseEntity>(
+    this: EntityClass<T>,
+    filePath: string,
+  ): Promise<T> {
+    const entity = await super.create<T>(filePath);
+    await mkdir(entity.path, { recursive: true });
+    return entity;
+  }
+
+  async delete(): Promise<void> {
+    await rimraf(this.path);
+  }
+}
+
 export class FileEntity extends BaseEntity {
-  data;
+  metadata;
 
   constructor(_path: string) {
     super(_path);
 
-    this.data = new Metadata(
+    this.metadata = new Metadata(
       path.join(getMetadataDirectory(this.path), `${this.name}.json`),
       {},
     );
   }
 
   async load(): Promise<void> {
-    await this.data.get();
+    await this.metadata.get();
+  }
+
+  async json() {
+    return { name: this.name, metadata: await this.metadata.get() };
+  }
+
+  async delete(): Promise<void> {
+    await fs.unlink(this.path);
+    await this.metadata.delete();
   }
 
   static async fromDirent<T extends BaseEntity>(
@@ -174,7 +234,11 @@ export class ImageEntity extends FileEntity {
   async write(data: Uint8Array) {
     await fs.writeFile(this.path, data);
     await generateThumbnail(this.path);
-    return { name: this.name };
+  }
+
+  async delete(): Promise<void> {
+    await super.delete();
+    await tryUnlink(this.thumbnailPath);
   }
 }
 
@@ -182,7 +246,7 @@ type EntityType<T> = T extends new (...args: any[]) => infer A ? A : never;
 
 export class EntityRepository<
   TClass extends EntityClass<BaseEntity>,
-  TEntity = EntityType<TClass>,
+  TEntity extends BaseEntity = EntityType<TClass>,
 > {
   constructor(
     private baseDir: string,
@@ -191,6 +255,22 @@ export class EntityRepository<
 
   get path() {
     return this.baseDir;
+  }
+
+  private getEntityPath(name: string) {
+    return path.join(this.baseDir, name);
+  }
+
+  private async getAvailableEntityName(name: string) {
+    return await getAvailableName(
+      this.baseDir,
+      name,
+      this.assetClass.isDirectory,
+    );
+  }
+
+  private async getAvailableEntityPath(name: string) {
+    return this.getEntityPath(await this.getAvailableEntityName(name));
   }
 
   async all(): Promise<TEntity[]> {
@@ -213,20 +293,34 @@ export class EntityRepository<
 
   async get(name: string): Promise<TEntity> {
     return (await this.assetClass.fromPath(
-      path.join(this.baseDir, name),
+      this.getEntityPath(name),
     )) as TEntity;
   }
 
   async create(name: string): Promise<TEntity> {
     await mkdir(this.path, { recursive: true });
 
-    const newName = await getNewName(
-      this.baseDir,
-      name,
-      this.assetClass.isDirectory,
-    );
     return (await this.assetClass.create(
-      path.join(this.baseDir, newName),
+      await this.getAvailableEntityPath(name),
     )) as TEntity;
+  }
+
+  async rename(oldName: string, newName: string): Promise<TEntity> {
+    newName = await this.getAvailableEntityName(newName);
+    await fs.rename(this.getEntityPath(oldName), this.getEntityPath(newName));
+    return await this.get(newName);
+  }
+
+  async getOrRename(name: string, newName?: string) {
+    if (newName) {
+      return await this.rename(name, newName);
+    }
+
+    return await this.get(name);
+  }
+
+  async delete(name: string): Promise<void> {
+    const entity = await this.get(name);
+    await entity.delete();
   }
 }

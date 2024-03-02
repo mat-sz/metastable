@@ -1,5 +1,5 @@
 import path from 'path';
-import fs, { mkdir } from 'fs/promises';
+import fs, { mkdir, unlink } from 'fs/promises';
 import { FileInfo } from '@metastable/types';
 
 export const IMAGE_EXTENSIONS = [
@@ -54,14 +54,6 @@ export async function imageFilenames(dirPath: string) {
     const split = name.split('.');
     return IMAGE_EXTENSIONS.includes(split[split.length - 1]);
   });
-}
-
-export async function tryUnlink(filePath: string) {
-  try {
-    await fs.unlink(filePath);
-  } catch {
-    //
-  }
 }
 
 export async function walk(
@@ -202,6 +194,19 @@ export async function tryMkdir(path: string): Promise<boolean> {
   }
 }
 
+export async function tryUnlink(filePath?: string): Promise<boolean> {
+  if (!filePath) {
+    return false;
+  }
+
+  try {
+    await unlink(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const METADATA_DIRECTORY_NAME = '.metastable';
 
 export function getMetadataDirectory(filePath: string) {
@@ -216,7 +221,7 @@ export function getMetadataDirectory(filePath: string) {
 const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
 const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
-export async function getNewName(
+export async function getAvailableName(
   parent: string,
   name: string,
   isDirectory = false,

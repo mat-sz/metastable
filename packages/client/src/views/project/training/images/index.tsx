@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsPlus } from 'react-icons/bs';
+import { BsPlus, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
 
 import { FilePicker } from '@components/filePicker';
@@ -9,6 +9,7 @@ import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
 import { FileManager } from './fileManager';
 import { UploadQueue, UploadQueueItem } from './UploadQueue';
+import { IconButton } from '@components/iconButton';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
@@ -79,6 +80,19 @@ export const Images: React.FC = observer(() => {
               </FilePicker>
             </>
           }
+          selectionActions={selection => (
+            <>
+              <IconButton
+                onClick={() => {
+                  for (const item of selection) {
+                    project.deleteInput(item.id);
+                  }
+                }}
+              >
+                <BsTrash />
+              </IconButton>
+            </>
+          )}
         />
       </div>
       <Settings />
