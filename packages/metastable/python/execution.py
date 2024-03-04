@@ -33,8 +33,13 @@ from helpers import jsonout, get_save_image_counter
 import ipadapter
 import progress_hook
 
-def load_image(img):
-    i = Image.open(BytesIO(base64.b64decode(img)))
+def get_bytes(url):
+    if url.startswith("data:"):
+        prefix, data = url.split(",")
+        return BytesIO(base64.b64decode(data))
+
+def load_image(url):
+    i = Image.open(get_bytes(url))
     i = ImageOps.exif_transpose(i)
     image = i.convert("RGB")
     image = np.array(image).astype(np.float32) / 255.0

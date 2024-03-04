@@ -7,7 +7,7 @@ export async function imageUrlToBase64(url: string): Promise<string> {
     try {
       const reader = new FileReader();
       reader.onload = () => {
-        onSuccess((reader.result as string).split(',')[1]);
+        onSuccess(reader.result as string);
       };
       reader.readAsDataURL(blob);
     } catch (e) {
@@ -34,13 +34,11 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
 }
 
 export async function base64ify(image: string) {
-  if (image.startsWith('blob:')) {
-    return await imageUrlToBase64(image);
-  } else if (image.startsWith('data:')) {
-    return image.split(',')[1];
+  if (image.startsWith('data:')) {
+    return image;
   }
 
-  return image;
+  return await imageUrlToBase64(image);
 }
 
 export async function prepareImage(
