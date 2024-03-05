@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 
 import { Card, CardTag, CardTags, List } from '$components/list';
 import { Pagination } from '$components/pagination';
@@ -74,7 +74,10 @@ export const CivitAI: React.FC = observer(() => {
     nsfw: false,
   });
   const [item, setItem] = useState<CivitAIModel | undefined>();
-  const { data, error, isLoading } = useSWR(args, fetchCivitAI);
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['fetchModels', args.query, args.type, args.page, args.nsfw],
+    queryFn: () => fetchCivitAI(args),
+  });
 
   if (item) {
     return <Model model={item} onClose={() => setItem(undefined)} />;

@@ -48,7 +48,6 @@
     "react-use-pointer-drag": "^0.1.2",
     "react-var-ui": "^1.5.1",
     "sass": "^1.66.1",
-    "swr": "^2.2.4",
     "trpc-electron": "^0.1.0",
     "use-context-menu": "^0.4.13"
   },
