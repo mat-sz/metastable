@@ -1,7 +1,7 @@
 import React from 'react';
 import { BsFillFloppy2Fill } from 'react-icons/bs';
 
-import { IconButton } from '@components/iconButton';
+import { IconButton } from '$components/iconButton';
 import styles from './index.module.scss';
 import { useEditor } from './context';
 import { useSimpleProject } from '../../context';

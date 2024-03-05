@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 import { BsBoxFill } from 'react-icons/bs';
 import { runInAction } from 'mobx';
 
-import { Checkbox } from '@components/checkbox';
-import { ModelList } from '@components/modelList';
-import { mainStore } from '@stores/MainStore';
+import { Checkbox } from '$components/checkbox';
+import { ModelList } from '$components/modelList';
+import { mainStore } from '$stores/MainStore';
 import { Item } from '../components/Item';
 import { DownloadableModel } from '../../../types/model';
 

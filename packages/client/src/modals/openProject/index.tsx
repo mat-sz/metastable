@@ -2,11 +2,11 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsHdd, BsImage } from 'react-icons/bs';
 
-import { filesize } from '@utils/file';
-import { Modal, useModal } from '@components/modal';
-import { Card, CardTag, CardTags, List } from '@components/list';
-import { mainStore } from '@stores/MainStore';
-import { fuzzy } from '@utils/fuzzy';
+import { filesize } from '$utils/file';
+import { Modal, useModal } from '$components/modal';
+import { Card, CardTag, CardTags, List } from '$components/list';
+import { mainStore } from '$stores/MainStore';
+import { fuzzy } from '$utils/fuzzy';
 import styles from './index.module.scss';
 
 export const OpenProject: React.FC = observer(() => {

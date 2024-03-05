@@ -10,8 +10,8 @@ import { createTRPCReact } from '@trpc/react-query';
 import type { Router } from '@metastable/metastable';
 import { ipcLink } from 'trpc-electron/renderer';
 
-import { getUrl } from '@utils/url';
-import { IS_ELECTRON } from '@utils/config';
+import { getUrl } from '$utils/url';
+import { IS_ELECTRON } from '$utils/config';
 
 declare global {
   interface Window {

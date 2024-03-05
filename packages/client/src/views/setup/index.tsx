@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { mainStore } from '@stores/MainStore';
+import { mainStore } from '$stores/MainStore';
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 

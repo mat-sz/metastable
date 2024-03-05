@@ -9,13 +9,13 @@ import {
   TaskState,
 } from '@metastable/types';
 
-import { API } from '@api';
-import { getStaticUrl } from '@utils/url';
+import { API } from '$api';
+import { getStaticUrl } from '$utils/url';
 import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
 import { ConfigStore } from './ConfigStore';
-import { IS_ELECTRON } from '@utils/config';
+import { IS_ELECTRON } from '$utils/config';
 
 class MainStore {
   projects = new ProjectStore();

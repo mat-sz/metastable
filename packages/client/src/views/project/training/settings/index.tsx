@@ -15,9 +15,9 @@ import {
 import { BsPlay, BsX } from 'react-icons/bs';
 
 import { ModelType } from '@metastable/types';
-import { IconButton } from '@components/iconButton';
-import { mainStore } from '@stores/MainStore';
-import { ProgressBar } from '@components/progressBar';
+import { IconButton } from '$components/iconButton';
+import { mainStore } from '$stores/MainStore';
+import { ProgressBar } from '$components/progressBar';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { VarModel } from './components/VarModel';

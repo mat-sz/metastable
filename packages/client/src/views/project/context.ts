@@ -4,7 +4,7 @@ import type {
   BaseProject,
   SimpleProject,
   TrainingProject,
-} from '@stores/project';
+} from '$stores/project';
 
 export const ProjectContext = React.createContext<BaseProject>(
   undefined as any,

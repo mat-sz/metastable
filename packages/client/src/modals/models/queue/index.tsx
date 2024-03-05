@@ -2,9 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { TaskState } from '@metastable/types';
 
-import { ProgressBar } from '@components/progressBar';
-import { mainStore } from '@stores/MainStore';
-import { filesize } from '@utils/file';
+import { ProgressBar } from '$components/progressBar';
+import { mainStore } from '$stores/MainStore';
+import { filesize } from '$utils/file';
 import styles from './index.module.scss';
 
 export const Queue: React.FC = observer(() => {

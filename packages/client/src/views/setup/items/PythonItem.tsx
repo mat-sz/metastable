@@ -3,9 +3,9 @@ import { runInAction } from 'mobx';
 import { FaPython } from 'react-icons/fa';
 import { observer } from 'mobx-react-lite';
 
-import { RequirementsTable } from '@components/requirementsTable';
-import { Toggle } from '@components/toggle';
-import { mainStore } from '@stores/MainStore';
+import { RequirementsTable } from '$components/requirementsTable';
+import { Toggle } from '$components/toggle';
+import { mainStore } from '$stores/MainStore';
 import styles from './PythonItem.module.scss';
 import { Item } from '../components/Item';
 

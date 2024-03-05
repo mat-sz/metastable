@@ -3,12 +3,12 @@ import { observer } from 'mobx-react-lite';
 import { Model } from '@metastable/types';
 import { BsFolder } from 'react-icons/bs';
 
-import { Card, List } from '@components/list';
-import { Breadcrumbs } from '@components/breadcrumbs';
-import { mainStore } from '@stores/MainStore';
-import { getStaticUrl } from '@utils/url';
-import { fuzzy } from '@utils/fuzzy';
-import { removeFileExtension, stringToColor } from '@utils/string';
+import { Card, List } from '$components/list';
+import { Breadcrumbs } from '$components/breadcrumbs';
+import { mainStore } from '$stores/MainStore';
+import { getStaticUrl } from '$utils/url';
+import { fuzzy } from '$utils/fuzzy';
+import { removeFileExtension, stringToColor } from '$utils/string';
 
 interface Props {
   type: string;

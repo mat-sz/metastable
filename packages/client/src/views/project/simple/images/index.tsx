@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsPlay } from 'react-icons/bs';
 
-import { IconButton } from '@components/iconButton';
-import { ImagePreview } from '@components/imagePreview';
+import { IconButton } from '$components/iconButton';
+import { ImagePreview } from '$components/imagePreview';
 import styles from './index.module.scss';
 import { Settings } from '../settings';
 import { useSimpleProject } from '../../context';

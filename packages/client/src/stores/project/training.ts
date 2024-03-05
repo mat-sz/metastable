@@ -5,7 +5,7 @@ import {
   ModelType,
 } from '@metastable/types';
 
-import { API } from '@api';
+import { API } from '$api';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 

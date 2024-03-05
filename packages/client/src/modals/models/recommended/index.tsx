@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ModelList } from '@components/modelList';
+import { ModelList } from '$components/modelList';
 import { DownloadButton } from '../DownloadButton';
 
 export const Recommended: React.FC = () => {

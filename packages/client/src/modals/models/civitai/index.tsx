@@ -4,12 +4,12 @@ import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
 import useSWR from 'swr';
 
-import { Card, CardTag, CardTags, List } from '@components/list';
-import { Pagination } from '@components/pagination';
-import { Loading } from '@components/loading';
-import { Toggle } from '@components/toggle';
-import { IconButton } from '@components/iconButton';
-import { Rating } from '@components/rating';
+import { Card, CardTag, CardTags, List } from '$components/list';
+import { Pagination } from '$components/pagination';
+import { Loading } from '$components/loading';
+import { Toggle } from '$components/toggle';
+import { IconButton } from '$components/iconButton';
+import { Rating } from '$components/rating';
 import styles from './index.module.scss';
 import { CivitAIModel, CivitAIResponse } from './types';
 import { Model } from './Model';

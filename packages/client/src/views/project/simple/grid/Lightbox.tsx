@@ -8,8 +8,8 @@ import {
   BsXLg,
 } from 'react-icons/bs';
 
-import { IconButton } from '@components/iconButton';
-import { ImagePreview } from '@components/imagePreview';
+import { IconButton } from '$components/iconButton';
+import { ImagePreview } from '$components/imagePreview';
 import styles from './Lightbox.module.scss';
 
 interface Props {

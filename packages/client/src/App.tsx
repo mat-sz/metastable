@@ -1,8 +1,8 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { UI } from '@components/ui';
-import { mainStore } from '@stores/MainStore';
+import { UI } from '$components/ui';
+import { mainStore } from '$stores/MainStore';
 import './index.scss';
 import { Project } from './views/project';
 import { Projects } from './views/system/Projects';

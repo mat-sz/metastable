@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { usePointerDrag } from 'react-use-pointer-drag';
 import clsx from 'clsx';
 
-import { clamp } from '@utils/math';
+import { clamp } from '$utils/math';
 import styles from './index.module.scss';
 
 export type Area = [x: number, y: number, width: number, height: number];

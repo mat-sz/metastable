@@ -1,15 +1,15 @@
 import { IVarBaseInputProps, VarBase, useVarUIValue } from 'react-var-ui';
+import { observer } from 'mobx-react-lite';
+import { BsChevronRight } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
-import { useUI } from '@components/ui';
-import { stringToColor } from '@utils/string';
-import { ModelSelect } from '@modals/modelSelect';
+import { useUI } from '$components/ui';
+import { ModelSelect } from '$modals/modelSelect';
+import { stringToColor } from '$utils/string';
+import { getStaticUrl } from '$utils/url';
+import { mainStore } from '$stores/MainStore';
 import styles from './VarModel.module.scss';
 import { useSimpleProject } from '../../../context';
-import { mainStore } from '@/stores/MainStore';
-import { observer } from 'mobx-react-lite';
-import { getStaticUrl } from '@/common/utils/url';
-import { BsChevronRight } from 'react-icons/bs';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;

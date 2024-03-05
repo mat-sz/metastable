@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { TRPC } from '@api';
+import { TRPC } from '$api';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';

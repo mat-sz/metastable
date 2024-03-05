@@ -3,9 +3,9 @@ import { MdNoPhotography } from 'react-icons/md';
 import clsx from 'clsx';
 import { usePointerDrag } from 'react-use-pointer-drag';
 
-import { Vector2 } from '@editor/primitives/Vector2';
-import { Rectangle } from '@editor/primitives/Rectangle';
-import { Point } from '@editor/types';
+import { Vector2 } from '$editor/primitives/Vector2';
+import { Rectangle } from '$editor/primitives/Rectangle';
+import { Point } from '$editor/types';
 import styles from './FileList.module.scss';
 import { FileManagerItem } from './types';
 

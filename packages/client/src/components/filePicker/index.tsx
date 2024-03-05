@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { useFileInput } from '@hooks/useFileInput';
-import { usePaste } from '@hooks/usePaste';
+import { useFileInput } from '$hooks/useFileInput';
+import { usePaste } from '$hooks/usePaste';
 import { Dropzone } from './Dropzone';
 
 interface FilePickerState {

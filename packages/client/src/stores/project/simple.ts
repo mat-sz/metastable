@@ -5,11 +5,11 @@ import {
   ModelType,
 } from '@metastable/types';
 
-import { API } from '@api';
-import { Editor } from '@editor';
-import { Point } from '@editor/types';
-import { randomSeed } from '@utils/comfy';
-import { base64ify, loadImage, prepareImage } from '@utils/image';
+import { API } from '$api';
+import { Editor } from '$editor';
+import { Point } from '$editor/types';
+import { randomSeed } from '$utils/comfy';
+import { base64ify, loadImage, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 

@@ -11,7 +11,7 @@ import {
 } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
-import { mainStore } from '@stores/MainStore';
+import { mainStore } from '$stores/MainStore';
 import { VarModel } from '../components/VarModel';
 import { useSimpleProject } from '../../../context';
 

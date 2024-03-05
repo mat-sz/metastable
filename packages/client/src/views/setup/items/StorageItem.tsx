@@ -2,9 +2,9 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsHddFill } from 'react-icons/bs';
 
-import { AvailableStorage } from '@components/availableStorage';
-import { mainStore } from '@stores/MainStore';
-import { filesize } from '@utils/file';
+import { AvailableStorage } from '$components/availableStorage';
+import { mainStore } from '$stores/MainStore';
+import { filesize } from '$utils/file';
 import styles from './StorageItem.module.scss';
 import { Item } from '../components/Item';
 

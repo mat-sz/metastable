@@ -1,8 +1,8 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { Project as APIProject } from '@metastable/types';
 
-import { API } from '@api';
-import { getStaticUrl } from '@utils/url';
+import { API } from '$api';
+import { getStaticUrl } from '$utils/url';
 
 export class BaseProject<T = any> {
   outputFilenames: string[] = [];

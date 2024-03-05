@@ -3,8 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { BsDownload, BsHourglass } from 'react-icons/bs';
 import { DownloadSettings, TaskState } from '@metastable/types';
 
-import { filesize } from '@utils/file';
-import { mainStore } from '@stores/MainStore';
+import { filesize } from '$utils/file';
+import { mainStore } from '$stores/MainStore';
 
 interface DownloadButtonProps {
   files: DownloadSettings[];

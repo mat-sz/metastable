@@ -3,11 +3,11 @@ import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
 
-import { API, TRPC } from '@api';
-import { IconButton } from '@components/iconButton';
-import { mainStore } from '@stores/MainStore';
-import { copy } from '@utils/clipboard';
-import { filesize } from '@utils/file';
+import { API, TRPC } from '$api';
+import { IconButton } from '$components/iconButton';
+import { mainStore } from '$stores/MainStore';
+import { copy } from '$utils/clipboard';
+import { filesize } from '$utils/file';
 import styles from './index.module.scss';
 import { LogItem } from '@metastable/types';
 

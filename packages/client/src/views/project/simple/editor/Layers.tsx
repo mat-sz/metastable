@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { BsImage, BsPlus } from 'react-icons/bs';
 import { useContextMenu, ContextMenuItem } from 'use-context-menu';
 
-import { IconButton } from '@components/iconButton';
-import type { Layer } from '@editor/types';
+import { IconButton } from '$components/iconButton';
+import type { Layer } from '$editor/types';
 import styles from './index.module.scss';
 import { useEditor } from './context';
 

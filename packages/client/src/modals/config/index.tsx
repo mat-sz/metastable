@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { VarString, VarUI } from 'react-var-ui';
 
-import { Modal } from '@components/modal';
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '@components/tabs';
-import { mainStore } from '@stores/MainStore';
+import { Modal } from '$components/modal';
+import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
+import { mainStore } from '$stores/MainStore';
 
 export const Config: React.FC = observer(() => {
   const config = mainStore.config;

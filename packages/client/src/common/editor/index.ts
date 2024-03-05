@@ -1,7 +1,7 @@
 import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 
-import { loadImage } from '@utils/image';
+import { loadImage } from '$utils/image';
 import { MoveTool } from './tools/move';
 import { BrushTool } from './tools/brush';
 import {

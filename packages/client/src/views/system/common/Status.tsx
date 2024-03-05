@@ -11,11 +11,11 @@ import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 import { TaskState } from '@metastable/types';
 
-import { ProgressButton } from '@components/progressButton';
-import { useUI } from '@components/ui';
-import { Backend } from '@modals/backend';
-import { ModelManager } from '@modals/models';
-import { mainStore } from '@stores/MainStore';
+import { ProgressButton } from '$components/progressButton';
+import { useUI } from '$components/ui';
+import { Backend } from '$modals/backend';
+import { ModelManager } from '$modals/models';
+import { mainStore } from '$stores/MainStore';
 import styles from './Status.module.scss';
 import { Utilization } from '../Utilization';
 

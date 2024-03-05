@@ -59,14 +59,14 @@ export default defineConfig(({ mode }) => {
           }
         : {}),
       alias: {
-        '@': path.resolve(__dirname, './src'),
-        '@api': path.resolve(__dirname, './src/common/api'),
-        '@components': path.resolve(__dirname, './src/components'),
-        '@editor': path.resolve(__dirname, './src/common/editor'),
-        '@hooks': path.resolve(__dirname, './src/common/hooks'),
-        '@modals': path.resolve(__dirname, './src/modals'),
-        '@stores': path.resolve(__dirname, './src/stores'),
-        '@utils': path.resolve(__dirname, './src/common/utils'),
+        $: path.resolve(__dirname, './src'),
+        $api: path.resolve(__dirname, './src/common/api'),
+        $components: path.resolve(__dirname, './src/components'),
+        $editor: path.resolve(__dirname, './src/common/editor'),
+        $hooks: path.resolve(__dirname, './src/common/hooks'),
+        $modals: path.resolve(__dirname, './src/modals'),
+        $stores: path.resolve(__dirname, './src/stores'),
+        $utils: path.resolve(__dirname, './src/common/utils'),
       },
     },
   };

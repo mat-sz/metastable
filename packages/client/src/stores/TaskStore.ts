@@ -6,7 +6,7 @@ import {
   TaskEvent,
 } from '@metastable/types';
 
-import { API } from '@api';
+import { API } from '$api';
 
 export class TaskStore {
   queues: Record<string, Task<any>[]> = {

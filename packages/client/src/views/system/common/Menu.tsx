@@ -1,12 +1,12 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { useUI } from '@components/ui';
-import { NewProject } from '@modals/newProject';
-import { OpenProject } from '@modals/openProject';
-import { ModelManager } from '@modals/models';
-import { Config } from '@modals/config';
-import { mainStore } from '@stores/MainStore';
+import { useUI } from '$components/ui';
+import { NewProject } from '$modals/newProject';
+import { OpenProject } from '$modals/openProject';
+import { ModelManager } from '$modals/models';
+import { Config } from '$modals/config';
+import { mainStore } from '$stores/MainStore';
 
 interface Props {
   className?: string;

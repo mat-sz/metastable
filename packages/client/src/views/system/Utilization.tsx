@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-import { ProgressBar } from '@components/progressBar';
-import { filesize } from '@utils/file';
+import { ProgressBar } from '$components/progressBar';
+import { filesize } from '$utils/file';
 import styles from './Utilization.module.scss';
 import { Utilization as UtilizationData } from '@metastable/types';
-import { TRPC } from '@api';
+import { TRPC } from '$api';
 
 const MB = 1024 * 1024;
 

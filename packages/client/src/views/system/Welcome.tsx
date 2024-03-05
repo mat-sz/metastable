@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Card, List } from '@components/list';
-import { useUI } from '@components/ui';
-import { mainStore } from '@stores/MainStore';
+import { Card, List } from '$components/list';
+import { useUI } from '$components/ui';
+import { mainStore } from '$stores/MainStore';
 import styles from './Welcome.module.scss';
 import { ModelManager } from '../../modals/models';
 

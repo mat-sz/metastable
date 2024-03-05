@@ -5,8 +5,8 @@ import Ansi from 'ansi-to-react';
 import { FaPython } from 'react-icons/fa';
 import { TaskState } from '@metastable/types';
 
-import { Loading } from '@components/loading';
-import { mainStore } from '@stores/MainStore';
+import { Loading } from '$components/loading';
+import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { List } from './components/List';
 import { Item } from './components/Item';

@@ -4,9 +4,9 @@ import { BsPlus, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
 import { Base64 } from 'js-base64';
 
-import { TRPC } from '@api';
-import { FilePicker } from '@components/filePicker';
-import { IconButton } from '@components/iconButton';
+import { TRPC } from '$api';
+import { FilePicker } from '$components/filePicker';
+import { IconButton } from '$components/iconButton';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';

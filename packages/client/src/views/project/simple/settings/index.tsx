@@ -12,9 +12,9 @@ import {
 
 import styles from './index.module.scss';
 
-import { Tab, TabPanel, TabView, Tabs } from '@components/tabs';
-import { ProgressBar } from '@components/progressBar';
-import { mainStore } from '@stores/MainStore';
+import { Tab, TabPanel, TabView, Tabs } from '$components/tabs';
+import { ProgressBar } from '$components/progressBar';
+import { mainStore } from '$stores/MainStore';
 import { General } from './sections/General';
 import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';

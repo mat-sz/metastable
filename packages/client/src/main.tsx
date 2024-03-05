@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TRPC, TRPCClient } from '@api';
+import { TRPC, TRPCClient } from '$api';
 
 import { App } from './App.tsx';
 

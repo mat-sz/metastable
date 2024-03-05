@@ -21,16 +21,16 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@api": ["src/common/api/index.js"],
-      "@api/*": ["src/common/api/*"],
-      "@components/*": ["src/components/*"],
-      "@editor": ["src/common/editor/index.js"],
-      "@editor/*": ["src/common/editor/*"],
-      "@hooks/*": ["src/common/hooks/*"],
-      "@modals/*": ["src/modals/*"],
-      "@stores/*": ["src/stores/*"],
-      "@utils/*": ["src/common/utils/*"],
-      "@/*": ["src/*"]
+      "$api": ["src/common/api/index.js"],
+      "$api/*": ["src/common/api/*"],
+      "$components/*": ["src/components/*"],
+      "$editor": ["src/common/editor/index.js"],
+      "$editor/*": ["src/common/editor/*"],
+      "$hooks/*": ["src/common/hooks/*"],
+      "$modals/*": ["src/modals/*"],
+      "$stores/*": ["src/stores/*"],
+      "$utils/*": ["src/common/utils/*"],
+      "$/*": ["src/*"]
     }
   },
   "include": ["src"],

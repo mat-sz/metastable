@@ -7,9 +7,9 @@ import {
 } from 'react-icons/vsc';
 import { observer } from 'mobx-react-lite';
 
-import { API } from '@api';
-import { mainStore } from '@stores/MainStore';
-import { IS_ELECTRON, IS_MAC } from '@utils/config';
+import { API } from '$api';
+import { mainStore } from '$stores/MainStore';
+import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import styles from './Header.module.scss';
 import { Menu } from '../common/Menu';
 

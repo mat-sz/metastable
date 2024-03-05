@@ -1,9 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { Project as APIProject } from '@metastable/types';
 
-import { API } from '@api';
-import { arrayMove } from '@utils/array';
-import { tryParse } from '@utils/json';
+import { API } from '$api';
+import { arrayMove } from '$utils/array';
+import { tryParse } from '$utils/json';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';

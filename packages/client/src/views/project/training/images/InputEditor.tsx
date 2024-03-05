@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 import { BsFloppy, BsX } from 'react-icons/bs';
 import { ProjectTrainingInputMetadata } from '@metastable/types';
 
-import { TRPC } from '@api';
-import { ImageCrop } from '@components/imageCrop';
-import { IconButton } from '@components/iconButton';
+import { TRPC } from '$api';
+import { ImageCrop } from '$components/imageCrop';
+import { IconButton } from '$components/iconButton';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 

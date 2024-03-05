@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsGpuCard } from 'react-icons/bs';
 
-import { mainStore } from '@stores/MainStore';
+import { mainStore } from '$stores/MainStore';
 import { RequirementsTable } from '../../../components/requirementsTable';
 import { Item } from '../components/Item';
 

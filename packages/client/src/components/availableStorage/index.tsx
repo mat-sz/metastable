@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { filesize } from '@utils/file';
+import { filesize } from '$utils/file';
 import styles from './index.module.scss';
 
 interface Props {
