@@ -1,4 +1,9 @@
+import { contextBridge } from 'electron';
 import { exposeElectronTRPC } from 'trpc-electron/main';
+
+contextBridge.exposeInMainWorld('electronConfig', {
+  isMac: process.platform === 'darwin',
+});
 
 process.once('loaded', async () => {
   exposeElectronTRPC();
