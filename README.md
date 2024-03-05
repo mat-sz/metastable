@@ -15,7 +15,7 @@ Metastable uses code from:
 
 ### Requirements
 
-- node.js 18+
+- node.js 20+
 - npm
 - yarn (`npm install -g yarn` or via your system's package manager)
 - git
@@ -47,7 +47,7 @@ Metastable uses code from:
 
 #### Windows
 
-- Install node.js 18 or newer: https://nodejs.org/en/download
+- Install node.js 20 or newer: https://nodejs.org/en/download
 - Install git: https://git-scm.com/download/win
 - Open Command Prompt (or Powershell)
 - Run `npm install -g yarn`

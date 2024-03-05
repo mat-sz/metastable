@@ -1,4 +1,3 @@
-import { Dirent } from 'fs';
 import path from 'path';
 import { Project } from '@metastable/types';
 import { mkdir } from 'fs/promises';
@@ -6,11 +5,9 @@ import { rimraf } from 'rimraf';
 
 import { directorySize } from '../helpers/fs.js';
 import {
-  BaseEntity,
   Metadata,
   EntityRepository,
   ImageEntity,
-  EntityClass,
   DirectoryEntity,
 } from './common.js';
 

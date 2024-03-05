@@ -39,5 +39,8 @@
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
     }
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
