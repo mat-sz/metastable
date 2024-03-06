@@ -11,8 +11,8 @@ import {
 } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
+import { VarModel } from '$components/varModel';
 import { mainStore } from '$stores/MainStore';
-import { VarModel } from '../components/VarModel';
 import { useSimpleProject } from '../../../context';
 
 export const General: React.FC = observer(() => {
@@ -21,7 +21,18 @@ export const General: React.FC = observer(() => {
   return (
     <>
       <VarCategory label="Checkpoint">
-        <VarModel path="models.base.name" modelType={ModelType.CHECKPOINT} />
+        <VarModel
+          path="models.base.name"
+          modelType={ModelType.CHECKPOINT}
+          onSelect={model => {
+            if (model.samplerSettings) {
+              project.settings.sampler = {
+                ...project.settings.sampler,
+                ...model.samplerSettings,
+              };
+            }
+          }}
+        />
         <VarSlider
           label="CLIP skip last layers"
           path="models.base.clip_skip"

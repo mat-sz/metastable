@@ -2,6 +2,13 @@ button.selection {
   height: 2.5rem;
   padding: 0.75rem;
 
+  span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 12rem;
+    overflow: hidden;
+  }
+
   .icon {
     width: 1.5rem;
     height: 1.5rem;

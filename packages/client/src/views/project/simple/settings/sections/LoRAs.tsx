@@ -12,9 +12,9 @@ import { ModelType } from '@metastable/types';
 
 import { IconButton } from '$components/iconButton';
 import { useUI } from '$components/ui';
+import { VarModel } from '$components/varModel';
 import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
-import { VarModel } from '../components/VarModel';
 import { useSimpleProject } from '../../../context';
 
 export const LoRAs: React.FC = observer(() => {

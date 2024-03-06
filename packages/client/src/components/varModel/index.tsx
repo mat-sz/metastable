@@ -1,18 +1,18 @@
 import { IVarBaseInputProps, VarBase, useVarUIValue } from 'react-var-ui';
 import { observer } from 'mobx-react-lite';
 import { BsChevronRight } from 'react-icons/bs';
-import { ModelType } from '@metastable/types';
+import { Model, ModelType } from '@metastable/types';
 
 import { useUI } from '$components/ui';
 import { ModelSelect } from '$modals/modelSelect';
 import { stringToColor } from '$utils/string';
 import { getStaticUrl } from '$utils/url';
 import { mainStore } from '$stores/MainStore';
-import styles from './VarModel.module.scss';
-import { useSimpleProject } from '../../../context';
+import styles from './index.module.scss';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;
+  onSelect?: (modelData: Model) => void;
 }
 
 export const VarModel = observer(
@@ -26,9 +26,9 @@ export const VarModel = observer(
     error,
     errorPath,
     modelType,
+    onSelect,
   }: IVarModelProps): JSX.Element => {
     const { showModal } = useUI();
-    const project = useSimpleProject();
     const [currentValue, setCurrentValue, currentError] = useVarUIValue({
       path,
       fallbackValue: value,
@@ -60,13 +60,7 @@ export const VarModel = observer(
                   type={modelType}
                   onSelect={model => {
                     setCurrentValue(model.file.name);
-
-                    if (model.samplerSettings) {
-                      project.settings.sampler = {
-                        ...project.settings.sampler,
-                        ...model.samplerSettings,
-                      };
-                    }
+                    onSelect?.(model);
                   }}
                 />,
               );

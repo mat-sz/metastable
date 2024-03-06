@@ -13,10 +13,10 @@ import { BsX } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
 import { IconButton } from '$components/iconButton';
+import { VarModel } from '$components/varModel';
 import { useUI } from '$components/ui';
 import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
-import { VarModel } from '../components/VarModel';
 import { useSimpleProject } from '../../../context';
 
 export const Controlnets: React.FC = observer(() => {

@@ -17,10 +17,10 @@ import { BsPlay, BsX } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 import { IconButton } from '$components/iconButton';
 import { mainStore } from '$stores/MainStore';
+import { VarModel } from '$components/varModel';
 import { ProgressBar } from '$components/progressBar';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
-import { VarModel } from './components/VarModel';
 
 export const Settings: React.FC = observer(() => {
   const project = useTraningProject();
@@ -147,24 +147,22 @@ export const Settings: React.FC = observer(() => {
           />
         </VarCategory>
         <VarCategory label="Dataset settings">
-          <VarArray path="dataset.activationTags">
-            {(_, i) => (
-              <div className={styles.tag}>
-                <VarString label="Tag" path="" />
-                <IconButton
-                  title="Delete"
-                  onClick={() => {
-                    project.settings.dataset.activationTags =
-                      project.settings.dataset.activationTags.filter(
-                        (_, tagI) => tagI !== i,
-                      );
-                  }}
-                >
-                  <BsX />
-                </IconButton>
-              </div>
-            )}
-          </VarArray>
+          {project.settings.dataset.activationTags.map((_, i) => (
+            <div className={styles.tag}>
+              <VarString label="Tag" path={`dataset.activationTags.${i}`} />
+              <IconButton
+                title="Delete"
+                onClick={() => {
+                  project.settings.dataset.activationTags =
+                    project.settings.dataset.activationTags.filter(
+                      (_, tagI) => tagI !== i,
+                    );
+                }}
+              >
+                <BsX />
+              </IconButton>
+            </div>
+          ))}
           <VarButton
             buttonLabel="Add activation tag"
             onClick={() => {
