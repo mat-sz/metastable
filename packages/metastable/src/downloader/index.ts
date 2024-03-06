@@ -4,7 +4,7 @@ import { createWriteStream } from 'fs';
 import axios from 'axios';
 import { DownloadSettings, TaskState, DownloadData } from '@metastable/types';
 
-import { exists } from '../helpers/fs.js';
+import { exists, tryMkdir } from '../helpers/fs.js';
 import { BaseTask } from '../tasks/task.js';
 import { WrappedPromise } from '../helpers/promise.js';
 
@@ -108,7 +108,6 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
           responseType: 'stream',
           headers: {
             'User-Agent': USER_AGENT,
-            ...this.headers,
             Range: `bytes=${start}-${end || ''}`,
           },
         });
@@ -180,7 +179,7 @@ export class DownloadModelTask extends BaseDownloadTask {
     public savePath: string,
     public headers: Record<string, string> = {},
   ) {
-    super('download', settings.url, savePath);
+    super('download', settings.url, savePath, headers);
   }
 
   async execute() {
@@ -188,6 +187,8 @@ export class DownloadModelTask extends BaseDownloadTask {
 
     if (state === TaskState.SUCCESS) {
       const { imageUrl, info } = this.settings;
+
+      await tryMkdir(path.join(path.dirname(this.savePath), '.metastable'));
 
       if (imageUrl) {
         try {
@@ -225,7 +226,14 @@ export class DownloadModelTask extends BaseDownloadTask {
 
       if (info) {
         try {
-          await fs.writeFile(`${this.savePath}.json`, JSON.stringify(info));
+          await fs.writeFile(
+            path.join(
+              path.dirname(this.savePath),
+              '.metastable',
+              `${path.basename(this.savePath)}.json`,
+            ),
+            JSON.stringify(info),
+          );
         } catch {}
       }
     }

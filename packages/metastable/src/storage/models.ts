@@ -28,7 +28,7 @@ export class Models {
     const name = parts[parts.length - 1];
     parts[parts.length - 1] += '.json';
     return new JSONFile(this.metaPath(type, ...parts), {
-      name,
+      name: removeFileExtension(name),
     });
   }
 
@@ -66,15 +66,8 @@ export class Models {
             continue;
           }
 
-          let data: Partial<Model> & { name: string } = {
-            name: removeFileExtension(base),
-          };
-
           const modelFile = this.modelFile(dir.name, ...file.parts, base);
-          data = {
-            ...data,
-            ...(await modelFile.readJson()),
-          };
+          const data: Omit<Model, 'file'> = await modelFile.readJson();
 
           for (const extension of IMAGE_EXTENSIONS) {
             if (
