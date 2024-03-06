@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsPlus, BsTrash } from 'react-icons/bs';
+import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
 import { Base64 } from 'js-base64';
 
 import { TRPC } from '$api';
+import { useUI } from '$components/ui';
 import { FilePicker } from '$components/filePicker';
-import { IconButton } from '$components/iconButton';
+import { Tagger } from '$modals/tagger';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
@@ -15,6 +16,7 @@ import { UploadQueue, UploadQueueItem } from './UploadQueue';
 import { InputEditor } from './InputEditor';
 
 export const Images: React.FC = observer(() => {
+  const { showModal } = useUI();
   const project = useTraningProject();
   const allInputsQuery = TRPC.project.input.all.useQuery({
     projectId: project.id,
@@ -72,6 +74,7 @@ export const Images: React.FC = observer(() => {
                   ),
                 );
               }
+              await allInputsQuery.refetch();
             }}
             onReset={() => {
               setQueue([]);
@@ -113,18 +116,33 @@ export const Images: React.FC = observer(() => {
           }
           selectionActions={selection => (
             <>
-              <IconButton
+              <button
                 onClick={() => {
+                  showModal(
+                    <Tagger
+                      project={project}
+                      inputs={selection.map(item => item.id)}
+                    />,
+                  );
+                }}
+              >
+                <BsTagFill />
+                <span>Run tagging</span>
+              </button>
+              <button
+                onClick={async () => {
                   for (const item of selection) {
-                    deleteInputMutation.mutate({
+                    await deleteInputMutation.mutateAsync({
                       projectId: project.id,
                       name: item.id,
                     });
                   }
+                  await allInputsQuery.refetch();
                 }}
               >
                 <BsTrash />
-              </IconButton>
+                <span>Delete</span>
+              </button>
             </>
           )}
         />

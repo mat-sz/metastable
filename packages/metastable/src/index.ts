@@ -12,6 +12,7 @@ import {
   ProjectSettings,
   ProjectTrainingSettings,
   Utilization,
+  ProjectTaggingSettings,
 } from '@metastable/types';
 import chokidar from 'chokidar';
 
@@ -26,6 +27,7 @@ import { Kohya } from './kohya/index.js';
 import { ProjectEntity } from './data/project.js';
 import { EntityRepository } from './data/common.js';
 import { TypedEventEmitter } from './types.js';
+import { Tagger } from './kohya/tagger.js';
 
 type MetastableEvents = {
   event: (event: AnyEvent) => void;
@@ -43,6 +45,7 @@ export class Metastable extends (EventEmitter as {
   setup = new Setup(this);
   tasks = new Tasks();
   kohya?: Kohya;
+  tagger?: Tagger;
   project;
 
   onEvent = async (event: AnyEvent) => {
@@ -169,6 +172,12 @@ export class Metastable extends (EventEmitter as {
 
     this.kohya = new Kohya(this.python!);
     this.kohya.on('event', this.onEvent);
+
+    this.tagger?.removeAllListeners();
+    this.tagger?.stopAll();
+
+    this.tagger = new Tagger(this.python!);
+    this.tagger.on('event', this.onEvent);
   }
 
   async restartComfy() {
@@ -336,6 +345,16 @@ export class Metastable extends (EventEmitter as {
     return await this.kohya?.train(project, settings);
   }
 
+  async tag(projectId: Project['id'], settings: ProjectTaggingSettings) {
+    const project = await this.project.get(projectId);
+    settings.tagger.path ||= this.storage.models.path(
+      ModelType.TAGGER,
+      settings.tagger.name,
+    );
+
+    return await this.tagger?.run(project, settings);
+  }
+
   stopTraining(projectId: Project['id']) {
     return this.kohya?.stop(projectId);
   }
@@ -371,7 +390,7 @@ export class Metastable extends (EventEmitter as {
     }
 
     return this.tasks.queues.downloads.add(
-      new DownloadModelTask(data, savePath),
+      new DownloadModelTask(data, savePath, headers),
     );
   }
 

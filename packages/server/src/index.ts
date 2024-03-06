@@ -22,7 +22,7 @@ import {
 const metastable = new Metastable(dataRoot, { skipPythonSetup });
 await metastable.init();
 
-const app = Fastify({ maxParamLength: 5000 });
+const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });
 app.register(fastifyCompress);
 
 const maxAge = 30 * 24 * 60 * 60 * 1000;

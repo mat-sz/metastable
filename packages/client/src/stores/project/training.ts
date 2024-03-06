@@ -3,6 +3,7 @@ import {
   Project as APIProject,
   ProjectTrainingSettings,
   ModelType,
+  ProjectTaggingSettings,
 } from '@metastable/types';
 
 import { API } from '$api';
@@ -66,6 +67,10 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
 
   async cancel() {
     await API.project.training.stop.mutate({ projectId: this.id });
+  }
+
+  async tag(settings: ProjectTaggingSettings) {
+    await API.project.tagger.start.mutate({ projectId: this.id, settings });
   }
 
   async request() {

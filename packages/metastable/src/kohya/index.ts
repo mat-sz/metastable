@@ -66,10 +66,10 @@ export class Kohya extends EventEmitter {
         if (inputData.crop) {
           await sharp(fromPath)
             .extract({
-              left: inputData.crop[0],
-              top: inputData.crop[1],
-              width: inputData.crop[2],
-              height: inputData.crop[3],
+              left: Math.floor(inputData.crop[0]),
+              top: Math.floor(inputData.crop[1]),
+              width: Math.floor(inputData.crop[2]),
+              height: Math.floor(inputData.crop[3]),
             })
             .toFile(toPath);
         } else {

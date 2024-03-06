@@ -14,6 +14,7 @@ export enum ModelType {
   LORA = 'lora',
   STYLE_MODEL = 'style_model',
   UPSCALE_MODEL = 'upscale_model',
+  TAGGER = 'tagger',
   VAE = 'vae',
   VAE_APPROX = 'vae_approx',
 }

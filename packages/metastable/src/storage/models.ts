@@ -11,7 +11,7 @@ import {
   exists,
 } from '../helpers/fs.js';
 
-const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors'];
+const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
 const MODEL_TYPES = Object.values(ModelType);
 
 function isModel(name: string) {

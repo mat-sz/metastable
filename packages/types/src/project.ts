@@ -105,6 +105,16 @@ export interface ProjectTrainingSettings {
   };
 }
 
+export interface ProjectTaggingSettings {
+  inputs: string[];
+  threshold: number;
+  removeUnderscore: boolean;
+  tagger: {
+    name: string;
+    path?: string;
+  };
+}
+
 export interface ProjectInfo {
   type: string;
 }
