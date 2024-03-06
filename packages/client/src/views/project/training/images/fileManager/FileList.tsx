@@ -100,8 +100,17 @@ export const FileList: React.FC<Props> = ({
   const [dragSelectionPreview, setDragSelectionPreview] = useState<string[]>();
 
   const { dragProps } = usePointerDrag({
-    dragPredicate: ({ deltaX, deltaY }) =>
-      Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) >= 25,
+    dragPredicate: ({ deltaX, deltaY, initialEvent }) => {
+      if (
+        initialEvent &&
+        initialEvent.pointerType === 'mouse' &&
+        initialEvent.button !== 0
+      ) {
+        return false;
+      }
+
+      return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) >= 25;
+    },
     preventDefault: true,
     stopPropagation: true,
     pointerDownPreventDefault: true,
@@ -172,6 +181,9 @@ export const FileList: React.FC<Props> = ({
       onSelect(getDragSelection(listEl, box, selection, mode));
       setDragSelectionPreview(undefined);
     },
+    onClick: () => {
+      onSelect([]);
+    },
   });
 
   return !!items.length ? (
@@ -188,6 +200,9 @@ export const FileList: React.FC<Props> = ({
           target="_blank"
           rel="noopener noreferrer"
           key={item.id}
+          onPointerDown={e => {
+            e.stopPropagation();
+          }}
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();

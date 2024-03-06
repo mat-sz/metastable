@@ -23,13 +23,16 @@ export const FileManager: React.FC<Props> = ({
     <div className={styles.manager}>
       <div className={styles.actions}>
         {actions}
-        {!!actions && <div className={styles.separator} />}
-        {selection.length > 0 &&
-          selectionActions?.(
-            selection
-              .map(id => items.find(item => item.id === id))
-              .filter(item => !!item) as FileManagerItem[],
-          )}
+        {selection.length > 0 && (
+          <>
+            {!!actions && <div className={styles.separator} />}
+            {selectionActions?.(
+              selection
+                .map(id => items.find(item => item.id === id))
+                .filter(item => !!item) as FileManagerItem[],
+            )}
+          </>
+        )}
       </div>
       <FileList
         items={items}

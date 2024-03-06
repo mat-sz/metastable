@@ -60,7 +60,7 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
         <div className={styles.crop}>
           <ImageCrop
             src={url}
-            defaultArea={metadata.crop}
+            defaultArea={(metadataQuery.data.metadata as any).crop}
             onChange={area => {
               setMetadata(metadata => ({ ...metadata, crop: area }));
             }}
