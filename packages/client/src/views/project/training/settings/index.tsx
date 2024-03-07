@@ -22,6 +22,28 @@ import { ProgressBar } from '$components/progressBar';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 
+const optimizers = [
+  'AdamW',
+  'AdamW8bit',
+  'Adafactor',
+  'DAdaptation',
+  'DAdaptAdaGrad',
+  'DAdaptAdam',
+  'DAdaptAdan',
+  'DAdaptAdanIP',
+  'DAdaptAdamPreprint',
+  'DAdaptLion',
+  'DAdaptSGD',
+  'Lion',
+  'Lion8bit',
+  'PagedAdamW8bit',
+  'PagedAdamW32bit',
+  'PagedLion8bit',
+  'Prodigy',
+  'SGDNesterov',
+  'SGDNesterov8bit',
+];
+
 export const Settings: React.FC = observer(() => {
   const project = useTraningProject();
 
@@ -169,8 +191,42 @@ export const Settings: React.FC = observer(() => {
               project.settings.dataset.activationTags.push('');
             }}
           />
+          <VarToggle label="Bucketing" path="dataset.bucketing" />
           <VarToggle label="Shuffle tags" path="dataset.shuffleTags" />
           <VarNumber label="Repeats" path="dataset.repeats" />
+        </VarCategory>
+        <VarCategory label="Optimizer">
+          <VarSelect
+            label="Name"
+            path="optimizer.name"
+            options={optimizers.map(name => ({ key: name, label: name }))}
+          />
+          {project.settings.optimizer.arguments?.map((_, i) => (
+            <div className={styles.tag}>
+              <VarString label="Argument" path={`optimizer.arguments.${i}`} />
+              <IconButton
+                title="Delete"
+                onClick={() => {
+                  project.settings.optimizer.arguments =
+                    project.settings.optimizer.arguments?.filter(
+                      (_, argI) => argI !== i,
+                    );
+                }}
+              >
+                <BsX />
+              </IconButton>
+            </div>
+          ))}
+          <VarButton
+            buttonLabel="Add argument"
+            onClick={() => {
+              if (!project.settings.optimizer.arguments) {
+                project.settings.optimizer.arguments = [''];
+              } else {
+                project.settings.optimizer.arguments.push('');
+              }
+            }}
+          />
         </VarCategory>
         <VarCategory label="Limits">
           <VarNumber label="Training epochs" path="limits.trainingEpochs" />

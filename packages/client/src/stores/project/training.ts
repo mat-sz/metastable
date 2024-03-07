@@ -13,7 +13,6 @@ import { mainStore } from '../MainStore';
 export function defaultSettings(): ProjectTrainingSettings {
   return {
     mode: 'lora',
-    bucketing: false,
     base: {
       name: mainStore.defaultModelName(ModelType.CHECKPOINT),
       sdxl: false,
@@ -35,9 +34,14 @@ export function defaultSettings(): ProjectTrainingSettings {
       minSnrGamma: true,
     },
     dataset: {
+      bucketing: true,
       activationTags: [],
       shuffleTags: true,
       repeats: 10,
+    },
+    optimizer: {
+      name: 'Adafactor',
+      arguments: [],
     },
     limits: {
       trainingEpochs: 10,

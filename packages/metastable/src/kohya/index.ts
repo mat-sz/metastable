@@ -108,6 +108,10 @@ export class Kohya extends EventEmitter {
       output_dir: project.output.path,
       output_name: `${Date.now()}`,
 
+      // Optimizer
+      optimizer_type: settings.optimizer.name,
+      optimizer_args: settings.optimizer.arguments,
+
       // Other
       cache_latents: true,
     };
@@ -115,7 +119,7 @@ export class Kohya extends EventEmitter {
     const datasets = {
       general: {
         resolution: settings.resolution.width, // TODO: Do something with height?
-        enable_bucket: settings.bucketing,
+        enable_bucket: settings.dataset.bucketing,
         caption_prefix:
           settings.dataset.activationTags.join(', ') +
           (settings.dataset.activationTags.length > 0 ? ',' : ''),

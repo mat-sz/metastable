@@ -74,7 +74,6 @@ export interface ProjectTrainingInputMetadata {
 
 export interface ProjectTrainingSettings {
   mode: 'lora';
-  bucketing: boolean;
   base: { name: string; path?: string; sdxl: boolean };
   resolution: { width: number; height: number };
   network: {
@@ -92,7 +91,12 @@ export interface ProjectTrainingSettings {
     warmupRatio: number;
     minSnrGamma: boolean;
   };
+  optimizer: {
+    name: string;
+    arguments: string[];
+  };
   dataset: {
+    bucketing: boolean;
     activationTags: string[];
     shuffleTags: boolean;
     repeats: number;
