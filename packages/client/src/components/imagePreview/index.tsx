@@ -16,6 +16,9 @@ interface PointerState {
   scale: number;
 }
 
+const MAX_SCALE = 3;
+const MIN_SCALE = 0.25;
+
 export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -32,8 +35,12 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
       const height = imageRef.current!.naturalHeight;
       const width = imageRef.current!.naturalWidth;
       const scale = Math.max(
-        Math.min(wrapperRect.width / width, wrapperRect.height / height, 1),
-        0.25,
+        Math.min(
+          wrapperRect.width / width,
+          wrapperRect.height / height,
+          MAX_SCALE,
+        ),
+        MIN_SCALE,
       );
 
       const vector = Vector2.fromSize(wrapperRect)
