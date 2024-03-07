@@ -48,11 +48,9 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
                   name,
                   metadata,
                 });
+                onClose?.();
               }}
             >
-              <BsFloppy />
-            </IconButton>
-            <IconButton onClick={onClose}>
               <BsX />
             </IconButton>
           </div>

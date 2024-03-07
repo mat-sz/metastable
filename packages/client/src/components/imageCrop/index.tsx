@@ -235,6 +235,20 @@ export const ImageCrop: React.FC<ImageCropProps> = ({
             <option value="16:9">16:9</option>
           </select>
         </div>
+        <button
+          onClick={() => {
+            const img = imageRef.current;
+            if (!img) {
+              return;
+            }
+
+            const area: Area = [0, 0, img.naturalWidth, img.naturalHeight];
+            setArea(area);
+            onChange(area);
+          }}
+        >
+          Reset
+        </button>
       </div>
       <div
         className={clsx(styles.crop, { [styles.loading]: !loaded })}
