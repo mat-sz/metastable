@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { BsFloppy, BsX } from 'react-icons/bs';
+import { BsX } from 'react-icons/bs';
 import { ProjectTrainingInputMetadata } from '@metastable/types';
 
 import { TRPC } from '$api';

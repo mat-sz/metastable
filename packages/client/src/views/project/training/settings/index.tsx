@@ -169,22 +169,24 @@ export const Settings: React.FC = observer(() => {
           />
         </VarCategory>
         <VarCategory label="Dataset settings">
-          {project.settings.dataset.activationTags.map((_, i) => (
-            <div className={styles.tag}>
-              <VarString label="Tag" path={`dataset.activationTags.${i}`} />
-              <IconButton
-                title="Delete"
-                onClick={() => {
-                  project.settings.dataset.activationTags =
-                    project.settings.dataset.activationTags.filter(
-                      (_, tagI) => tagI !== i,
-                    );
-                }}
-              >
-                <BsX />
-              </IconButton>
-            </div>
-          ))}
+          <VarArray path="dataset.activationTags">
+            {(_, i) => (
+              <div className={styles.tag}>
+                <VarString label="Tag" path="" />
+                <IconButton
+                  title="Delete"
+                  onClick={() => {
+                    project.settings.dataset.activationTags =
+                      project.settings.dataset.activationTags.filter(
+                        (_, tagI) => tagI !== i,
+                      );
+                  }}
+                >
+                  <BsX />
+                </IconButton>
+              </div>
+            )}
+          </VarArray>
           <VarButton
             buttonLabel="Add activation tag"
             onClick={() => {
@@ -201,22 +203,24 @@ export const Settings: React.FC = observer(() => {
             path="optimizer.name"
             options={optimizers.map(name => ({ key: name, label: name }))}
           />
-          {project.settings.optimizer.arguments?.map((_, i) => (
-            <div className={styles.tag}>
-              <VarString label="Argument" path={`optimizer.arguments.${i}`} />
-              <IconButton
-                title="Delete"
-                onClick={() => {
-                  project.settings.optimizer.arguments =
-                    project.settings.optimizer.arguments?.filter(
-                      (_, argI) => argI !== i,
-                    );
-                }}
-              >
-                <BsX />
-              </IconButton>
-            </div>
-          ))}
+          <VarArray path="optimizer.arguments">
+            {(_, i) => (
+              <div className={styles.tag}>
+                <VarString label="Argument" path="" />
+                <IconButton
+                  title="Delete"
+                  onClick={() => {
+                    project.settings.optimizer.arguments =
+                      project.settings.optimizer.arguments?.filter(
+                        (_, argI) => argI !== i,
+                      );
+                  }}
+                >
+                  <BsX />
+                </IconButton>
+              </div>
+            )}
+          </VarArray>
           <VarButton
             buttonLabel="Add argument"
             onClick={() => {

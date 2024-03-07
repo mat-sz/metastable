@@ -1065,7 +1065,7 @@ __metadata:
     react-hotkeys-hook: "npm:^4.4.4"
     react-icons: "npm:^4.11.0"
     react-use-pointer-drag: "npm:^0.1.2"
-    react-var-ui: "npm:^1.5.1"
+    react-var-ui: "npm:^1.5.2"
     sass: "npm:^1.66.1"
     tree-kill: "npm:^1.2.2"
     trpc-electron: "npm:^0.1.0"
@@ -5652,9 +5652,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-var-ui@npm:^1.5.1":
-  version: 1.5.1
-  resolution: "react-var-ui@npm:1.5.1"
+"react-var-ui@npm:^1.5.2":
+  version: 1.5.2
+  resolution: "react-var-ui@npm:1.5.2"
   dependencies:
     "@uiw/react-color-sketch": "npm:^2.0.5"
     filesize: "npm:^8.0.6"
@@ -5662,7 +5662,7 @@ __metadata:
     react-use-pointer-drag: "npm:^0.1.1"
   peerDependencies:
     react: ">=16"
-  checksum: 96af7361450d2d8d89ce03e38b986cd6a80f272b5df99b8786adb4d2530f2fd8e4c69d02be7295422b77395df2f265016fbb126758234bbbaa0704393b5749c2
+  checksum: 5b7adcbeb01e8bec38cccba59f71af215393257eaa285d4e4ac00c89e302f7197dd7fd5adbebcfd8feca9f43b279b3fdbb62f6fc0b75df20c2a23e22069c09dc
   languageName: node
   linkType: hard
 

@@ -46,7 +46,7 @@
     "react-hotkeys-hook": "^4.4.4",
     "react-icons": "^4.11.0",
     "react-use-pointer-drag": "^0.1.2",
-    "react-var-ui": "^1.5.1",
+    "react-var-ui": "^1.5.2",
     "sass": "^1.66.1",
     "trpc-electron": "^0.1.0",
     "use-context-menu": "^0.4.13"
