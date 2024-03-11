@@ -51,6 +51,10 @@ export interface ProjectSettings {
     positive: string;
     negative: string;
   };
+  output?: {
+    format?: string;
+    path?: string;
+  };
   sampler: {
     seed: number;
     seed_randomize: boolean;

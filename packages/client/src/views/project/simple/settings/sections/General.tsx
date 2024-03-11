@@ -94,6 +94,17 @@ export const General: React.FC = observer(() => {
           </>
         )}
       </VarCategory>
+      <VarCategory label="Output">
+        <VarSelect
+          label="Format"
+          path="output.format"
+          defaultValue="png"
+          options={[
+            { key: 'png', label: 'PNG' },
+            { key: 'jpg', label: 'JPEG' },
+          ]}
+        />
+      </VarCategory>
       <VarCategory label="Sampler settings">
         <VarNumber
           label="Seed"

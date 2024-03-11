@@ -35,6 +35,9 @@ export function defaultSettings(): ProjectSettings {
       scheduler: 'karras',
       tiling: false,
     },
+    output: {
+      format: 'png',
+    },
   };
 }
 

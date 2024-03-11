@@ -329,7 +329,11 @@ export class Metastable extends (EventEmitter as {
       ...settings,
       id: id,
       project_id: projectId,
-      output_path: project.output.path,
+      output: {
+        path: project.output.path,
+        format: 'png',
+        ...(settings.output || {}),
+      },
     });
 
     return { id };

@@ -238,15 +238,20 @@ def load_controlnet(controlnet_path):
     return controlnet
 
 def save_images(settings, images):
-    output_dir = settings["output_path"]
+    output_settings = settings["output"]
+    output_dir = output_settings["path"]
     counter = get_save_image_counter(output_dir)
+    ext = "png"
 
     output_filenames = []
+
+    if "format" in output_settings:
+        ext = output_settings["format"]
 
     for image in images:
         i = 255. * image.cpu().detach().numpy()
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-        file = f"{counter:05}.png"
+        file = f"{counter:05}.{ext}"
         img.save(os.path.join(output_dir, file), compress_level=4)
         output_filenames.append(file)
         counter += 1
