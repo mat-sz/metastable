@@ -116,6 +116,7 @@ export class ModelEntity extends FileEntity {
       type: this.type!,
       id: this.name,
       name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
+      metadata: this.metadata.json,
       file: {
         name: this.name,
         parts,

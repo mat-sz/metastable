@@ -145,20 +145,22 @@ export const router = t.router({
 
       return map;
     }),
+    get: t.procedure
+      .input(z.object({ type: z.nativeEnum(ModelType), name: z.string() }))
+      .query(async ({ ctx: { metastable }, input: { type, name } }) => {
+        const model = await metastable.model.get(type, name);
+        return await model.legacyJson();
+      }),
     update: t.procedure
       .input(
         z.object({
           type: z.nativeEnum(ModelType),
           name: z.string(),
-          longName: z.string(),
-          description: z.string(),
-          source: z.string(),
-          sourceId: z.string(),
-          nsfw: z.boolean(),
+          metadata: z.any(),
         }),
       )
       .mutation(
-        async ({ ctx: { metastable }, input: { type, name, ...metadata } }) => {
+        async ({ ctx: { metastable }, input: { type, name, metadata } }) => {
           const model = await metastable.model.get(type, name);
           await model.metadata.update(metadata);
           return await model.legacyJson();
