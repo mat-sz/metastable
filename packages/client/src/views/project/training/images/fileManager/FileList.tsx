@@ -7,10 +7,10 @@ import { Vector2 } from '$editor/primitives/Vector2';
 import { Rectangle } from '$editor/primitives/Rectangle';
 import { Point } from '$editor/types';
 import styles from './FileList.module.scss';
-import { FileManagerItem } from './types';
+import { ImageFile } from '@metastable/types';
 
 interface Props {
-  items: FileManagerItem[];
+  items: ImageFile[];
   selection?: string[];
   onSelect?: (itemIds: string[]) => void;
   onOpen?: (itemIds: string[]) => void;
@@ -193,13 +193,13 @@ export const FileList: React.FC<Props> = ({
         <a
           className={clsx(styles.file, {
             [styles.selected]: (dragSelectionPreview ?? selection)?.includes(
-              item.id,
+              item.name,
             ),
           })}
-          href={item.fileUrl}
+          href={item.image.url}
           target="_blank"
           rel="noopener noreferrer"
-          key={item.id}
+          key={item.name}
           onPointerDown={e => {
             e.stopPropagation();
           }}
@@ -209,16 +209,16 @@ export const FileList: React.FC<Props> = ({
 
             if (e.shiftKey) {
               const last = lastClickedIdRef.current;
-              const lastIndex = items.findIndex(item => item.id === last);
+              const lastIndex = items.findIndex(item => item.name === last);
               if (lastIndex === -1) {
-                onSelect([item.id]);
+                onSelect([item.name]);
               } else {
                 const newSelection = items
                   .slice(
                     Math.min(lastIndex, index),
                     Math.max(lastIndex, index) + 1,
                   )
-                  .map(item => item.id);
+                  .map(item => item.name);
                 if (e.ctrlKey) {
                   onSelect(mergeSelection(selection, newSelection, 'add'));
                 } else {
@@ -226,22 +226,22 @@ export const FileList: React.FC<Props> = ({
                 }
               }
             } else if (e.ctrlKey) {
-              onSelect(mergeSelection(selection, [item.id], 'xor'));
+              onSelect(mergeSelection(selection, [item.name], 'xor'));
             } else {
-              onSelect([item.id]);
+              onSelect([item.name]);
             }
 
             if (!e.shiftKey) {
-              lastClickedIdRef.current = item.id;
+              lastClickedIdRef.current = item.name;
             }
           }}
           onDoubleClick={() => {
-            onOpen([item.id]);
+            onOpen([item.name]);
           }}
-          data-id={item.id}
+          data-id={item.name}
         >
-          {item.thumbnailUrl ? (
-            <img src={item.thumbnailUrl} />
+          {item.image.thumbnailUrl ? (
+            <img src={item.image.thumbnailUrl} />
           ) : (
             <div className={styles.icon}>
               <MdNoPhotography />

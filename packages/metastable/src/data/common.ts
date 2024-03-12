@@ -1,6 +1,8 @@
 import { Dirent } from 'fs';
-import fs, { mkdir, rm } from 'fs/promises';
+import fs, { mkdir } from 'fs/promises';
 import path from 'path';
+import { rimraf } from 'rimraf';
+import { ImageInfo } from '@metastable/types';
 
 import {
   IMAGE_EXTENSIONS,
@@ -9,7 +11,7 @@ import {
   tryUnlink,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
-import { rimraf } from 'rimraf';
+import { getStaticUrl } from '../helpers/url.js';
 
 export type EntityClass<T extends BaseEntity> = {
   new (...args: any[]): T;
@@ -215,6 +217,13 @@ export class ImageEntity extends FileEntity {
     return getThumbnailPath(this.path);
   }
 
+  get image(): ImageInfo {
+    return {
+      url: getStaticUrl(this.path),
+      thumbnailUrl: getStaticUrl(this.thumbnailPath!),
+    };
+  }
+
   static async fromPath<T extends BaseEntity>(
     this: EntityClass<T>,
     filePath: string,
@@ -243,6 +252,13 @@ export class ImageEntity extends FileEntity {
   async delete(): Promise<void> {
     await super.delete();
     await tryUnlink(this.thumbnailPath);
+  }
+
+  async json() {
+    return {
+      ...(await super.json()),
+      image: this.image,
+    };
   }
 }
 

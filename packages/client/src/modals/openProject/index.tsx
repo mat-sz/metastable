@@ -26,11 +26,7 @@ export const OpenProject: React.FC = observer(() => {
             <Card
               name={item.name}
               key={item.id}
-              imageUrl={
-                item.lastOutput
-                  ? mainStore.thumb(item.id, 'output', item.lastOutput)
-                  : undefined
-              }
+              imageUrl={item.lastOutput?.image.thumbnailUrl}
               onClick={() => {
                 mainStore.projects.open(item.id);
                 close();
@@ -40,8 +36,8 @@ export const OpenProject: React.FC = observer(() => {
                 {!!item.size && (
                   <CardTag icon={<BsHdd />} text={filesize(item.size)} />
                 )}
-                {!!item.outputs && (
-                  <CardTag icon={<BsImage />} text={item.outputs} />
+                {!!item.outputCount && (
+                  <CardTag icon={<BsImage />} text={item.outputCount} />
                 )}
               </CardTags>
             </Card>

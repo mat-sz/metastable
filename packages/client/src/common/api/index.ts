@@ -15,7 +15,6 @@ import { IS_ELECTRON } from '$utils/config';
 
 declare global {
   interface Window {
-    dataDir?: string;
     wsOnOpen?: () => void;
     wsOnClose?: () => void;
   }

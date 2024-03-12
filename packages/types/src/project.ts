@@ -1,3 +1,5 @@
+import { ImageFile, ImageInfo } from './file.js';
+
 export interface ProjectInputEmpty {
   mode: 'empty';
   batch_size: number;
@@ -131,7 +133,7 @@ export interface Project extends ProjectInfo {
   id: string;
   name: string;
   settings: any;
-  lastOutput?: string;
-  outputs?: number;
+  lastOutput?: ImageFile;
+  outputCount?: number;
   size?: number;
 }

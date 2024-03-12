@@ -5,7 +5,6 @@ import { BsFolder } from 'react-icons/bs';
 
 import { Card, List } from '$components/list';
 import { Breadcrumbs } from '$components/breadcrumbs';
-import { getStaticUrl } from '$utils/url';
 import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import { modelStore } from '$stores/ModelStore';
@@ -90,11 +89,7 @@ export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
               name={item.name}
               key={item.file.name}
               color={stringToColor(removeFileExtension(item.file.name))}
-              imageUrl={
-                item.image
-                  ? getStaticUrl(`/models/${type}/.metastable/${item.image}`)
-                  : undefined
-              }
+              imageUrl={item.image?.thumbnailUrl}
               onClick={() => {
                 onSelect(item);
               }}

@@ -3,7 +3,9 @@ import os from 'node:os';
 import { app, BrowserWindow, Menu, MenuItem } from 'electron';
 import { createIPCHandler } from 'trpc-electron/main';
 
-import { Metastable, router } from '@metastable/metastable';
+import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
+
+setUseFileUrl(true);
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.PUBLIC = app.isPackaged

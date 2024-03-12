@@ -54,11 +54,13 @@ export class Metastable extends (EventEmitter as {
 
     if (event.event === 'prompt.end') {
       const settings = this.settingsCache[event.data.id];
+      event.data.outputs = [];
       try {
         const project = await this.project.get(event.data.project_id);
         for (const filename of event.data.output_filenames) {
           const output = await project.output.get(filename);
           await output.metadata.set(settings);
+          event.data.outputs.push(await output.json());
         }
       } catch {}
       delete this.settingsCache[event.data.id];
@@ -430,3 +432,4 @@ export class Metastable extends (EventEmitter as {
 }
 
 export * from './trpc.js';
+export { setUseFileUrl } from './helpers/url.js';

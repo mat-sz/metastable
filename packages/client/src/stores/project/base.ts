@@ -1,11 +1,10 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
-import { Project as APIProject } from '@metastable/types';
+import { Project as APIProject, ImageFile } from '@metastable/types';
 
 import { API } from '$api';
-import { getStaticUrl } from '$utils/url';
 
 export class BaseProject<T = any> {
-  outputFilenames: string[] = [];
+  currentOutputs: ImageFile[] = [];
   mode: string = 'images';
   id;
   name;
@@ -18,10 +17,10 @@ export class BaseProject<T = any> {
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
-    this.outputFilenames = data.lastOutput ? [data.lastOutput] : [];
+    this.currentOutputs = data.lastOutput ? [data.lastOutput] : [];
 
     makeObservable(this, {
-      outputFilenames: observable,
+      currentOutputs: observable,
       mode: observable,
       id: observable,
       name: observable,
@@ -58,22 +57,7 @@ export class BaseProject<T = any> {
     this._autosaveTimeout = setTimeout(() => this.save(), 5000) as any;
   }
 
-  view(type: string, filename: string) {
-    return getStaticUrl(`/projects/${this.id}/${type}/${filename}`);
-  }
-
-  thumb(type: string, filename: string) {
-    const split = filename.split('.');
-    if (split.length > 1) {
-      split.pop();
-      split.push('thumb', 'jpg');
-    }
-    return getStaticUrl(
-      `/projects/${this.id}/${type}/.metastable/${split.join('.')}`,
-    );
-  }
-
-  onPromptDone(outputFilenames: string[]) {
-    this.outputFilenames = outputFilenames;
+  onPromptDone(outputs: ImageFile[]) {
+    this.currentOutputs = outputs;
   }
 }

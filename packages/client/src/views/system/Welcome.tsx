@@ -21,11 +21,7 @@ export const Welcome: React.FC = observer(() => {
               <Card
                 name={item.name}
                 key={item.id}
-                imageUrl={
-                  item.lastOutput
-                    ? mainStore.thumb(item.id, 'output', item.lastOutput)
-                    : undefined
-                }
+                imageUrl={item.lastOutput?.image.thumbnailUrl}
                 onClick={() => {
                   mainStore.projects.open(item.id);
                 }}

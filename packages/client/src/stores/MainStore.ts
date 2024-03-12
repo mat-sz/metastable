@@ -5,12 +5,10 @@ import {
   AnyEvent,
   ComfyTorchInfo,
   InstanceInfo,
-  Project as APIProject,
   TaskState,
 } from '@metastable/types';
 
 import { API } from '$api';
-import { getStaticUrl } from '$utils/url';
 import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
@@ -113,11 +111,6 @@ class MainStore {
     runInAction(() => {
       this.info = data;
     });
-
-    const dataDir = (data as any).dataDir;
-    if (dataDir) {
-      window.dataDir = dataDir;
-    }
   }
 
   onConnected() {
@@ -134,21 +127,6 @@ class MainStore {
     }
 
     return this.backendStatus;
-  }
-
-  view(projectId: APIProject['id'], type: string, filename: string) {
-    return getStaticUrl(`/projects/${projectId}/${type}/${filename}`);
-  }
-
-  thumb(projectId: APIProject['id'], type: string, filename: string) {
-    const split = filename.split('.');
-    if (split.length > 1) {
-      split.pop();
-      split.push('thumb', 'jpg');
-    }
-    return getStaticUrl(
-      `/projects/${projectId}/${type}/.metastable/${split.join('.')}`,
-    );
   }
 
   onMessage(message: AnyEvent) {
@@ -177,7 +155,7 @@ class MainStore {
         );
         for (const project of this.projects.projects) {
           if (project.id === message.data.project_id) {
-            project.onPromptDone(message.data.output_filenames);
+            project.onPromptDone(message.data.outputs);
           }
         }
         break;

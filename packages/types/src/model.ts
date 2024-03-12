@@ -1,4 +1,4 @@
-import { FileInfo } from './file.js';
+import { ImageInfo } from './file.js';
 import { ProjectSettings } from './project.js';
 
 export enum ModelType {
@@ -30,9 +30,16 @@ export interface ModelInfo {
   baseModel?: string;
 }
 
-export interface Model extends ModelInfo {
-  type: ModelType;
+export interface Model {
+  id: string;
   name: string;
-  file: FileInfo;
-  image?: string;
+  type: ModelType;
+  file: {
+    name: string;
+    path: string;
+    parts: string[];
+    size: number;
+  };
+  metadata?: ModelInfo;
+  image?: ImageInfo;
 }

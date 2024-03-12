@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 import { nanoid } from 'nanoid';
 import { Base64 } from 'js-base64';
+import { ImageFile } from '@metastable/types';
 
 import { TRPC } from '$api';
 import { useUI } from '$components/ui';
@@ -24,22 +25,18 @@ export const Images: React.FC = observer(() => {
   const createInputMutation = TRPC.project.input.create.useMutation();
   const deleteInputMutation = TRPC.project.input.delete.useMutation();
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
-  const [editing, setEditing] = useState<string>();
+  const [editing, setEditing] = useState<ImageFile>();
 
   if (editing) {
-    return <InputEditor name={editing} onClose={() => setEditing(undefined)} />;
+    return (
+      <InputEditor input={editing} onClose={() => setEditing(undefined)} />
+    );
   }
 
   const inputs = allInputsQuery.data;
   if (!inputs) {
     return <div>Loading...</div>;
   }
-
-  const items = inputs.map(filename => ({
-    id: filename,
-    fileUrl: project.view('input', filename),
-    thumbnailUrl: project.thumb('input', filename),
-  }));
 
   return (
     <div className={styles.main}>
@@ -85,8 +82,8 @@ export const Images: React.FC = observer(() => {
           />
         )}
         <FileManager
-          items={items}
-          onOpen={ids => setEditing(ids[0])}
+          items={inputs}
+          onOpen={ids => setEditing(inputs.find(item => item.name === ids[0]))}
           actions={
             <>
               <FilePicker
@@ -121,7 +118,7 @@ export const Images: React.FC = observer(() => {
                   showModal(
                     <Tagger
                       project={project}
-                      inputs={selection.map(item => item.id)}
+                      inputs={selection.map(item => item.name)}
                     />,
                   );
                 }}
@@ -134,7 +131,7 @@ export const Images: React.FC = observer(() => {
                   for (const item of selection) {
                     await deleteInputMutation.mutateAsync({
                       projectId: project.id,
-                      name: item.id,
+                      name: item.name,
                     });
                   }
                   await allInputsQuery.refetch();

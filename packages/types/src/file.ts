@@ -3,3 +3,14 @@ export interface FileInfo {
   size: number;
   parts: string[];
 }
+
+export interface ImageInfo {
+  url: string;
+  thumbnailUrl: string;
+}
+
+export interface ImageFile {
+  name: string;
+  image: ImageInfo;
+  metadata?: any;
+}

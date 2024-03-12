@@ -1,5 +1,5 @@
 import path from 'path';
-import { Project } from '@metastable/types';
+import { Project, ProjectSettings } from '@metastable/types';
 import { mkdir } from 'fs/promises';
 import { rimraf } from 'rimraf';
 
@@ -47,14 +47,15 @@ export class ProjectEntity extends DirectoryEntity {
   ): Promise<Project | Omit<Project, 'settings'>> {
     await this.load();
     const outputs = await this.output.all();
+    const lastOutput = outputs[outputs.length - 1];
 
-    const json: any = {
+    const json: Omit<Project, 'settings'> & { settings?: any } = {
       type: 'simple',
       ...this.metadata.json!,
       id: this.name,
       name: this.name,
-      lastOutput: outputs[outputs.length - 1]?.name,
-      outputs: outputs.length,
+      lastOutput: await lastOutput?.json(),
+      outputCount: outputs.length,
       size: await directorySize(this._path),
     };
 

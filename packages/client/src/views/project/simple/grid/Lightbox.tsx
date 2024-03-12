@@ -11,9 +11,10 @@ import {
 import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import styles from './Lightbox.module.scss';
+import { ImageFile } from '@metastable/types';
 
 interface Props {
-  images: [url: string, thumb: string][];
+  images: ImageFile[];
   current?: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -25,8 +26,8 @@ export const Lightbox: React.FC<Props> = ({
   onChange,
   onClose,
 }) => {
-  const currentUrl = images[current];
-  const filename = currentUrl[0].split('/').slice(-1)[0];
+  const currentFile = images[current];
+  const filename = currentFile.name;
 
   const previous = useCallback(
     () => onChange(current === 0 ? images.length - 1 : current - 1),
@@ -49,10 +50,10 @@ export const Lightbox: React.FC<Props> = ({
         </div>
         <div>{filename}</div>
         <div>
-          <IconButton href={currentUrl[0]} download={filename}>
+          <IconButton href={currentFile.image.url} download={filename}>
             <BsDownload />
           </IconButton>
-          <IconButton href={currentUrl[0]}>
+          <IconButton href={currentFile.image.url}>
             <BsArrowUpRightSquare />
           </IconButton>
           <IconButton onClick={onClose}>
@@ -69,7 +70,7 @@ export const Lightbox: React.FC<Props> = ({
         >
           <BsArrowLeft />
         </button>
-        <ImagePreview url={currentUrl[0]} />
+        <ImagePreview url={currentFile.image.url} />
         <button
           onClick={e => {
             e.stopPropagation();
@@ -80,14 +81,14 @@ export const Lightbox: React.FC<Props> = ({
         </button>
       </div>
       <div className={styles.thumbnails} onClick={e => e.stopPropagation()}>
-        {images.map((url, i) => {
+        {images.map((file, i) => {
           if (Math.abs(current - i) > 5) {
             return undefined;
           }
 
           return (
             <img
-              src={url[1]}
+              src={file.image.thumbnailUrl}
               key={i}
               onClick={() => onChange(i)}
               className={i === current ? styles.active : undefined}

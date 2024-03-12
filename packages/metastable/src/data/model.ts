@@ -1,5 +1,5 @@
 import path from 'path';
-import { Model, ModelType } from '@metastable/types';
+import { ImageInfo, Model, ModelType } from '@metastable/types';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import chokidar from 'chokidar';
 import EventEmitter from 'events';
@@ -13,6 +13,7 @@ import {
 import { FileEntity } from './common.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
 import { TypedEventEmitter } from '../types.js';
+import { getStaticUrl } from '../helpers/url.js';
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
 export class ModelEntity extends FileEntity {
@@ -68,6 +69,17 @@ export class ModelEntity extends FileEntity {
     return getThumbnailPath(this.imagePath);
   }
 
+  get image(): ImageInfo | undefined {
+    if (this.imageName) {
+      return {
+        url: getStaticUrl(this.imagePath!),
+        thumbnailUrl: getStaticUrl(this.thumbnailPath!),
+      };
+    }
+
+    return undefined;
+  }
+
   async writeImage(data: Buffer, extension: string) {
     this.imageName = `${this.name}.${extension}`;
     const imagePath = this.imagePath!;
@@ -87,7 +99,7 @@ export class ModelEntity extends FileEntity {
         path: this.path,
         size: (await stat(this.path)).size,
       },
-      image: this.imageName,
+      image: this.image,
     };
 
     return json;
@@ -102,13 +114,20 @@ export class ModelEntity extends FileEntity {
 
     const json: Model = {
       type: this.type!,
+      id: this.name,
       name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
       file: {
         name: this.name,
         parts,
+        path: this.path,
         size: (await stat(this.path)).size,
       },
-      image: this.imageName,
+      image: this.imageName
+        ? {
+            url: getStaticUrl(this.imagePath!),
+            thumbnailUrl: getStaticUrl(this.thumbnailPath!),
+          }
+        : undefined,
     };
 
     return json;

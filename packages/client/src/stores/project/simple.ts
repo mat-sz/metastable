@@ -3,6 +3,7 @@ import {
   ProjectSettings,
   Project as APIProject,
   ModelType,
+  ImageFile,
 } from '@metastable/types';
 
 import { API } from '$api';
@@ -264,12 +265,12 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     this.settings = settings;
   }
 
-  onPromptDone(outputFilenames: string[]) {
-    super.onPromptDone(outputFilenames);
+  onPromptDone(outputs: ImageFile[]) {
+    this.currentOutputs = outputs;
 
     if (this.addOutputToEditor) {
-      this.editor.addImage(this.view('output', outputFilenames[0]), {
-        name: `Output (${outputFilenames[0]})`,
+      this.editor.addImage(outputs[0].image.url, {
+        name: `Output (${outputs[0].name})`,
         offset: toJS(this.addOutputToEditor),
       });
       this.addOutputToEditor = undefined;

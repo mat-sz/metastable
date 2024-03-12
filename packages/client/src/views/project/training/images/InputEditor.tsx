@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { BsX } from 'react-icons/bs';
-import { ProjectTrainingInputMetadata } from '@metastable/types';
+import { ImageFile, ProjectTrainingInputMetadata } from '@metastable/types';
 
 import { TRPC } from '$api';
 import { ImageCrop } from '$components/imageCrop';
@@ -10,17 +10,16 @@ import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 
 interface InputEditorProps {
-  name: string;
+  input: ImageFile;
   onClose?: () => void;
 }
 
 export const InputEditor: React.FC<InputEditorProps> = observer(
-  ({ name, onClose }) => {
+  ({ input, onClose }) => {
     const project = useTraningProject();
-    const url = project.view('input', name);
     const metadataQuery = TRPC.project.input.get.useQuery({
       projectId: project.id,
-      name,
+      name: input.name,
     });
     const metadataMutation = TRPC.project.input.update.useMutation();
     const [metadata, setMetadata] = useState<ProjectTrainingInputMetadata>({});
@@ -39,13 +38,13 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
       <div className={styles.editor}>
         <div className={styles.header}>
           <span></span>
-          <span>{name}</span>
+          <span>{input.name}</span>
           <div>
             <IconButton
               onClick={async () => {
                 metadataMutation.mutate({
                   projectId: project.id,
-                  name,
+                  name: input.name,
                   metadata,
                 });
                 onClose?.();
@@ -57,7 +56,7 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
         </div>
         <div className={styles.crop}>
           <ImageCrop
-            src={url}
+            src={input.image.url}
             defaultArea={(metadataQuery.data.metadata as any).crop}
             onChange={area => {
               setMetadata(metadata => ({ ...metadata, crop: area }));

@@ -6,7 +6,6 @@ import { Model, ModelType } from '@metastable/types';
 import { useUI } from '$components/ui';
 import { ModelSelect } from '$modals/modelSelect';
 import { stringToColor } from '$utils/string';
-import { getStaticUrl } from '$utils/url';
 import styles from './index.module.scss';
 import { modelStore } from '$stores/ModelStore';
 
@@ -70,13 +69,7 @@ export const VarModel = observer(
                   style={{ backgroundColor: stringToColor(currentValue) }}
                   className={styles.icon}
                 >
-                  {model.image && (
-                    <img
-                      src={getStaticUrl(
-                        `/models/${modelType}/.metastable/${model.image}`,
-                      )}
-                    />
-                  )}
+                  {model.image && <img src={model.image.thumbnailUrl} />}
                 </div>
                 <span className={styles.name}>{model.name}</span>
                 <div className={styles.chevron}>

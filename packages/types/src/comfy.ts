@@ -1,3 +1,4 @@
+import { ImageFile } from './file.js';
 import { Project } from './project.js';
 
 export interface ComfyTorchInfo {
@@ -57,6 +58,7 @@ export interface PromptEndEvent {
   event: 'prompt.end';
   data: {
     id: string;
+    outputs: ImageFile[];
     output_filenames: string[];
     project_id: Project['id'];
   };

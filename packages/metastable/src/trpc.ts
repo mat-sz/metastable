@@ -262,7 +262,7 @@ export const router = t.router({
           const project = await metastable.project.get(projectId);
           const inputs = await project.input.all();
 
-          return inputs.map(input => input.name);
+          return await Promise.all(inputs.map(input => input.json()));
         }),
       get: t.procedure
         .input(
@@ -335,7 +335,7 @@ export const router = t.router({
           const project = await metastable.project.get(projectId);
           const outputs = await project.output.all();
 
-          return outputs.map(output => output.name);
+          return await Promise.all(outputs.map(output => output.json()));
         }),
       get: t.procedure
         .input(

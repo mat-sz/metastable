@@ -29,7 +29,7 @@ const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 app.register(fastifyStatic, {
   root: metastable.storage.dataRoot,
-  prefix: '/static',
+  prefix: '/temp',
   cacheControl: false,
   decorateReply: true,
 });
@@ -83,6 +83,16 @@ app.register(fastifyTRPCPlugin, {
       console.error(`Error in tRPC handler on path '${path}':`, error);
     },
   } satisfies FastifyTRPCPluginOptions<Router>['trpcOptions'],
+});
+
+app.get('/static', (req, reply) => {
+  const filePath = (req.query as any)?.path;
+  if (filePath) {
+    reply.sendFile(path.basename(filePath), path.dirname(filePath));
+  } else {
+    reply.status(404);
+    reply.send('Not found');
+  }
 });
 
 app.listen({ host, port });

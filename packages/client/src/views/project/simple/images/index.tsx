@@ -11,29 +11,28 @@ import { useSimpleProject } from '../../context';
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const filenames = project.outputFilenames;
+  const outputs = project.currentOutputs;
 
-  const selected = filenames[selectedIndex];
-  const path = selected && project.view('output', filenames[selectedIndex]);
+  const selected = outputs[selectedIndex];
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [filenames, setSelectedIndex]);
+  }, [outputs, setSelectedIndex]);
 
   return (
     <div className={styles.main}>
       <div className={styles.preview}>
-        {filenames.length ? (
-          <ImagePreview url={path} />
+        {outputs.length ? (
+          <ImagePreview url={selected.image.url} />
         ) : (
           <div className={styles.info}>Your output image will appear here.</div>
         )}
-        {filenames.length > 1 && (
+        {outputs.length > 1 && (
           <div className={styles.thumbnails}>
-            {filenames.map((filename, i) => (
+            {outputs.map((file, i) => (
               <img
                 className={selectedIndex === i ? styles.selected : undefined}
-                src={project.thumb('output', filename)}
+                src={file.image?.thumbnailUrl}
                 key={i}
                 onClick={() => setSelectedIndex(i)}
               />

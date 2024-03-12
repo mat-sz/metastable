@@ -25,10 +25,11 @@ export const General: React.FC = observer(() => {
           path="models.base.name"
           modelType={ModelType.CHECKPOINT}
           onSelect={model => {
-            if (model.samplerSettings) {
+            const samplerSettings = model.metadata?.samplerSettings;
+            if (samplerSettings) {
               project.settings.sampler = {
                 ...project.settings.sampler,
-                ...model.samplerSettings,
+                ...samplerSettings,
               };
             }
           }}

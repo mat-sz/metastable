@@ -24,17 +24,12 @@ export const Grid: React.FC = observer(() => {
     return <div className={styles.info}>No project output images found.</div>;
   }
 
-  const urls: [string, string][] = outputs.map(filename => [
-    project.view('output', filename),
-    project.thumb('output', filename),
-  ]);
-
   return (
     <>
       <div className={styles.grid}>
-        {urls.map((url, i) => (
+        {outputs.map((output, i) => (
           <a
-            href={url[0]}
+            href={output.image.url}
             target="_blank"
             rel="noopener noreferrer"
             key={i}
@@ -46,14 +41,14 @@ export const Grid: React.FC = observer(() => {
               }
             }}
           >
-            <img src={url[1]} />
+            <img src={output.image.thumbnailUrl} />
           </a>
         ))}
       </div>
       {open && (
         <Lightbox
           current={current}
-          images={urls}
+          images={outputs}
           onChange={setCurrent}
           onClose={() => setOpen(false)}
         />
