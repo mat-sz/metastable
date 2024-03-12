@@ -147,20 +147,17 @@ export const CivitAI: React.FC = observer(() => {
                 icon={<MdNoPhotography />}
               >
                 <CardTags>
-                  <CardTag
-                    icon={<Rating value={item.stats.rating} small />}
-                    text={`(${item.stats.ratingCount})`}
-                  />
+                  <CardTag icon={<Rating value={item.stats.rating} small />}>
+                    ({item.stats.ratingCount})
+                  </CardTag>
                 </CardTags>
                 <CardTags>
-                  <CardTag
-                    icon={<BsDownload />}
-                    text={`(${item.stats.downloadCount})`}
-                  />
-                  <CardTag
-                    icon={<BsHeartFill />}
-                    text={`(${item.stats.favoriteCount})`}
-                  />
+                  <CardTag icon={<BsDownload />}>
+                    ({item.stats.downloadCount})
+                  </CardTag>
+                  <CardTag icon={<BsHeartFill />}>
+                    ({item.stats.favoriteCount})
+                  </CardTag>
                 </CardTags>
               </Card>
             )}

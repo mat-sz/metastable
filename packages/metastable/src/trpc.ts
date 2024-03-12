@@ -134,7 +134,7 @@ export const router = t.router({
     }),
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
       const models = await metastable.model.all();
-      const jsons = await Promise.all(models.map(model => model.legacyJson()));
+      const jsons = await Promise.all(models.map(model => model.json()));
       const map: Record<string, Model[]> = {};
       for (const json of jsons) {
         if (!map[json.type]) {
@@ -149,7 +149,7 @@ export const router = t.router({
       .input(z.object({ type: z.nativeEnum(ModelType), name: z.string() }))
       .query(async ({ ctx: { metastable }, input: { type, name } }) => {
         const model = await metastable.model.get(type, name);
-        return await model.legacyJson();
+        return await model.json();
       }),
     update: t.procedure
       .input(
@@ -163,7 +163,7 @@ export const router = t.router({
         async ({ ctx: { metastable }, input: { type, name, metadata } }) => {
           const model = await metastable.model.get(type, name);
           await model.metadata.update(metadata);
-          return await model.legacyJson();
+          return await model.json();
         },
       ),
     delete: t.procedure

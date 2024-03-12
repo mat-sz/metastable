@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import styles from './index.module.scss';
+import { BsThreeDots } from 'react-icons/bs';
 
 interface CardProps {
   name?: string;
@@ -47,14 +48,72 @@ export const CardTags: React.FC<React.PropsWithChildren> = ({ children }) => {
 
 interface CardTagProps {
   icon?: React.ReactNode;
-  text?: React.ReactNode;
 }
 
-export const CardTag: React.FC<CardTagProps> = ({ icon, text }) => {
+export const CardTag: React.FC<React.PropsWithChildren<CardTagProps>> = ({
+  icon,
+  children,
+}) => {
   return (
     <div className={styles.tag}>
       {icon}
-      {!!text && <span>{text}</span>}
+      {!!children && <span>{children}</span>}
     </div>
+  );
+};
+
+export const CardMenu: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const close = () => setOpen(false);
+    document.addEventListener('pointerdown', close);
+
+    return () => {
+      document.removeEventListener('pointerdown', close);
+    };
+  }, [open]);
+
+  return (
+    <div
+      className={styles.menu}
+      onClick={e => {
+        e.stopPropagation();
+      }}
+    >
+      <button
+        onClick={() => setOpen(current => !current)}
+        onPointerDown={e => e.stopPropagation()}
+        className={styles.menuToggle}
+      >
+        <BsThreeDots />
+      </button>
+      {open && <div className={styles.menuItems}>{children}</div>}
+    </div>
+  );
+};
+
+interface CardMenuItemProps {
+  icon?: React.ReactNode;
+  onClick?: () => void;
+}
+
+export const CardMenuItem: React.FC<
+  React.PropsWithChildren<CardMenuItemProps>
+> = ({ icon, children, onClick }) => {
+  return (
+    <button
+      className={styles.menuItem}
+      onPointerDown={() => {
+        onClick?.();
+      }}
+    >
+      {icon}
+      {icon ? <span>{children}</span> : children}
+    </button>
   );
 };

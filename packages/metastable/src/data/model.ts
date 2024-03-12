@@ -89,24 +89,6 @@ export class ModelEntity extends FileEntity {
 
   async json() {
     await this.load();
-
-    const json: any = {
-      type: this.type,
-      name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
-      metadata: this.metadata.json!,
-      file: {
-        name: this.name,
-        path: this.path,
-        size: (await stat(this.path)).size,
-      },
-      image: this.image,
-    };
-
-    return json;
-  }
-
-  async legacyJson() {
-    await this.load();
     const parts = this.modelBaseDir
       ? path.relative(this.modelBaseDir, this.path).split(path.sep)
       : [];
@@ -123,12 +105,7 @@ export class ModelEntity extends FileEntity {
         path: this.path,
         size: (await stat(this.path)).size,
       },
-      image: this.imageName
-        ? {
-            url: getStaticUrl(this.imagePath!),
-            thumbnailUrl: getStaticUrl(this.thumbnailPath!),
-          }
-        : undefined,
+      image: this.image,
     };
 
     return json;

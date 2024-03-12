@@ -3,11 +3,14 @@ import { observer } from 'mobx-react-lite';
 import { Model, ModelType } from '@metastable/types';
 import { BsFolder } from 'react-icons/bs';
 
-import { Card, List } from '$components/list';
+import { Card, CardMenu, CardMenuItem, List } from '$components/list';
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import { modelStore } from '$stores/ModelStore';
+import { useUI } from '$components/ui';
+import { ModelEdit } from '$modals/modelEdit';
+import { ModelDelete } from '$modals/modelDelete';
 
 interface Props {
   type: ModelType;
@@ -56,6 +59,7 @@ function listDirectories(data: Model[], index: number) {
 export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
   const data = modelStore.type(type) || [];
   const [parts, setParts] = useState<string[]>([]);
+  const { showModal } = useUI();
 
   const models = listFiles(data, parts, false);
   const allModels = listFiles(data, parts, true);
@@ -93,7 +97,28 @@ export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
               onClick={() => {
                 onSelect(item);
               }}
-            />
+            >
+              <CardMenu>
+                <CardMenuItem
+                  onClick={() => {
+                    showModal(
+                      <ModelEdit name={item.file.name} type={item.type} />,
+                    );
+                  }}
+                >
+                  Edit
+                </CardMenuItem>
+                <CardMenuItem
+                  onClick={() => {
+                    showModal(
+                      <ModelDelete name={item.file.name} type={item.type} />,
+                    );
+                  }}
+                >
+                  Delete
+                </CardMenuItem>
+              </CardMenu>
+            </Card>
           )
         }
       </List>

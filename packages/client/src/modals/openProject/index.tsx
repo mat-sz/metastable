@@ -34,10 +34,10 @@ export const OpenProject: React.FC = observer(() => {
             >
               <CardTags>
                 {!!item.size && (
-                  <CardTag icon={<BsHdd />} text={filesize(item.size)} />
+                  <CardTag icon={<BsHdd />}>{filesize(item.size)}</CardTag>
                 )}
                 {!!item.outputCount && (
-                  <CardTag icon={<BsImage />} text={item.outputCount} />
+                  <CardTag icon={<BsImage />}>{item.outputCount}</CardTag>
                 )}
               </CardTags>
             </Card>
