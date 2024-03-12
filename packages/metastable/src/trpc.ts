@@ -2,7 +2,13 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
 import { z } from 'zod';
 import type { BrowserWindow } from 'electron';
-import { AnyEvent, LogItem, Utilization } from '@metastable/types';
+import {
+  AnyEvent,
+  LogItem,
+  Model,
+  ModelType,
+  Utilization,
+} from '@metastable/types';
 import { Base64 } from 'js-base64';
 
 import type { Metastable } from './index.js';
@@ -34,7 +40,7 @@ export const router = t.router({
       .input(
         z.object({
           url: z.string(),
-          type: z.string(),
+          type: z.nativeEnum(ModelType),
           name: z.string(),
           imageUrl: z.string().optional(),
           info: z.any().optional(),
@@ -91,7 +97,10 @@ export const router = t.router({
       });
     }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
-      return await metastable.info();
+      return {
+        samplers: metastable.comfy?.samplers || [],
+        schedulers: metastable.comfy?.schedulers || [],
+      };
     }),
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
@@ -111,13 +120,35 @@ export const router = t.router({
     },
   },
   model: {
+    onChange: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<void>(emit => {
+        const onEvent = () => {
+          emit.next();
+        };
+
+        metastable.model.on('change', onEvent);
+        return () => {
+          metastable.model.off('change', onEvent);
+        };
+      });
+    }),
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
-      return await metastable.storage.models.all();
+      const models = await metastable.model.all();
+      const jsons = await Promise.all(models.map(model => model.legacyJson()));
+      const map: Record<string, Model[]> = {};
+      for (const json of jsons) {
+        if (!map[json.type]) {
+          map[json.type] = [];
+        }
+        map[json.type].push(json);
+      }
+
+      return map;
     }),
     update: t.procedure
       .input(
         z.object({
-          type: z.string(),
+          type: z.nativeEnum(ModelType),
           name: z.string(),
           longName: z.string(),
           description: z.string(),
@@ -127,19 +158,21 @@ export const router = t.router({
         }),
       )
       .mutation(
-        async ({ ctx: { metastable }, input: { type, name, ...data } }) => {
-          return await metastable.storage.models.update(type, name, data);
+        async ({ ctx: { metastable }, input: { type, name, ...metadata } }) => {
+          const model = await metastable.model.get(type, name);
+          await model.metadata.update(metadata);
+          return await model.legacyJson();
         },
       ),
     delete: t.procedure
       .input(
         z.object({
-          type: z.string(),
+          type: z.nativeEnum(ModelType),
           name: z.string(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input: { type, name } }) => {
-        await metastable.storage.models.delete(type, name);
+        await metastable.model.delete(type, name);
       }),
   },
   setup: {

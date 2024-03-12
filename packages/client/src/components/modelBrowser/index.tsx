@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Model } from '@metastable/types';
+import { Model, ModelType } from '@metastable/types';
 import { BsFolder } from 'react-icons/bs';
 
 import { Card, List } from '$components/list';
 import { Breadcrumbs } from '$components/breadcrumbs';
-import { mainStore } from '$stores/MainStore';
 import { getStaticUrl } from '$utils/url';
 import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
+import { modelStore } from '$stores/ModelStore';
 
 interface Props {
-  type: string;
+  type: ModelType;
   onSelect: (model: Model) => void;
 }
 
@@ -55,7 +55,7 @@ function listDirectories(data: Model[], index: number) {
 }
 
 export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
-  const data = mainStore.info.models[type] || [];
+  const data = modelStore.type(type) || [];
   const [parts, setParts] = useState<string[]>([]);
 
   const models = listFiles(data, parts, false);

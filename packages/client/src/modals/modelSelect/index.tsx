@@ -1,11 +1,11 @@
 import React from 'react';
-import { Model } from '@metastable/types';
+import { Model, ModelType } from '@metastable/types';
 
 import { Modal, useModal } from '$components/modal';
 import { ModelBrowser } from '../../components/modelBrowser';
 
 interface Props {
-  type: string;
+  type: ModelType;
   onSelect: (model: Model) => void;
 }
 

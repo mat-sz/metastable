@@ -26,7 +26,7 @@ export class ProjectEntity extends DirectoryEntity {
   }
 
   async load(): Promise<void> {
-    await this.metadata.get();
+    await this.metadata.refresh();
     await mkdir(this.input.path, { recursive: true });
     await mkdir(this.output.path, { recursive: true });
   }

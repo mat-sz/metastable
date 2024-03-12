@@ -16,6 +16,7 @@ import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
 import { ConfigStore } from './ConfigStore';
 import { IS_ELECTRON } from '$utils/config';
+import { modelStore } from './ModelStore';
 
 class MainStore {
   projects = new ProjectStore();
@@ -23,7 +24,6 @@ class MainStore {
   info: InstanceInfo = {
     samplers: [],
     schedulers: [],
-    models: {},
   };
   torchInfo?: ComfyTorchInfo = undefined;
 
@@ -191,9 +191,6 @@ class MainStore {
           prompt => prompt.id !== message.data.id,
         );
         break;
-      case 'models.changed':
-        this.refresh();
-        break;
       case 'backend.status':
         this.backendStatus = message.data;
         if (message.data === 'ready') {
@@ -215,8 +212,8 @@ class MainStore {
     }
   }
 
-  hasFile(type: string, name: string) {
-    if (this.info.models[type]?.find(({ file }) => file.name === name)) {
+  hasFile(type: ModelType, name: string) {
+    if (modelStore.has(type, name)) {
       return 'downloaded';
     }
 
@@ -243,11 +240,13 @@ class MainStore {
   }
 
   get hasCheckpoint() {
-    return this.info.models[ModelType.CHECKPOINT]?.[0];
+    const model = modelStore.defaultModel(ModelType.CHECKPOINT);
+    return !!model;
   }
 
   defaultModelName(type: ModelType) {
-    return this.info.models[type]?.[0]?.file.name;
+    const model = modelStore.defaultModel(type);
+    return model?.file.name;
   }
 }
 

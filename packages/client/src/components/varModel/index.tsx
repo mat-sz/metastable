@@ -7,8 +7,8 @@ import { useUI } from '$components/ui';
 import { ModelSelect } from '$modals/modelSelect';
 import { stringToColor } from '$utils/string';
 import { getStaticUrl } from '$utils/url';
-import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
+import { modelStore } from '$stores/ModelStore';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;
@@ -38,9 +38,7 @@ export const VarModel = observer(
     });
 
     const model = currentValue
-      ? mainStore.info.models[modelType]?.find(
-          model => model.file.name === currentValue,
-        )
+      ? modelStore.find(modelType, currentValue)
       : undefined;
 
     return (

@@ -1,3 +1,5 @@
+import { DownloadSettings } from './download.js';
+
 export interface Requirement {
   name: string;
   expected: string | number | boolean;
@@ -53,7 +55,7 @@ export interface SetupDetails {
 }
 
 export interface SetupSettings {
-  downloads: { name: string; type: string; url: string }[];
+  downloads: DownloadSettings[];
   pythonMode: 'static' | 'system';
   torchMode: 'nvidia' | 'amd' | 'cpu';
 }

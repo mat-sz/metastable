@@ -1,4 +1,4 @@
-import { SetupSettings, TaskState } from '@metastable/types';
+import { DownloadSettings, TaskState } from '@metastable/types';
 
 import type { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
@@ -6,7 +6,7 @@ import { BaseTask } from '../../tasks/task.js';
 export class DownloadModelsTask extends BaseTask {
   constructor(
     private metastable: Metastable,
-    private downloads: SetupSettings['downloads'],
+    private downloads: DownloadSettings[],
   ) {
     super('models.download', undefined);
   }

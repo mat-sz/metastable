@@ -137,7 +137,7 @@ export class DirectoryEntity extends BaseEntity {
   }
 
   async load(): Promise<void> {
-    await this.metadata.get();
+    await this.metadata.refresh();
   }
 
   static async fromDirent<T extends BaseEntity>(
@@ -172,16 +172,20 @@ export class FileEntity extends BaseEntity {
     super(_path);
 
     this.metadata = new Metadata(
-      path.join(getMetadataDirectory(this.path), `${this.name}.json`),
+      path.join(this.metadataPath, `${this.name}.json`),
       {},
     );
   }
 
-  async load(): Promise<void> {
-    await this.metadata.get();
+  get metadataPath() {
+    return getMetadataDirectory(this.path);
   }
 
-  async json() {
+  async load(): Promise<void> {
+    await this.metadata.refresh();
+  }
+
+  async json(): Promise<{ name: string; metadata?: any }> {
     return { name: this.name, metadata: await this.metadata.get() };
   }
 
@@ -250,7 +254,7 @@ export class EntityRepository<
 > {
   constructor(
     private baseDir: string,
-    private assetClass: TClass,
+    private entityClass: TClass,
   ) {}
 
   get path() {
@@ -265,7 +269,7 @@ export class EntityRepository<
     return await getAvailableName(
       this.baseDir,
       name,
-      this.assetClass.isDirectory,
+      this.entityClass.isDirectory,
     );
   }
 
@@ -280,7 +284,7 @@ export class EntityRepository<
 
     const promises = items.map(async item => {
       try {
-        return await this.assetClass.fromDirent(item);
+        return await this.entityClass.fromDirent(item);
       } catch {
         return undefined;
       }
@@ -292,7 +296,7 @@ export class EntityRepository<
   }
 
   async get(name: string): Promise<TEntity> {
-    return (await this.assetClass.fromPath(
+    return (await this.entityClass.fromPath(
       this.getEntityPath(name),
     )) as TEntity;
   }
@@ -300,7 +304,7 @@ export class EntityRepository<
   async create(name: string): Promise<TEntity> {
     await mkdir(this.path, { recursive: true });
 
-    return (await this.assetClass.create(
+    return (await this.entityClass.create(
       await this.getAvailableEntityPath(name),
     )) as TEntity;
   }

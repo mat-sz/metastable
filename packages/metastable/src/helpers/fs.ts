@@ -1,6 +1,6 @@
 import path from 'path';
 import fs, { mkdir, unlink } from 'fs/promises';
-import { FileInfo } from '@metastable/types';
+import { Dirent } from 'fs';
 
 export const IMAGE_EXTENSIONS = [
   'png',
@@ -56,36 +56,21 @@ export async function imageFilenames(dirPath: string) {
   });
 }
 
-export async function walk(
-  currentPath: string,
-  relative: string,
-  parts: string[] = [],
-) {
+export async function walk(currentPath: string) {
   const files = await fs.readdir(currentPath, {
     withFileTypes: true,
   });
 
-  const output: FileInfo[] = [];
+  const output: Dirent[] = [];
   for (const file of files) {
     if (file.isFile()) {
       if (file.name.startsWith('.')) {
         continue;
       }
 
-      const filePath = path.join(currentPath, file.name);
-      output.push({
-        name: path.join(relative, file.name),
-        size: (await fs.stat(filePath)).size,
-        parts,
-      });
+      output.push(file);
     } else if (file.isDirectory()) {
-      output.push(
-        ...(await walk(
-          path.join(currentPath, file.name),
-          path.join(relative, file.name),
-          [...parts, file.name],
-        )),
-      );
+      output.push(...(await walk(path.join(file.path, file.name))));
     }
   }
 

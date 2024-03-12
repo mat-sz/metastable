@@ -17,6 +17,7 @@ export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.UPSCALE_MODEL]: 'Upscale model',
   [ModelType.VAE]: 'VAE',
   [ModelType.VAE_APPROX]: 'VAE Approximation',
+  [ModelType.TAGGER]: 'Tagger',
 };
 
 export const downloadable: DownloadableModelGroup[] = [

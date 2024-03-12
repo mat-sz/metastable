@@ -14,13 +14,12 @@ import {
   Utilization,
   ProjectTaggingSettings,
 } from '@metastable/types';
-import chokidar from 'chokidar';
 
 import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
 import { PythonInstance } from './python/index.js';
 import { Storage } from './storage/index.js';
-import { exists, isPathIn, resolveConfigPath } from './helpers/fs.js';
+import { resolveConfigPath } from './helpers/fs.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { Tasks } from './tasks/index.js';
 import { Kohya } from './kohya/index.js';
@@ -28,6 +27,7 @@ import { ProjectEntity } from './data/project.js';
 import { EntityRepository } from './data/common.js';
 import { TypedEventEmitter } from './types.js';
 import { Tagger } from './kohya/tagger.js';
+import { ModelRepository } from './data/model.js';
 
 type MetastableEvents = {
   event: (event: AnyEvent) => void;
@@ -47,6 +47,7 @@ export class Metastable extends (EventEmitter as {
   kohya?: Kohya;
   tagger?: Tagger;
   project;
+  model;
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
@@ -81,22 +82,9 @@ export class Metastable extends (EventEmitter as {
       path.join(this.dataRoot, 'projects'),
       ProjectEntity,
     );
+    this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
     this.setup.on('event', this.onEvent);
     this.tasks.on('event', this.onEvent);
-
-    let timeout: any = undefined;
-    chokidar.watch(this.storage.modelsDir, {}).on('all', (event: string) => {
-      if (event !== 'add' && event !== 'unlink') {
-        return;
-      }
-
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        this.onEvent({
-          event: 'models.changed',
-        });
-      }, 250);
-    });
 
     setInterval(async () => {
       // @ts-ignore
@@ -126,7 +114,6 @@ export class Metastable extends (EventEmitter as {
   }
 
   async init() {
-    await this.storage.init();
     await this.reload();
   }
 
@@ -249,42 +236,59 @@ export class Metastable extends (EventEmitter as {
     const id = nanoid();
     this.settingsCache[id] = settings;
 
-    settings.models.base.path ||= this.storage.models.path(
-      ModelType.CHECKPOINT,
-      settings.models.base.name,
-    );
+    if (!settings.models.base.path) {
+      const model = await this.model.get(
+        ModelType.CHECKPOINT,
+        settings.models.base.name,
+      );
+      settings.models.base.path = model.path;
+    }
 
-    const embeddingsDir = this.storage.models.dir(ModelType.EMBEDDING);
-    if (await exists(embeddingsDir)) {
-      settings.models.base.embeddings_path = embeddingsDir;
+    const embeddingsPath = await this.model.getEmbeddingsPath();
+    if (embeddingsPath) {
+      settings.models.base.embeddings_path = embeddingsPath;
     }
 
     if (settings.models.loras) {
-      settings.models.loras = settings.models.loras
-        .filter(model => model.enabled && model.name)
-        .map(model => ({
-          ...model,
-          path:
-            model.path || this.storage.models.path(ModelType.LORA, model.name!),
-        }));
+      settings.models.loras = settings.models.loras.filter(
+        model => model.enabled && model.name,
+      );
+
+      for (const modelSettings of settings.models.loras) {
+        if (!modelSettings.path) {
+          const model = await this.model.get(
+            ModelType.LORA,
+            modelSettings.name!,
+          );
+          modelSettings.path = model.path;
+        }
+      }
     }
 
     if (settings.models.controlnets) {
-      settings.models.controlnets = settings.models.controlnets
-        .filter(model => model.enabled && model.name)
-        .map(model => ({
-          ...model,
-          path:
-            model.path ||
-            this.storage.models.path(ModelType.CONTROLNET, model.name!),
-        }));
+      settings.models.controlnets = settings.models.controlnets.filter(
+        model => model.enabled && model.name && model.image,
+      );
+
+      for (const modelSettings of settings.models.controlnets) {
+        if (!modelSettings.path) {
+          const model = await this.model.get(
+            ModelType.CONTROLNET,
+            modelSettings.name!,
+          );
+          modelSettings.path = model.path;
+        }
+      }
     }
 
     if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
-      settings.models.upscale.path ||= this.storage.models.path(
-        ModelType.UPSCALE_MODEL,
-        settings.models.upscale.name,
-      );
+      if (!settings.models.upscale.path) {
+        const model = await this.model.get(
+          ModelType.UPSCALE_MODEL,
+          settings.models.upscale.name,
+        );
+        settings.models.upscale.path = model.path;
+      }
     } else {
       settings.models.upscale = undefined;
     }
@@ -302,24 +306,46 @@ export class Metastable extends (EventEmitter as {
           ...model,
           path:
             model.path ||
-            this.storage.models.path(ModelType.IPADAPTER, model.name!),
+            this.model.getEntityPath(ModelType.IPADAPTER, model.name!),
           clip_vision_path:
             model.path ||
-            this.storage.models.path(
+            this.model.getEntityPath(
               ModelType.CLIP_VISION,
               model.clip_vision_name!,
             ),
         }));
+
+      for (const modelSettings of settings.models.ipadapters) {
+        if (!modelSettings.path) {
+          const model = await this.model.get(
+            ModelType.IPADAPTER,
+            modelSettings.name!,
+          );
+          modelSettings.path = model.path;
+        }
+
+        if (!modelSettings.clip_vision_path) {
+          const model = await this.model.get(
+            ModelType.CLIP_VISION,
+            modelSettings.clip_vision_name!,
+          );
+          modelSettings.clip_vision_path = model.path;
+        }
+      }
     }
 
     if (settings.sampler.preview?.method === 'taesd') {
-      const list = await this.storage.models.type(ModelType.VAE_APPROX);
+      const decoderModel = await this.model.get(
+        ModelType.VAE_APPROX,
+        'taesd_decoder',
+      );
+      const decoderXlModel = await this.model.get(
+        ModelType.VAE_APPROX,
+        'taesdxl_decoder',
+      );
       settings.sampler.preview.taesd = {
-        taesd_decoder: await this.storage.models.find(list, 'taesd_decoder'),
-        taesdxl_decoder: await this.storage.models.find(
-          list,
-          'taesdxl_decoder',
-        ),
+        taesd_decoder: decoderModel.path,
+        taesdxl_decoder: decoderXlModel.path,
       };
     }
 
@@ -341,20 +367,26 @@ export class Metastable extends (EventEmitter as {
 
   async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
     const project = await this.project.get(projectId);
-    settings.base.path ||= this.storage.models.path(
-      ModelType.CHECKPOINT,
-      settings.base.name,
-    );
+    if (!settings.base.path) {
+      const model = await this.model.get(
+        ModelType.CHECKPOINT,
+        settings.base.name,
+      );
+      settings.base.path = model.path;
+    }
 
     return await this.kohya?.train(project, settings);
   }
 
   async tag(projectId: Project['id'], settings: ProjectTaggingSettings) {
     const project = await this.project.get(projectId);
-    settings.tagger.path ||= this.storage.models.path(
-      ModelType.TAGGER,
-      settings.tagger.name,
-    );
+    if (!settings.tagger.path) {
+      const model = await this.model.get(
+        ModelType.TAGGER,
+        settings.tagger.name,
+      );
+      settings.tagger.path = model.path;
+    }
 
     return await this.tagger?.run(project, settings);
   }
@@ -364,12 +396,10 @@ export class Metastable extends (EventEmitter as {
   }
 
   async downloadModel(data: DownloadSettings) {
-    const savePath = this.storage.models.path(data.type, data.name);
-    if (!isPathIn(this.storage.modelsDir, savePath)) {
-      throw new Error(
-        'Attempted to save file outside of the parent directory.',
-      );
-    }
+    const savePath = this.model.getEntityPath(
+      data.type as ModelType,
+      data.name,
+    );
 
     const url = new URL(data.url);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
@@ -396,14 +426,6 @@ export class Metastable extends (EventEmitter as {
     return this.tasks.queues.downloads.add(
       new DownloadModelTask(data, savePath, headers),
     );
-  }
-
-  async info() {
-    return {
-      samplers: this.comfy?.samplers || [],
-      schedulers: this.comfy?.schedulers || [],
-      models: await this.storage.models.all(),
-    };
   }
 }
 

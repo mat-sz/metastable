@@ -7,6 +7,7 @@ import { DownloadSettings, TaskState, DownloadData } from '@metastable/types';
 import { exists, tryMkdir } from '../helpers/fs.js';
 import { BaseTask } from '../tasks/task.js';
 import { WrappedPromise } from '../helpers/promise.js';
+import { ModelEntity } from '../data/model.js';
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;
@@ -188,6 +189,7 @@ export class DownloadModelTask extends BaseDownloadTask {
     if (state === TaskState.SUCCESS) {
       const { imageUrl, info } = this.settings;
 
+      const model = new ModelEntity(this.savePath);
       await tryMkdir(path.join(path.dirname(this.savePath), '.metastable'));
 
       if (imageUrl) {
@@ -195,7 +197,7 @@ export class DownloadModelTask extends BaseDownloadTask {
           const { data, headers } = await axios({
             url: imageUrl,
             method: 'GET',
-            responseType: 'stream',
+            responseType: 'arraybuffer',
             headers: {
               'User-Agent': USER_AGENT,
             },
@@ -212,28 +214,14 @@ export class DownloadModelTask extends BaseDownloadTask {
           }
 
           if (ext) {
-            const writeStream = createWriteStream(
-              path.join(
-                path.dirname(this.savePath),
-                '.metastable',
-                `${path.basename(this.savePath)}.${ext}`,
-              ),
-            );
-            data.pipe(writeStream);
+            await model.writeImage(data, ext);
           }
         } catch {}
       }
 
       if (info) {
         try {
-          await fs.writeFile(
-            path.join(
-              path.dirname(this.savePath),
-              '.metastable',
-              `${path.basename(this.savePath)}.json`,
-            ),
-            JSON.stringify(info),
-          );
+          await model.metadata.set(info);
         } catch {}
       }
     }

@@ -1,4 +1,4 @@
-import { ModelInfo } from './model.js';
+import { ModelInfo, ModelType } from './model.js';
 
 export interface DownloadData {
   offset: number;
@@ -10,7 +10,7 @@ export interface DownloadData {
 
 export interface DownloadSettings {
   name: string;
-  type: string;
+  type: ModelType;
   url: string;
   size?: number;
   imageUrl?: string;

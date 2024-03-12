@@ -1,0 +1,228 @@
+import path from 'path';
+import { Model, ModelType } from '@metastable/types';
+import { mkdir, stat, writeFile } from 'fs/promises';
+import chokidar from 'chokidar';
+import EventEmitter from 'events';
+
+import {
+  IMAGE_EXTENSIONS,
+  exists,
+  removeFileExtension,
+  walk,
+} from '../helpers/fs.js';
+import { FileEntity } from './common.js';
+import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
+import { TypedEventEmitter } from '../types.js';
+
+const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
+export class ModelEntity extends FileEntity {
+  type: ModelType | undefined = undefined;
+  imageName: string | undefined = undefined;
+  simpleName: string;
+  modelBaseDir: string | undefined = undefined;
+
+  constructor(_path: string) {
+    super(_path);
+    this.simpleName = removeFileExtension(this.name);
+  }
+
+  async load(): Promise<void> {
+    const split = this.name.split('.');
+    if (
+      split.length < 2 ||
+      !MODEL_EXTENSIONS.includes(split[split.length - 1])
+    ) {
+      throw new Error('Not a valid model file.');
+    }
+
+    await this.metadata.refresh();
+
+    for (const extension of IMAGE_EXTENSIONS) {
+      if (
+        await exists(path.join(this.metadataPath, `${this.name}.${extension}`))
+      ) {
+        this.imageName = `${this.name}.${extension}`;
+        break;
+      }
+    }
+
+    const imagePath = this.imagePath;
+    if (imagePath) {
+      await generateThumbnail(imagePath);
+    }
+  }
+
+  get imagePath() {
+    if (!this.imageName) {
+      return undefined;
+    }
+
+    return path.join(this.metadataPath, this.imageName);
+  }
+
+  get thumbnailPath() {
+    if (!this.imagePath) {
+      return undefined;
+    }
+
+    return getThumbnailPath(this.imagePath);
+  }
+
+  async writeImage(data: Buffer, extension: string) {
+    this.imageName = `${this.name}.${extension}`;
+    const imagePath = this.imagePath!;
+    await writeFile(imagePath, data);
+    await generateThumbnail(imagePath);
+  }
+
+  async json() {
+    await this.load();
+
+    const json: any = {
+      type: this.type,
+      name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
+      metadata: this.metadata.json!,
+      file: {
+        name: this.name,
+        path: this.path,
+        size: (await stat(this.path)).size,
+      },
+      image: this.imageName,
+    };
+
+    return json;
+  }
+
+  async legacyJson() {
+    await this.load();
+    const parts = this.modelBaseDir
+      ? path.relative(this.modelBaseDir, this.path).split(path.sep)
+      : [];
+    parts.pop();
+
+    const json: Model = {
+      type: this.type!,
+      name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
+      file: {
+        name: this.name,
+        parts,
+        size: (await stat(this.path)).size,
+      },
+      image: this.imageName,
+    };
+
+    return json;
+  }
+}
+
+type ModelRepositoryEvents = {
+  change: () => void;
+};
+
+export class ModelRepository extends (EventEmitter as {
+  new (): TypedEventEmitter<ModelRepositoryEvents>;
+}) {
+  private searchPaths: { [key in ModelType]?: string[] } = {};
+  private cache: ModelEntity[] | undefined = undefined;
+
+  constructor(private baseDir: string) {
+    super();
+
+    for (const type of Object.values(ModelType)) {
+      this.searchPaths[type] = [path.join(baseDir, type)];
+    }
+
+    let timeout: any = undefined;
+    chokidar.watch(baseDir, {}).on('all', (event: string) => {
+      if (event !== 'add' && event !== 'unlink') {
+        return;
+      }
+
+      this.cache = undefined;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        this.emit('change');
+      }, 250);
+    });
+  }
+
+  get path() {
+    return this.baseDir;
+  }
+
+  getEntityPath(type: ModelType, name: string) {
+    return path.join(this.baseDir, type, name);
+  }
+
+  async refresh() {
+    const promises: Promise<ModelEntity | undefined>[] = [];
+
+    for (const [type, paths] of Object.entries(this.searchPaths)) {
+      for (const dirPath of paths) {
+        await mkdir(dirPath, { recursive: true });
+        const items = await walk(dirPath);
+        promises.push(
+          ...items.map(async item => {
+            try {
+              const model = await ModelEntity.fromDirent<ModelEntity>(item);
+              model.type = type as ModelType;
+              model.modelBaseDir = dirPath;
+              return model;
+            } catch {
+              return undefined;
+            }
+          }),
+        );
+      }
+    }
+
+    const models = (await Promise.all(promises)).filter(
+      entity => !!entity,
+    ) as ModelEntity[];
+    this.cache = models;
+    return models;
+  }
+
+  async all(): Promise<ModelEntity[]> {
+    if (!this.cache) {
+      return await this.refresh();
+    }
+
+    return this.cache;
+  }
+
+  async type(type: ModelType) {
+    const models = await this.all();
+    return models.filter(model => model.type === type);
+  }
+
+  async get(type: ModelType, name: string): Promise<ModelEntity> {
+    const basename = path.basename(name.replace(/[\\\/]/g, path.sep));
+    const cache = await this.all();
+
+    const model = cache.find(
+      model =>
+        model.type === type &&
+        (model.name === basename || model.simpleName === basename),
+    );
+    if (!model) {
+      throw new Error(`Unable to find model '${name}' of type '${type}'.`);
+    }
+    await model.load();
+    return model;
+  }
+
+  async getEmbeddingsPath(): Promise<string | undefined> {
+    const embeddingsDir = path.join(this.baseDir, ModelType.EMBEDDING);
+    if (await exists(embeddingsDir)) {
+      return embeddingsDir;
+    }
+
+    return undefined;
+  }
+
+  async delete(type: ModelType, name: string): Promise<void> {
+    const entity = await this.get(type, name);
+    await entity.delete();
+  }
+}
