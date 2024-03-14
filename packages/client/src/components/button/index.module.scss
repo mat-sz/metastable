@@ -1,0 +1,19 @@
+.button {
+  &.danger {
+    background: var(--color-bg-danger);
+    color: white;
+
+    &:hover {
+      background: var(--color-bg-danger-hover);
+    }
+  }
+
+  &.secondary {
+    background: none;
+
+    &:hover {
+      background: none;
+      text-decoration: underline;
+    }
+  }
+}

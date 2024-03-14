@@ -1,8 +1,9 @@
 import React from 'react';
 import { ModelType } from '@metastable/types';
 
-import { Modal, useModal } from '$components/modal';
+import { Modal, ModalActions, useModal } from '$components/modal';
 import { TRPC } from '$api';
+import { Button } from '$components/button';
 
 interface Props {
   type: ModelType;
@@ -19,21 +20,25 @@ export const ModelDelete: React.FC<Props> = ({ type, name }) => {
       <div>
         Are you sure you want to delete <span>{name}</span>?
       </div>
-      <button
-        onClick={() => {
-          close();
-        }}
-      >
-        Cancel
-      </button>
-      <button
-        onClick={() => {
-          deleteMutation.mutate({ name, type });
-          close();
-        }}
-      >
-        Confirm
-      </button>
+      <ModalActions>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            close();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="danger"
+          onClick={() => {
+            deleteMutation.mutate({ name, type });
+            close();
+          }}
+        >
+          Confirm
+        </Button>
+      </ModalActions>
     </Modal>
   );
 };

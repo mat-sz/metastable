@@ -82,3 +82,17 @@
   flex: 1;
   min-height: 0;
 }
+
+.actions {
+  margin: -0.5rem;
+  margin-top: 0.5rem;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  justify-content: flex-end;
+
+  & > * {
+    margin-left: 0.5rem;
+  }
+}

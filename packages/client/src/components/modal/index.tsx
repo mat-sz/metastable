@@ -50,4 +50,10 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   );
 };
 
+export const ModalActions: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
+  return <div className={styles.actions}>{children}</div>;
+};
+
 export { useModal };
