@@ -41,6 +41,7 @@
 
 .modal_small {
   @media screen and (min-width: 960px) {
+    border-radius: 5px;
     max-width: 600px;
     height: auto;
   }
@@ -58,16 +59,22 @@
   align-items: center;
   justify-content: space-between;
   background: var(--color-bg-panel-dark);
-  padding: 0.5rem;
+  padding: 1rem;
+  padding-bottom: 0;
 
   span {
-    font-weight: bold;
+    font-size: 1.2rem;
+    font-weight: 400;
   }
 
   button {
     padding: 0;
     font-size: 0;
     background: none;
+
+    &:hover {
+      background: none;
+    }
 
     svg {
       font-size: 1.4rem;
@@ -76,7 +83,7 @@
 }
 
 .body {
-  padding: 0.5rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -84,12 +91,12 @@
 }
 
 .actions {
-  margin: -0.5rem;
-  margin-top: 0.5rem;
+  margin: -1rem;
+  margin-top: 1rem;
   background: var(--color-bg);
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 1rem;
   justify-content: flex-end;
 
   & > * {

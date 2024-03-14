@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
-import { BsX } from 'react-icons/bs';
+import { BsXLg } from 'react-icons/bs';
 
 import styles from './index.module.scss';
 import { useModal } from './context';
@@ -41,7 +41,7 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
         <div className={styles.title}>
           <span>{title}</span>
           <button onClick={close}>
-            <BsX />
+            <BsXLg />
           </button>
         </div>
         <div className={styles.body}>{children}</div>
