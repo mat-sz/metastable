@@ -14,6 +14,7 @@ import { ModelDelete } from '$modals/modelDelete';
 
 interface Props {
   type: ModelType;
+  defaultParts?: string[];
   onSelect: (model: Model) => void;
 }
 
@@ -56,72 +57,74 @@ function listDirectories(data: Model[], index: number) {
   return [...set];
 }
 
-export const ModelBrowser: React.FC<Props> = observer(({ type, onSelect }) => {
-  const data = modelStore.type(type) || [];
-  const [parts, setParts] = useState<string[]>([]);
-  const { showModal } = useUI();
+export const ModelBrowser: React.FC<Props> = observer(
+  ({ type, onSelect, defaultParts = [] }) => {
+    const data = modelStore.type(type) || [];
+    const [parts, setParts] = useState<string[]>(defaultParts);
+    const { showModal } = useUI();
 
-  const models = listFiles(data, parts, false);
-  const allModels = listFiles(data, parts, true);
-  const directories = listDirectories(data, parts.length);
+    const models = listFiles(data, parts, false);
+    const allModels = listFiles(data, parts, true);
+    const directories = listDirectories(data, parts.length);
 
-  return (
-    <>
-      <Breadcrumbs value={parts} onChange={setParts} />
-      <List
-        items={[...directories, ...models]}
-        quickFilter={(_, search) =>
-          fuzzy(
-            allModels,
-            search,
-            item => `${item.name} ${removeFileExtension(item.file.name)}`,
-          )
-        }
-      >
-        {item =>
-          typeof item === 'string' ? (
-            <Card
-              name={item}
-              key={item}
-              icon={<BsFolder />}
-              onClick={() => {
-                setParts(parts => [...parts, item]);
-              }}
-            />
-          ) : (
-            <Card
-              name={item.name}
-              key={item.file.name}
-              color={stringToColor(removeFileExtension(item.file.name))}
-              imageUrl={item.image?.thumbnailUrl}
-              onClick={() => {
-                onSelect(item);
-              }}
-            >
-              <CardMenu>
-                <CardMenuItem
-                  onClick={() => {
-                    showModal(
-                      <ModelEdit name={item.file.name} type={item.type} />,
-                    );
-                  }}
-                >
-                  Edit
-                </CardMenuItem>
-                <CardMenuItem
-                  onClick={() => {
-                    showModal(
-                      <ModelDelete name={item.file.name} type={item.type} />,
-                    );
-                  }}
-                >
-                  Delete
-                </CardMenuItem>
-              </CardMenu>
-            </Card>
-          )
-        }
-      </List>
-    </>
-  );
-});
+    return (
+      <>
+        <Breadcrumbs value={parts} onChange={setParts} />
+        <List
+          items={[...directories, ...models]}
+          quickFilter={(_, search) =>
+            fuzzy(
+              allModels,
+              search,
+              item => `${item.name} ${removeFileExtension(item.file.name)}`,
+            )
+          }
+        >
+          {item =>
+            typeof item === 'string' ? (
+              <Card
+                name={item}
+                key={item}
+                icon={<BsFolder />}
+                onClick={() => {
+                  setParts(parts => [...parts, item]);
+                }}
+              />
+            ) : (
+              <Card
+                name={item.name}
+                key={item.file.name}
+                color={stringToColor(removeFileExtension(item.file.name))}
+                imageUrl={item.image?.thumbnailUrl}
+                onClick={() => {
+                  onSelect(item);
+                }}
+              >
+                <CardMenu>
+                  <CardMenuItem
+                    onClick={() => {
+                      showModal(
+                        <ModelEdit name={item.file.name} type={item.type} />,
+                      );
+                    }}
+                  >
+                    Edit
+                  </CardMenuItem>
+                  <CardMenuItem
+                    onClick={() => {
+                      showModal(
+                        <ModelDelete name={item.file.name} type={item.type} />,
+                      );
+                    }}
+                  >
+                    Delete
+                  </CardMenuItem>
+                </CardMenu>
+              </Card>
+            )
+          }
+        </List>
+      </>
+    );
+  },
+);

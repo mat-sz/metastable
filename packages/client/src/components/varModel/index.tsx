@@ -54,6 +54,7 @@ export const VarModel = observer(
             onClick={() => {
               showModal(
                 <ModelSelect
+                  value={model}
                   type={modelType}
                   onSelect={model => {
                     setCurrentValue(model.file.name);
