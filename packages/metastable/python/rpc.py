@@ -22,6 +22,42 @@ class RPCNamespace:
 
         return self.methods[method_name](*args)
 
+PRIMITIVES = (bool, str, int, float, type(None))
+
+class RPCSession:
+    def __init__(self):
+        self.references = {}
+        self.current = 0
+
+    def alloc(self, obj):
+        key = self.current
+        self.references[key] = obj
+        self.current += 1
+        return { "__ref": key }
+
+    def autoalloc(self, obj):
+        if isinstance(obj, PRIMITIVES):
+            return obj
+        elif isinstance(obj, dict):
+            return { key: self.autoalloc(value) for key, value in obj.items() }
+        elif isinstance(obj, list) or isinstance(obj, tuple):
+            return [self.autoalloc(value) for value in obj]
+        else:
+            return self.alloc(obj)
+    
+    def autoexpand(self, obj):
+        if isinstance(obj, PRIMITIVES):
+            return obj
+        elif isinstance(obj, dict):
+            if "__ref" in obj and isinstance(obj["__ref"], int):
+                return self.references[obj["__ref"]]
+            
+            return { key: self.autoexpand(value) for key, value in obj.items() }
+        elif isinstance(obj, list) or isinstance(obj, tuple):
+            return [self.autoexpand(value) for value in obj]
+        else:
+            return self.autoexpand(obj)
+
 class RPC:
     def method(name):
         def decorator(func):
@@ -30,32 +66,64 @@ class RPC:
         return decorator
 
     def __init__(self):
+        self.sessions = {}
         self.namespaces = {}
+
+    def session(self, session_id):
+        if session_id not in self.sessions:
+            self.sessions[session_id] = RPCSession()
+        
+        return self.sessions[session_id]
 
     def add_namespace(self, name, obj):
         self.namespaces[name] = RPCNamespace(obj)
 
     def handle(self, request):
-        if not isinstance(request, dict) or "id" not in request or "rpc" not in request:
+        if (not isinstance(request, dict) or "id" not in request
+            or "rpc" not in request  or "method" not in request):
             raise Exception("Invalid request")
 
         request_id = request["id"]
         try:
-            method_namespace, method = request["method"].split(":")
+            method = request["method"]
+            session_id = request["session"]
+            if method == "session:start":
+                self.sessions[session_id] = RPCSession()
+
+                return {
+                    "rpc": True,
+                    "id": request_id,
+                    "result": session_id
+                }
+
+            if session_id not in self.sessions:
+                raise Exception("Session not found")
+            
+            session = self.sessions[session_id]
+            method_namespace, method_name = method.split(":")
+
+            if method == "session:destroy":
+                del self.sessions[session_id]
+
+                return {
+                    "rpc": True,
+                    "id": request_id,
+                }
             
             if method_namespace not in self.namespaces:
                 raise Exception("Namespace not found")
 
             params = []
             if "params" in request:
-                params = request["params"]
+                params = session.autoexpand(request["params"])
             
             namespace = self.namespaces[method_namespace]
-            result = namespace.invoke(method, *params)
+            result = namespace.invoke(method_name, *params)
+
             return {
                 "rpc": True,
                 "id": request_id,
-                "result": result
+                "result": session.autoalloc(result)
             }
         except Exception as error:
             return {

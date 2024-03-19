@@ -40,7 +40,6 @@ import yaml
 import execution
 import comfy.model_management
 
-
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
     device_name = comfy.model_management.get_torch_device_name(device)
@@ -61,7 +60,7 @@ def prompt_worker(q):
         gc.collect()
         comfy.model_management.soft_empty_cache()
 
-async def run(prompt_queue):
+async def run(prompt_queue, rpc):
     loop = asyncio.get_event_loop()
     
     while True:
@@ -84,6 +83,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     prompt_queue = execution.PromptQueue()
+    rpc = RPC()
 
     cuda_malloc_warning()
 
@@ -97,6 +97,6 @@ if __name__ == "__main__":
 
     try:
         jsonout("ready")
-        loop.run_until_complete(run(prompt_queue))
+        loop.run_until_complete(run(prompt_queue, rpc))
     except KeyboardInterrupt:
         print("Stopped server")

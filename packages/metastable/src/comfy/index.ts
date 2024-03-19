@@ -13,6 +13,7 @@ import { nanoid } from 'nanoid/non-secure';
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
 import { TypedEventEmitter } from '../types.js';
+import { ComfySession } from './session.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -31,6 +32,7 @@ interface RPCRequest {
   method: string;
   params?: any[];
   id: string;
+  session: string;
 }
 
 interface RPCResponse {
@@ -75,13 +77,18 @@ export class Comfy extends (EventEmitter as {
     this.start();
   }
 
-  invoke(method: string, ...params: unknown[]): Promise<unknown> {
+  invoke(
+    sessionId: string,
+    method: string,
+    ...params: unknown[]
+  ): Promise<unknown> {
     const id = nanoid();
     this.writeJson({
       rpc: true,
       method,
       params,
       id,
+      session: sessionId,
     } as RPCRequest);
 
     return new Promise((resolve, reject) => {
@@ -101,6 +108,19 @@ export class Comfy extends (EventEmitter as {
     } else {
       callbacks.resolve(response.result);
     }
+  }
+
+  async session<T>(
+    callback:
+      | ((session: ComfySession) => Promise<T>)
+      | ((session: ComfySession) => T),
+  ): Promise<T> {
+    const sessionId = nanoid();
+    await this.invoke(sessionId, 'session:begin');
+    const session = new ComfySession(this, sessionId);
+    const result = await callback(session);
+    await this.invoke(sessionId, 'session:end');
+    return result;
   }
 
   handleJson(e: any) {
@@ -178,6 +198,7 @@ export class Comfy extends (EventEmitter as {
       text: text.trimEnd(),
     };
     this.logBuffer.push(item);
+    console.log('Backend', type, text);
     this.emit('log', [item]);
   }
 
