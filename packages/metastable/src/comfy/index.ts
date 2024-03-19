@@ -8,6 +8,7 @@ import {
   ComfyStatus,
   AnyEvent,
 } from '@metastable/types';
+import { nanoid } from 'nanoid/non-secure';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
@@ -25,6 +26,23 @@ type MetastableEvents = {
   reset: () => void;
 };
 
+interface RPCRequest {
+  rpc: true;
+  method: string;
+  params?: any[];
+  id: string;
+}
+
+interface RPCResponse {
+  rpc: true;
+  result?: any;
+  error?: {
+    message: string;
+    data?: any;
+  };
+  id: string;
+}
+
 export class Comfy extends (EventEmitter as {
   new (): TypedEventEmitter<MetastableEvents>;
 }) {
@@ -38,6 +56,14 @@ export class Comfy extends (EventEmitter as {
   status: ComfyStatus = 'starting';
   queue_remaining = 0;
 
+  rpcCallbacks: Map<
+    string,
+    {
+      resolve: (result: unknown) => void;
+      reject: (error: any) => void;
+    }
+  > = new Map();
+
   constructor(
     public python: PythonInstance,
     private mainPath = path.join(baseDir, 'python', 'main.py'),
@@ -49,7 +75,40 @@ export class Comfy extends (EventEmitter as {
     this.start();
   }
 
+  invoke(method: string, ...params: unknown[]): Promise<unknown> {
+    const id = nanoid();
+    this.writeJson({
+      rpc: true,
+      method,
+      params,
+      id,
+    } as RPCRequest);
+
+    return new Promise((resolve, reject) => {
+      this.rpcCallbacks.set(id, { resolve, reject });
+    });
+  }
+
+  handleRPC(response: RPCResponse) {
+    const callbacks = this.rpcCallbacks.get(response.id);
+    if (!callbacks) {
+      console.log('Unhandled RPC response', response);
+      return;
+    }
+
+    if (response.error) {
+      callbacks.reject(new Error(response.error.message));
+    } else {
+      callbacks.resolve(response.result);
+    }
+  }
+
   handleJson(e: any) {
+    if ('rpc' in e) {
+      this.handleRPC(e);
+      return;
+    }
+
     switch (e.event) {
       case 'info.torch':
         this.torchInfo = e.data;
@@ -137,9 +196,11 @@ export class Comfy extends (EventEmitter as {
     this.emit('event', { event: 'backend.status', data: status });
   }
 
+  writeJson(data: any) {
+    this.process?.stdin.write(JSON.stringify(data) + '\n');
+  }
+
   send(eventName: string, data: any) {
-    this.process?.stdin.write(
-      JSON.stringify({ event: eventName, data }) + '\n',
-    );
+    this.writeJson({ event: eventName, data });
   }
 }

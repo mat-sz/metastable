@@ -19,6 +19,7 @@ import comfy.samplers
 import custom
 from helpers import jsonout, get_torch_info
 from comfy.cli_args import args
+from rpc import RPC
 
 import progress_hook
 
@@ -71,7 +72,10 @@ async def run(prompt_queue):
         
         try:
             ev = json.loads(res)
-            if ev["event"] == "prompt":
+
+            if "rpc" in ev:
+                print(json.dumps(rpc.handle(ev)), flush=True)
+            elif "event" in ev and ev["event"] == "prompt":
                 prompt_queue.put(ev["data"])
         except:
             pass
