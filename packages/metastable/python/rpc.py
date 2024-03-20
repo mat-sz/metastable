@@ -1,28 +1,44 @@
-def permission(permission_required):
-    def decorator(func):
-        func.permission_required = permission_required
-        return func
-    return decorator
+from io import BytesIO
+import base64
+
+PRIMITIVES = (bool, str, int, float, type(None))
+
+def is_key(obj, key, type):
+    return key in obj and isinstance(obj[key], type)
 
 class RPCNamespace:
     def __init__(self, obj):
         self.object = obj
         self.methods = {}
+        self.is_autoref = {}
 
         for func_name in dir(obj):
             func = getattr(obj, func_name)
             if callable(func):
-                method_name = getattr(func, "rpc_name", None)
+                method_name = getattr(func, "_rpc_name", None)
                 if method_name is not None:
                     self.methods[method_name] = func
 
-    def invoke(self, method_name, *args):
+                    method_autoref = getattr(func, "_rpc_autoref", False)
+                    self.is_autoref[method_name] = method_autoref
+
+    def invoke(self, method_name, params, session=None):
         if method_name not in self.methods:
             raise Exception("Method not found")
 
-        return self.methods[method_name](*args)
+        is_autoref = self.is_autoref[method_name]
+        if is_autoref:
+            if session is None:
+                raise Exception("Method requires a session to be open")
 
-PRIMITIVES = (bool, str, int, float, type(None))
+            params = session.autoexpand(params)
+        
+        result = self.methods[method_name](*params)
+
+        if is_autoref:
+            result = session.autoalloc(result)
+
+        return result
 
 class RPCSession:
     def __init__(self):
@@ -30,10 +46,13 @@ class RPCSession:
         self.current = 0
 
     def alloc(self, obj):
+        if isinstance(obj, BytesIO):
+            return { "$bytes": base64.b64encode(obj.getvalue()).decode() }
+        
         key = self.current
         self.references[key] = obj
         self.current += 1
-        return { "__ref": key }
+        return { "$ref": key }
 
     def autoalloc(self, obj):
         if isinstance(obj, PRIMITIVES):
@@ -49,8 +68,10 @@ class RPCSession:
         if isinstance(obj, PRIMITIVES):
             return obj
         elif isinstance(obj, dict):
-            if "__ref" in obj and isinstance(obj["__ref"], int):
-                return self.references[obj["__ref"]]
+            if is_key(obj, "$ref", int):
+                return self.references[obj["$ref"]]
+            elif is_key(obj, "$bytes", str):
+                return BytesIO(base64.b64decode(obj["$bytes"]))
             
             return { key: self.autoexpand(value) for key, value in obj.items() }
         elif isinstance(obj, list) or isinstance(obj, tuple):
@@ -61,19 +82,17 @@ class RPCSession:
 class RPC:
     def method(name):
         def decorator(func):
-            func.rpc_name = name
+            func._rpc_name = name
             return func
         return decorator
+
+    def autoref(func):
+        func._rpc_autoref = True
+        return func
 
     def __init__(self):
         self.sessions = {}
         self.namespaces = {}
-
-    def session(self, session_id):
-        if session_id not in self.sessions:
-            self.sessions[session_id] = RPCSession()
-        
-        return self.sessions[session_id]
 
     def add_namespace(self, name, obj):
         self.namespaces[name] = RPCNamespace(obj)
@@ -86,44 +105,46 @@ class RPC:
         request_id = request["id"]
         try:
             method = request["method"]
-            session_id = request["session"]
-            if method == "session:start":
-                self.sessions[session_id] = RPCSession()
-
-                return {
-                    "rpc": True,
-                    "id": request_id,
-                    "result": session_id
-                }
-
-            if session_id not in self.sessions:
-                raise Exception("Session not found")
+            session_id = request["session"] if "session" in request else None
+            session = None
             
-            session = self.sessions[session_id]
+            if session_id is not None:
+                if method == "session:start":
+                    self.sessions[session_id] = RPCSession()
+
+                    return {
+                        "rpc": True,
+                        "id": request_id,
+                        "result": session_id
+                    }
+                elif method == "session:destroy":
+                    del self.sessions[session_id]
+
+                    return {
+                        "rpc": True,
+                        "id": request_id,
+                    }
+                
+                if session_id not in self.sessions:
+                    raise Exception("Session not found")
+                
+                session = self.sessions[session_id]
+
             method_namespace, method_name = method.split(":")
-
-            if method == "session:destroy":
-                del self.sessions[session_id]
-
-                return {
-                    "rpc": True,
-                    "id": request_id,
-                }
             
             if method_namespace not in self.namespaces:
                 raise Exception("Namespace not found")
-
+                
+            namespace = self.namespaces[method_namespace]
+            
             params = []
             if "params" in request:
-                params = session.autoexpand(request["params"])
-            
-            namespace = self.namespaces[method_namespace]
-            result = namespace.invoke(method_name, *params)
+                params = request["params"]
 
             return {
                 "rpc": True,
                 "id": request_id,
-                "result": session.autoalloc(result)
+                "result": namespace.invoke(method_name, params, session)
             }
         except Exception as error:
             return {

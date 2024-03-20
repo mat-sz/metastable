@@ -78,7 +78,7 @@ export class Comfy extends (EventEmitter as {
   }
 
   invoke(
-    sessionId: string,
+    sessionId: string | undefined,
     method: string,
     ...params: unknown[]
   ): Promise<unknown> {
@@ -116,10 +116,10 @@ export class Comfy extends (EventEmitter as {
       | ((session: ComfySession) => T),
   ): Promise<T> {
     const sessionId = nanoid();
-    await this.invoke(sessionId, 'session:begin');
+    await this.invoke(sessionId, 'session:start');
     const session = new ComfySession(this, sessionId);
     const result = await callback(session);
-    await this.invoke(sessionId, 'session:end');
+    await this.invoke(sessionId, 'session:destroy');
     return result;
   }
 
