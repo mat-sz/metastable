@@ -3,7 +3,6 @@ import {
   ModelType,
   ComfyStatus,
   AnyEvent,
-  ComfyTorchInfo,
   InstanceInfo,
   TaskState,
 } from '@metastable/types';
@@ -23,7 +22,6 @@ class MainStore {
     samplers: [],
     schedulers: [],
   };
-  torchInfo?: ComfyTorchInfo = undefined;
 
   setup = new SetupStore();
 
@@ -81,7 +79,7 @@ class MainStore {
 
   get deviceName() {
     if (this.status === 'ready') {
-      const device = this.torchInfo?.device;
+      const device = this.info.torch?.device;
 
       if (device?.name) {
         return device.name;
@@ -174,9 +172,6 @@ class MainStore {
         if (message.data === 'ready') {
           this.refresh();
         }
-        break;
-      case 'info.torch':
-        this.torchInfo = message.data;
         break;
       case 'setup.status':
         this.setup.status = message.data;

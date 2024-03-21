@@ -1,6 +1,9 @@
+import { ComfyTorchInfo } from './comfy.js';
+
 export interface InstanceInfo {
   samplers: string[];
   schedulers: string[];
+  torch?: ComfyTorchInfo;
 }
 
 export interface ConfigType {

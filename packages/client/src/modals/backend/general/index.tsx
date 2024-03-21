@@ -12,7 +12,7 @@ import styles from './index.module.scss';
 import { LogItem } from '@metastable/types';
 
 export const General: React.FC = observer(() => {
-  const torchInfo = mainStore.torchInfo;
+  const torchInfo = mainStore.info.torch;
   const [log, setLog] = useState<LogItem[]>([]);
   const logRef = useRef<HTMLDivElement>(null);
 

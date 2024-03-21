@@ -64,15 +64,9 @@ export interface PromptEndEvent {
   };
 }
 
-export interface TorchInfoEvent {
-  event: 'info.torch';
-  data: ComfyTorchInfo;
-}
-
 export type ComfyEvent =
   | PromptStartEvent
   | PromptQueueEvent
   | PromptErrorEvent
   | PromptProgressEvent
-  | PromptEndEvent
-  | TorchInfoEvent;
+  | PromptEndEvent;

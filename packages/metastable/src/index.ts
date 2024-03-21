@@ -219,13 +219,6 @@ export class Metastable extends (EventEmitter as {
         event: 'backend.status',
         data: comfy.status,
       });
-
-      if (comfy.torchInfo) {
-        onEvent({
-          event: 'info.torch',
-          data: comfy.torchInfo,
-        });
-      }
     }
   }
 

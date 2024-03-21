@@ -3,6 +3,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy"))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "rpc.py"))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom.py"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "helpers.py"))
 
 import comfy.options
 comfy.options.enable_args_parsing()
@@ -44,6 +45,7 @@ import execution
 import comfy.model_management
 from namespaces.checkpoint import CheckpointNamespace
 from namespaces.image import ImageNamespace
+from namespaces.instance import InstanceNamespace
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
@@ -91,6 +93,7 @@ if __name__ == "__main__":
     rpc = RPC()
     rpc.add_namespace("checkpoint", CheckpointNamespace)
     rpc.add_namespace("image", ImageNamespace)
+    rpc.add_namespace("instance", InstanceNamespace)
 
     cuda_malloc_warning()
 

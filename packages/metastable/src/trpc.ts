@@ -97,10 +97,13 @@ export const router = t.router({
       });
     }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
-      return {
-        samplers: metastable.comfy?.samplers || [],
-        schedulers: metastable.comfy?.schedulers || [],
-      };
+      return (
+        (await metastable.comfy?.info()) || {
+          schedulers: [],
+          samplers: [],
+          torch: undefined,
+        }
+      );
     }),
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();

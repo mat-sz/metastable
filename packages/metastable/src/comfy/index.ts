@@ -4,9 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import {
   LogItem,
-  ComfyTorchInfo,
   ComfyStatus,
   AnyEvent,
+  InstanceInfo,
 } from '@metastable/types';
 import { nanoid } from 'nanoid/non-secure';
 import { Readable } from 'stream';
@@ -52,9 +52,6 @@ export class Comfy extends (EventEmitter as {
 }) {
   process?: ChildProcessWithoutNullStreams;
 
-  samplers: string[] = [];
-  schedulers: string[] = [];
-  torchInfo?: ComfyTorchInfo = undefined;
   logBuffer = new CircularBuffer<LogItem>(25);
 
   status: ComfyStatus = 'starting';
@@ -77,6 +74,14 @@ export class Comfy extends (EventEmitter as {
     super();
 
     this.start();
+  }
+
+  async info() {
+    if (this.status !== 'ready') {
+      return undefined;
+    }
+
+    return (await this.invoke(undefined, 'instance:info')) as InstanceInfo;
   }
 
   invoke(
@@ -132,15 +137,6 @@ export class Comfy extends (EventEmitter as {
     }
 
     switch (e.event) {
-      case 'info.torch':
-        this.torchInfo = e.data;
-        break;
-      case 'info.samplers':
-        this.samplers = e.data;
-        break;
-      case 'info.schedulers':
-        this.schedulers = e.data;
-        break;
       case 'ready':
         this.setStatus('ready');
         break;
@@ -204,7 +200,6 @@ export class Comfy extends (EventEmitter as {
 
   reset() {
     this.queue_remaining = 0;
-    this.torchInfo = undefined;
     this.emit('reset');
   }
 
