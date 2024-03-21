@@ -9,6 +9,8 @@ import {
   AnyEvent,
 } from '@metastable/types';
 import { nanoid } from 'nanoid/non-secure';
+import { Readable } from 'stream';
+import es from 'event-stream';
 
 import type { PythonInstance } from '../python/index.js';
 import { CircularBuffer } from '../helpers/buffer.js';
@@ -159,29 +161,27 @@ export class Comfy extends (EventEmitter as {
     const proc = this.python.spawn([this.mainPath, ...args], this.env);
 
     proc.stdin.setDefaultEncoding('utf-8');
-    proc.stdout.setEncoding('utf-8');
-    proc.stderr.setEncoding('utf-8');
+
     proc.on('spawn', () => this.setStatus('starting'));
     proc.on('close', () => this.setStatus('error'));
     proc.on('exit', () => this.setStatus('error'));
 
+    proc.stdout.setEncoding('utf-8');
     proc.stdout.on('data', data => {
-      const split = data.split('\n');
-      for (const item of split) {
-        if (!item) {
-          continue;
-        }
-
-        try {
-          this.handleJson(JSON.parse(item));
-        } catch {
-          this.log('stdout', item);
-        }
-      }
+      this.log('stdout', data);
     });
 
+    proc.stderr.setEncoding('utf-8');
     proc.stderr.on('data', data => {
       this.log('stderr', data);
+    });
+
+    const jsonOut = proc.stdio[3] as Readable;
+    jsonOut.setEncoding('utf-8');
+    jsonOut.pipe(es.split('\x1e')).on('data', data => {
+      try {
+        this.handleJson(JSON.parse(data));
+      } catch {}
     });
 
     this.process = proc;

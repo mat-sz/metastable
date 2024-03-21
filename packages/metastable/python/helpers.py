@@ -5,8 +5,16 @@ import torch
 import sys
 from comfy.model_management import get_torch_device, get_total_memory, vae_dtype
 
+out = os.fdopen(3, 'bw')
+
+def out_write(data):
+    global out
+    out.write(data.encode('utf-8'))
+    out.write(b'\x1e')
+    out.flush()
+
 def jsonout(event_name, data=None):
-    print(json.dumps({ "event": event_name, "data": data }), flush=True)
+    out_write(json.dumps({ "event": event_name, "data": data }))
 
 def get_save_image_counter(output_dir):
     def map_filename(filename):

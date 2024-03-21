@@ -84,6 +84,7 @@ export class PythonInstance {
         ...this.env,
         ...env,
       },
+      stdio: ['pipe', 'pipe', 'pipe', 'pipe'],
     });
 
     proc.stdin.setDefaultEncoding('utf-8');
