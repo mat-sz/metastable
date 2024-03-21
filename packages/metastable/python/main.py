@@ -79,9 +79,9 @@ async def run(prompt_queue, rpc):
         try:
             ev = json.loads(res)
 
-            if "rpc" in ev:
+            if ev["type"] == "rpc":
                 out_write(json.dumps(rpc.handle(ev)))
-            elif "event" in ev and ev["event"] == "prompt":
+            elif ev["type"] == "event" and ev["event"] == "prompt":
                 prompt_queue.put(ev["data"])
         except:
             pass

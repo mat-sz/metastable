@@ -14,7 +14,7 @@ def out_write(data):
     out.flush()
 
 def jsonout(event_name, data=None):
-    out_write(json.dumps({ "event": event_name, "data": data }))
+    out_write(json.dumps({ "type": "event", "event": event_name, "data": data }))
 
 def get_save_image_counter(output_dir):
     def map_filename(filename):

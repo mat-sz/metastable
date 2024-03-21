@@ -99,7 +99,8 @@ class RPC:
 
     def handle(self, request):
         if (not isinstance(request, dict) or "id" not in request
-            or "rpc" not in request  or "method" not in request):
+            or "type" not in request or request["type"] != "rpc"
+            or "method" not in request):
             raise Exception("Invalid request")
 
         request_id = request["id"]
@@ -113,7 +114,7 @@ class RPC:
                     self.sessions[session_id] = RPCSession()
 
                     return {
-                        "rpc": True,
+                        "type": "rpc",
                         "id": request_id,
                         "result": session_id
                     }
@@ -121,7 +122,7 @@ class RPC:
                     del self.sessions[session_id]
 
                     return {
-                        "rpc": True,
+                        "type": "rpc",
                         "id": request_id,
                     }
                 
@@ -142,13 +143,13 @@ class RPC:
                 params = request["params"]
 
             return {
-                "rpc": True,
+                "type": "rpc",
                 "id": request_id,
                 "result": namespace.invoke(method_name, params, session)
             }
         except Exception as error:
             return {
-                "rpc": True,
+                "type": "rpc",
                 "id": request_id,
                 "error": {
                     "message": type(error).__name__ + "\n" + str(error),

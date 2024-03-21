@@ -30,7 +30,7 @@ type MetastableEvents = {
 };
 
 interface RPCRequest {
-  rpc: true;
+  type: 'rpc';
   method: string;
   params?: any[];
   id: string;
@@ -38,7 +38,7 @@ interface RPCRequest {
 }
 
 interface RPCResponse {
-  rpc: true;
+  type: 'rpc';
   result?: any;
   error?: {
     message: string;
@@ -91,7 +91,7 @@ export class Comfy extends (EventEmitter as {
   ): Promise<unknown> {
     const id = nanoid();
     this.writeJson({
-      rpc: true,
+      type: 'rpc',
       method,
       params,
       id,
@@ -131,7 +131,7 @@ export class Comfy extends (EventEmitter as {
   }
 
   handleJson(e: any) {
-    if ('rpc' in e) {
+    if (e.type === 'rpc') {
       this.handleRPC(e);
       return;
     }
@@ -217,6 +217,6 @@ export class Comfy extends (EventEmitter as {
   }
 
   send(eventName: string, data: any) {
-    this.writeJson({ event: eventName, data });
+    this.writeJson({ type: 'event', event: eventName, data });
   }
 }
