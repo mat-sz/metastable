@@ -346,7 +346,7 @@ export class Metastable extends (EventEmitter as {
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
-    this.comfy?.send('prompt', {
+    await this.comfy?.invoke(undefined, 'legacy:prompt', {
       ...settings,
       id: id,
       project_id: projectId,

@@ -90,7 +90,7 @@ export class Comfy extends (EventEmitter as {
     ...params: unknown[]
   ): Promise<unknown> {
     const id = nanoid();
-    this.writeJson({
+    this.write({
       type: 'rpc',
       method,
       params,
@@ -194,7 +194,7 @@ export class Comfy extends (EventEmitter as {
       text: text.trimEnd(),
     };
     this.logBuffer.push(item);
-    console.log('Backend', type, text);
+    console.log(`[Backend (${type})]`, text);
     this.emit('log', [item]);
   }
 
@@ -212,11 +212,7 @@ export class Comfy extends (EventEmitter as {
     this.emit('event', { event: 'backend.status', data: status });
   }
 
-  writeJson(data: any) {
+  write(data: any) {
     this.process?.stdin.write(JSON.stringify(data) + '\n');
-  }
-
-  send(eventName: string, data: any) {
-    this.writeJson({ type: 'event', event: eventName, data });
   }
 }

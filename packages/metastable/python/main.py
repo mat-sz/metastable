@@ -78,13 +78,14 @@ async def run(prompt_queue, rpc):
         
         try:
             ev = json.loads(res)
-
-            if ev["type"] == "rpc":
-                out_write(json.dumps(rpc.handle(ev)))
-            elif ev["type"] == "event" and ev["event"] == "prompt":
-                prompt_queue.put(ev["data"])
+            out_write(json.dumps(rpc.handle(ev)))
         except:
             pass
+
+class LegacyNamespace:
+    @RPC.method("prompt")
+    def prompt(settings):
+        prompt_queue.put(settings)
 
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
@@ -94,16 +95,13 @@ if __name__ == "__main__":
     rpc.add_namespace("checkpoint", CheckpointNamespace)
     rpc.add_namespace("image", ImageNamespace)
     rpc.add_namespace("instance", InstanceNamespace)
+    rpc.add_namespace("legacy", LegacyNamespace)
 
     cuda_malloc_warning()
 
     progress_hook.reset()
 
     threading.Thread(target=prompt_worker, daemon=True, args=(prompt_queue,)).start()
-
-    jsonout("info.torch", get_torch_info())
-    jsonout("info.samplers", comfy.samplers.KSampler.SAMPLERS)
-    jsonout("info.schedulers", comfy.samplers.KSampler.SCHEDULERS + list(custom.get_custom_schedulers().keys()))
 
     try:
         jsonout("ready")
