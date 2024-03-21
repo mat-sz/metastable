@@ -13,8 +13,6 @@ from PIL import Image, ImageOps
 import numpy as np
 import safetensors.torch
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy"))
-
 import torch
 
 import comfy.samplers

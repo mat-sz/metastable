@@ -1,5 +1,8 @@
 import sys
 import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "rpc.py"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom.py"))
 
 import comfy.options
 comfy.options.enable_args_parsing()
@@ -39,6 +42,8 @@ import yaml
 
 import execution
 import comfy.model_management
+from namespaces.checkpoint import CheckpointNamespace
+from namespaces.image import ImageNamespace
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
@@ -84,6 +89,8 @@ if __name__ == "__main__":
     asyncio.set_event_loop(loop)
     prompt_queue = execution.PromptQueue()
     rpc = RPC()
+    rpc.add_namespace("checkpoint", CheckpointNamespace)
+    rpc.add_namespace("image", ImageNamespace)
 
     cuda_malloc_warning()
 
