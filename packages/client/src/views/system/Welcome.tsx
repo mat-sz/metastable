@@ -1,23 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { Card, List } from '$components/list';
 import { useUI } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import styles from './Welcome.module.scss';
-import { ModelManager } from '../../modals/models';
+import { BsClockHistory, BsPlus } from 'react-icons/bs';
+import { NewProject } from '$modals/newProject';
+import { fuzzy } from '$utils/fuzzy';
 
 export const Welcome: React.FC = observer(() => {
   const { showModal } = useUI();
-  const [projectName, setProjectName] = useState('');
-  const data = mainStore.projects.recent;
+  const data = mainStore.projects.all;
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.welcome}>
-        <div className={styles.recent}>
-          <List header={<h2>Recent</h2>} small items={data}>
-            {item => (
+    <div className={styles.welcome}>
+      <div className={styles.tabs}>
+        <div className={styles.tab}>
+          <BsClockHistory />
+          <span>Recent</span>
+        </div>
+      </div>
+      <div className={styles.view}>
+        <List
+          header={<h2>Recent</h2>}
+          small
+          items={['new', ...data]}
+          quickFilter={(data, search) =>
+            fuzzy(
+              data.filter(item => typeof item === 'object'),
+              search,
+              item => item.name,
+            )
+          }
+        >
+          {item =>
+            typeof item === 'string' ? (
+              <Card
+                name="New empty project"
+                icon={<BsPlus />}
+                onClick={() => showModal(<NewProject />)}
+              />
+            ) : (
               <Card
                 name={item.name}
                 key={item.id}
@@ -26,37 +50,9 @@ export const Welcome: React.FC = observer(() => {
                   mainStore.projects.open(item.id);
                 }}
               />
-            )}
-          </List>
-        </div>
-        <div className={styles.actions}>
-          <h2>New</h2>
-          {mainStore.hasCheckpoint ? (
-            <>
-              <input
-                type="text"
-                value={projectName}
-                onChange={e => setProjectName(e.target.value)}
-              />
-              <button onClick={() => mainStore.projects.create(projectName)}>
-                Create a new project
-              </button>
-            </>
-          ) : (
-            <>
-              <div>
-                Please install a checkpoint model before creating a new project.
-              </div>
-              <button
-                onClick={() =>
-                  showModal(<ModelManager defaultTab="recommended" />)
-                }
-              >
-                Download manager
-              </button>
-            </>
-          )}
-        </div>
+            )
+          }
+        </List>
       </div>
     </div>
   );

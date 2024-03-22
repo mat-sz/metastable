@@ -2,12 +2,20 @@
   background: var(--color-bg-panel-dark);
   display: flex;
 
+  .logo {
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+  }
+
   .tab {
     background: var(--color-bg-panel);
     padding-left: 1rem;
-    padding-top: 0.4rem;
-    padding-bottom: calc(0.4rem - 2px);
-    padding-right: 0;
+    padding-top: 0.7rem;
+    padding-bottom: calc(0.7rem - 2px);
+    padding-right: 1rem;
     margin-right: 2px;
     display: inline-flex;
     align-items: center;
@@ -29,7 +37,7 @@
       line-height: 0;
       font-size: 1.2rem;
       margin-left: 0.5rem;
-      margin-right: 0.5rem;
+      margin-right: -0.5rem;
       margin-top: 0.1rem;
     }
   }

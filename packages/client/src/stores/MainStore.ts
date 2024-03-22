@@ -35,6 +35,7 @@ class MainStore {
 
   backendStatus: ComfyStatus = 'starting';
   infoReady = false;
+  view: string | undefined = 'home';
 
   tasks = new TaskStore();
   config = new ConfigStore();

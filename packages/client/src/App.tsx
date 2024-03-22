@@ -5,10 +5,22 @@ import { UI } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import './index.scss';
 import { Project } from './views/project';
-import { Projects } from './views/system/Projects';
+import { TabBar } from './views/system/TabBar';
 import { Welcome } from './views/system/Welcome';
 import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
+import { Settings } from './views/settings';
+
+const View: React.FC = observer(() => {
+  switch (mainStore.view) {
+    case 'project':
+      return <Project />;
+    case 'settings':
+      return <Settings />;
+    default:
+      return <Welcome />;
+  }
+});
 
 export const App: React.FC = observer(() => {
   if (!mainStore.ready) {
@@ -18,7 +30,7 @@ export const App: React.FC = observer(() => {
   if (mainStore.setup?.status?.status !== 'done') {
     return (
       <UI>
-        <Main showMenu={false}>
+        <Main>
           <Setup />
         </Main>
       </UI>
@@ -28,14 +40,8 @@ export const App: React.FC = observer(() => {
   return (
     <UI>
       <Main>
-        {mainStore.projects.projects.length === 0 ? (
-          <Welcome />
-        ) : (
-          <>
-            <Projects />
-            <Project />
-          </>
-        )}
+        <TabBar />
+        <View />
       </Main>
     </UI>
   );

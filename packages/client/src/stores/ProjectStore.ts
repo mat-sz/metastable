@@ -7,6 +7,7 @@ import { tryParse } from '$utils/json';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
+import { mainStore } from './MainStore';
 
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 6;
@@ -109,6 +110,7 @@ export class ProjectStore {
 
   select(id?: APIProject['id']) {
     this.currentId = id;
+    mainStore.view = id ? 'project' : 'home';
   }
 
   move(fromId: APIProject['id'], toId?: APIProject['id']) {
@@ -123,7 +125,7 @@ export class ProjectStore {
     this.projects = this.projects.filter(project => project.id !== id);
 
     if (id === this.currentId) {
-      this.currentId = this.projects[0]?.id;
+      this.select(this.projects[0]?.id);
     }
   }
 }

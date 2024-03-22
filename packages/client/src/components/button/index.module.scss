@@ -8,6 +8,15 @@
     }
   }
 
+  &.primary {
+    background: var(--color-bg-primary);
+    color: white;
+
+    &:hover {
+      background: var(--color-bg-primary-hover);
+    }
+  }
+
   &.secondary {
     background: none;
 

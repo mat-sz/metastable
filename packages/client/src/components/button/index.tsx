@@ -11,7 +11,7 @@ export interface ButtonProps
   href?: string;
   download?: string;
   round?: boolean;
-  variant?: 'danger' | 'secondary' | 'default';
+  variant?: 'danger' | 'primary' | 'secondary' | 'default';
 }
 
 export const Button: React.FC<ButtonProps> = ({
