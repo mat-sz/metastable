@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { BsList, BsXLg } from 'react-icons/bs';
 
 import styles from './Header.module.scss';
-import { Menu } from '../common/Menu';
 import { Status } from '../common/Status';
 
 interface Props {
@@ -39,7 +38,6 @@ export const Header: React.FC<Props> = observer(({ showMenu = true }) => {
           <BsXLg />
         </button>
         <div className={styles.main}>
-          <Menu />
           <Status className={styles.status} />
         </div>
       </div>

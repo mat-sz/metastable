@@ -14,15 +14,12 @@ import { ModelType } from '@metastable/types';
 
 import { IconButton } from '$components/iconButton';
 import { VarModel } from '$components/varModel';
-import { useUI } from '$components/ui';
-import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 
 export const Controlnets: React.FC = observer(() => {
   const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.CONTROLNET);
-  const { showModal } = useUI();
 
   return (
     <>
@@ -77,8 +74,8 @@ export const Controlnets: React.FC = observer(() => {
         />
       ) : (
         <VarButton
-          buttonLabel="Download manager"
-          onClick={() => showModal(<ModelManager defaultTab="recommended" />)}
+          buttonLabel="Model manager"
+          onClick={() => mainStore.openModelManager()}
         />
       )}
     </>

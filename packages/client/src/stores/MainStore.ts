@@ -218,6 +218,10 @@ class MainStore {
     return !!model;
   }
 
+  openModelManager() {
+    this.view = 'models';
+  }
+
   defaultModelName(type: ModelType) {
     const model = modelStore.defaultModel(type);
     return model?.file.name;

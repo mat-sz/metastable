@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useDrag, useDrop } from 'react-dnd';
 import clsx from 'clsx';
-import { BsGearFill, BsHouseFill, BsX } from 'react-icons/bs';
+import { BsBox, BsGearFill, BsHouseFill, BsX } from 'react-icons/bs';
 import { runInAction } from 'mobx';
 
 import { mainStore } from '$stores/MainStore';
@@ -102,6 +102,9 @@ export const TabBar: React.FC = observer(() => {
       </ViewTab>
       <ViewTab viewId="settings">
         <BsGearFill />
+      </ViewTab>
+      <ViewTab viewId="models">
+        <BsBox />
       </ViewTab>
       {mainStore.projects.projects.map(project => (
         <ProjectTab key={project.id} project={project} />

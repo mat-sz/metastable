@@ -11,14 +11,11 @@ import { BsX } from 'react-icons/bs';
 import { ModelType } from '@metastable/types';
 
 import { IconButton } from '$components/iconButton';
-import { useUI } from '$components/ui';
 import { VarModel } from '$components/varModel';
-import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 
 export const LoRAs: React.FC = observer(() => {
-  const { showModal } = useUI();
   const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.LORA);
 
@@ -64,8 +61,8 @@ export const LoRAs: React.FC = observer(() => {
         />
       ) : (
         <VarButton
-          buttonLabel="Download manager"
-          onClick={() => showModal(<ModelManager defaultTab="recommended" />)}
+          buttonLabel="Model manager"
+          onClick={() => mainStore.openModelManager()}
         />
       )}
     </>

@@ -3,16 +3,13 @@ import { observer } from 'mobx-react-lite';
 import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
 
-import { useUI } from '$components/ui';
 import { VarModel } from '$components/varModel';
-import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 
 export const Upscale: React.FC = observer(() => {
   const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.UPSCALE_MODEL);
-  const { showModal } = useUI();
 
   const enabled = !!project.settings.models.upscale?.name;
 
@@ -34,8 +31,8 @@ export const Upscale: React.FC = observer(() => {
         />
       ) : (
         <VarButton
-          buttonLabel="Download manager"
-          onClick={() => showModal(<ModelManager defaultTab="recommended" />)}
+          buttonLabel="Model manager"
+          onClick={() => mainStore.openModelManager()}
         />
       )}
       {enabled && (

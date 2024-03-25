@@ -10,6 +10,7 @@ import { Welcome } from './views/system/Welcome';
 import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 import { Settings } from './views/settings';
+import { ModelManager } from './views/models';
 
 const View: React.FC = observer(() => {
   switch (mainStore.view) {
@@ -17,6 +18,8 @@ const View: React.FC = observer(() => {
       return <Project />;
     case 'settings':
       return <Settings />;
+    case 'models':
+      return <ModelManager />;
     default:
       return <Welcome />;
   }

@@ -11,7 +11,6 @@ import { API } from '$api';
 import { mainStore } from '$stores/MainStore';
 import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import styles from './Header.module.scss';
-import { Menu } from '../common/Menu';
 
 interface Props {
   showMenu?: boolean;
@@ -20,7 +19,6 @@ interface Props {
 export const Header: React.FC<Props> = observer(({ showMenu = !IS_MAC }) => {
   return (
     <div className={styles.header}>
-      {showMenu && <Menu className={styles.menu} />}
       <div className={styles.title}>
         <h1>Metastable</h1>
       </div>

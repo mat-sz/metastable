@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  BsDownload,
   BsFillCheckCircleFill,
   BsFillExclamationCircleFill,
   BsFillQuestionCircleFill,
@@ -14,7 +13,6 @@ import { TaskState } from '@metastable/types';
 import { ProgressButton } from '$components/progressButton';
 import { useUI } from '$components/ui';
 import { Backend } from '$modals/backend';
-import { ModelManager } from '$modals/models';
 import { mainStore } from '$stores/MainStore';
 import styles from './Status.module.scss';
 import { Utilization } from '../Utilization';
@@ -65,14 +63,6 @@ export const Status: React.FC<Props> = observer(({ className }) => {
         >
           <BsImage />
           <span>Queued images: {mainStore.promptRemaining}</span>
-        </ProgressButton>
-        <ProgressButton
-          value={remaining}
-          max={count}
-          onClick={() => showModal(<ModelManager defaultTab="queue" />)}
-        >
-          <BsDownload />
-          <span>Queued downloads: {remaining}</span>
         </ProgressButton>
       </div>
       <div className={styles.info}>
