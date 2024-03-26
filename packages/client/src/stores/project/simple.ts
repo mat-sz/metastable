@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import {
   ProjectSettings,
   Project as APIProject,
@@ -59,6 +59,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       removeIPAdapter: action,
       onPromptDone: action,
       setSettings: action,
+      firstPrompt: computed,
     });
   }
 
@@ -73,6 +74,27 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       ModelType.CHECKPOINT,
     );
     this.settings = settings;
+  }
+
+  get queueCount() {
+    return mainStore.promptQueue.filter(prompt => prompt.projectId === this.id)
+      .length;
+  }
+
+  get firstPrompt() {
+    return mainStore.promptQueue.find(prompt => prompt.projectId === this.id);
+  }
+
+  get progressValue() {
+    return this.firstPrompt?.value || 0;
+  }
+
+  get progressMax() {
+    return this.firstPrompt?.max || 0;
+  }
+
+  get progressMarquee() {
+    return !!this.firstPrompt && !this.firstPrompt.max;
   }
 
   validate() {

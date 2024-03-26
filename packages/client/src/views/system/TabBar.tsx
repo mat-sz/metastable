@@ -8,6 +8,7 @@ import { runInAction } from 'mobx';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import styles from './TabBar.module.scss';
+import { ProgressBar } from '$components/progressBar';
 
 const TAB_ITEM = 'project_tab';
 
@@ -34,10 +35,14 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
 
     drag(drop(ref));
 
+    const max = project.progressMax;
+    const value = project.progressValue;
+    const marquee = project.progressMarquee;
+
     return (
       <div
         ref={ref}
-        className={clsx(styles.tab, {
+        className={clsx(styles.tab, styles.projectTab, {
           [styles.selected]:
             mainStore.view === 'project' &&
             mainStore.projects.currentId === project.id,
@@ -53,6 +58,17 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
           opacity: isDragging ? 0.5 : 1,
         }}
       >
+        {!!project.queueCount && (
+          <span className={styles.tabBadge}>{project.queueCount}</span>
+        )}
+        {!!(max || marquee) && (
+          <ProgressBar
+            className={styles.tabProgress}
+            value={value}
+            max={max}
+            marquee={marquee}
+          />
+        )}
         <span>{project.name}</span>
         <button
           onClick={e => {

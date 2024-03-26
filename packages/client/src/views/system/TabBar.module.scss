@@ -21,6 +21,31 @@
     align-items: center;
     cursor: pointer;
     border-bottom: 2px solid transparent;
+    position: relative;
+
+    .tabBadge {
+      position: absolute;
+      top: 0.3rem;
+      left: 0.4rem;
+      background: var(--color-accent);
+      color: white;
+      font-weight: bold;
+      font-size: 0.7rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 100%;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .tabProgress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-radius: 0;
+    }
 
     &.selected {
       background: var(--color-bg-interactive);

@@ -1,4 +1,11 @@
-import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+  toJS,
+} from 'mobx';
 import { Project as APIProject, ImageFile } from '@metastable/types';
 
 import { API } from '$api';
@@ -29,7 +36,27 @@ export class BaseProject<T = any> {
       rename: action,
       save: action,
       triggerAutosave: action,
+      queueCount: computed,
+      progressValue: computed,
+      progressMax: computed,
+      progressMarquee: computed,
     });
+  }
+
+  get queueCount() {
+    return 0;
+  }
+
+  get progressValue() {
+    return 0;
+  }
+
+  get progressMax() {
+    return 0;
+  }
+
+  get progressMarquee() {
+    return false;
   }
 
   async rename(name: string) {
