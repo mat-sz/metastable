@@ -5,6 +5,7 @@ import { Queue } from './queue';
 import { Recommended } from './recommended';
 import { CivitAI } from './civitai';
 import { InstalledModels } from './installed';
+import { BsDownload, BsGlobe, BsHddFill, BsStarFill } from 'react-icons/bs';
 
 interface Props {
   defaultTab?: 'installed' | 'queue' | 'recommended' | 'civitai';
@@ -12,12 +13,12 @@ interface Props {
 
 export const ModelManager: React.FC<Props> = ({ defaultTab = 'installed' }) => {
   return (
-    <TabView defaultTab={defaultTab}>
+    <TabView defaultTab={defaultTab} variant="large" direction="vertical">
       <Tabs>
-        <Tab id="installed" title="Installed models" />
-        <Tab id="queue" title="Download queue" />
-        <Tab id="recommended" title="Recommended" />
-        <Tab id="civitai" title="CivitAI" />
+        <Tab id="installed" title="Installed models" icon={<BsHddFill />} />
+        <Tab id="queue" title="Download queue" icon={<BsDownload />} />
+        <Tab id="recommended" title="Recommended" icon={<BsStarFill />} />
+        <Tab id="civitai" title="CivitAI" icon={<BsGlobe />} />
       </Tabs>
       <TabContent>
         <TabPanel id="installed">

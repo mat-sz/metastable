@@ -8,7 +8,6 @@ import {
 } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
-import { TaskState } from '@metastable/types';
 
 import { ProgressButton } from '$components/progressButton';
 import { useUI } from '$components/ui';
@@ -25,18 +24,6 @@ export const Status: React.FC<Props> = observer(({ className }) => {
   const status = mainStore.status;
   const { showModal } = useUI();
   const [showUtilization, setShowUtilization] = useState(false);
-
-  const downloads = mainStore.tasks.downloads;
-  const count = downloads.filter(
-    item =>
-      item.state === TaskState.SUCCESS ||
-      item.state === TaskState.RUNNING ||
-      item.state === TaskState.PREPARING ||
-      item.state === TaskState.QUEUED,
-  ).length;
-  const remaining = downloads.filter(
-    item => item.state !== TaskState.SUCCESS,
-  ).length;
 
   return (
     <div className={clsx(styles.status, className)}>

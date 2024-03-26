@@ -56,6 +56,7 @@ export const Tabs: React.FC<React.PropsWithChildren<TabsProps>> = ({
 interface TabViewProps {
   defaultTab: string | number;
   direction?: 'horizontal' | 'vertical';
+  variant?: 'default' | 'large';
   className?: string;
 }
 
@@ -63,11 +64,19 @@ export const TabView: React.FC<React.PropsWithChildren<TabViewProps>> = ({
   defaultTab,
   children,
   direction = 'horizontal',
+  variant = 'default',
   className,
 }) => {
   const [selectedTab, setSelectedTab] = useState(defaultTab);
   return (
-    <div className={clsx(styles.tabView, styles[direction], className)}>
+    <div
+      className={clsx(
+        styles.tabView,
+        styles[direction],
+        styles[variant],
+        className,
+      )}
+    >
       <TabsContext.Provider
         value={{ selected: selectedTab, select: setSelectedTab }}
       >

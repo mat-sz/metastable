@@ -1,11 +1,11 @@
 .welcome {
-  display: grid;
-  grid-template-columns: 10rem 1fr;
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  padding: 1rem;
-  padding-left: 0;
-  grid-gap: 1rem;
+}
+
+.view {
+  background: none;
 }
 
 .tab {

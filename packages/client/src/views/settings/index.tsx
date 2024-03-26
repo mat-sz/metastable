@@ -5,6 +5,7 @@ import { VarString, VarUI } from 'react-var-ui';
 import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
+import { BsDownload, BsGearFill } from 'react-icons/bs';
 
 export const Settings: React.FC = observer(() => {
   const config = mainStore.config;
@@ -15,13 +16,13 @@ export const Settings: React.FC = observer(() => {
 
   return (
     <VarUI values={temp} onChange={setTemp} className={styles.settings}>
-      <TabView defaultTab="general">
+      <TabView defaultTab="general" variant="large" direction="vertical">
         <Tabs>
-          <Tab id="general" title="General" />
-          <Tab id="downloads" title="Downloads" />
+          <Tab id="general" title="General" icon={<BsGearFill />} />
+          <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
         </Tabs>
         <TabContent>
-          <TabPanel id="general"></TabPanel>
+          <TabPanel id="general">Empty.</TabPanel>
           <TabPanel id="downloads">
             <VarString path="civitai.apiKey" label="CivitAI API key" />
           </TabPanel>
