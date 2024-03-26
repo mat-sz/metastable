@@ -125,7 +125,12 @@ export class ProjectStore {
     this.projects = this.projects.filter(project => project.id !== id);
 
     if (id === this.currentId) {
-      this.select(this.projects[0]?.id);
+      const selectId = this.projects[0]?.id;
+      if (mainStore.view === 'project') {
+        this.select(selectId);
+      } else {
+        this.currentId = selectId;
+      }
     }
   }
 }

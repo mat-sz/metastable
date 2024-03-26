@@ -43,6 +43,12 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
             mainStore.projects.currentId === project.id,
         })}
         onClick={() => mainStore.projects.select(project.id)}
+        onPointerUp={e => {
+          if (e.pointerType === 'mouse' && e.button === 1) {
+            e.stopPropagation();
+            mainStore.projects.close(project.id);
+          }
+        }}
         style={{
           opacity: isDragging ? 0.5 : 1,
         }}
