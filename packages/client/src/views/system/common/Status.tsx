@@ -4,12 +4,10 @@ import {
   BsFillExclamationCircleFill,
   BsFillQuestionCircleFill,
   BsGpuCard,
-  BsImage,
 } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 
-import { ProgressButton } from '$components/progressButton';
 import { useUI } from '$components/ui';
 import { Backend } from '$modals/backend';
 import { mainStore } from '$stores/MainStore';
@@ -43,14 +41,6 @@ export const Status: React.FC<Props> = observer(({ className }) => {
           {status === 'ready' && <BsFillCheckCircleFill />}
           <span>Status: {status}</span>
         </button>
-        <ProgressButton
-          value={mainStore.promptValue}
-          max={mainStore.promptMax}
-          marquee={mainStore.promptRemaining > 0}
-        >
-          <BsImage />
-          <span>Queued images: {mainStore.promptRemaining}</span>
-        </ProgressButton>
       </div>
       <div className={styles.info}>
         <button
