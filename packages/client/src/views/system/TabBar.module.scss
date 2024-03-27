@@ -1,6 +1,7 @@
 .tabs {
   background: var(--color-bg-panel-dark);
   display: flex;
+  -webkit-app-region: drag;
 
   .logo {
     font-weight: bold;
@@ -22,6 +23,7 @@
     cursor: pointer;
     border-bottom: 2px solid transparent;
     position: relative;
+    -webkit-app-region: no-drag;
 
     .tabBadge {
       position: absolute;

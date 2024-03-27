@@ -1,0 +1,23 @@
+.controls {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  margin-left: auto;
+
+  button {
+    background: none;
+    font-size: 0;
+    height: 100%;
+    border-radius: 0;
+    padding: 0.2rem 0.9rem;
+    -webkit-app-region: no-drag;
+
+    &:hover {
+      background: var(--color-bg-panel);
+    }
+
+    svg {
+      font-size: 1rem;
+    }
+  }
+}

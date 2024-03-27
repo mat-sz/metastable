@@ -10,6 +10,7 @@ import type { BaseProject } from '$stores/project';
 import styles from './TabBar.module.scss';
 import { ProgressBar } from '$components/progressBar';
 import { TaskState } from '@metastable/types';
+import { Controls } from './Controls';
 
 const TAB_ITEM = 'project_tab';
 
@@ -169,6 +170,7 @@ export const TabBar: React.FC = observer(() => {
       {mainStore.projects.projects.map(project => (
         <ProjectTab key={project.id} project={project} />
       ))}
+      <Controls />
     </div>
   );
 });
