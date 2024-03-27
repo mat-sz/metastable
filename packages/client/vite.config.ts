@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
                       formats: ['cjs'],
                     },
                     rollupOptions: {
-                      external: ['sharp', 'chokidar'],
+                      external: ['sharp', 'chokidar', 'axios'],
                       output: {
                         inlineDynamicImports: true,
                         entryFileNames: '[name].cjs',

@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction, toJS } from 'mobx';
 import {
   DownloadSettings,
   Requirement,
@@ -72,7 +72,7 @@ export class SetupStore {
 
     API.setup.start.mutate({
       pythonMode: this.pythonMode,
-      downloads: this.downloads,
+      downloads: toJS(this.downloads),
       torchMode,
     });
   }
