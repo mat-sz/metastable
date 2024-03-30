@@ -1,7 +1,8 @@
 import type { Editor } from '..';
-import { type PointerData, linePoints } from '../helpers';
+import { linePoints, type PointerData } from '../helpers';
 import { Vector2 } from '../primitives/Vector2';
 import { Point, Tool, ToolOption, ToolOptionType } from '../types';
+
 
 export class BrushTool implements Tool {
   readonly id: string = 'brush';

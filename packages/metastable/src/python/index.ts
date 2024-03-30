@@ -1,7 +1,8 @@
-import which from 'which';
 import { spawn } from 'child_process';
-import path from 'path';
 import os from 'os';
+import path from 'path';
+
+import which from 'which';
 
 import { stdout } from '../helpers/spawn.js';
 

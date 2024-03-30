@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import React, { useEffect, useRef, useState } from 'react';
 import { BsImage, BsPlus } from 'react-icons/bs';
-import { useContextMenu, ContextMenuItem } from 'use-context-menu';
+import { ContextMenuItem, useContextMenu } from 'use-context-menu';
 
 import { IconButton } from '$components/iconButton';
 import type { Layer } from '$editor/types';
-import styles from './index.module.scss';
 import { useEditor } from './context';
+import styles from './index.module.scss';
 
 export interface LayerProps {
   layer: Layer;
@@ -75,7 +75,7 @@ export const Layers: React.FC = () => {
         return;
       }
 
-      for (let item of e.clipboardData!.items) {
+      for (const item of e.clipboardData!.items) {
         const file = item.getAsFile();
 
         if (file?.type.startsWith('image/')) {

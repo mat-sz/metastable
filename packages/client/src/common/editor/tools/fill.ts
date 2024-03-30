@@ -2,6 +2,7 @@ import type { Editor } from '..';
 import { type PointerData } from '../helpers';
 import { Tool, ToolOption, ToolOptionType } from '../types';
 
+
 function getPixel(
   dataView: DataView,
   x: number,

@@ -1,8 +1,8 @@
+import { ImageFile } from '@metastable/types';
 import React, { useState } from 'react';
 
-import styles from './index.module.scss';
 import { FileList } from './FileList';
-import { ImageFile } from '@metastable/types';
+import styles from './index.module.scss';
 
 interface Props {
   items: ImageFile[];

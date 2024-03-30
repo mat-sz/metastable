@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { observer } from 'mobx-react-lite';
 import { Model, ModelType } from '@metastable/types';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
 import { BsFolder } from 'react-icons/bs';
 
-import { Card, CardMenu, CardMenuItem, List } from '$components/list';
 import { Breadcrumbs } from '$components/breadcrumbs';
+import { Card, CardMenu, CardMenuItem, List } from '$components/list';
+import { useUI } from '$components/ui';
+import { ModelDelete } from '$modals/modelDelete';
+import { ModelEdit } from '$modals/modelEdit';
+import { modelStore } from '$stores/ModelStore';
 import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
-import { modelStore } from '$stores/ModelStore';
-import { useUI } from '$components/ui';
-import { ModelEdit } from '$modals/modelEdit';
-import { ModelDelete } from '$modals/modelDelete';
 
 interface Props {
   type: ModelType;

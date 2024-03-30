@@ -9,7 +9,8 @@
     "setup:nvidia": "pip3 install --extra-index-url https://download.pytorch.org/whl/cu121 -r ./python/requirements.txt",
     "setup:other": "pip3 install -r ./python/requirements.txt",
     "setup:amd": "yarn setup:amd:rocm5.6",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "run -T eslint src --ext ts,tsx"
   },
   "devDependencies": {
     "@metastable/types": "*",

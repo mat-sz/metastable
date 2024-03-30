@@ -1,5 +1,6 @@
-import os from 'os';
 import fs from 'fs/promises';
+import os from 'os';
+
 import semver, { SemVer } from 'semver';
 
 import { BaseDownloadTask } from '../../downloader/index.js';

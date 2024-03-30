@@ -1,9 +1,9 @@
-import React from 'react';
+import { Requirement } from '@metastable/types';
 import clsx from 'clsx';
+import React from 'react';
 import { BsCheckCircleFill, BsXCircleFill } from 'react-icons/bs';
 
 import styles from './index.module.scss';
-import { Requirement } from '@metastable/types';
 
 interface Props {
   requirements: Requirement[];

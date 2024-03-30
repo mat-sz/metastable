@@ -1,16 +1,17 @@
+import { EventEmitter } from 'events';
 import os from 'os';
 import path from 'path';
-import si from 'systeminformation';
-import checkDiskSpace from 'check-disk-space';
-import { EventEmitter } from 'events';
-import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 
-import type { Metastable } from '../index.js';
+import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
+import checkDiskSpace from 'check-disk-space';
+import si from 'systeminformation';
+
 import { getOS, getPython } from './helpers.js';
-import { DownloadPythonTask } from './tasks/downloadPython.js';
-import { ExtractPythonTask } from './tasks/extractPython.js';
 import { ConfigurePythonTask } from './tasks/configurePython.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
+import { DownloadPythonTask } from './tasks/downloadPython.js';
+import { ExtractPythonTask } from './tasks/extractPython.js';
+import type { Metastable } from '../index.js';
 
 export class Setup extends EventEmitter {
   settings: SetupSettings | undefined = undefined;
@@ -42,7 +43,7 @@ export class Setup extends EventEmitter {
   async details(): Promise<SetupDetails> {
     const graphics = await si.graphics();
     const dataRoot = this.metastable.storage.dataRoot;
-    // @ts-ignore
+    // @ts-expect-error This library doesn't work well with TS.
     const usage = await checkDiskSpace(dataRoot);
 
     return {

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+
 import { Task, TaskQueue, TaskState } from '@metastable/types';
 
 import { BaseTask } from './task.js';

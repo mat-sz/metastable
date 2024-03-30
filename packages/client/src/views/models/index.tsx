@@ -1,11 +1,11 @@
 import React from 'react';
+import { BsDownload, BsGlobe, BsHddFill, BsStarFill } from 'react-icons/bs';
 
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
-import { Queue } from './queue';
-import { Recommended } from './recommended';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { CivitAI } from './civitai';
 import { InstalledModels } from './installed';
-import { BsDownload, BsGlobe, BsHddFill, BsStarFill } from 'react-icons/bs';
+import { Queue } from './queue';
+import { Recommended } from './recommended';
 
 interface Props {
   defaultTab?: 'installed' | 'queue' | 'recommended' | 'civitai';

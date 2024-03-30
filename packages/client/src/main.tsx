@@ -1,11 +1,13 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TRPC, TRPCClient } from '$api';
+import ReactDOM from 'react-dom/client';
 
 import { App } from './App.tsx';
+
+import { TRPC, TRPCClient } from '$api';
+
 
 const queryClient = new QueryClient();
 

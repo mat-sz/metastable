@@ -2,6 +2,7 @@ import type { Editor } from '.';
 import { Vector2 } from './primitives/Vector2';
 import { Point, PointerState } from './types';
 
+
 export function linePoints(
   { x: startX, y: startY }: Point,
   { x: endX, y: endY }: Point,

@@ -1,10 +1,11 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import { BsGrid, BsList, BsListUl } from 'react-icons/bs';
-import clsx from 'clsx';
 
 import styles from './index.module.scss';
 import { Search } from '../search';
 import { Switch, SwitchOption } from '../switch';
+
 
 interface ListProps<T> {
   small?: boolean;

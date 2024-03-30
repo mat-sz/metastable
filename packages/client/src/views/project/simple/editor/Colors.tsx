@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BsArrow90DegUp } from 'react-icons/bs';
 
-import styles from './index.module.scss';
 import { useEditor } from './context';
 import { ResetColorsIcon } from './icons/ResetColors';
+import styles from './index.module.scss';
 
 export const Colors: React.FC = () => {
   const editor = useEditor();

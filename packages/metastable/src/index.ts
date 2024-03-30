@@ -1,33 +1,34 @@
 import EventEmitter from 'events';
 import path from 'path';
-import { nanoid } from 'nanoid/non-secure';
-import si from 'systeminformation';
-import checkDiskSpace from 'check-disk-space';
+
 import {
   AnyEvent,
-  LogItem,
   DownloadSettings,
+  LogItem,
   ModelType,
   Project,
   ProjectSettings,
+  ProjectTaggingSettings,
   ProjectTrainingSettings,
   Utilization,
-  ProjectTaggingSettings,
 } from '@metastable/types';
+import checkDiskSpace from 'check-disk-space';
+import { nanoid } from 'nanoid/non-secure';
+import si from 'systeminformation';
 
-import { Setup } from './setup/index.js';
 import { Comfy } from './comfy/index.js';
-import { PythonInstance } from './python/index.js';
-import { Storage } from './storage/index.js';
-import { resolveConfigPath } from './helpers/fs.js';
-import { DownloadModelTask } from './downloader/index.js';
-import { Tasks } from './tasks/index.js';
-import { Kohya } from './kohya/index.js';
-import { ProjectEntity } from './data/project.js';
 import { EntityRepository } from './data/common.js';
-import { TypedEventEmitter } from './types.js';
-import { Tagger } from './kohya/tagger.js';
 import { ModelRepository } from './data/model.js';
+import { ProjectEntity } from './data/project.js';
+import { DownloadModelTask } from './downloader/index.js';
+import { resolveConfigPath } from './helpers/fs.js';
+import { Kohya } from './kohya/index.js';
+import { Tagger } from './kohya/tagger.js';
+import { PythonInstance } from './python/index.js';
+import { Setup } from './setup/index.js';
+import { Storage } from './storage/index.js';
+import { Tasks } from './tasks/index.js';
+import { TypedEventEmitter } from './types.js';
 
 type MetastableEvents = {
   event: (event: AnyEvent) => void;
@@ -89,7 +90,6 @@ export class Metastable extends (EventEmitter as {
     this.tasks.on('event', this.onEvent);
 
     setInterval(async () => {
-      // @ts-ignore
       const [graphics, cpuTemperature, currentLoad, mem, usage] =
         await Promise.all([
           si.graphics(),

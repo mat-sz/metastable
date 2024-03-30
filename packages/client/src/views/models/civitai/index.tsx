@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
 import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
-import { useQuery } from '@tanstack/react-query';
 
-import { Card, CardTag, CardTags, List } from '$components/list';
-import { Pagination } from '$components/pagination';
-import { Loading } from '$components/loading';
-import { Toggle } from '$components/toggle';
 import { IconButton } from '$components/iconButton';
+import { Card, CardTag, CardTags, List } from '$components/list';
+import { Loading } from '$components/loading';
+import { Pagination } from '$components/pagination';
 import { Rating } from '$components/rating';
+import { Toggle } from '$components/toggle';
 import styles from './index.module.scss';
-import { CivitAIModel, CivitAIResponse } from './types';
 import { Model } from './Model';
+import { CivitAIModel, CivitAIResponse } from './types';
 
 const CivitAISort = [
   'Highest Rated',

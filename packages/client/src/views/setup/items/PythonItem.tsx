@@ -1,7 +1,7 @@
-import React from 'react';
 import { runInAction } from 'mobx';
-import { FaPython } from 'react-icons/fa';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { FaPython } from 'react-icons/fa';
 
 import { RequirementsTable } from '$components/requirementsTable';
 import { Toggle } from '$components/toggle';

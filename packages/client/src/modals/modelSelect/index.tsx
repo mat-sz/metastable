@@ -1,5 +1,5 @@
-import React from 'react';
 import { Model, ModelType } from '@metastable/types';
+import React from 'react';
 
 import { Modal, useModal } from '$components/modal';
 import { ModelBrowser } from '../../components/modelBrowser';

@@ -1,4 +1,4 @@
-import { ImageFile, ImageInfo } from './file.js';
+import { ImageFile } from './file.js';
 
 export interface ProjectInputEmpty {
   mode: 'empty';

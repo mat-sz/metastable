@@ -1,6 +1,6 @@
-import React from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import { BsCheck, BsChevronRight, BsExclamation, BsX } from 'react-icons/bs';
 
 import styles from './Item.module.scss';

@@ -1,6 +1,6 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
 import { TaskState } from '@metastable/types';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';

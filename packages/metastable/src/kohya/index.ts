@@ -1,19 +1,21 @@
+import { ChildProcess } from 'child_process';
 import EventEmitter from 'events';
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 import {
   LogItem,
   ProjectTrainingInputMetadata,
   ProjectTrainingSettings,
 } from '@metastable/types';
-import fs from 'fs/promises';
-import { ChildProcess } from 'child_process';
 import sharp from 'sharp';
 
-import type { PythonInstance } from '../python/index.js';
-import { CircularBuffer } from '../helpers/buffer.js';
-import { JSONFile, TextFile, removeFileExtension } from '../helpers/fs.js';
 import type { ProjectEntity } from '../data/project.js';
+import { CircularBuffer } from '../helpers/buffer.js';
+import { JSONFile, removeFileExtension, TextFile } from '../helpers/fs.js';
+import type { PythonInstance } from '../python/index.js';
+
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

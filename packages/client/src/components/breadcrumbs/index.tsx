@@ -1,8 +1,8 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsChevronRight, BsHouseFill } from 'react-icons/bs';
 
 import styles from './index.module.scss';
-import { BsChevronRight, BsHouseFill } from 'react-icons/bs';
 
 interface Props {
   value: string[];

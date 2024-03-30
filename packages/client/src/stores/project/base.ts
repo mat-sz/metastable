@@ -1,3 +1,4 @@
+import { Project as APIProject, ImageFile } from '@metastable/types';
 import {
   action,
   computed,
@@ -6,7 +7,6 @@ import {
   runInAction,
   toJS,
 } from 'mobx';
-import { Project as APIProject, ImageFile } from '@metastable/types';
 
 import { API } from '$api';
 

@@ -2,6 +2,7 @@ import type { Editor } from '..';
 import { type PointerData } from '../helpers';
 import { Tool, ToolOption } from '../types';
 
+
 export class EyedropperTool implements Tool {
   readonly id: string = 'eyedropper';
   readonly name: string = 'Eyedropper';

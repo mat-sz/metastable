@@ -1,3 +1,4 @@
+
 import {
   createTRPCClient,
   createWSClient,
@@ -6,12 +7,13 @@ import {
   wsLink,
 } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-
-import type { Router } from '@metastable/metastable';
 import { ipcLink } from 'trpc-electron/renderer';
 
-import { getUrl } from '$utils/url';
+
 import { IS_ELECTRON } from '$utils/config';
+import { getUrl } from '$utils/url';
+import type { Router } from '@metastable/metastable';
+
 
 declare global {
   interface Window {

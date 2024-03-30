@@ -1,10 +1,12 @@
-import semver from 'semver';
-import os from 'os';
 import fs from 'fs/promises';
-import { Requirement, SetupOS, SetupPython } from '@metastable/types';
+import os from 'os';
 
-import { PythonInstance } from '../python/index.js';
+import { Requirement, SetupOS, SetupPython } from '@metastable/types';
+import semver from 'semver';
+
 import { PipDependency } from './types.js';
+import { PythonInstance } from '../python/index.js';
+
 
 export async function isGNULibc() {
   try {

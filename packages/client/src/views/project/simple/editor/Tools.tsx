@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
+import React, { useEffect, useState } from 'react';
 import { BsBrush, BsCursor, BsEraser } from 'react-icons/bs';
 import { PiEyedropper, PiPaintBucket, PiSelectionLight } from 'react-icons/pi';
 
-import styles from './index.module.scss';
 import { Colors } from './Colors';
 import { useEditor } from './context';
+import styles from './index.module.scss';
 
 const toolIcons: Record<string, JSX.Element> = {
   move: <BsCursor />,

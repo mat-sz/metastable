@@ -1,5 +1,5 @@
-import React from 'react';
 import clsx from 'clsx';
+import React from 'react';
 
 import styles from './index.module.scss';
 
@@ -10,7 +10,6 @@ export interface ButtonProps
   > {
   href?: string;
   download?: string;
-  round?: boolean;
   variant?: 'danger' | 'primary' | 'secondary' | 'default';
 }
 
@@ -19,7 +18,6 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   href,
   download,
-  round,
   variant = 'default',
   ...props
 }) => {

@@ -1,4 +1,3 @@
-import { makeAutoObservable, runInAction, toJS } from 'mobx';
 import {
   DownloadSettings,
   Requirement,
@@ -6,9 +5,11 @@ import {
   SetupSettings,
   SetupStatus,
 } from '@metastable/types';
+import { makeAutoObservable, runInAction, toJS } from 'mobx';
+
+import { filesize } from '$utils/file';
 
 import { API } from '$api';
-import { filesize } from '$utils/file';
 
 const GB = 1024 * 1024 * 1024;
 const VRAM_MIN = 2 * GB;
@@ -38,7 +39,7 @@ export class SetupStore {
   }
 
   async init() {
-    this.refresh();
+    await this.refresh();
 
     const details = await API.setup.details.query();
     runInAction(() => {

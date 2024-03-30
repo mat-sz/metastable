@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint . --ext ts,tsx"
+    "lint": "run -T eslint src --ext ts,tsx"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

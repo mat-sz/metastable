@@ -1,5 +1,5 @@
-import { makeAutoObservable, runInAction } from 'mobx';
 import { ConfigType } from '@metastable/types';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
 

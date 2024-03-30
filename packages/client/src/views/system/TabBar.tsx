@@ -1,16 +1,16 @@
-import React, { useRef } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useDrag, useDrop } from 'react-dnd';
+import { TaskState } from '@metastable/types';
 import clsx from 'clsx';
-import { BsBox, BsGearFill, BsHouseFill, BsX } from 'react-icons/bs';
 import { runInAction } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { BsBox, BsGearFill, BsHouseFill, BsX } from 'react-icons/bs';
 
+import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
-import styles from './TabBar.module.scss';
-import { ProgressBar } from '$components/progressBar';
-import { TaskState } from '@metastable/types';
 import { Controls } from './Controls';
+import styles from './TabBar.module.scss';
 
 const TAB_ITEM = 'project_tab';
 

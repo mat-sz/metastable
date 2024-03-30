@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
-import { nanoid } from 'nanoid';
-import { Base64 } from 'js-base64';
 import { ImageFile } from '@metastable/types';
+import { Base64 } from 'js-base64';
+import { observer } from 'mobx-react-lite';
+import { nanoid } from 'nanoid';
+import React, { useState } from 'react';
+import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 
-import { TRPC } from '$api';
-import { useUI } from '$components/ui';
 import { FilePicker } from '$components/filePicker';
+import { useUI } from '$components/ui';
 import { Tagger } from '$modals/tagger';
+import { FileManager } from './fileManager';
 import styles from './index.module.scss';
+import { InputEditor } from './InputEditor';
+import { UploadQueue, UploadQueueItem } from './UploadQueue';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
-import { FileManager } from './fileManager';
-import { UploadQueue, UploadQueueItem } from './UploadQueue';
-import { InputEditor } from './InputEditor';
+
+import { TRPC } from '$api';
 
 export const Images: React.FC = observer(() => {
   const { showModal } = useUI();

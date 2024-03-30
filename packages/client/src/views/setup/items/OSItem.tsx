@@ -1,7 +1,7 @@
-import React from 'react';
-import { FaWindows, FaApple, FaLinux } from 'react-icons/fa';
-import { BsQuestion } from 'react-icons/bs';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsQuestion } from 'react-icons/bs';
+import { FaApple, FaLinux, FaWindows } from 'react-icons/fa';
 
 import { RequirementsTable } from '$components/requirementsTable';
 import { mainStore } from '$stores/MainStore';

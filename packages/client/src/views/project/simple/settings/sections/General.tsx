@@ -1,5 +1,6 @@
-import React from 'react';
+import { ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import {
   VarCategory,
   VarImage,
@@ -9,7 +10,6 @@ import {
   VarString,
   VarToggle,
 } from 'react-var-ui';
-import { ModelType } from '@metastable/types';
 
 import { VarModel } from '$components/varModel';
 import { mainStore } from '$stores/MainStore';

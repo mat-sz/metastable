@@ -1,13 +1,14 @@
 import { Dirent } from 'fs';
 import fs, { mkdir } from 'fs/promises';
 import path from 'path';
-import { rimraf } from 'rimraf';
+
 import { ImageInfo } from '@metastable/types';
+import { rimraf } from 'rimraf';
 
 import {
-  IMAGE_EXTENSIONS,
-  getMetadataDirectory,
   getAvailableName,
+  getMetadataDirectory,
+  IMAGE_EXTENSIONS,
   tryUnlink,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';

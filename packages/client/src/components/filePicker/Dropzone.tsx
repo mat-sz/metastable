@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './Dropzone.module.scss';
 import { Portal } from '../portal';
 
+
 interface Props {
   onFiles?: (files: File[]) => void;
 }

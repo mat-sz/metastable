@@ -1,21 +1,23 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import EventEmitter from 'events';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import {
-  LogItem,
-  ComfyStatus,
-  AnyEvent,
-  InstanceInfo,
-} from '@metastable/types';
-import { nanoid } from 'nanoid/non-secure';
 import { Readable } from 'stream';
-import es from 'event-stream';
+import { fileURLToPath } from 'url';
 
-import type { PythonInstance } from '../python/index.js';
-import { CircularBuffer } from '../helpers/buffer.js';
-import { TypedEventEmitter } from '../types.js';
+import {
+  AnyEvent,
+  ComfyStatus,
+  InstanceInfo,
+  LogItem,
+} from '@metastable/types';
+import es from 'event-stream';
+import { nanoid } from 'nanoid/non-secure';
+
 import { ComfySession } from './session.js';
+import { CircularBuffer } from '../helpers/buffer.js';
+import type { PythonInstance } from '../python/index.js';
+import { TypedEventEmitter } from '../types.js';
+
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

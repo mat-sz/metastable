@@ -1,13 +1,14 @@
-import path from 'path';
-import fs from 'fs/promises';
 import { createWriteStream } from 'fs';
-import axios from 'axios';
-import { DownloadSettings, TaskState, DownloadData } from '@metastable/types';
+import fs from 'fs/promises';
+import path from 'path';
 
-import { exists, tryMkdir } from '../helpers/fs.js';
-import { BaseTask } from '../tasks/task.js';
-import { WrappedPromise } from '../helpers/promise.js';
+import { DownloadData, DownloadSettings, TaskState } from '@metastable/types';
+import axios from 'axios';
+
 import { ModelEntity } from '../data/model.js';
+import { exists, tryMkdir } from '../helpers/fs.js';
+import { WrappedPromise } from '../helpers/promise.js';
+import { BaseTask } from '../tasks/task.js';
 
 const USER_AGENT = 'Metastable/0.0.0';
 const CHUNK_SIZE = 10 * 1024 * 1024;

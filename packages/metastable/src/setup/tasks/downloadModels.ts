@@ -3,6 +3,7 @@ import { DownloadSettings, TaskState } from '@metastable/types';
 import type { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 
+
 export class DownloadModelsTask extends BaseTask {
   constructor(
     private metastable: Metastable,

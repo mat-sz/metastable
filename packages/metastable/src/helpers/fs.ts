@@ -1,6 +1,6 @@
-import path from 'path';
-import fs, { mkdir, unlink } from 'fs/promises';
 import { Dirent } from 'fs';
+import fs, { mkdir, unlink } from 'fs/promises';
+import path from 'path';
 
 export const IMAGE_EXTENSIONS = [
   'png',
@@ -203,6 +203,7 @@ export function getMetadataDirectory(filePath: string) {
   return path.join(dirName, METADATA_DIRECTORY_NAME);
 }
 
+// eslint-disable-next-line no-control-regex
 const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
 const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
@@ -223,11 +224,7 @@ export async function getAvailableName(
 
   let counter = 1;
 
-  while (true) {
-    if (!items.includes(name)) {
-      break;
-    }
-
+  while (items.includes(name)) {
     counter++;
     name = `${nameWithoutExtension} (${counter})${extension}`;
   }

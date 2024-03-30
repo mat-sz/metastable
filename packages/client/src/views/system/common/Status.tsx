@@ -1,3 +1,5 @@
+import clsx from 'clsx';
+import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import {
   BsFillCheckCircleFill,
@@ -5,8 +7,6 @@ import {
   BsFillQuestionCircleFill,
   BsGpuCard,
 } from 'react-icons/bs';
-import { observer } from 'mobx-react-lite';
-import clsx from 'clsx';
 
 import { useUI } from '$components/ui';
 import { Backend } from '$modals/backend';

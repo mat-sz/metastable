@@ -1,4 +1,5 @@
 import path from 'path';
+
 import sharp from 'sharp';
 
 import { exists, getMetadataDirectory, tryMkdir } from './fs.js';

@@ -50,7 +50,7 @@ function fuzzyWordMatch(a: string, b: string): boolean {
   return false;
 }
 
-const SPLIT_REGEX = /[\s_\.-]/;
+const SPLIT_REGEX = /[\s_.-]/;
 
 export function fuzzy<T>(
   items: T[],

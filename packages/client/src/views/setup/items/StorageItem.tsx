@@ -1,5 +1,5 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import { BsHddFill } from 'react-icons/bs';
 
 import { AvailableStorage } from '$components/availableStorage';

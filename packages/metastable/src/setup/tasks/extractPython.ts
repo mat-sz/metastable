@@ -1,6 +1,6 @@
+import { TaskState } from '@metastable/types';
 import decompress from 'decompress';
 import { rimraf } from 'rimraf';
-import { TaskState } from '@metastable/types';
 
 import { tryUnlink } from '../../helpers/fs.js';
 import { BaseTask } from '../../tasks/task.js';

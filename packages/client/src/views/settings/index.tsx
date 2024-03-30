@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { BsDownload, BsGearFill } from 'react-icons/bs';
 import { VarString, VarUI } from 'react-var-ui';
 
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
-import { BsDownload, BsGearFill } from 'react-icons/bs';
 
 export const Settings: React.FC = observer(() => {
   const config = mainStore.config;

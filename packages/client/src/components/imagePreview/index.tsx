@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import styles from './index.module.scss';
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
+import styles from './index.module.scss';
 
 interface ImagePreviewProps {
   url?: string;

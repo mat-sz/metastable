@@ -1,7 +1,3 @@
-import { TRPCError, initTRPC } from '@trpc/server';
-import { observable } from '@trpc/server/observable';
-import { z } from 'zod';
-import type { BrowserWindow } from 'electron';
 import {
   AnyEvent,
   LogItem,
@@ -9,9 +5,14 @@ import {
   ModelType,
   Utilization,
 } from '@metastable/types';
+import { initTRPC, TRPCError } from '@trpc/server';
+import { observable } from '@trpc/server/observable';
+import type { BrowserWindow } from 'electron';
 import { Base64 } from 'js-base64';
+import { z } from 'zod';
 
 import type { Metastable } from './index.js';
+
 
 export interface TRPCContext {
   metastable: Metastable;

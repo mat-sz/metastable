@@ -1,16 +1,16 @@
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsChevronRight } from 'react-icons/bs';
-import { observer } from 'mobx-react-lite';
 
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
-import styles from './index.module.scss';
 import { List } from './components/List';
-import { OSItem } from './items/OSItem';
+import styles from './index.module.scss';
 import { HardwareItem } from './items/HardwareItem';
+import { ModelsItem } from './items/ModelsItem';
+import { OSItem } from './items/OSItem';
 import { PythonItem } from './items/PythonItem';
 import { StorageItem } from './items/StorageItem';
-import { ModelsItem } from './items/ModelsItem';
 
 export const Step1: React.FC = observer(() => {
   const details = mainStore.setup.details;

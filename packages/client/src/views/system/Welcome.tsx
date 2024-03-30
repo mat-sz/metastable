@@ -1,14 +1,15 @@
-import React from 'react';
+import { Project } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsClockHistory, BsPlus } from 'react-icons/bs';
 
 import { Card, List } from '$components/list';
-import { useUI } from '$components/ui';
-import { mainStore } from '$stores/MainStore';
-import styles from './Welcome.module.scss';
-import { BsClockHistory, BsPlus } from 'react-icons/bs';
-import { NewProject } from '$modals/newProject';
-import { fuzzy } from '$utils/fuzzy';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
+import { useUI } from '$components/ui';
+import { NewProject } from '$modals/newProject';
+import { mainStore } from '$stores/MainStore';
+import { fuzzy } from '$utils/fuzzy';
+import styles from './Welcome.module.scss';
 
 export const Welcome: React.FC = observer(() => {
   const { showModal } = useUI();
@@ -33,7 +34,7 @@ export const Welcome: React.FC = observer(() => {
               items={['new', ...data]}
               quickFilter={(data, search) =>
                 fuzzy(
-                  data.filter(item => typeof item === 'object'),
+                  data.filter(item => typeof item === 'object') as Project[],
                   search,
                   item => item.name,
                 )

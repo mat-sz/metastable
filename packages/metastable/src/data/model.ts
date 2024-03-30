@@ -1,19 +1,21 @@
-import path from 'path';
-import { ImageInfo, Model, ModelType } from '@metastable/types';
-import { mkdir, stat, writeFile } from 'fs/promises';
-import chokidar from 'chokidar';
 import EventEmitter from 'events';
+import { mkdir, stat, writeFile } from 'fs/promises';
+import path from 'path';
 
+import { ImageInfo, Model, ModelType } from '@metastable/types';
+import chokidar from 'chokidar';
+
+import { FileEntity } from './common.js';
 import {
-  IMAGE_EXTENSIONS,
   exists,
+  IMAGE_EXTENSIONS,
   removeFileExtension,
   walk,
 } from '../helpers/fs.js';
-import { FileEntity } from './common.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
-import { TypedEventEmitter } from '../types.js';
 import { getStaticUrl } from '../helpers/url.js';
+import { TypedEventEmitter } from '../types.js';
+
 
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
 export class ModelEntity extends FileEntity {
@@ -194,7 +196,7 @@ export class ModelRepository extends (EventEmitter as {
   }
 
   async get(type: ModelType, name: string): Promise<ModelEntity> {
-    const basename = path.basename(name.replace(/[\\\/]/g, path.sep));
+    const basename = path.basename(name.replace(/[\\/]/g, path.sep));
     const cache = await this.all();
 
     const model = cache.find(

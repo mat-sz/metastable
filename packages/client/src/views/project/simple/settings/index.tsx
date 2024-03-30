@@ -1,23 +1,22 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
-import { VarUI } from 'react-var-ui';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 import {
-  BsWrench,
-  BsRecordCircle,
-  BsGearWideConnected,
   BsFullscreen,
+  BsGearWideConnected,
   BsPlugFill,
+  BsRecordCircle,
+  BsWrench,
 } from 'react-icons/bs';
+import { VarUI } from 'react-var-ui';
 
+import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
 import styles from './index.module.scss';
-
-import { Tab, TabPanel, TabView, Tabs } from '$components/tabs';
-import { General } from './sections/General';
-import { LoRAs } from './sections/LoRAs';
 import { Controlnets } from './sections/Controlnets';
-import { Upscale } from './sections/Upscale';
+import { General } from './sections/General';
 import { IPAdapters } from './sections/IPAdapters';
+import { LoRAs } from './sections/LoRAs';
+import { Upscale } from './sections/Upscale';
 import { useSimpleProject } from '../../context';
 
 interface SettingsProps {

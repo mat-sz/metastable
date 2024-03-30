@@ -1,9 +1,9 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
 import { ModelType } from '@metastable/types';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
 import { ModelBrowser } from '$components/modelBrowser';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { modelStore } from '$stores/ModelStore';
 import styles from './index.module.scss';
 

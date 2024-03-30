@@ -1,15 +1,17 @@
-import path from 'path';
-import { Project, ProjectSettings } from '@metastable/types';
 import { mkdir } from 'fs/promises';
+import path from 'path';
+
+import { Project } from '@metastable/types';
 import { rimraf } from 'rimraf';
 
-import { directorySize } from '../helpers/fs.js';
 import {
-  Metadata,
+  DirectoryEntity,
   EntityRepository,
   ImageEntity,
-  DirectoryEntity,
+  Metadata,
 } from './common.js';
+import { directorySize } from '../helpers/fs.js';
+
 
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;

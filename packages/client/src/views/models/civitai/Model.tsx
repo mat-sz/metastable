@@ -6,10 +6,10 @@ import {
   BsHeartFill,
 } from 'react-icons/bs';
 
-import { IconButton } from '$components/iconButton';
-import { Tab, TabPanel, TabView, Tabs, TabContent } from '$components/tabs';
-import { Rating } from '$components/rating';
 import { Carousel } from '$components/carousel';
+import { IconButton } from '$components/iconButton';
+import { Rating } from '$components/rating';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import styles from './Model.module.scss';
 import { CivitAIModel, CivitAIModelVersion, CivitAITypeMap } from './types';
 import { DownloadButton } from '../DownloadButton';

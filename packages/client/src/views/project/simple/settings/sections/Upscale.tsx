@@ -1,7 +1,7 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
-import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 import { ModelType } from '@metastable/types';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { VarButton, VarCategory, VarToggle } from 'react-var-ui';
 
 import { VarModel } from '$components/varModel';
 import { mainStore } from '$stores/MainStore';

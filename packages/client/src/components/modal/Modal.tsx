@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
+import React, { useEffect, useRef } from 'react';
 import { BsXLg } from 'react-icons/bs';
 
-import styles from './index.module.scss';
 import { useModal } from './context';
+import styles from './Modal.module.scss';
 
 export interface ModalProps {
   title: string;
@@ -55,5 +55,3 @@ export const ModalActions: React.FC<React.PropsWithChildren> = ({
 }) => {
   return <div className={styles.actions}>{children}</div>;
 };
-
-export { useModal };

@@ -1,3 +1,4 @@
+import { ImageFile } from '@metastable/types';
 import React, { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
@@ -11,7 +12,6 @@ import {
 import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import styles from './Lightbox.module.scss';
-import { ImageFile } from '@metastable/types';
 
 interface Props {
   images: ImageFile[];
@@ -31,11 +31,11 @@ export const Lightbox: React.FC<Props> = ({
 
   const previous = useCallback(
     () => onChange(current === 0 ? images.length - 1 : current - 1),
-    [onChange, current],
+    [onChange, current, images.length],
   );
   const next = useCallback(
     () => onChange(current === images.length - 1 ? 0 : current + 1),
-    [onChange, current],
+    [onChange, current, images.length],
   );
 
   useHotkeys('escape', onClose);

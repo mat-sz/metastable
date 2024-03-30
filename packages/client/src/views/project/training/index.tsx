@@ -1,10 +1,11 @@
-import React from 'react';
-import { BsImage } from 'react-icons/bs';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsImage } from 'react-icons/bs';
 
-import styles from './index.module.scss';
+
 import { Images } from './images';
+import styles from './index.module.scss';
 import { useTraningProject } from '../context';
 
 export const TrainingProjectView: React.FC = observer(() => {

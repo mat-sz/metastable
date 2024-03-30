@@ -1,16 +1,16 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 
 import { UI } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import './index.scss';
+import { ModelManager } from './views/models';
 import { Project } from './views/project';
-import { TabBar } from './views/system/TabBar';
-import { Welcome } from './views/system/Welcome';
+import { Settings } from './views/settings';
 import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
-import { Settings } from './views/settings';
-import { ModelManager } from './views/models';
+import { TabBar } from './views/system/TabBar';
+import { Welcome } from './views/system/Welcome';
 
 const View: React.FC = observer(() => {
   switch (mainStore.view) {

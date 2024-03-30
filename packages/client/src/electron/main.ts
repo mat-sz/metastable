@@ -1,9 +1,10 @@
-import path from 'node:path';
 import os from 'node:os';
+import path from 'node:path';
+
+import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { app, BrowserWindow, Menu, MenuItem } from 'electron';
 import { createIPCHandler } from 'trpc-electron/main';
 
-import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 
 setUseFileUrl(true);
 

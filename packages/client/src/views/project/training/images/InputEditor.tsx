@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { observer } from 'mobx-react-lite';
-import { BsX } from 'react-icons/bs';
 import { ImageFile, ProjectTrainingInputMetadata } from '@metastable/types';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { BsX } from 'react-icons/bs';
 
-import { TRPC } from '$api';
-import { ImageCrop } from '$components/imageCrop';
 import { IconButton } from '$components/iconButton';
+import { ImageCrop } from '$components/imageCrop';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
+
+import { TRPC } from '$api';
 
 interface InputEditorProps {
   input: ImageFile;

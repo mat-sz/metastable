@@ -1,5 +1,5 @@
-import type { GlueTexture } from 'fxglue';
 import type { PointerData } from './helpers';
+import type { GlueTexture } from 'fxglue';
 
 export enum ToolOptionType {
   SLIDER,

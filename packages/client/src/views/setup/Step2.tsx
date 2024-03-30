@@ -1,15 +1,15 @@
+import { TaskState } from '@metastable/types';
+import Ansi from 'ansi-to-react';
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsArchiveFill, BsDownload, BsHourglassSplit } from 'react-icons/bs';
-import { observer } from 'mobx-react-lite';
-import Ansi from 'ansi-to-react';
 import { FaPython } from 'react-icons/fa';
-import { TaskState } from '@metastable/types';
 
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
-import styles from './index.module.scss';
-import { List } from './components/List';
 import { Item } from './components/Item';
+import { List } from './components/List';
+import styles from './index.module.scss';
 
 const TASK_ICONS: Record<string, React.ReactNode> = {
   'python.download': <BsDownload />,

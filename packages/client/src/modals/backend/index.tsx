@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { Modal } from '$components/modal';
-import { Tab, TabContent, TabPanel, TabView, Tabs } from '$components/tabs';
-import { General } from './general';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { Compatibility } from './compatibility';
+import { General } from './general';
 
 export const Backend: React.FC = () => {
   return (

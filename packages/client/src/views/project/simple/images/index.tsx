@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
 import { BsPlay } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import styles from './index.module.scss';
-import { Settings } from '../settings';
 import { useSimpleProject } from '../../context';
+import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();

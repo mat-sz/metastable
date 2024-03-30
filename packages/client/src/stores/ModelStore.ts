@@ -1,5 +1,5 @@
+import { Model, ModelType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
-import { ModelType, Model } from '@metastable/types';
 
 import { API } from '$api';
 

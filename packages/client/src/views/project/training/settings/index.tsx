@@ -1,6 +1,8 @@
-import React from 'react';
-import { observer } from 'mobx-react-lite';
+import { ModelType } from '@metastable/types';
 import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsPlay, BsX } from 'react-icons/bs';
 import {
   VarArray,
   VarButton,
@@ -12,13 +14,11 @@ import {
   VarToggle,
   VarUI,
 } from 'react-var-ui';
-import { BsPlay, BsX } from 'react-icons/bs';
 
-import { ModelType } from '@metastable/types';
 import { IconButton } from '$components/iconButton';
-import { mainStore } from '$stores/MainStore';
-import { VarModel } from '$components/varModel';
 import { ProgressBar } from '$components/progressBar';
+import { VarModel } from '$components/varModel';
+import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 

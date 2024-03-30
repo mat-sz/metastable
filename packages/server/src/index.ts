@@ -1,22 +1,23 @@
 import path from 'path';
-import Fastify from 'fastify';
-import fastifyWebsocket from '@fastify/websocket';
-import fastifyStatic from '@fastify/static';
+
 import fastifyCompress from '@fastify/compress';
 import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import fastifyWebsocket from '@fastify/websocket';
+import { Metastable, router, Router } from '@metastable/metastable';
 import {
   fastifyTRPCPlugin,
   FastifyTRPCPluginOptions,
 } from '@trpc/server/adapters/fastify';
-import { Metastable, router, Router } from '@metastable/metastable';
+import Fastify from 'fastify';
 
 import {
+  dataRoot,
   host,
   port,
-  useProxy,
-  staticRoot,
-  dataRoot,
   skipPythonSetup,
+  staticRoot,
+  useProxy,
 } from './config.js';
 
 const metastable = new Metastable(dataRoot, { skipPythonSetup });

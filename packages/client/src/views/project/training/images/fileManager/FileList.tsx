@@ -1,13 +1,13 @@
+import { ImageFile } from '@metastable/types';
+import clsx from 'clsx';
 import React, { useRef, useState } from 'react';
 import { MdNoPhotography } from 'react-icons/md';
-import clsx from 'clsx';
 import { usePointerDrag } from 'react-use-pointer-drag';
 
-import { Vector2 } from '$editor/primitives/Vector2';
 import { Rectangle } from '$editor/primitives/Rectangle';
+import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
 import styles from './FileList.module.scss';
-import { ImageFile } from '@metastable/types';
 
 interface Props {
   items: ImageFile[];
@@ -40,7 +40,7 @@ function mergeSelection(a: string[], b: string[], mode: SelectionMode) {
   switch (mode) {
     case 'add':
       return [...new Set([...a, ...b])];
-    case 'xor':
+    case 'xor': {
       const set = new Set(a);
       for (const item of b) {
         if (set.has(item)) {
@@ -50,6 +50,7 @@ function mergeSelection(a: string[], b: string[], mode: SelectionMode) {
         }
       }
       return [...set];
+    }
     default:
       return b;
   }
@@ -186,7 +187,7 @@ export const FileList: React.FC<Props> = ({
     },
   });
 
-  return !!items.length ? (
+  return items.length ? (
     <div className={styles.files} ref={listRef} {...dragProps()}>
       <div className={styles.selectionBox} ref={selectionBoxRef} />
       {items.map((item, index) => (

@@ -2,8 +2,13 @@ import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 
 import { loadImage } from '$utils/image';
-import { MoveTool } from './tools/move';
+import { isVisible, PointerData } from './helpers';
 import { BrushTool } from './tools/brush';
+import { EraserTool } from './tools/eraser';
+import { EyedropperTool } from './tools/eyedropper';
+import { FillTool } from './tools/fill';
+import { MoveTool } from './tools/move';
+import { SelectTool } from './tools/select';
 import {
   EditorSelection,
   EditorState,
@@ -12,11 +17,6 @@ import {
   PointerState,
   Tool,
 } from './types';
-import { EraserTool } from './tools/eraser';
-import { SelectTool } from './tools/select';
-import { PointerData, isVisible } from './helpers';
-import { FillTool } from './tools/fill';
-import { EyedropperTool } from './tools/eyedropper';
 
 export class BasicEventEmitter<
   TEvents extends { [key: string]: (...args: any[]) => void },

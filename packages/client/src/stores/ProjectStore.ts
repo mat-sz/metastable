@@ -1,13 +1,14 @@
-import { makeAutoObservable, runInAction } from 'mobx';
 import { Project as APIProject } from '@metastable/types';
+import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
 import { arrayMove } from '$utils/array';
 import { tryParse } from '$utils/json';
+import { mainStore } from './MainStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
-import { mainStore } from './MainStore';
+
+import { API } from '$api';
 
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 6;

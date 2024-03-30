@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
 import clsx from 'clsx';
+import React, { useContext, useState } from 'react';
 
 import styles from './index.module.scss';
 

@@ -1,10 +1,10 @@
-import { makeAutoObservable, runInAction } from 'mobx';
 import {
   DownloadData,
   DownloadSettings,
   Task,
   TaskEvent,
 } from '@metastable/types';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
 

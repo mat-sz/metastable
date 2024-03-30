@@ -1,11 +1,12 @@
-import os from 'os';
 import { spawn } from 'child_process';
+import os from 'os';
+
 import { SetupSettings, TaskState } from '@metastable/types';
 
-import { PythonInstance } from '../../python/index.js';
-import { requiredPackages } from '../helpers.js';
-import { BaseTask } from '../../tasks/task.js';
 import { WrappedPromise } from '../../helpers/promise.js';
+import { PythonInstance } from '../../python/index.js';
+import { BaseTask } from '../../tasks/task.js';
+import { requiredPackages } from '../helpers.js';
 
 export class ConfigurePythonTask extends BaseTask {
   constructor(
@@ -17,7 +18,7 @@ export class ConfigurePythonTask extends BaseTask {
   }
 
   async execute() {
-    let collecting: string[] = [];
+    const collecting: string[] = [];
     let required: string[] = requiredPackages.map(pkg => {
       let dependency = pkg.name;
       if (pkg.extra) {

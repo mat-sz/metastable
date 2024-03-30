@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
-import { nanoid } from 'nanoid/non-secure';
+
 import { Task, TaskState } from '@metastable/types';
+import { nanoid } from 'nanoid/non-secure';
 
 import { WrappedPromise } from '../helpers/promise.js';
 

@@ -1,12 +1,13 @@
-import React from 'react';
-import { BsGrid, BsImage, BsPencil } from 'react-icons/bs';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { BsGrid, BsImage, BsPencil } from 'react-icons/bs';
 
-import styles from './index.module.scss';
-import { Images } from './images';
-import { Grid } from './grid';
+
 import { ImageEditor } from './editor';
+import { Grid } from './grid';
+import { Images } from './images';
+import styles from './index.module.scss';
 import { useSimpleProject } from '../context';
 
 export const SimpleProjectView: React.FC = observer(() => {

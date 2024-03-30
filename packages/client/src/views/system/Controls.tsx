@@ -1,16 +1,17 @@
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
-  VscChromeMinimize,
-  VscChromeMaximize,
   VscChromeClose,
+  VscChromeMaximize,
+  VscChromeMinimize,
   VscChromeRestore,
 } from 'react-icons/vsc';
-import { observer } from 'mobx-react-lite';
 
-import { API } from '$api';
 import { mainStore } from '$stores/MainStore';
 import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import styles from './Controls.module.scss';
+
+import { API } from '$api';
 
 export const Controls: React.FC = observer(() => {
   if (!IS_ELECTRON || IS_MAC) {

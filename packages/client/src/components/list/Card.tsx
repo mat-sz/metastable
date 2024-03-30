@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { BsThreeDots } from 'react-icons/bs';
 
 import styles from './index.module.scss';
-import { BsThreeDots } from 'react-icons/bs';
 
 interface CardProps {
   name?: string;

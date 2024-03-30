@@ -1,12 +1,14 @@
+import { ChildProcess } from 'child_process';
 import EventEmitter from 'events';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { LogItem, ModelType, ProjectTaggingSettings } from '@metastable/types';
-import { ChildProcess } from 'child_process';
 
-import { CircularBuffer } from '../helpers/buffer.js';
+import { LogItem, ProjectTaggingSettings } from '@metastable/types';
+
 import type { ProjectEntity } from '../data/project.js';
+import { CircularBuffer } from '../helpers/buffer.js';
 import { PythonInstance } from '../python/index.js';
+
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

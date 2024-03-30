@@ -1,6 +1,6 @@
+import clsx from 'clsx';
 import React from 'react';
 import { BsStarFill } from 'react-icons/bs';
-import clsx from 'clsx';
 
 import styles from './index.module.scss';
 
