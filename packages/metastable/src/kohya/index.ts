@@ -16,7 +16,6 @@ import { CircularBuffer } from '../helpers/buffer.js';
 import { JSONFile, removeFileExtension, TextFile } from '../helpers/fs.js';
 import type { PythonInstance } from '../python/index.js';
 
-
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',

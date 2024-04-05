@@ -4,13 +4,13 @@ import React from 'react';
 import { UI } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import './index.scss';
+import { Home } from './views/home';
 import { ModelManager } from './views/models';
 import { Project } from './views/project';
 import { Settings } from './views/settings';
 import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 import { TabBar } from './views/system/TabBar';
-import { Welcome } from './views/system/Welcome';
 
 const View: React.FC = observer(() => {
   switch (mainStore.view) {
@@ -21,7 +21,7 @@ const View: React.FC = observer(() => {
     case 'models':
       return <ModelManager />;
     default:
-      return <Welcome />;
+      return <Home />;
   }
 });
 
