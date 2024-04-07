@@ -16,6 +16,7 @@ export class ProjectStore {
   currentId: APIProject['id'] | undefined = undefined;
   recent: APIProject[] = [];
   all: APIProject[] = [];
+  loading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -65,10 +66,15 @@ export class ProjectStore {
   }
 
   async create(name: string = 'Untitled', type = 'simple', temporary = false) {
+    if (this.loading) {
+      return;
+    }
+
     if (!name.trim()) {
       return;
     }
 
+    this.loading = true;
     const settings = defaultSettings();
     const project = {
       name,
@@ -77,40 +83,54 @@ export class ProjectStore {
       temporary,
     };
 
-    const json = await API.project.create.mutate(project);
+    try {
+      const json = await API.project.create.mutate(project);
 
-    runInAction(() => {
-      this.projects.push(createProject(json, settings));
-      this.select(json.id);
-    });
+      runInAction(() => {
+        this.projects.push(createProject(json, settings));
+        this.select(json.id);
+      });
 
-    if (!temporary) {
-      this.pushRecent(json.id);
+      if (!temporary) {
+        this.pushRecent(json.id);
+      }
+      this.refresh();
+    } finally {
+      this.loading = false;
     }
-    this.refresh();
   }
 
   async open(id: APIProject['id']) {
-    const json = await API.project.get.query({ projectId: id });
-    if (!json) {
+    if (this.loading) {
       return;
     }
 
-    const settings = json.settings ?? defaultSettings();
+    this.loading = true;
 
-    const project = createProject(json, settings);
-    runInAction(() => {
-      this.projects = [
-        ...this.projects.filter(project => project.id !== id),
-        project,
-      ];
-      this.select(json.id);
-    });
+    try {
+      const json = await API.project.get.query({ projectId: id });
+      if (!json) {
+        return;
+      }
 
-    if (!json.temporary) {
-      this.pushRecent(json.id);
+      const settings = json.settings ?? defaultSettings();
+
+      const project = createProject(json, settings);
+      runInAction(() => {
+        this.projects = [
+          ...this.projects.filter(project => project.id !== id),
+          project,
+        ];
+        this.select(json.id);
+      });
+
+      if (!json.temporary) {
+        this.pushRecent(json.id);
+      }
+      this.refresh();
+    } finally {
+      this.loading = false;
     }
-    this.refresh();
   }
 
   select(id?: APIProject['id']) {

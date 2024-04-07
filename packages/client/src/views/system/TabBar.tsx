@@ -4,7 +4,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { BsBox, BsGearFill, BsHouseFill, BsX } from 'react-icons/bs';
+import { BsBox, BsGearFill, BsHouseFill, BsPlusLg, BsX } from 'react-icons/bs';
 
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
@@ -13,6 +13,75 @@ import { Controls } from './Controls';
 import styles from './TabBar.module.scss';
 
 const TAB_ITEM = 'project_tab';
+
+interface BaseTabProps {
+  badge?: string | number;
+  value?: number;
+  max?: number;
+  marquee?: boolean;
+  isSelected?: boolean;
+  opacity?: number;
+  onClick?: () => void;
+  onClose?: () => void;
+}
+
+export const BaseTab = React.forwardRef<
+  HTMLDivElement,
+  React.PropsWithChildren<BaseTabProps>
+>(
+  (
+    {
+      badge,
+      value,
+      max,
+      marquee,
+      isSelected,
+      children,
+      onClick,
+      onClose,
+      opacity,
+    },
+    ref,
+  ) => {
+    return (
+      <div
+        ref={ref}
+        className={clsx(styles.tab, {
+          [styles.selected]: isSelected,
+        })}
+        onClick={onClick}
+        onPointerUp={e => {
+          if (e.pointerType === 'mouse' && e.button === 1) {
+            e.stopPropagation();
+            onClose?.();
+          }
+        }}
+        style={{ opacity }}
+      >
+        {!!badge && <span className={styles.tabBadge}>{badge}</span>}
+        {!!(max || marquee) && (
+          <ProgressBar
+            className={styles.tabProgress}
+            value={value}
+            max={max}
+            marquee={marquee}
+          />
+        )}
+        <span>{children}</span>
+        {onClose && (
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              onClose();
+            }}
+          >
+            <BsX />
+          </button>
+        )}
+      </div>
+    );
+  },
+);
 
 export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
   ({ project }) => {
@@ -42,45 +111,22 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
     const marquee = project.progressMarquee;
 
     return (
-      <div
+      <BaseTab
         ref={ref}
-        className={clsx(styles.tab, styles.projectTab, {
-          [styles.selected]:
-            mainStore.view === 'project' &&
-            mainStore.projects.currentId === project.id,
-        })}
+        isSelected={
+          mainStore.view === 'project' &&
+          mainStore.projects.currentId === project.id
+        }
+        opacity={isDragging ? 0.5 : 1}
         onClick={() => mainStore.projects.select(project.id)}
-        onPointerUp={e => {
-          if (e.pointerType === 'mouse' && e.button === 1) {
-            e.stopPropagation();
-            project.close();
-          }
-        }}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-        }}
+        onClose={() => project.close()}
+        badge={project.queueCount}
+        value={value}
+        max={max}
+        marquee={marquee}
       >
-        {!!project.queueCount && (
-          <span className={styles.tabBadge}>{project.queueCount}</span>
-        )}
-        {!!(max || marquee) && (
-          <ProgressBar
-            className={styles.tabProgress}
-            value={value}
-            max={max}
-            marquee={marquee}
-          />
-        )}
-        <span>{project.name}</span>
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            project.close();
-          }}
-        >
-          <BsX />
-        </button>
-      </div>
+        {project.name}
+      </BaseTab>
     );
   },
 );
@@ -95,27 +141,20 @@ export const ViewTab: React.FC<
   }>
 > = observer(({ viewId, badge, value, max, marquee, children }) => {
   return (
-    <div
-      className={clsx(styles.tab, {
-        [styles.selected]: mainStore.view === viewId,
-      })}
+    <BaseTab
       onClick={() =>
         runInAction(() => {
           mainStore.view = viewId;
         })
       }
+      badge={badge}
+      value={value}
+      max={max}
+      marquee={marquee}
+      isSelected={mainStore.view === viewId}
     >
-      {!!badge && <span className={styles.tabBadge}>{badge}</span>}
-      {!!(max || marquee) && (
-        <ProgressBar
-          className={styles.tabProgress}
-          value={value}
-          max={max}
-          marquee={marquee}
-        />
-      )}
-      <span>{children}</span>
-    </div>
+      {children}
+    </BaseTab>
   );
 });
 
@@ -170,6 +209,11 @@ export const TabBar: React.FC = observer(() => {
       {mainStore.projects.projects.map(project => (
         <ProjectTab key={project.id} project={project} />
       ))}
+      <BaseTab
+        onClick={() => mainStore.projects.create(undefined, 'simple', true)}
+      >
+        <BsPlusLg />
+      </BaseTab>
       <Controls />
     </div>
   );

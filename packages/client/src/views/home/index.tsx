@@ -4,9 +4,7 @@ import { BsClockHistory, BsFiles, BsPlus } from 'react-icons/bs';
 
 import { Card, List } from '$components/list';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { NewProject } from '$modals/newProject';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { fuzzy } from '$utils/fuzzy';
 import styles from './index.module.scss';
 
@@ -35,7 +33,9 @@ export const Home: React.FC = observer(() => {
                   <Card
                     name="New empty project"
                     icon={<BsPlus />}
-                    onClick={() => modalStore.show(<NewProject />)}
+                    onClick={() =>
+                      mainStore.projects.create(undefined, 'simple', true)
+                    }
                   />
                 ) : (
                   <Card
@@ -59,24 +59,16 @@ export const Home: React.FC = observer(() => {
                 fuzzy(data, search, item => item.name)
               }
             >
-              {item =>
-                typeof item === 'string' ? (
-                  <Card
-                    name="New empty project"
-                    icon={<BsPlus />}
-                    onClick={() => modalStore.show(<NewProject />)}
-                  />
-                ) : (
-                  <Card
-                    name={item.name}
-                    key={item.id}
-                    imageUrl={item.lastOutput?.image.thumbnailUrl}
-                    onClick={() => {
-                      mainStore.projects.open(item.id);
-                    }}
-                  />
-                )
-              }
+              {item => (
+                <Card
+                  name={item.name}
+                  key={item.id}
+                  imageUrl={item.lastOutput?.image.thumbnailUrl}
+                  onClick={() => {
+                    mainStore.projects.open(item.id);
+                  }}
+                />
+              )}
             </List>
           </TabPanel>
         </TabContent>
