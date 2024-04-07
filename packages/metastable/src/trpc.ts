@@ -261,6 +261,16 @@ export const router = t.router({
           return await project.json(true);
         },
       ),
+    delete: t.procedure
+      .input(
+        z.object({
+          projectId: z.string(),
+        }),
+      )
+      .mutation(async ({ ctx: { metastable }, input: { projectId } }) => {
+        const project = await metastable.project.getOrRename(projectId);
+        await project.delete();
+      }),
     prompt: t.procedure
       .input(z.object({ projectId: z.string(), settings: z.any() }))
       .mutation(

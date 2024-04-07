@@ -9,7 +9,10 @@ import {
 } from 'mobx';
 
 import { API } from '$api';
+import { TemporaryProject } from '$modals/temporaryProject';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
+
 export class BaseProject<T = any> {
   currentOutputs: ImageFile[] = [];
   mode: string = 'images';
@@ -61,6 +64,20 @@ export class BaseProject<T = any> {
     return false;
   }
 
+  async delete() {
+    mainStore.projects.close(this.id);
+    await API.project.delete.mutate({ projectId: this.id });
+  }
+
+  async close(force = false) {
+    if (!force && this.temporary) {
+      modalStore.show(<TemporaryProject project={this} />);
+      return;
+    }
+
+    mainStore.projects.close(this.id);
+  }
+
   async save(name?: string) {
     const id = this.id;
     const settings = toJS(this.settings);
@@ -83,6 +100,8 @@ export class BaseProject<T = any> {
         if (!json.temporary) {
           mainStore.projects.pushRecent(json.id);
         }
+
+        mainStore.projects.refresh();
       });
     }
   }

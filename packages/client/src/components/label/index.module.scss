@@ -1,0 +1,23 @@
+.label {
+  display: block;
+  margin: 0.6rem 0;
+
+  .title {
+    text-transform: uppercase;
+    color: var(--color-fg-soft);
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+  }
+
+  .required {
+    color: var(--color-bg-danger);
+    margin-left: 0.3rem;
+  }
+
+  input,
+  textarea,
+  button {
+    width: 100%;
+  }
+}

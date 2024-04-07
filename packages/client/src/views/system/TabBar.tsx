@@ -53,7 +53,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         onPointerUp={e => {
           if (e.pointerType === 'mouse' && e.button === 1) {
             e.stopPropagation();
-            mainStore.projects.close(project.id);
+            project.close();
           }
         }}
         style={{
@@ -75,7 +75,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         <button
           onClick={e => {
             e.stopPropagation();
-            mainStore.projects.close(project.id);
+            project.close();
           }}
         >
           <BsX />
