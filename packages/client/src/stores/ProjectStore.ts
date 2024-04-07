@@ -23,6 +23,10 @@ export class ProjectStore {
     this.init();
   }
 
+  get temporary() {
+    return this.projects.filter(project => project.temporary);
+  }
+
   get current() {
     return this.projects.find(project => project.id === this.currentId);
   }

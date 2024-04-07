@@ -78,7 +78,7 @@ export class BaseProject<T = any> {
     mainStore.projects.close(this.id);
   }
 
-  async save(name?: string) {
+  async save(name?: string, temporary?: boolean) {
     const id = this.id;
     const settings = toJS(this.settings);
 
@@ -86,7 +86,7 @@ export class BaseProject<T = any> {
       projectId: id,
       settings,
       name,
-      temporary: this.temporary && !name,
+      temporary: temporary ?? (this.temporary && !name),
     });
 
     if (json) {
