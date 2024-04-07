@@ -41,6 +41,7 @@ export interface PromptProgressEvent {
     project_id: string;
     max: number;
     value: number;
+    preview?: string;
   };
 }
 

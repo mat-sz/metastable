@@ -40,3 +40,31 @@
     }
   }
 }
+
+.progressPreview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+
+  & > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    min-width: 500px;
+    max-width: 100%;
+  }
+
+  img {
+    border-radius: 8px;
+    min-width: 500px;
+  }
+
+  .progressBar {
+    width: 100%;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+  }
+}

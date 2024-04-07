@@ -12,10 +12,6 @@ class LatentPreviewer:
     def decode_latent_to_preview(self, x0):
         pass
 
-    def decode_latent_to_preview_image(self, preview_format, x0):
-        preview_image = self.decode_latent_to_preview(x0)
-        return ("JPEG", preview_image, MAX_PREVIEW_RESOLUTION)
-
 class TAESDPreviewerImpl(LatentPreviewer):
     def __init__(self, taesd):
         self.taesd = taesd
@@ -71,10 +67,6 @@ def get_previewer(device, method, latent_format, taesd_decoder_path):
     return previewer
 
 def prepare_callback(model, steps, method, x0_output_dict=None, taesd_decoder_path=None):
-    preview_format = "JPEG"
-    if preview_format not in ["JPEG", "PNG"]:
-        preview_format = "JPEG"
-
     previewer = get_previewer(model.load_device, method, model.model.latent_format, taesd_decoder_path)
 
     pbar = comfy.utils.ProgressBar(steps)
@@ -84,7 +76,7 @@ def prepare_callback(model, steps, method, x0_output_dict=None, taesd_decoder_pa
 
         preview_bytes = None
         if previewer:
-            preview_bytes = previewer.decode_latent_to_preview_image(preview_format, x0)
+            preview_bytes = previewer.decode_latent_to_preview(x0)
         pbar.update_absolute(step + 1, total_steps, preview_bytes)
     return callback
 

@@ -31,8 +31,13 @@ class MainStore {
   promptRemaining = 0;
   promptValue = 0;
   promptMax = 0;
-  promptQueue: { id: string; projectId: string; value: number; max: number }[] =
-    [];
+  promptQueue: {
+    id: string;
+    projectId: string;
+    value: number;
+    max: number;
+    preview?: string;
+  }[] = [];
   trainingQueue: { id: string }[] = [];
 
   backendStatus: ComfyStatus = 'starting';
@@ -177,6 +182,7 @@ class MainStore {
           if (prompt) {
             prompt.value = message.data.value;
             prompt.max = message.data.max;
+            prompt.preview = message.data.preview;
           }
         }
         break;

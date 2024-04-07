@@ -53,6 +53,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     super(data, settings);
     makeObservable(this, {
       editor: observable,
+      preview: computed,
       request: action,
       addLora: action,
       addControlnet: action,
@@ -94,6 +95,10 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
 
   get progressMax() {
     return this.firstPrompt?.max || 0;
+  }
+
+  get preview() {
+    return this.firstPrompt?.preview;
   }
 
   get progressMarquee() {
