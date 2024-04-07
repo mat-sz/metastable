@@ -51,7 +51,7 @@ export class ProjectStore {
     });
   }
 
-  private pushRecent(id: string) {
+  pushRecent(id: string) {
     const recentArray: string[] =
       tryParse(localStorage.getItem(LS_RECENT)) || [];
     const recent = Array.isArray(recentArray)
@@ -64,7 +64,7 @@ export class ProjectStore {
     );
   }
 
-  async create(name: string, type = 'simple') {
+  async create(name: string = 'Untitled', type = 'simple', temporary = false) {
     if (!name.trim()) {
       return;
     }
@@ -74,16 +74,19 @@ export class ProjectStore {
       name,
       type,
       settings,
+      temporary,
     };
 
     const json = await API.project.create.mutate(project);
 
     runInAction(() => {
-      this.projects.push(createProject(json as any, settings));
+      this.projects.push(createProject(json, settings));
       this.select(json.id);
     });
 
-    this.pushRecent(json.id);
+    if (!temporary) {
+      this.pushRecent(json.id);
+    }
     this.refresh();
   }
 
@@ -95,7 +98,7 @@ export class ProjectStore {
 
     const settings = json.settings ?? defaultSettings();
 
-    const project = createProject(json as any, settings);
+    const project = createProject(json, settings);
     runInAction(() => {
       this.projects = [
         ...this.projects.filter(project => project.id !== id),
@@ -104,7 +107,9 @@ export class ProjectStore {
       this.select(json.id);
     });
 
-    this.pushRecent(json.id);
+    if (!json.temporary) {
+      this.pushRecent(json.id);
+    }
     this.refresh();
   }
 

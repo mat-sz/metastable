@@ -4,7 +4,10 @@ import { BaseProject } from './base';
 import { SimpleProject } from './simple';
 import { TrainingProject } from './training';
 
-export function createProject(data: APIProject, settings?: any) {
+export function createProject(
+  data: Omit<APIProject, 'settings'>,
+  settings?: any,
+) {
   switch (data.type) {
     case 'training':
       return new TrainingProject(data, settings);

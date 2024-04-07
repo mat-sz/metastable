@@ -54,7 +54,7 @@ export function defaultSettings(): ProjectTrainingSettings {
 
 export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   constructor(
-    data: APIProject,
+    data: Omit<APIProject, 'settings'>,
     settings: ProjectTrainingSettings = defaultSettings(),
   ) {
     super(data, settings);

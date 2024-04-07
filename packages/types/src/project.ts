@@ -136,4 +136,5 @@ export interface Project extends ProjectInfo {
   lastOutput?: ImageFile;
   outputCount?: number;
   size?: number;
+  temporary?: boolean;
 }

@@ -46,7 +46,10 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
   editor = new Editor();
   addOutputToEditor: Point | undefined = undefined;
 
-  constructor(data: APIProject, settings: ProjectSettings = defaultSettings()) {
+  constructor(
+    data: Omit<APIProject, 'settings'>,
+    settings: ProjectSettings = defaultSettings(),
+  ) {
     super(data, settings);
     makeObservable(this, {
       editor: observable,

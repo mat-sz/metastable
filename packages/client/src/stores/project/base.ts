@@ -9,22 +9,24 @@ import {
 } from 'mobx';
 
 import { API } from '$api';
-
+import { mainStore } from '$stores/MainStore';
 export class BaseProject<T = any> {
   currentOutputs: ImageFile[] = [];
   mode: string = 'images';
   id;
   name;
   type;
+  temporary;
 
   constructor(
-    data: APIProject,
+    data: Omit<APIProject, 'settings'>,
     public settings: T,
   ) {
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
     this.currentOutputs = data.lastOutput ? [data.lastOutput] : [];
+    this.temporary = data.temporary ?? false;
 
     makeObservable(this, {
       currentOutputs: observable,
@@ -32,8 +34,8 @@ export class BaseProject<T = any> {
       id: observable,
       name: observable,
       type: observable,
+      temporary: observable,
       settings: observable,
-      rename: action,
       save: action,
       triggerAutosave: action,
       queueCount: computed,
@@ -59,23 +61,30 @@ export class BaseProject<T = any> {
     return false;
   }
 
-  async rename(name: string) {
-    const json = await API.project.update.mutate({ projectId: this.id, name });
+  async save(name?: string) {
+    const id = this.id;
+    const settings = toJS(this.settings);
+
+    const json = await API.project.update.mutate({
+      projectId: id,
+      settings,
+      name,
+      temporary: this.temporary && !name,
+    });
+
     if (json) {
       runInAction(() => {
         this.id = json.id;
         this.name = json.name;
+        if (mainStore.projects.currentId === id && id !== json.id) {
+          mainStore.projects.select(json.id);
+        }
+
+        if (!json.temporary) {
+          mainStore.projects.pushRecent(json.id);
+        }
       });
     }
-  }
-
-  async save() {
-    const settings = toJS(this.settings);
-
-    await API.project.update.mutate({
-      projectId: this.id,
-      settings,
-    });
   }
 
   private _autosaveTimeout: number | undefined = undefined;
