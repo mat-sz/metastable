@@ -1,12 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 
-
+import { TRPC } from '$api';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
-
-import { TRPC } from '$api';
 
 export const Grid: React.FC = observer(() => {
   const project = useSimpleProject();

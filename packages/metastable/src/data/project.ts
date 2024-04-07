@@ -12,7 +12,6 @@ import {
 } from './common.js';
 import { directorySize } from '../helpers/fs.js';
 
-
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 

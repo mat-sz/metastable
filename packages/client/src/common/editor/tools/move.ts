@@ -3,7 +3,6 @@ import { type PointerData } from '../helpers';
 import { Vector2 } from '../primitives/Vector2';
 import { Tool, ToolOption } from '../types';
 
-
 export class MoveTool implements Tool {
   readonly id: string = 'move';
   readonly name: string = 'Move';

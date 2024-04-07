@@ -16,7 +16,6 @@ import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
 import { getStaticUrl } from '../helpers/url.js';
 import { TypedEventEmitter } from '../types.js';
 
-
 const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
 export class ModelEntity extends FileEntity {
   type: ModelType | undefined = undefined;

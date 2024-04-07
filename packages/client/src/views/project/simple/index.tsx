@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsGrid, BsImage, BsPencil } from 'react-icons/bs';
 
-
 import { ImageEditor } from './editor';
 import { Grid } from './grid';
 import { Images } from './images';

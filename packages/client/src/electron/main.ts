@@ -5,7 +5,6 @@ import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { app, BrowserWindow, Menu, MenuItem } from 'electron';
 import { createIPCHandler } from 'trpc-electron/main';
 
-
 setUseFileUrl(true);
 
 process.env.DIST = path.join(__dirname, '../dist');

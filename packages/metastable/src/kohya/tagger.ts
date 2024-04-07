@@ -9,7 +9,6 @@ import type { ProjectEntity } from '../data/project.js';
 import { CircularBuffer } from '../helpers/buffer.js';
 import { PythonInstance } from '../python/index.js';
 
-
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',

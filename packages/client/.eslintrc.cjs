@@ -23,7 +23,7 @@ module.exports = {
         ignoreDeclarationSort: true,
       },
     ],
-    'no-multiple-empty-lines': 'error',
+    'no-multiple-empty-lines': ['error', { max: 1 }],
     'import/order': [
       'error',
       {
@@ -37,6 +37,10 @@ module.exports = {
         pathGroups: [
           {
             pattern: '$*/**',
+            group: 'internal',
+          },
+          {
+            pattern: '$*',
             group: 'internal',
           },
         ],

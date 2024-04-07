@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
 
-
 import { Actions } from './Actions';
 import { EditorContext } from './context';
 import styles from './index.module.scss';

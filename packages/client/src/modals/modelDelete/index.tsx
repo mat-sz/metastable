@@ -1,10 +1,9 @@
 import { ModelType } from '@metastable/types';
 import React from 'react';
 
+import { TRPC } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
-
-import { TRPC } from '$api';
 
 interface Props {
   type: ModelType;

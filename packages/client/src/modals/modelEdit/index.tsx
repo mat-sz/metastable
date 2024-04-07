@@ -2,9 +2,8 @@ import { Model, ModelType } from '@metastable/types';
 import React, { useEffect, useState } from 'react';
 import { VarString, VarUI } from 'react-var-ui';
 
-import { Modal, useModal } from '$components/modal';
-
 import { TRPC } from '$api';
+import { Modal, useModal } from '$components/modal';
 
 interface Props {
   type: ModelType;

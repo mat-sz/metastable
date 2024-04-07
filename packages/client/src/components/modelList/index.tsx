@@ -6,7 +6,6 @@ import { downloadable, TYPE_NAMES } from '../../data/models';
 import { DownloadableModel } from '../../types/model';
 import { IconButton } from '../iconButton';
 
-
 interface Props {
   beforeModel?: (model: DownloadableModel) => React.ReactNode;
   afterModel?: (model: DownloadableModel) => React.ReactNode;

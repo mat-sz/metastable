@@ -7,14 +7,13 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
+import { API } from '$api';
 import { IS_ELECTRON } from '$utils/config';
 import { ConfigStore } from './ConfigStore';
 import { modelStore } from './ModelStore';
 import { ProjectStore } from './ProjectStore';
 import { SetupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
-
-import { API } from '$api';
 
 class MainStore {
   projects = new ProjectStore();

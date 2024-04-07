@@ -13,7 +13,6 @@ import { z } from 'zod';
 
 import type { Metastable } from './index.js';
 
-
 export interface TRPCContext {
   metastable: Metastable;
   win?: BrowserWindow;

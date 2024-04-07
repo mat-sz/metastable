@@ -6,7 +6,6 @@ import styles from './index.module.scss';
 import { Search } from '../search';
 import { Switch, SwitchOption } from '../switch';
 
-
 interface ListProps<T> {
   small?: boolean;
   items: T[];

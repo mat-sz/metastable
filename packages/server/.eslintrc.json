@@ -25,7 +25,7 @@
         "ignoreDeclarationSort": true
       }
     ],
-    "no-multiple-empty-lines": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
     "import/order": [
       "error",
       {

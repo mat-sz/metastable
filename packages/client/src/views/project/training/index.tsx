@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsImage } from 'react-icons/bs';
 
-
 import { Images } from './images';
 import styles from './index.module.scss';
 import { useTraningProject } from '../context';

@@ -7,7 +7,6 @@ import semver from 'semver';
 import { PipDependency } from './types.js';
 import { PythonInstance } from '../python/index.js';
 
-
 export async function isGNULibc() {
   try {
     const text = await fs.readFile('/usr/bin/ldd', { encoding: 'utf8' });

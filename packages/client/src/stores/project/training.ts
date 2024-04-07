@@ -6,11 +6,9 @@ import {
 } from '@metastable/types';
 import { action, makeObservable, toJS } from 'mobx';
 
+import { API } from '$api';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
-
-
-import { API } from '$api';
 
 export function defaultSettings(): ProjectTrainingSettings {
   return {

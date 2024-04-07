@@ -18,7 +18,6 @@ import { CircularBuffer } from '../helpers/buffer.js';
 import type { PythonInstance } from '../python/index.js';
 import { TypedEventEmitter } from '../types.js';
 
-
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',

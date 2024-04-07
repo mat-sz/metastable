@@ -3,7 +3,6 @@ import { type PointerData } from '../helpers';
 import { Rectangle } from '../primitives/Rectangle';
 import { Tool, ToolOption } from '../types';
 
-
 export class SelectTool implements Tool {
   readonly id: string = 'select';
   readonly name: string = 'Select';

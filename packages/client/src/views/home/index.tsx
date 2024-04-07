@@ -1,4 +1,3 @@
-import { Project } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsClockHistory, BsFiles, BsPlus } from 'react-icons/bs';

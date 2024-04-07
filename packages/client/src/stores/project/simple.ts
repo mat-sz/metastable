@@ -6,14 +6,13 @@ import {
 } from '@metastable/types';
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
+import { API } from '$api';
+import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { randomSeed } from '$utils/comfy';
 import { base64ify, loadImage, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
-
-import { API } from '$api';
-import { Editor } from '$editor';
 
 export function defaultSettings(): ProjectSettings {
   return {

@@ -4,13 +4,12 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
 
+import { API, TRPC } from '$api';
 import { IconButton } from '$components/iconButton';
 import { mainStore } from '$stores/MainStore';
 import { copy } from '$utils/clipboard';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
-
-import { API, TRPC } from '$api';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.info.torch;
