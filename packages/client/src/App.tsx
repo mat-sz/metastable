@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { UI } from '$components/ui';
+import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import './index.scss';
 import { Home } from './views/home';
@@ -32,20 +32,20 @@ export const App: React.FC = observer(() => {
 
   if (mainStore.setup?.status?.status !== 'done') {
     return (
-      <UI>
+      <UIWrapper>
         <Main>
           <Setup />
         </Main>
-      </UI>
+      </UIWrapper>
     );
   }
 
   return (
-    <UI>
+    <UIWrapper>
       <Main>
         <TabBar />
         <View />
       </Main>
-    </UI>
+    </UIWrapper>
   );
 });

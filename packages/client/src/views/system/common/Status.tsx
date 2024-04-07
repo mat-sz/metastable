@@ -8,9 +8,9 @@ import {
   BsGpuCard,
 } from 'react-icons/bs';
 
-import { useUI } from '$components/ui';
 import { Backend } from '$modals/backend';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import styles from './Status.module.scss';
 import { Utilization } from '../Utilization';
 
@@ -20,14 +20,13 @@ interface Props {
 
 export const Status: React.FC<Props> = observer(({ className }) => {
   const status = mainStore.status;
-  const { showModal } = useUI();
   const [showUtilization, setShowUtilization] = useState(false);
 
   return (
     <div className={clsx(styles.status, className)}>
       <div className={styles.progress}>
         <button
-          onClick={() => showModal(<Backend />)}
+          onClick={() => modalStore.show(<Backend />)}
           className={clsx({
             [styles.error]: status === 'error',
             [styles.waiting]: status === 'starting' || status === 'connecting',

@@ -3,8 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { BsChevronRight } from 'react-icons/bs';
 import { IVarBaseInputProps, useVarUIValue, VarBase } from 'react-var-ui';
 
-import { useUI } from '$components/ui';
 import { ModelSelect } from '$modals/modelSelect';
+import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
 import styles from './index.module.scss';
@@ -27,7 +27,6 @@ export const VarModel = observer(
     modelType,
     onSelect,
   }: IVarModelProps): JSX.Element => {
-    const { showModal } = useUI();
     const [currentValue, setCurrentValue, currentError] = useVarUIValue({
       path,
       fallbackValue: value,
@@ -52,7 +51,7 @@ export const VarModel = observer(
           <button
             className={styles.selection}
             onClick={() => {
-              showModal(
+              modalStore.show(
                 <ModelSelect
                   value={model}
                   type={modelType}

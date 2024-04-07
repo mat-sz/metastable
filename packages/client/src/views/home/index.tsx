@@ -4,15 +4,13 @@ import { BsClockHistory, BsFiles, BsPlus } from 'react-icons/bs';
 
 import { Card, List } from '$components/list';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { useUI } from '$components/ui';
 import { NewProject } from '$modals/newProject';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import { fuzzy } from '$utils/fuzzy';
 import styles from './index.module.scss';
 
 export const Home: React.FC = observer(() => {
-  const { showModal } = useUI();
-
   return (
     <div className={styles.home}>
       <TabView
@@ -37,7 +35,7 @@ export const Home: React.FC = observer(() => {
                   <Card
                     name="New empty project"
                     icon={<BsPlus />}
-                    onClick={() => showModal(<NewProject />)}
+                    onClick={() => modalStore.show(<NewProject />)}
                   />
                 ) : (
                   <Card
@@ -66,7 +64,7 @@ export const Home: React.FC = observer(() => {
                   <Card
                     name="New empty project"
                     icon={<BsPlus />}
-                    onClick={() => showModal(<NewProject />)}
+                    onClick={() => modalStore.show(<NewProject />)}
                   />
                 ) : (
                   <Card

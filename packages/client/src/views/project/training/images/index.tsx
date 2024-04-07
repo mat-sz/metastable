@@ -7,8 +7,8 @@ import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 
 import { TRPC } from '$api';
 import { FilePicker } from '$components/filePicker';
-import { useUI } from '$components/ui';
 import { Tagger } from '$modals/tagger';
+import { modalStore } from '$stores/ModalStore';
 import { FileManager } from './fileManager';
 import styles from './index.module.scss';
 import { InputEditor } from './InputEditor';
@@ -17,7 +17,6 @@ import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
-  const { showModal } = useUI();
   const project = useTraningProject();
   const allInputsQuery = TRPC.project.input.all.useQuery({
     projectId: project.id,
@@ -115,7 +114,7 @@ export const Images: React.FC = observer(() => {
             <>
               <button
                 onClick={() => {
-                  showModal(
+                  modalStore.show(
                     <Tagger
                       project={project}
                       inputs={selection.map(item => item.name)}

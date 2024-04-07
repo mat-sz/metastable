@@ -5,9 +5,9 @@ import { BsFolder } from 'react-icons/bs';
 
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { Card, CardMenu, CardMenuItem, List } from '$components/list';
-import { useUI } from '$components/ui';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
+import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
@@ -61,7 +61,6 @@ export const ModelBrowser: React.FC<Props> = observer(
   ({ type, onSelect, defaultParts = [] }) => {
     const data = modelStore.type(type) || [];
     const [parts, setParts] = useState<string[]>(defaultParts);
-    const { showModal } = useUI();
 
     const models = listFiles(data, parts, false);
     const allModels = listFiles(data, parts, true);
@@ -103,7 +102,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                 <CardMenu>
                   <CardMenuItem
                     onClick={() => {
-                      showModal(
+                      modalStore.show(
                         <ModelEdit name={item.file.name} type={item.type} />,
                       );
                     }}
@@ -112,7 +111,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                   </CardMenuItem>
                   <CardMenuItem
                     onClick={() => {
-                      showModal(
+                      modalStore.show(
                         <ModelDelete name={item.file.name} type={item.type} />,
                       );
                     }}
