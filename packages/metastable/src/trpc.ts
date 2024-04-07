@@ -204,7 +204,8 @@ export const router = t.router({
   project: {
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
       const projects = await metastable.project.all();
-      return await Promise.all(projects.map(project => project.json()));
+      const data = await Promise.all(projects.map(project => project.json()));
+      return data.filter(project => !project.temporary);
     }),
     create: t.procedure
       .input(

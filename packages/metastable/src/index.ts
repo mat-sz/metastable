@@ -113,14 +113,47 @@ export class Metastable extends (EventEmitter as {
         vramUsed: gpu?.memoryUsed,
       });
     }, 1000);
+
+    process.on('beforeExit', () => {
+      this.handleExit();
+    });
+    process.on('SIGINT', () => {
+      this.handleExit();
+    });
+    process.on('SIGUSR1', () => {
+      this.handleExit();
+    });
+    process.on('SIGUSR2', () => {
+      this.handleExit();
+    });
+  }
+
+  async handleExit() {
+    console.log('Cleaning up and exiting...');
+    await this.cleanup();
+    console.log('Bye!');
+    process.exit(0);
   }
 
   async init() {
+    this.cleanup();
     await this.reload();
   }
 
   private resolvePath(value: string | undefined) {
     return resolveConfigPath(value, this.dataRoot);
+  }
+
+  async cleanup() {
+    const projects = await this.project.all();
+    for (const project of projects) {
+      try {
+        const data = await project.metadata.get();
+        if (data.temporary) {
+          await project.delete();
+        }
+      } catch {}
+    }
   }
 
   async reload() {

@@ -15,7 +15,9 @@ import { directorySize } from '../helpers/fs.js';
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
-  metadata = new Metadata(path.join(this._path, 'project.json'));
+  metadata = new Metadata<{ type?: string; temporary?: boolean }>(
+    path.join(this._path, 'project.json'),
+  );
   settings = new Metadata(path.join(this._path, 'settings.json'));
 
   input = new EntityRepository(path.join(this._path, 'input'), ImageEntity);
