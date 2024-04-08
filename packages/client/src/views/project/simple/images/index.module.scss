@@ -23,24 +23,6 @@
   align-items: center;
 }
 
-.thumbnails {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    cursor: pointer;
-    height: 125px;
-    width: auto;
-    margin: 0.5rem 0.25rem;
-    border: 0.25rem solid transparent;
-
-    &.selected {
-      border-color: white;
-    }
-  }
-}
-
 .progressPreview {
   display: flex;
   justify-content: center;

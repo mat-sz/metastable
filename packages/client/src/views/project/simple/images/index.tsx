@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BsPlay } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
@@ -11,20 +11,12 @@ import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const outputs = project.currentOutputs;
-
-  const selected = outputs[selectedIndex];
   const preview = project.preview;
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [outputs, setSelectedIndex]);
 
   return (
     <div className={styles.main}>
       <div className={styles.preview}>
-        {project.progressValue ? (
+        {!project.currentOutput && project.progressValue ? (
           <div className={styles.progressPreview}>
             <div>
               <div>Generating...</div>
@@ -40,25 +32,11 @@ export const Images: React.FC = observer(() => {
           </div>
         ) : (
           <>
-            {outputs.length ? (
-              <ImagePreview url={selected.image.url} />
+            {project.currentOutput ? (
+              <ImagePreview url={project.currentOutput} />
             ) : (
               <div className={styles.info}>
                 Your output image will appear here.
-              </div>
-            )}
-            {outputs.length > 1 && (
-              <div className={styles.thumbnails}>
-                {outputs.map((file, i) => (
-                  <img
-                    className={
-                      selectedIndex === i ? styles.selected : undefined
-                    }
-                    src={file.image?.thumbnailUrl}
-                    key={i}
-                    onClick={() => setSelectedIndex(i)}
-                  />
-                ))}
               </div>
             )}
           </>

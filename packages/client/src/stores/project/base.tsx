@@ -14,12 +14,13 @@ import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 
 export class BaseProject<T = any> {
-  currentOutputs: ImageFile[] = [];
+  currentOutput: string | undefined = undefined;
   mode: string = 'images';
   id;
   name;
   type;
   temporary;
+  outputs: ImageFile[] = [];
 
   constructor(
     data: Omit<APIProject, 'settings'>,
@@ -28,11 +29,12 @@ export class BaseProject<T = any> {
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
-    this.currentOutputs = data.lastOutput ? [data.lastOutput] : [];
+    this.currentOutput = data.lastOutput?.image.url;
     this.temporary = data.temporary ?? false;
 
     makeObservable(this, {
-      currentOutputs: observable,
+      currentOutput: observable,
+      outputs: observable,
       mode: observable,
       id: observable,
       name: observable,
@@ -41,11 +43,13 @@ export class BaseProject<T = any> {
       settings: observable,
       save: action,
       triggerAutosave: action,
+      onPromptDone: action,
       queueCount: computed,
       progressValue: computed,
       progressMax: computed,
       progressMarquee: computed,
     });
+    this.refresh();
   }
 
   get queueCount() {
@@ -62,6 +66,21 @@ export class BaseProject<T = any> {
 
   get progressMarquee() {
     return false;
+  }
+
+  async refresh() {
+    try {
+      const outputs = await API.project.output.all.query({
+        projectId: this.id,
+      });
+      if (outputs) {
+        runInAction(() => {
+          this.outputs = outputs;
+        });
+      }
+    } catch {
+      //
+    }
   }
 
   async delete() {
@@ -113,6 +132,7 @@ export class BaseProject<T = any> {
   }
 
   onPromptDone(outputs: ImageFile[]) {
-    this.currentOutputs = outputs;
+    this.currentOutput = outputs[0]?.image.url;
+    this.outputs.push(...outputs);
   }
 }

@@ -61,8 +61,8 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       removeLora: action,
       removeControlnet: action,
       removeIPAdapter: action,
-      onPromptDone: action,
       setSettings: action,
+      queue: computed,
       firstPrompt: computed,
     });
   }
@@ -80,13 +80,16 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     this.settings = settings;
   }
 
+  get queue() {
+    return mainStore.promptQueue.filter(prompt => prompt.projectId === this.id);
+  }
+
   get queueCount() {
-    return mainStore.promptQueue.filter(prompt => prompt.projectId === this.id)
-      .length;
+    return this.queue.length;
   }
 
   get firstPrompt() {
-    return mainStore.promptQueue.find(prompt => prompt.projectId === this.id);
+    return this.queue[0];
   }
 
   get progressValue() {
@@ -172,6 +175,8 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     if (this.settings.sampler.seed_randomize) {
       this.settings.sampler.seed = randomSeed();
     }
+
+    this.currentOutput = undefined;
 
     const settings = toJS(this.settings);
     let width = 512;
@@ -296,7 +301,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
   }
 
   onPromptDone(outputs: ImageFile[]) {
-    this.currentOutputs = outputs;
+    super.onPromptDone(outputs);
 
     if (this.addOutputToEditor) {
       this.editor.addImage(outputs[0].image.url, {
