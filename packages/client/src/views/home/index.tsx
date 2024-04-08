@@ -31,6 +31,7 @@ export const Home: React.FC = observer(() => {
               {item =>
                 typeof item === 'string' ? (
                   <Card
+                    key={item}
                     name="New empty project"
                     icon={<BsPlus />}
                     onClick={() =>
