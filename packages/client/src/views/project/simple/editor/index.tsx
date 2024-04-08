@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
 
+import { Editor } from '$editor';
 import { Actions } from './Actions';
 import { EditorContext } from './context';
 import styles from './index.module.scss';
@@ -14,6 +15,10 @@ import { Settings } from '../settings';
 export const ImageEditor: React.FC = observer(() => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const project = useSimpleProject();
+
+  if (!project.editor) {
+    project.editor = new Editor();
+  }
   const editor = project.editor;
 
   useEffect(() => {

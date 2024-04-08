@@ -43,7 +43,7 @@ export function defaultSettings(): ProjectSettings {
 }
 
 export class SimpleProject extends BaseProject<ProjectSettings> {
-  editor = new Editor();
+  editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
 
   constructor(
@@ -304,7 +304,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     super.onPromptDone(outputs);
 
     if (this.addOutputToEditor) {
-      this.editor.addImage(outputs[0].image.url, {
+      this.editor?.addImage(outputs[0].image.url, {
         name: `Output (${outputs[0].name})`,
         offset: toJS(this.addOutputToEditor),
       });
