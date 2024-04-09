@@ -8,6 +8,7 @@ import {
   VarModel,
   VarRandomNumber,
   VarSelect,
+  VarSize,
   VarSlider,
   VarString,
   VarToggle,
@@ -51,6 +52,11 @@ export const General: React.FC = observer(() => {
         />
         {project.settings.input.mode === 'empty' ? (
           <>
+            <VarSize
+              label="Image size"
+              widthPath="input.width"
+              heightPath="input.height"
+            />
             <VarSlider
               label="Width"
               path="input.width"

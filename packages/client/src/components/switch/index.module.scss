@@ -1,17 +1,23 @@
 .switch {
   display: flex;
   align-items: center;
-  background: var(--color-bg-panel);
+  background: var(--color-bg-interactive);
   border-radius: 5px;
   overflow: hidden;
+  padding: 0.25rem;
 }
 
 .option {
   background: none;
-  border-radius: 0;
+  border-radius: 5px;
   height: 100%;
+  padding: 0.5rem 1rem;
+
+  &:not(:last-child) {
+    margin-right: 0.2rem;
+  }
 
   &.active {
-    background: var(--color-bg-interactive);
+    background: var(--color-bg-interactive-hover);
   }
 }

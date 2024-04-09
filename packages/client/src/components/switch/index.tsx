@@ -29,17 +29,19 @@ export const SwitchOption: React.FC<
 };
 
 interface SwitchProps {
+  className?: string;
   value: string;
   onChange: (value: string) => void;
 }
 
 export const Switch: React.FC<React.PropsWithChildren<SwitchProps>> = ({
+  className,
   children,
   ...props
 }) => {
   return (
     <SwitchContext.Provider value={props}>
-      <div className={styles.switch}>{children}</div>
+      <div className={clsx(styles.switch, className)}>{children}</div>
     </SwitchContext.Provider>
   );
 };

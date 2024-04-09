@@ -1,0 +1,23 @@
+.switch {
+  & > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    svg {
+      font-size: 1.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    span {
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .resolution {
+      color: var(--color-fg-soft);
+      font-size: 0.7rem;
+    }
+  }
+}

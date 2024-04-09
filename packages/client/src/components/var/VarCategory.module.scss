@@ -1,6 +1,8 @@
 .category {
   &.collapsible {
-    cursor: pointer;
+    .title {
+      cursor: pointer;
+    }
   }
 
   .title {
