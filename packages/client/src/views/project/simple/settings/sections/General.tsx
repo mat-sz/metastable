@@ -20,7 +20,7 @@ export const General: React.FC = observer(() => {
 
   return (
     <>
-      <VarCategory label="Checkpoint">
+      <VarCategory label="Checkpoint" collapsible>
         <VarModel
           path="models.base.name"
           modelType={ModelType.CHECKPOINT}
@@ -34,20 +34,12 @@ export const General: React.FC = observer(() => {
             }
           }}
         />
-        <VarSlider
-          label="CLIP skip last layers"
-          path="models.base.clip_skip"
-          min={0}
-          max={12}
-          step={1}
-          defaultValue={0}
-        />
       </VarCategory>
-      <VarCategory label="Prompt">
+      <VarCategory label="Prompt" collapsible>
         <VarString label="Positive" path="conditioning.positive" multiline />
         <VarString label="Negative" path="conditioning.negative" multiline />
       </VarCategory>
-      <VarCategory label="Input">
+      <VarCategory label="Input" collapsible>
         <VarSelect
           label="Mode"
           path="input.mode"
@@ -95,18 +87,7 @@ export const General: React.FC = observer(() => {
           </>
         )}
       </VarCategory>
-      <VarCategory label="Output">
-        <VarSelect
-          label="Format"
-          path="output.format"
-          defaultValue="png"
-          options={[
-            { key: 'png', label: 'PNG' },
-            { key: 'jpg', label: 'JPEG' },
-          ]}
-        />
-      </VarCategory>
-      <VarCategory label="Sampler settings">
+      <VarCategory label="Sampler settings" collapsible defaultCollapsed={true}>
         <VarRandomNumber
           label="Seed"
           path="sampler.seed"
@@ -156,6 +137,25 @@ export const General: React.FC = observer(() => {
           }))}
         />
         <VarToggle label="Tiling" path="sampler.tiling" />
+      </VarCategory>
+      <VarCategory label="Other settings" collapsible defaultCollapsed={true}>
+        <VarSelect
+          label="Format"
+          path="output.format"
+          defaultValue="png"
+          options={[
+            { key: 'png', label: 'PNG' },
+            { key: 'jpg', label: 'JPEG' },
+          ]}
+        />
+        <VarSlider
+          label="CLIP skip last layers"
+          path="models.base.clip_skip"
+          min={0}
+          max={12}
+          step={1}
+          defaultValue={0}
+        />
       </VarCategory>
     </>
   );

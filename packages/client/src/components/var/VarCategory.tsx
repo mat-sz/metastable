@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
-import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
+import { BsChevronDown, BsChevronLeft } from 'react-icons/bs';
 
 import styles from './VarCategory.module.scss';
 
@@ -20,6 +20,8 @@ export interface IVarCategoryProps {
    */
   collapsible?: boolean;
 
+  defaultCollapsed?: boolean;
+
   children?: React.ReactNode;
 }
 
@@ -31,21 +33,31 @@ export const VarCategory = ({
   className,
   children,
   collapsible,
+  defaultCollapsed = false,
 }: IVarCategoryProps): JSX.Element => {
-  const [isCollapsed, setCollapsed] = useState(false);
+  const [isCollapsed, setCollapsed] = useState(defaultCollapsed);
 
   return (
-    <div className={clsx(styles.category, className)}>
-      <div className={styles.title}>
+    <div
+      className={clsx(
+        styles.category,
+        { [styles.collapsible]: collapsible },
+        className,
+      )}
+    >
+      <div
+        className={styles.title}
+        onClick={() => {
+          if (collapsible) {
+            setCollapsed(isCollapsed => !isCollapsed);
+          }
+        }}
+      >
         {label}
         {collapsible && (
-          <button
-            title={isCollapsed ? 'Expand' : 'Collapse'}
-            className={styles.collapse}
-            onClick={() => setCollapsed(isCollapsed => !isCollapsed)}
-          >
-            {isCollapsed ? <BsChevronDown /> : <BsChevronUp />}
-          </button>
+          <span className={styles.collapse}>
+            {isCollapsed ? <BsChevronLeft /> : <BsChevronDown />}
+          </span>
         )}
       </div>
       {(!collapsible || !isCollapsed) && <div>{children}</div>}
