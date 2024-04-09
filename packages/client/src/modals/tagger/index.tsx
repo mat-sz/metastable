@@ -1,10 +1,15 @@
 import { ModelType, ProjectTaggingSettings } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { VarCategory, VarSlider, VarToggle, VarUI } from 'react-var-ui';
 
 import { Modal } from '$components/modal';
-import { VarModel } from '$components/varModel';
+import {
+  VarCategory,
+  VarModel,
+  VarSlider,
+  VarToggle,
+  VarUI,
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import type { TrainingProject } from '$stores/project';
 import styles from './index.module.scss';

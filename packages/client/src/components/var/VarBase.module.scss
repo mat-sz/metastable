@@ -1,0 +1,32 @@
+.error {
+  color: var(--color-fg-error);
+}
+
+.label {
+  display: block;
+  margin: 1rem 0;
+
+  .title {
+    color: var(--color-fg);
+    font-size: 0.8rem;
+    margin-bottom: 0.1rem;
+    font-weight: 500;
+  }
+
+  .required {
+    color: var(--color-bg-danger);
+    margin-left: 0.3rem;
+  }
+
+  input,
+  textarea,
+  button {
+    width: 100%;
+  }
+
+  &.inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

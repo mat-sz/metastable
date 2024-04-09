@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { VarSlider, VarUI } from 'react-var-ui';
 
+import { VarSlider, VarUI } from '$components/var';
 import { useEditor } from './context';
 import styles from './index.module.scss';
 

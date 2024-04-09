@@ -7,10 +7,11 @@ import {
   BsPlugFill,
   BsRecordCircle,
   BsWrench,
+  BsXCircleFill,
 } from 'react-icons/bs';
-import { VarUI } from 'react-var-ui';
 
 import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
+import { VarUI } from '$components/var';
 import styles from './index.module.scss';
 import { Controlnets } from './sections/Controlnets';
 import { General } from './sections/General';
@@ -52,7 +53,12 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         }}
         values={toJS(project.settings)}
       >
-        {!!error && <div className={styles.error}>{error}</div>}
+        {!!error && (
+          <div className={styles.error}>
+            <BsXCircleFill />
+            <span>{error}</span>
+          </div>
+        )}
         <TabPanel id="general">
           <General />
         </TabPanel>

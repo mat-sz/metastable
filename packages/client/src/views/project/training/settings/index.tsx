@@ -3,21 +3,21 @@ import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsPlay, BsX } from 'react-icons/bs';
+
+import { IconButton } from '$components/iconButton';
+import { ProgressBar } from '$components/progressBar';
 import {
   VarArray,
   VarButton,
   VarCategory,
+  VarModel,
   VarNumber,
   VarSelect,
   VarSlider,
   VarString,
   VarToggle,
   VarUI,
-} from 'react-var-ui';
-
-import { IconButton } from '$components/iconButton';
-import { ProgressBar } from '$components/progressBar';
-import { VarModel } from '$components/varModel';
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';

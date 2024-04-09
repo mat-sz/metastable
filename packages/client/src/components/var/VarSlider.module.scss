@@ -1,0 +1,93 @@
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  --track-height: 0.5rem;
+  --thumb-height: 1rem;
+  --track-offset: calc(var(--thumb-height) / 2);
+
+  .wrapper {
+    position: relative;
+    height: var(--thumb-height);
+    flex: 1;
+    cursor: pointer;
+    margin-left: var(--track-offset);
+    margin-right: calc(var(--track-offset) + 0.4rem);
+    touch-action: none;
+  }
+
+  .input {
+    span {
+      margin-left: 0.2rem;
+    }
+  }
+
+  .track,
+  .fill {
+    position: absolute;
+    height: var(--track-height);
+    left: 0;
+    top: calc(50% - var(--track-height) / 2);
+    margin: 0 calc(-1 * var(--track-offset));
+    border-radius: 0.2rem;
+    pointer-events: none;
+  }
+
+  .track {
+    background: var(--color-bg-interactive);
+    right: 0;
+    z-index: 0;
+  }
+
+  .fill {
+    background: var(--color-accent);
+    z-index: 1;
+    padding-left: var(--track-offset);
+    width: calc(var(--fill) + var(--track-offset));
+  }
+
+  .thumb {
+    left: var(--fill);
+    background: var(--color-accent);
+    position: absolute;
+    z-index: 2;
+    width: var(--thumb-height);
+    height: var(--thumb-height);
+    pointer-events: none;
+    transform: translate(-50%, 0);
+    border-radius: 100%;
+  }
+
+  input {
+    width: 2.5rem;
+    height: 1.3rem;
+    padding: 0 0.2rem;
+    text-align: right;
+    border-radius: 0.25rem;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  span {
+    font-size: 0.8rem;
+    width: 2.5rem;
+    text-align: right;
+  }
+
+  button {
+    border: none;
+    cursor: pointer;
+    height: 1.3rem;
+    margin-left: 0.4rem;
+    border-radius: 0.25rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

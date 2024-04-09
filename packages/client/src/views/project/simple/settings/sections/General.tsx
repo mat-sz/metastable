@@ -1,17 +1,17 @@
 import { ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+
 import {
   VarCategory,
   VarImage,
+  VarModel,
   VarNumber,
   VarSelect,
   VarSlider,
   VarString,
   VarToggle,
-} from 'react-var-ui';
-
-import { VarModel } from '$components/varModel';
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 
@@ -43,7 +43,7 @@ export const General: React.FC = observer(() => {
           defaultValue={0}
         />
       </VarCategory>
-      <VarCategory label="Conditioning">
+      <VarCategory label="Prompt">
         <VarString label="Positive" path="conditioning.positive" multiline />
         <VarString label="Negative" path="conditioning.negative" multiline />
       </VarCategory>

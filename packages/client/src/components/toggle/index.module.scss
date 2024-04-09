@@ -44,7 +44,6 @@ $speed: 0.2s;
   cursor: pointer;
   display: flex;
   height: $track-height;
-  margin-inline-end: 12px;
   position: relative;
   width: $track-width;
   min-width: $track-width;
@@ -92,6 +91,7 @@ $speed: 0.2s;
 .label {
   font-size: 0.9rem;
   color: var(--color-fg-soft);
+  margin-inline-start: 1rem;
 }
 
 [dir='rtl'] {

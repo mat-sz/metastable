@@ -1,0 +1,22 @@
+.category {
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--color-fg-soft);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    user-select: none;
+    font-weight: bold;
+  }
+
+  .collapse {
+    background: none;
+    border: none;
+    color: var(--color-fg-soft);
+    font-size: 0;
+    cursor: pointer;
+  }
+
+  padding-bottom: 1rem;
+}

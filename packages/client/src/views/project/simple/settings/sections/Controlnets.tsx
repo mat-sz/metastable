@@ -2,18 +2,18 @@ import { ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsX } from 'react-icons/bs';
+
+import { IconButton } from '$components/iconButton';
 import {
   VarArray,
   VarButton,
   VarCategory,
   VarImage,
+  VarModel,
   VarSelect,
   VarSlider,
   VarToggle,
-} from 'react-var-ui';
-
-import { IconButton } from '$components/iconButton';
-import { VarModel } from '$components/varModel';
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 

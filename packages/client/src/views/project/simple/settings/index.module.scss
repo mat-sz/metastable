@@ -10,13 +10,26 @@
 }
 
 .error {
-  margin: 0.5rem 1rem;
+  margin-bottom: 1rem;
   padding: 0.5rem;
   border-radius: 5px;
   font-size: 0.8rem;
-  color: var(--color-fg-error);
+  border: 1px solid var(--color-fg-error);
   background: var(--color-bg-error);
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  font-size: 0;
+
+  span {
+    font-size: 0.8rem;
+  }
+
+  svg {
+    font-size: 1.5rem;
+    color: var(--color-fg-error);
+    margin-right: 0.5rem;
+  }
 }
 
 .actions {
