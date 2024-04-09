@@ -7,6 +7,7 @@ export * from './VarButton';
 export * from './VarImage';
 export * from './VarModel';
 export * from './VarNumber';
+export * from './VarRandomNumber';
 export * from './VarScope';
 export * from './VarSelect';
 export * from './VarSlider';

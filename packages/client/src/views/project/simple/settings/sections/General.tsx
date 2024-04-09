@@ -6,7 +6,7 @@ import {
   VarCategory,
   VarImage,
   VarModel,
-  VarNumber,
+  VarRandomNumber,
   VarSelect,
   VarSlider,
   VarString,
@@ -107,12 +107,11 @@ export const General: React.FC = observer(() => {
         />
       </VarCategory>
       <VarCategory label="Sampler settings">
-        <VarNumber
+        <VarRandomNumber
           label="Seed"
           path="sampler.seed"
-          readOnly={project.settings.sampler.seed_randomize}
+          isRandomizedPath="sampler.seed_randomize"
         />
-        <VarToggle label="Randomize seed" path="sampler.seed_randomize" />
         <VarSlider
           label="CFG"
           path="sampler.cfg"
