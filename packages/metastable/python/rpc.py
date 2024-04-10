@@ -33,7 +33,11 @@ class RPCNamespace:
 
             params = session.autoexpand(params)
         
-        result = self.methods[method_name](*params)
+        result = None
+        if isinstance(params, dict):
+            result = self.methods[method_name](**params)
+        else:
+            result = self.methods[method_name](*params)
 
         if is_autoref:
             result = session.autoalloc(result)
