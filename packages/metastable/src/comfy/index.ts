@@ -33,7 +33,7 @@ type MetastableEvents = {
 interface RPCRequest {
   type: 'rpc';
   method: string;
-  params?: any[];
+  params?: Record<string, any>;
   id: string;
   session: string;
 }
@@ -88,7 +88,7 @@ export class Comfy extends (EventEmitter as {
   invoke(
     sessionId: string | undefined,
     method: string,
-    ...params: unknown[]
+    params?: unknown,
   ): Promise<unknown> {
     const id = nanoid();
     this.write({

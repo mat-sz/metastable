@@ -231,3 +231,13 @@ export async function getAvailableName(
 
   return name;
 }
+
+export async function getNextNumber(dirPath: string) {
+  const filenames = await fs.readdir(dirPath);
+  const numbers = filenames
+    .filter(name => name.includes('.'))
+    .map(name => name.split('.')[0])
+    .map(name => parseInt(name))
+    .filter(number => !!number);
+  return (Math.max(...numbers) || 0) + 1;
+}
