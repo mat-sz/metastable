@@ -117,13 +117,11 @@ class CheckpointNamespace:
 
     @RPC.autoref
     @RPC.method("vae.encode")
-    def vae_encode(vae, image):
-        return vae_encode(vae, image)
+    def vae_encode(vae, image, mask=None):
+        if mask is not None:
+            return vae_encode_inpaint(vae, image, mask)
 
-    @RPC.autoref
-    @RPC.method("vae.encode_inpaint")
-    def vae_encode_inpaint(vae, image, mask):
-        return vae_encode_inpaint(vae, image, mask)
+        return vae_encode(vae, image)
 
     @RPC.autoref
     @RPC.method("lora.apply")

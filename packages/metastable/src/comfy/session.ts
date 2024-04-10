@@ -76,31 +76,44 @@ export class ComfyCheckpoint {
   async sample(
     latent: ComfyLatent,
     conditioning: ComfyConditioning,
-    sampler_name: string,
-    scheduler_name: string,
-    steps: number,
-    denoise: number,
-    cfg: number,
-    seed: number,
+    settings: {
+      samplerName: string;
+      schedulerName: string;
+      steps: number;
+      denoise: number;
+      cfg: number;
+      seed: number;
+      isCircular?: boolean;
+    },
   ) {
     return (await this.session.invoke('checkpoint:sample', {
       model: this.data.model,
       latent,
       conditioning,
-      sampler_name,
-      scheduler_name,
-      steps,
-      denoise,
-      cfg,
-      seed,
+      sampler_name: settings.samplerName,
+      scheduler_name: settings.schedulerName,
+      steps: settings.steps,
+      denoise: settings.denoise,
+      cfg: settings.cfg,
+      seed: settings.seed,
+      is_circular: settings.isCircular,
     })) as RPCRef;
   }
 
-  async decode(samples: RPCRef) {
+  async decode(samples: RPCRef, isCircular?: boolean) {
     return (await this.session.invoke('checkpoint:vae.decode', {
       vae: this.data.vae,
       samples,
+      is_circular: isCircular,
     })) as RPCRef[];
+  }
+
+  async encode(image: RPCRef, mask?: RPCRef) {
+    return (await this.session.invoke('checkpoint:vae.encode', {
+      vae: this.data.vae,
+      image,
+      mask,
+    })) as ComfyLatent;
   }
 }
 
@@ -124,10 +137,11 @@ export class ComfySession {
     return new ComfyCheckpoint(this, data as any);
   }
 
-  async emptyLatent(width: number, height: number) {
+  async emptyLatent(width: number, height: number, batchSize?: number) {
     return (await this.invoke('image:latent.empty', {
       width,
       height,
+      batch_size: batchSize,
     })) as ComfyLatent;
   }
 
@@ -136,6 +150,16 @@ export class ComfySession {
   }
 
   async loadImage(data: RPCBytes) {
-    return (await this.invoke('image:load', { data })) as RPCRef;
+    return (await this.invoke('image:load', { data })) as {
+      image: RPCRef;
+      mask: RPCRef;
+    };
+  }
+
+  async upscaleImages(modelPath: string, images: RPCRef[]) {
+    return (await this.invoke('image:upscale', {
+      images,
+      model_path: modelPath,
+    })) as RPCRef[];
   }
 }
