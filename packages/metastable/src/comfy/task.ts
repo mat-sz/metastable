@@ -1,7 +1,13 @@
 import { writeFile } from 'fs/promises';
 import path from 'path';
 
-import { ModelType, ProjectSettings, TaskState } from '@metastable/types';
+import {
+  ImageFile,
+  ModelType,
+  ProjectPromptTaskData,
+  ProjectSettings,
+  TaskState,
+} from '@metastable/types';
 
 import { ProjectEntity } from '../data/project.js';
 import { getNextNumber } from '../helpers/fs.js';
@@ -12,13 +18,13 @@ function toBase64(url: string) {
   return url.split(',')[1];
 }
 
-export class PromptTask extends BaseTask {
+export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   constructor(
     private metastable: Metastable,
     private project: ProjectEntity,
     private settings: ProjectSettings,
   ) {
-    super('prompt', {});
+    super('prompt', { projectId: project.name });
     this.created();
   }
 
@@ -142,10 +148,33 @@ export class PromptTask extends BaseTask {
     }
 
     settings.sampler.tiling = !!settings.sampler.tiling;
+
+    return { projectId: this.project.name };
+  }
+
+  private step(name: string, max?: number) {
+    this.data = {
+      ...this.data,
+      step: name,
+      stepValue: 0,
+      stepMax: max,
+      preview: undefined,
+    };
   }
 
   async execute() {
     await this.metastable.comfy!.session(async ctx => {
+      ctx.on('progress', e => {
+        this.progress = e.value / e.max;
+        this.data = {
+          ...this.data,
+          stepValue: e.value,
+          stepMax: e.max,
+          preview: e.preview,
+        };
+      });
+
+      this.step('checkpoint');
       const settings = this.settings;
       const checkpoint = await ctx.checkpoint(
         settings.models.base.path!,
@@ -157,6 +186,7 @@ export class PromptTask extends BaseTask {
 
       const loras = settings.models.loras;
       if (loras?.length) {
+        this.step('lora');
         for (const lora of loras) {
           if (lora.enabled) {
             await checkpoint.applyLora(lora.path!, lora.strength);
@@ -164,6 +194,7 @@ export class PromptTask extends BaseTask {
         }
       }
 
+      this.step('conditioning');
       let conditioning = await checkpoint.conditioning(
         settings.conditioning.positive,
         settings.conditioning.negative,
@@ -171,6 +202,7 @@ export class PromptTask extends BaseTask {
 
       const controlnets = settings.models.controlnets;
       if (controlnets?.length) {
+        this.step('controlnet');
         for (const controlnet of controlnets) {
           if (controlnet.enabled) {
             const { image } = await ctx.loadImage({
@@ -188,6 +220,7 @@ export class PromptTask extends BaseTask {
 
       const ipadapters = settings.models.ipadapters;
       if (ipadapters?.length) {
+        this.step('ipadapter');
         for (const ipadapter of ipadapters) {
           if (ipadapter.enabled) {
             const { image } = await ctx.loadImage({
@@ -207,6 +240,7 @@ export class PromptTask extends BaseTask {
 
       let latent = undefined;
 
+      this.step('input');
       switch (settings.input.mode) {
         case 'empty':
           latent = await ctx.emptyLatent(
@@ -237,6 +271,7 @@ export class PromptTask extends BaseTask {
         return;
       }
 
+      this.step('sample');
       const samples = await checkpoint.sample(latent, conditioning, {
         ...settings.sampler,
         samplerName: settings.sampler.sampler,
@@ -247,22 +282,32 @@ export class PromptTask extends BaseTask {
       const outputDir = this.project!.output.path;
 
       if (settings.models.upscale?.enabled) {
+        this.step('upscale');
         images = await ctx.upscaleImages(settings.models.upscale.path!, images);
       }
 
+      this.step('save');
       let counter = await getNextNumber(outputDir);
+      const ext = settings.output?.format || 'png';
+      const outputs: ImageFile[] = [];
       for (const image of images) {
-        const bytes = await ctx.dumpImage(image);
+        const bytes = await ctx.dumpImage(image, ext);
         const buffer = Buffer.from(bytes.$bytes, 'base64');
         const filename = `${counter.toLocaleString('en-US', {
           minimumIntegerDigits: 5,
           useGrouping: false,
-        })}.png`;
+        })}.${ext}`;
         await writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.output.get(filename);
         await output.metadata.set(settings);
+        outputs.push(await output.json());
         counter++;
       }
+
+      this.data = {
+        ...this.data,
+        outputs,
+      };
     });
 
     return TaskState.SUCCESS;

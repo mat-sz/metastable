@@ -138,3 +138,12 @@ export interface Project extends ProjectInfo {
   size?: number;
   temporary?: boolean;
 }
+
+export interface ProjectPromptTaskData {
+  projectId: string;
+  preview?: string;
+  step?: string;
+  stepValue?: number;
+  stepMax?: number;
+  outputs?: ImageFile[];
+}

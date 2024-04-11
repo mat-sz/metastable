@@ -17,19 +17,21 @@ export const ProgressBar: React.FC<
     <div
       className={clsx(
         styles.progress,
-        { [styles.marquee]: marquee && value >= max },
+        { [styles.marquee]: marquee },
         className,
       )}
     >
       <div className={styles.progressInfo}>{children}</div>
-      <div
-        className={styles.progressBar}
-        style={
-          typeof value !== 'undefined' && typeof max !== 'undefined'
-            ? { width: `${(value * 100) / max}%` }
-            : {}
-        }
-      />
+      {!marquee && (
+        <div
+          className={styles.progressBar}
+          style={
+            typeof value !== 'undefined' && typeof max !== 'undefined'
+              ? { width: `${(value * 100) / max}%` }
+              : {}
+          }
+        />
+      )}
     </div>
   );
 };

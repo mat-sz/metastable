@@ -5,34 +5,6 @@ import torch
 import sys
 from comfy.model_management import get_torch_device, get_total_memory, vae_dtype
 
-out = os.fdopen(3, 'bw')
-
-def out_write(data):
-    global out
-    out.write(data.encode('utf-8'))
-    out.write(b'\x1e')
-    out.flush()
-
-def jsonout(event_name, data=None):
-    out_write(json.dumps({ "type": "event", "event": event_name, "data": data }))
-
-def get_save_image_counter(output_dir):
-    def map_filename(filename):
-        try:
-            digits = int(filename.split('.')[0].split('_')[0])
-        except:
-            digits = 0
-        return digits
-
-    try:
-        counter = max(map(map_filename, os.listdir(output_dir))) + 1
-    except ValueError:
-        counter = 1
-    except FileNotFoundError:
-        os.makedirs(output_dir, exist_ok=True)
-        counter = 1
-    return counter
-
 def get_torch_device_info(device):
     if hasattr(device, 'type'):
         if device.type == "cuda":

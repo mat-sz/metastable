@@ -28,16 +28,6 @@ class MainStore {
   setup = new SetupStore();
 
   isMaximized = false;
-  promptRemaining = 0;
-  promptValue = 0;
-  promptMax = 0;
-  promptQueue: {
-    id: string;
-    projectId: string;
-    value: number;
-    max: number;
-    preview?: string;
-  }[] = [];
   trainingQueue: { id: string }[] = [];
 
   backendStatus: ComfyStatus = 'starting';
@@ -165,45 +155,9 @@ class MainStore {
 
   onMessage(message: AnyEvent) {
     switch (message.event) {
-      case 'prompt.start':
-        this.promptValue = 0;
-        this.promptMax = 0;
-        break;
-      case 'prompt.queue':
-        this.promptRemaining = message.data.queue_remaining;
-        break;
-      case 'prompt.progress':
-        {
-          this.promptValue = message.data.value;
-          this.promptMax = message.data.max;
-          const prompt = this.promptQueue.find(
-            prompt => prompt.id === message.data.id,
-          );
-          if (prompt) {
-            prompt.value = message.data.value;
-            prompt.max = message.data.max;
-            prompt.preview = message.data.preview;
-          }
-        }
-        break;
-      case 'prompt.end':
-        this.promptQueue = this.promptQueue.filter(
-          prompt => prompt.id !== message.data.id,
-        );
-        for (const project of this.projects.projects) {
-          if (project.id === message.data.project_id) {
-            project.onPromptDone(message.data.outputs);
-          }
-        }
-        break;
       case 'training.end':
         this.trainingQueue = this.trainingQueue.filter(
           item => item.id !== message.data.projectId,
-        );
-        break;
-      case 'prompt.error':
-        this.promptQueue = this.promptQueue.filter(
-          prompt => prompt.id !== message.data.id,
         );
         break;
       case 'backend.status':

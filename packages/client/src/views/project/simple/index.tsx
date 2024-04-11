@@ -1,8 +1,9 @@
+import { TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsGrid, BsHourglass, BsPencil } from 'react-icons/bs';
+import { BsGrid, BsHourglass, BsPencil, BsXCircleFill } from 'react-icons/bs';
 
 import { ProgressCircle } from '$components/progressCircle';
 import { ImageEditor } from './editor';
@@ -38,8 +39,8 @@ export const SimpleProjectView: React.FC = observer(() => {
                   className={styles.item}
                   key={item.id}
                   style={{
-                    backgroundImage: item.preview
-                      ? `url(${item.preview})`
+                    backgroundImage: item.data.preview
+                      ? `url(${item.data.preview})`
                       : undefined,
                   }}
                   onClick={() => {
@@ -50,8 +51,10 @@ export const SimpleProjectView: React.FC = observer(() => {
                   }}
                 >
                   <div className={styles.status}>
-                    {item.max ? (
-                      <ProgressCircle value={item.value} max={item.max} />
+                    {item.progress ? (
+                      <ProgressCircle value={item.progress} max={1} />
+                    ) : item.state === TaskState.FAILED ? (
+                      <BsXCircleFill />
                     ) : (
                       <BsHourglass />
                     )}

@@ -16,10 +16,10 @@ export const Images: React.FC = observer(() => {
   return (
     <div className={styles.main}>
       <div className={styles.preview}>
-        {!project.currentOutput && project.progressValue ? (
+        {!project.currentOutput && project.firstPrompt ? (
           <div className={styles.progressPreview}>
             <div>
-              <div>Generating...</div>
+              <div>{project.firstPrompt.data.step}...</div>
               <div className={styles.progressBar}>
                 <ProgressBar
                   value={project.progressValue}

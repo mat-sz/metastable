@@ -13,10 +13,10 @@ import {
   Utilization,
 } from '@metastable/types';
 import checkDiskSpace from 'check-disk-space';
-import { nanoid } from 'nanoid/non-secure';
 import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
+import { PromptTask } from './comfy/task.js';
 import { EntityRepository } from './data/common.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectEntity } from './data/project.js';
@@ -42,7 +42,6 @@ export class Metastable extends (EventEmitter as {
   storage;
   python?: PythonInstance;
   comfy?: Comfy;
-  settingsCache: Record<Project['id'], any> = {};
   setup = new Setup(this);
   tasks = new Tasks();
   kohya?: Kohya;
@@ -52,22 +51,6 @@ export class Metastable extends (EventEmitter as {
 
   onEvent = async (event: AnyEvent) => {
     console.log(`[${new Date().toISOString()}]`, event);
-
-    if (event.event === 'prompt.end') {
-      const settings = this.settingsCache[event.data.id];
-      event.data.outputs = [];
-      try {
-        const project = await this.project.get(event.data.project_id);
-        for (const filename of event.data.output_filenames) {
-          const output = await project.output.get(filename);
-          await output.metadata.set(settings);
-          event.data.outputs.push(await output.json());
-        }
-      } catch {}
-      delete this.settingsCache[event.data.id];
-    } else if (event.event === 'prompt.error') {
-      delete this.settingsCache[event.data.id];
-    }
     this.emit('event', event);
   };
 
@@ -224,15 +207,6 @@ export class Metastable extends (EventEmitter as {
     const comfy = this.comfy;
     comfy.on('event', this.onEvent);
 
-    comfy.on('reset', () => {
-      this.onEvent({
-        event: 'prompt.queue',
-        data: {
-          queue_remaining: comfy.queue_remaining,
-        },
-      });
-    });
-
     comfy.on('log', e => {
       this.emit('backendLog', e);
     });
@@ -242,12 +216,6 @@ export class Metastable extends (EventEmitter as {
     const comfy = this.comfy;
 
     if (comfy) {
-      onEvent({
-        event: 'prompt.queue',
-        data: {
-          queue_remaining: comfy.queue_remaining,
-        },
-      });
       onEvent({
         event: 'backend.status',
         data: comfy.status,
@@ -261,136 +229,10 @@ export class Metastable extends (EventEmitter as {
     }
 
     const project = await this.project.get(projectId);
-    const id = nanoid();
-    this.settingsCache[id] = settings;
+    const task = new PromptTask(this, project, settings);
+    this.tasks.queues.project.add(task);
 
-    if (!settings.models.base.path) {
-      const model = await this.model.get(
-        ModelType.CHECKPOINT,
-        settings.models.base.name,
-      );
-      settings.models.base.path = model.path;
-    }
-
-    const embeddingsPath = await this.model.getEmbeddingsPath();
-    if (embeddingsPath) {
-      settings.models.base.embeddings_path = embeddingsPath;
-    }
-
-    if (settings.models.loras) {
-      settings.models.loras = settings.models.loras.filter(
-        model => model.enabled && model.name,
-      );
-
-      for (const modelSettings of settings.models.loras) {
-        if (!modelSettings.path) {
-          const model = await this.model.get(
-            ModelType.LORA,
-            modelSettings.name!,
-          );
-          modelSettings.path = model.path;
-        }
-      }
-    }
-
-    if (settings.models.controlnets) {
-      settings.models.controlnets = settings.models.controlnets.filter(
-        model => model.enabled && model.name && model.image,
-      );
-
-      for (const modelSettings of settings.models.controlnets) {
-        if (!modelSettings.path) {
-          const model = await this.model.get(
-            ModelType.CONTROLNET,
-            modelSettings.name!,
-          );
-          modelSettings.path = model.path;
-        }
-      }
-    }
-
-    if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
-      if (!settings.models.upscale.path) {
-        const model = await this.model.get(
-          ModelType.UPSCALE_MODEL,
-          settings.models.upscale.name,
-        );
-        settings.models.upscale.path = model.path;
-      }
-    } else {
-      settings.models.upscale = undefined;
-    }
-
-    if (settings.models.ipadapters) {
-      settings.models.ipadapters = settings.models.ipadapters
-        .filter(
-          model =>
-            model.enabled &&
-            model.name &&
-            model.clip_vision_name &&
-            model.image,
-        )
-        .map(model => ({
-          ...model,
-          path:
-            model.path ||
-            this.model.getEntityPath(ModelType.IPADAPTER, model.name!),
-          clip_vision_path:
-            model.path ||
-            this.model.getEntityPath(
-              ModelType.CLIP_VISION,
-              model.clip_vision_name!,
-            ),
-        }));
-
-      for (const modelSettings of settings.models.ipadapters) {
-        if (!modelSettings.path) {
-          const model = await this.model.get(
-            ModelType.IPADAPTER,
-            modelSettings.name!,
-          );
-          modelSettings.path = model.path;
-        }
-
-        if (!modelSettings.clip_vision_path) {
-          const model = await this.model.get(
-            ModelType.CLIP_VISION,
-            modelSettings.clip_vision_name!,
-          );
-          modelSettings.clip_vision_path = model.path;
-        }
-      }
-    }
-
-    if (settings.sampler.preview?.method === 'taesd') {
-      const decoderModel = await this.model.get(
-        ModelType.VAE_APPROX,
-        'taesd_decoder',
-      );
-      const decoderXlModel = await this.model.get(
-        ModelType.VAE_APPROX,
-        'taesdxl_decoder',
-      );
-      settings.sampler.preview.taesd = {
-        taesd_decoder: decoderModel.path,
-        taesdxl_decoder: decoderXlModel.path,
-      };
-    }
-
-    settings.sampler.tiling = !!settings.sampler.tiling;
-
-    await this.comfy?.invoke(undefined, 'legacy:prompt', {
-      ...settings,
-      id: id,
-      project_id: projectId,
-      output: {
-        path: project.output.path,
-        format: 'png',
-        ...(settings.output || {}),
-      },
-    });
-
-    return { id };
+    return { id: task.id };
   }
 
   async train(projectId: Project['id'], settings: ProjectTrainingSettings) {

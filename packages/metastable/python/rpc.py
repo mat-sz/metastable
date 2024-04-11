@@ -1,5 +1,8 @@
 from io import BytesIO
 import base64
+import torch
+
+import rpc_hook
 
 PRIMITIVES = (bool, str, int, float, type(None))
 
@@ -34,10 +37,12 @@ class RPCNamespace:
             params = session.autoexpand(params)
         
         result = None
-        if isinstance(params, dict):
-            result = self.methods[method_name](**params)
-        else:
-            result = self.methods[method_name](*params)
+        
+        with torch.inference_mode():
+            if isinstance(params, dict):
+                result = self.methods[method_name](**params)
+            else:
+                result = self.methods[method_name](*params)
 
         if is_autoref:
             result = session.autoalloc(result)
@@ -146,10 +151,13 @@ class RPC:
             if "params" in request:
                 params = request["params"]
 
+            with rpc_hook.use(request_id, session_id):
+                result = namespace.invoke(method_name, params, session)
+
             return {
                 "type": "rpc",
                 "id": request_id,
-                "result": namespace.invoke(method_name, params, session)
+                "result": result
             }
         except Exception as error:
             return {

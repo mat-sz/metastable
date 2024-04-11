@@ -53,10 +53,10 @@ export class Comfy extends (EventEmitter as {
 }) {
   process?: ChildProcessWithoutNullStreams;
 
+  sessions: Record<string, ComfySession> = {};
   logBuffer = new CircularBuffer<LogItem>(25);
 
   status: ComfyStatus = 'starting';
-  queue_remaining = 0;
 
   rpcCallbacks: Map<
     string,
@@ -116,6 +116,7 @@ export class Comfy extends (EventEmitter as {
     } else {
       callbacks.resolve(response.result);
     }
+    this.rpcCallbacks.delete(response.id);
   }
 
   async session<T>(
@@ -126,8 +127,13 @@ export class Comfy extends (EventEmitter as {
     const sessionId = nanoid();
     await this.invoke(sessionId, 'session:start');
     const session = new ComfySession(this, sessionId);
+    this.sessions[sessionId] = session;
+
     const result = await callback(session);
+
+    delete this.sessions[sessionId];
     await this.invoke(sessionId, 'session:destroy');
+
     return result;
   }
 
@@ -141,12 +147,20 @@ export class Comfy extends (EventEmitter as {
       case 'ready':
         this.setStatus('ready');
         break;
-      case 'prompt.queue':
-        this.queue_remaining = e.data.queue_remaining;
+      case 'rpc.progress':
+        this.sessions[e.data.sessionId]?.emit('progress', {
+          max: e.data.max,
+          value: e.data.value,
+          preview: e.data.preview,
+        });
+        break;
+      case 'rpc.log':
+        this.sessions[e.data.sessionId]?.emit('log', {
+          type: e.data.type,
+          text: e.data.text,
+        });
         break;
     }
-
-    this.emit('event', e);
   }
 
   async start() {
@@ -200,7 +214,10 @@ export class Comfy extends (EventEmitter as {
   }
 
   reset() {
-    this.queue_remaining = 0;
+    for (const callbacks of this.rpcCallbacks.values()) {
+      callbacks.reject(new Error('Backend abruptly shut down.'));
+    }
+    this.rpcCallbacks.clear();
     this.emit('reset');
   }
 

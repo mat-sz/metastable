@@ -60,7 +60,6 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
     super(data, settings);
     makeObservable(this, {
       request: action,
-      onPromptDone: action,
       setSettings: action,
     });
   }

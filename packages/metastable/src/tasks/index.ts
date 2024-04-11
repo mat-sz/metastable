@@ -11,6 +11,7 @@ export class Tasks extends EventEmitter {
   queues: Record<string, BaseQueue> = {
     downloads: new BaseQueue('downloads'),
     setup: new BaseQueue('setup'),
+    project: new BaseQueue('project', { dismissSuccessful: true }),
   };
 
   constructor() {

@@ -12,13 +12,26 @@ export class TaskStore {
   queues: Record<string, Task<any>[]> = {
     downloads: [],
     setup: [],
+    project: [],
   };
 
+  eventListeners: Record<string, Set<(...args: any) => void>> = {
+    update: new Set(),
+    delete: new Set(),
+  };
   waiting = new Set<string>();
 
   constructor() {
     makeAutoObservable(this);
     this.refresh();
+  }
+
+  on(event: 'update' | 'delete', listener: (task: Task<any>) => void) {
+    this.eventListeners[event].add(listener);
+  }
+
+  off(event: 'update' | 'delete', listener: (task: Task<any>) => void) {
+    this.eventListeners[event].delete(listener);
   }
 
   async refresh() {
@@ -81,6 +94,12 @@ export class TaskStore {
     }
   }
 
+  emit(event: 'update' | 'delete', data: Task<any>) {
+    for (const listener of this.eventListeners[event]) {
+      listener(data);
+    }
+  }
+
   onMessage({ event, data }: TaskEvent) {
     switch (event) {
       case 'task.create':
@@ -91,8 +110,24 @@ export class TaskStore {
         break;
       case 'task.update':
         this.update(data);
+        {
+          const task = this.queues[data.queueId].find(
+            task => task.id === data.id,
+          );
+          if (task) {
+            this.emit('update', task);
+          }
+        }
         break;
       case 'task.delete':
+        {
+          const task = this.queues[data.queueId].find(
+            task => task.id === data.id,
+          );
+          if (task) {
+            this.emit('delete', task);
+          }
+        }
         this.updateQueue(data.queueId, queue =>
           queue.filter(item => item.id !== data.id),
         );

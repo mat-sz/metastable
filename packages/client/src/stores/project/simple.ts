@@ -2,7 +2,10 @@ import {
   Project as APIProject,
   ImageFile,
   ModelType,
+  ProjectPromptTaskData,
   ProjectSettings,
+  Task,
+  TaskState,
 } from '@metastable/types';
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
@@ -64,6 +67,13 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       setSettings: action,
       queue: computed,
       firstPrompt: computed,
+      onPromptDone: action,
+    });
+
+    mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
+      if (task.type === 'prompt' && task.data.outputs) {
+        this.onPromptDone(task.data.outputs);
+      }
     });
   }
 
@@ -80,8 +90,8 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     this.settings = settings;
   }
 
-  get queue() {
-    return mainStore.promptQueue.filter(prompt => prompt.projectId === this.id);
+  get queue(): Task<ProjectPromptTaskData>[] {
+    return this.tasks.filter(task => task.type === 'prompt');
   }
 
   get queueCount() {
@@ -89,23 +99,25 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
   }
 
   get firstPrompt() {
-    return this.queue[0];
+    return this.queue.find(
+      item => item.state === TaskState.RUNNING || TaskState.PREPARING,
+    );
   }
 
   get progressValue() {
-    return this.firstPrompt?.value || 0;
+    return this.firstPrompt?.progress;
   }
 
   get progressMax() {
-    return this.firstPrompt?.max || 0;
+    return this.firstPrompt ? 1 : undefined;
   }
 
   get preview() {
-    return this.firstPrompt?.preview;
+    return this.firstPrompt?.data.preview;
   }
 
   get progressMarquee() {
-    return !!this.firstPrompt && !this.firstPrompt.max;
+    return !!this.firstPrompt && !this.firstPrompt.progress;
   }
 
   validate() {
@@ -221,18 +233,10 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     }
 
     this.save();
-    const result = await API.project.prompt.mutate({
+    await API.project.prompt.mutate({
       projectId: this.id,
       settings,
     });
-    if (result) {
-      mainStore.promptQueue.push({
-        projectId: this.id,
-        id: result.id,
-        value: 0,
-        max: 0,
-      });
-    }
   }
 
   addLora(name: string, strength = 1) {
@@ -301,7 +305,8 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
   }
 
   onPromptDone(outputs: ImageFile[]) {
-    super.onPromptDone(outputs);
+    this.currentOutput = outputs[0]?.image.url;
+    this.outputs.push(...outputs);
 
     if (this.addOutputToEditor) {
       this.editor?.addImage(outputs[0].image.url, {

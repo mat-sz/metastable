@@ -1,4 +1,9 @@
+import EventEmitter from 'events';
+
+import { ProjectSettings } from '@metastable/types';
+
 import type { Comfy } from './index.js';
+import { TypedEventEmitter } from '../types.js';
 
 interface RPCRef {
   $ref: string | number;
@@ -84,6 +89,7 @@ export class ComfyCheckpoint {
       cfg: number;
       seed: number;
       isCircular?: boolean;
+      preview?: ProjectSettings['sampler']['preview'];
     },
   ) {
     return (await this.session.invoke('checkpoint:sample', {
@@ -97,6 +103,7 @@ export class ComfyCheckpoint {
       cfg: settings.cfg,
       seed: settings.seed,
       is_circular: settings.isCircular,
+      preview: settings.preview,
     })) as RPCRef;
   }
 
@@ -117,14 +124,33 @@ export class ComfyCheckpoint {
   }
 }
 
-export class ComfySession {
+interface ComfySessionProgressEvent {
+  value: number;
+  max: number;
+  preview?: string;
+}
+
+interface ComfySessionLogEvent {
+  type: 'stdout' | 'stderr';
+  text: string;
+}
+
+type ComfySessionEvents = {
+  progress: (event: ComfySessionProgressEvent) => void;
+  log: (event: ComfySessionLogEvent) => void;
+};
+
+export class ComfySession extends (EventEmitter as {
+  new (): TypedEventEmitter<ComfySessionEvents>;
+}) {
   constructor(
     private comfy: Comfy,
     private id: string,
-  ) {}
+  ) {
+    super();
+  }
 
   invoke(method: string, params?: unknown): Promise<unknown> {
-    console.log('invoking', method, params);
     return this.comfy.invoke(this.id, method, params);
   }
 
@@ -145,8 +171,11 @@ export class ComfySession {
     })) as ComfyLatent;
   }
 
-  async dumpImage(image: RPCRef) {
-    return (await this.invoke('image:dump', { image })) as RPCBytes;
+  async dumpImage(image: RPCRef, format: string = 'png') {
+    return (await this.invoke('image:dump', {
+      image,
+      format: format.toUpperCase(),
+    })) as RPCBytes;
   }
 
   async loadImage(data: RPCBytes) {

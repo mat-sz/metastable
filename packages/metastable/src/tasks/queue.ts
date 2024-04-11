@@ -8,7 +8,10 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
   #tasks: BaseTask<T>[] = [];
   running = false;
 
-  constructor(public readonly id: string) {
+  constructor(
+    public readonly id: string,
+    private readonly settings: { dismissSuccessful?: boolean } = {},
+  ) {
     super();
   }
 
@@ -66,6 +69,10 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
         current.started();
         const state = await current.execute();
         current.stopped(state);
+
+        if (this.settings.dismissSuccessful) {
+          this.dismiss(current.id);
+        }
       } catch (e: any) {
         if (typeof e === 'object' && 'errors' in e) {
           for (const error of e.errors) {

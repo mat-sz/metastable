@@ -1,14 +1,37 @@
+import torch
+
 import comfy.sd
 import comfy.sample
 import comfy.samplers
 import comfy.controlnet
 import comfy.clip_vision
 import comfy.utils
+import comfy.model_management
 import custom
-
-import torch
+import latent_preview
 
 from rpc import RPC
+
+last_checkpoint_path = None
+last_checkpoint = None
+
+def load_checkpoint(path, embeddings_path=None):
+    return comfy.sd.load_checkpoint_guess_config(path, output_vae=True, output_clip=True, embedding_directory=embeddings_path)
+
+def load_checkpoint_cached(path, embeddings_path=None):
+    global last_checkpoint, last_checkpoint_path
+
+    comfy.model_management.cleanup_models()
+
+    if last_checkpoint != None and last_checkpoint_path == path:
+        return last_checkpoint
+
+    last_checkpoint = None
+    comfy.model_management.cleanup_models()
+    
+    last_checkpoint_path = path
+    last_checkpoint = load_checkpoint(path, embeddings_path)
+    return last_checkpoint
 
 def get_sigmas(model, scheduler, steps, denoise, discard_penultimate_sigma=False):
     custom_schedulers = custom.get_custom_schedulers()
@@ -86,7 +109,7 @@ class CheckpointNamespace:
     @RPC.autoref
     @RPC.method("load")
     def load(path, embeddings_path=None, clip_layer=None):
-        (model, clip, vae, _) = comfy.sd.load_checkpoint_guess_config(path, output_vae=True, output_clip=True, embedding_directory=embeddings_path)
+        (model, clip, vae, _) = load_checkpoint_cached(path, embeddings_path)
         
         if clip_layer == None or clip_layer == 0:
             clip.clip_layer(None)
@@ -181,7 +204,7 @@ class CheckpointNamespace:
     
     @RPC.autoref
     @RPC.method("sample")
-    def sample(model, latent, conditioning, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False):
+    def sample(model, latent, conditioning, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
         model_set_circular(model, is_circular)
 
         latent_image = latent["samples"]
@@ -193,6 +216,16 @@ class CheckpointNamespace:
             noise_mask = latent["noise_mask"]
 
         callback = None
+        if preview is not None:
+            taesd_decoder_path = None
+            if preview["method"] == LatentPreviewMethod.TAESD:
+                taesd_decoder_name = model.model.latent_format.taesd_decoder_name
+                if taesd in preview and taesd_decoder_name in preview["taesd"]:
+                    taesd_decoder_path = preview["taesd"][taesd_decoder_name]
+
+            callback = latent_preview.prepare_callback(model, preview["method"], steps)
+        else:
+            callback = latent_preview.prepare_callback(model, "none", steps)
 
         discard_penultimate_sigma = False
         if sampler_name in ['dpm_2', 'dpm_2_ancestral', 'uni_pc', 'uni_pc_bh2']:

@@ -43,7 +43,7 @@ export class BaseProject<T = any> {
       settings: observable,
       save: action,
       triggerAutosave: action,
-      onPromptDone: action,
+      tasks: computed,
       queueCount: computed,
       progressValue: computed,
       progressMax: computed,
@@ -52,16 +52,22 @@ export class BaseProject<T = any> {
     this.refresh();
   }
 
+  get tasks() {
+    return mainStore.tasks.queues.project?.filter(
+      task => task.data?.projectId === this.id,
+    );
+  }
+
   get queueCount() {
     return 0;
   }
 
-  get progressValue() {
-    return 0;
+  get progressValue(): number | undefined {
+    return undefined;
   }
 
-  get progressMax() {
-    return 0;
+  get progressMax(): number | undefined {
+    return undefined;
   }
 
   get progressMarquee() {
@@ -129,10 +135,5 @@ export class BaseProject<T = any> {
   triggerAutosave() {
     clearTimeout(this._autosaveTimeout);
     this._autosaveTimeout = setTimeout(() => this.save(), 5000) as any;
-  }
-
-  onPromptDone(outputs: ImageFile[]) {
-    this.currentOutput = outputs[0]?.image.url;
-    this.outputs.push(...outputs);
   }
 }
