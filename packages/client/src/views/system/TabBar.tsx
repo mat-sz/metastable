@@ -6,6 +6,7 @@ import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { BsBox, BsGearFill, BsHouseFill, BsPlusLg, BsX } from 'react-icons/bs';
 
+import logo from '$/assets/logo.svg';
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
@@ -191,7 +192,9 @@ export const TabBar: React.FC = observer(() => {
 
   return (
     <div ref={drop} className={styles.tabs}>
-      <div className={styles.logo}>Metastable</div>
+      <div className={styles.logo}>
+        <img src={logo} alt="Logo" /> Metastable
+      </div>
       <ViewTab viewId="home">
         <BsHouseFill />
       </ViewTab>
