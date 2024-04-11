@@ -1,9 +1,7 @@
-import clsx from 'clsx';
 import { clone, get, set } from 'radash';
 import { ReactNode, useCallback, useMemo } from 'react';
 
 import { VarUIContext } from './common/VarUIContext';
-import styles from './VarUI.module.scss';
 
 export interface IVarUIProps<T extends object> {
   /**
@@ -87,7 +85,7 @@ export const VarUI: <T extends object>(
 
   return (
     <VarUIContext.Provider value={contextValue}>
-      <div className={clsx(styles.wrapper, className)}>{children}</div>
+      <div className={className}>{children}</div>
     </VarUIContext.Provider>
   );
 };

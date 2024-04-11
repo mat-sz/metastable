@@ -4,8 +4,8 @@
   color: white;
   transition: 0.2s ease-in-out all;
   transform: rotate(0deg);
-  --progress-fg: var(--color-accent);
-  --progress-bg: var(--color-bg-panel);
+  --progress-fg: var(--accent-900);
+  --progress-bg: var(--grey-300);
   display: flex;
   align-items: center;
   justify-content: center;

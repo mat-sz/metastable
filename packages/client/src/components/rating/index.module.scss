@@ -14,7 +14,7 @@
 }
 
 .background {
-  color: var(--color-fg-soft);
+  color: var(--grey-800);
 }
 
 .value {
@@ -36,10 +36,10 @@
   }
 
   .background {
-    color: var(--color-bg);
+    color: var(--grey-100);
   }
 
   .value {
-    color: var(--color-fg);
+    color: var(--grey-900);
   }
 }

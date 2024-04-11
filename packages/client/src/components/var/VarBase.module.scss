@@ -1,5 +1,5 @@
 .error {
-  color: var(--color-fg-error);
+  color: var(--red-900);
 }
 
 .label {
@@ -7,14 +7,14 @@
   margin: 1rem 0;
 
   .title {
-    color: var(--color-fg);
+    color: var(--grey-900);
     font-size: 0.8rem;
     margin-bottom: 0.1rem;
     font-weight: 500;
   }
 
   .required {
-    color: var(--color-bg-danger);
+    color: var(--red-900);
     margin-left: 0.3rem;
   }
 

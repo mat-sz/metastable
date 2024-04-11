@@ -19,31 +19,29 @@
 }
 
 :root {
-  --color-bg: #11111a;
-  --color-bg-panel-dark: #17171f;
-  --color-bg-panel: #22222a;
-  --color-bg-interactive: #33333a;
-  --color-bg-interactive-hover: #44444a;
-  --color-accent: #77f;
-  --color-fg-soft: #aaa;
-  --color-fg: #ddd;
-  --color-primary: #35353b;
-  --color-primary-soft: #575760;
+  --grey-100: #11111a;
+  --grey-200: #17171f;
+  --grey-300: #22222a;
+  --grey-400: #2b2b35;
+  --grey-500: #35353b;
+  --grey-600: #454556;
+  --grey-700: #575760;
+  --grey-800: #aaa;
+  --grey-900: #ddd;
 
-  --color-fg-ok: #0f5132;
-  --color-bg-ok: #75b798;
+  --accent-700: rgb(73, 73, 226);
+  --accent-800: rgb(93, 93, 207);
+  --accent-900: #77f;
 
-  --color-fg-warning: #332701;
-  --color-bg-warning: #ffda6a;
+  --green-100: #0f5132;
+  --green-900: #75b798;
 
-  --color-fg-error: #db504c;
-  --color-bg-error: #3b2931;
+  --yellow-100: #332701;
+  --yellow-900: #ffda6a;
 
-  --color-bg-primary: rgb(93, 93, 207);
-  --color-bg-primary-hover: rgb(73, 73, 226);
-
-  --color-bg-danger: #da373c;
-  --color-bg-danger-hover: #b12126;
+  --red-100: #3b2931;
+  --red-800: #b12126;
+  --red-900: #da373c;
 }
 
 /* Firefox */
@@ -77,8 +75,8 @@
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-fg);
+  background: var(--grey-100);
+  color: var(--grey-900);
   line-height: 1.4;
   user-select: none;
 
@@ -129,11 +127,11 @@ progress {
   width: 200px;
 
   &::-moz-progress-bar {
-    background-color: var(--color-accent);
+    background-color: var(--accent-900);
   }
 
   &::-webkit-progress-value {
-    background-color: var(--color-accent);
+    background-color: var(--accent-900);
   }
 
   &::-webkit-progress-bar {
@@ -152,9 +150,9 @@ input,
 textarea,
 select,
 option {
-  background: var(--color-bg-interactive);
+  background: var(--grey-400);
   border: none;
-  color: var(--color-fg);
+  color: var(--grey-900);
   padding: 0.6rem;
   border-radius: 5px;
 }
@@ -163,8 +161,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-bg-interactive);
-  color: var(--color-fg);
+  background-color: var(--grey-400);
+  color: var(--grey-900);
   padding: 0.6rem 1.2rem;
   font-size: 0.8rem;
   border-radius: 5px;
@@ -177,7 +175,7 @@ button {
     cursor: pointer;
 
     &:hover {
-      background-color: var(--color-bg-interactive-hover);
+      background-color: var(--grey-600);
     }
   }
 
@@ -191,7 +189,7 @@ table {
   width: 100%;
 
   tr:not(:last-child) {
-    border-bottom: 1px solid var(--color-bg-panel-dark);
+    border-bottom: 1px solid var(--grey-200);
   }
 
   th,
@@ -200,8 +198,8 @@ table {
   }
 
   th {
-    color: var(--color-fg-soft);
-    background: var(--color-bg-panel-dark);
+    color: var(--grey-800);
+    background: var(--grey-200);
     font-size: 0.8rem;
     text-transform: uppercase;
     text-align: left;

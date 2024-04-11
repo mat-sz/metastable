@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  border-top: 1px solid var(--grey-400);
 
   & > div {
     display: flex;
@@ -16,14 +17,14 @@
     font-weight: normal;
 
     &:hover {
-      background: var(--color-bg-interactive);
+      background: var(--grey-400);
     }
   }
 
   @media screen and (min-width: 960px) {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    background: var(--color-bg-panel-dark);
+    background: var(--grey-200);
     padding: 0.25rem 0;
 
     button {

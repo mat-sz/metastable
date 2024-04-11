@@ -4,14 +4,14 @@
 
   .title {
     text-transform: uppercase;
-    color: var(--color-fg-soft);
+    color: var(--grey-800);
     font-size: 0.8rem;
     margin-bottom: 0.3rem;
     font-weight: bold;
   }
 
   .required {
-    color: var(--color-bg-danger);
+    color: var(--red-900);
     margin-left: 0.3rem;
   }
 

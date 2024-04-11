@@ -10,7 +10,7 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
-  background: var(--color-bg-panel-dark);
+  background: var(--grey-200);
 
   li {
     text-transform: uppercase;
@@ -23,19 +23,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--color-fg-soft);
+    color: var(--grey-800);
 
     svg {
       font-size: 1.5rem;
     }
 
     &.active {
-      background: var(--color-bg-panel);
-      color: var(--color-fg);
+      background: var(--grey-300);
+      color: var(--grey-900);
     }
 
     &:hover {
-      background: var(--color-bg-interactive);
+      background: var(--grey-400);
     }
   }
 }

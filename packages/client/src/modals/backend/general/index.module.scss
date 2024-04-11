@@ -14,7 +14,7 @@
   max-height: 300px;
   overflow-y: auto;
   user-select: text;
-  background: var(--color-bg);
+  background: var(--grey-100);
   padding: 0.25rem;
   white-space: pre-wrap;
 
@@ -29,7 +29,7 @@
   }
 
   .timestamp {
-    color: var(--color-fg-soft);
+    color: var(--grey-800);
   }
 
   .error {

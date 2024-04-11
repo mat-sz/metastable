@@ -1,7 +1,8 @@
 .tabs {
-  background: var(--color-bg-panel-dark);
   display: flex;
   -webkit-app-region: drag;
+  background: var(--grey-200);
+  border-bottom: 1px solid var(--grey-400);
 
   .logo {
     font-weight: bold;
@@ -9,6 +10,7 @@
     justify-content: center;
     align-items: center;
     padding: 0 1rem;
+    border-right: 1px solid var(--grey-400);
 
     img {
       height: 1.5rem;
@@ -17,24 +19,30 @@
   }
 
   .tab {
-    background: var(--color-bg-panel);
     padding-left: 1rem;
-    padding-top: 0.7rem;
-    padding-bottom: calc(0.7rem - 2px);
+    padding-top: 0.8rem;
+    padding-bottom: calc(0.8rem - 2px);
     padding-right: 1rem;
-    margin-right: 2px;
     display: inline-flex;
     align-items: center;
     cursor: pointer;
     border-bottom: 2px solid transparent;
+    border-right: 1px solid var(--grey-400);
     position: relative;
     -webkit-app-region: no-drag;
+    font-size: 0;
+
+    span,
+    svg {
+      font-size: 1rem;
+      line-height: 1em;
+    }
 
     .tabBadge {
       position: absolute;
       top: 0.3rem;
       left: 0.4rem;
-      background: var(--color-accent);
+      background: var(--accent-900);
       color: white;
       font-weight: bold;
       font-size: 0.7rem;
@@ -55,12 +63,12 @@
     }
 
     &.selected {
-      background: var(--color-bg-interactive);
-      border-bottom: 2px solid var(--color-accent);
+      background: var(--grey-300);
+      border-bottom-color: var(--accent-900);
     }
 
     &:hover {
-      border-bottom: 2px solid var(--color-fg-soft);
+      border-bottom-color: var(--grey-800);
     }
 
     button {

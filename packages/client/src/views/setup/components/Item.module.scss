@@ -1,11 +1,11 @@
 .item {
-  background: var(--color-bg-panel);
-  border-bottom: 1px solid var(--color-bg);
+  background: var(--grey-300);
+  border-bottom: 1px solid var(--grey-100);
   transition: 0.2s ease-in-out all;
   height: 5.5rem;
   overflow: hidden;
-  --progress-fg: var(--color-accent);
-  --progress-bg: var(--color-bg-panel);
+  --progress-fg: var(--accent-900);
+  --progress-bg: var(--grey-300);
 
   .header {
     display: flex;
@@ -21,7 +21,7 @@
 
   &:hover,
   &.open {
-    background: var(--color-bg-interactive);
+    background: var(--grey-400);
   }
 
   .body {
@@ -68,7 +68,7 @@
   .icon {
     width: 2.5rem;
     height: 2.5rem;
-    background: var(--color-bg-panel-dark);
+    background: var(--grey-200);
   }
 
   .status {
@@ -78,17 +78,17 @@
     color: white;
 
     &.ok {
-      color: var(--color-fg-ok);
-      background: var(--color-bg-ok);
+      color: var(--green-100);
+      background: var(--green-900);
     }
 
     &.warning {
-      color: var(--color-fg-warning);
-      background: var(--color-bg-warning);
+      color: var(--yellow-100);
+      background: var(--yellow-900);
     }
 
     &.error {
-      color: var(--color-fg-error);
+      color: var(--red-900);
       background: var(--color-bg-error);
     }
 

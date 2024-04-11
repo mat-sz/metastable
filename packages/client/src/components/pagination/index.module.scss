@@ -10,11 +10,11 @@
     background: none;
 
     &.active {
-      background: var(--color-bg-interactive);
+      background: var(--grey-400);
     }
 
     &:hover {
-      background: var(--color-bg-interactive-hover);
+      background: var(--grey-600);
     }
   }
 }

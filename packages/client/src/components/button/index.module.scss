@@ -1,19 +1,19 @@
 .button {
   &.danger {
-    background: var(--color-bg-danger);
+    background: var(--red-900);
     color: white;
 
     &:hover {
-      background: var(--color-bg-danger-hover);
+      background: var(--red-800);
     }
   }
 
   &.primary {
-    background: var(--color-bg-primary);
+    background: var(--accent-800);
     color: white;
 
     &:hover {
-      background: var(--color-bg-primary-hover);
+      background: var(--accent-700);
     }
   }
 

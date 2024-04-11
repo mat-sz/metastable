@@ -35,13 +35,13 @@
   }
 
   .track {
-    background: var(--color-bg-interactive);
+    background: var(--grey-400);
     right: 0;
     z-index: 0;
   }
 
   .fill {
-    background: var(--color-accent);
+    background: var(--accent-900);
     z-index: 1;
     padding-left: var(--track-offset);
     width: calc(var(--fill) + var(--track-offset));
@@ -49,7 +49,7 @@
 
   .thumb {
     left: var(--fill);
-    background: var(--color-accent);
+    background: var(--accent-900);
     position: absolute;
     z-index: 2;
     width: var(--thumb-height);

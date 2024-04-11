@@ -1,6 +1,5 @@
 .content {
-  background: var(--color-bg-panel);
-  padding: 0.5rem;
+  padding: 1rem;
   margin-top: 0;
   display: flex;
   flex-direction: column;
@@ -51,10 +50,10 @@
 
     & > .tabs {
       display: flex;
-      border-bottom: 1px solid var(--color-bg-interactive-hover);
+      border-bottom: 1px solid var(--grey-600);
 
       & > .tab {
-        background: var(--color-bg-panel);
+        background: var(--grey-300);
         padding: 0 0.5rem;
         margin-right: 0.25rem;
         display: inline-flex;
@@ -62,7 +61,7 @@
         cursor: pointer;
 
         &.selected {
-          background: var(--color-bg-interactive-hover);
+          background: var(--grey-600);
         }
       }
     }
@@ -80,8 +79,9 @@
     }
 
     & > .tabs {
-      background: var(--color-bg-panel-dark);
+      background: var(--grey-200);
       display: flex;
+      border-right: 1px solid var(--grey-400);
 
       @media screen and (min-width: 960px) {
         display: block;
@@ -98,13 +98,14 @@
         font-size: 0.7rem;
         font-weight: bold;
         cursor: pointer;
+        border-bottom: 1px solid var(--grey-400);
 
         &.selected {
-          background: var(--color-bg-panel);
+          background: var(--grey-300);
         }
 
         &:hover {
-          background: var(--color-bg-interactive);
+          background: var(--grey-400);
         }
       }
     }
@@ -115,48 +116,45 @@
 
     & > .content {
       background: none;
-      padding: 0;
+      padding: 1rem;
     }
 
     &.vertical {
       @media screen and (min-width: 960px) {
         grid-template-columns: 15rem 1fr;
-        grid-gap: 1rem;
-        padding: 1rem;
-        padding-left: 0;
       }
 
       & > .tabs {
-        background: none;
+        background: var(--grey-200);
+        border-right: 1px solid var(--grey-400);
+        padding: 1rem;
 
         & > .tab {
           text-transform: none;
-          background: var(--color-bg-panel);
-          border-radius: 0 5px 5px 0;
-          padding: 1rem;
+          background: none;
+          border-radius: 5px;
+          padding: 0.5rem;
           display: flex;
           align-items: center;
           justify-content: flex-start;
           font-size: 0;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.2rem;
+          border: none;
 
-          &.selected {
-            background: var(--color-bg-interactive-hover);
-          }
-
+          &.selected,
           &:hover {
-            background: var(--color-bg-interactive);
+            background: var(--grey-400);
           }
 
           svg {
-            font-size: 1.25rem;
+            font-size: 1rem;
             margin-right: 0.5rem;
           }
 
           span {
-            font-size: 1rem;
+            font-size: 0.9rem;
             line-height: 1em;
-            font-weight: 600;
+            font-weight: 500;
           }
         }
       }

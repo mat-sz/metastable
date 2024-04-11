@@ -22,14 +22,14 @@
     }
 
     &.selected {
-      background: color-mix(in srgb, var(--color-accent) 50%, transparent);
+      background: color-mix(in srgb, var(--accent-900) 50%, transparent);
     }
   }
 
   .selectionBox {
     position: absolute;
-    border: 1px solid var(--color-accent);
-    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border: 1px solid var(--accent-900);
+    background: color-mix(in srgb, var(--accent-900) 30%, transparent);
     display: none;
   }
 }

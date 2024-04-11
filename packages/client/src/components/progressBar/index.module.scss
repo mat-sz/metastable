@@ -4,7 +4,7 @@
   font-size: 0.7rem;
   overflow: hidden;
   border-radius: 5px;
-  background-color: var(--color-bg-panel-dark);
+  background-color: var(--grey-200);
   flex: 1;
 
   .progressInfo {
@@ -23,7 +23,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    background-color: var(--color-accent);
+    background-color: var(--accent-900);
   }
 
   &.marquee:after {

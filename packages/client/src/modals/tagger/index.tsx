@@ -2,7 +2,8 @@ import { ModelType, ProjectTaggingSettings } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 
-import { Modal } from '$components/modal';
+import { Button } from '$components/button';
+import { Modal, ModalActions } from '$components/modal';
 import {
   VarCategory,
   VarModel,
@@ -57,7 +58,20 @@ export const Tagger: React.FC<Props> = observer(({ inputs, project }) => {
           </VarCategory>
         </VarUI>
       </div>
-      <button onClick={() => project.tag(settings)}>Start tagging</button>
+      <ModalActions>
+        <Button variant="secondary" onClick={() => close()}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            project.tag(settings);
+            close();
+          }}
+        >
+          Start
+        </Button>
+      </ModalActions>
     </Modal>
   );
 });

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { BsDownload, BsGearFill } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { VarString, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
@@ -22,13 +23,17 @@ export const Settings: React.FC = observer(() => {
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
         </Tabs>
         <TabContent>
+          <div className={styles.actions}>
+            <Button onClick={() => config.store(temp)} variant="primary">
+              Save
+            </Button>
+          </div>
           <TabPanel id="general">Empty.</TabPanel>
           <TabPanel id="downloads">
             <VarString path="civitai.apiKey" label="CivitAI API key" />
           </TabPanel>
         </TabContent>
       </TabView>
-      <button onClick={() => config.store(temp)}>Save</button>
     </VarUI>
   );
 });

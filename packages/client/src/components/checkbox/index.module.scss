@@ -10,7 +10,7 @@
   }
 
   .indicator {
-    background: var(--color-bg-panel-dark);
+    background: var(--grey-200);
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 100%;
@@ -20,7 +20,7 @@
     justify-content: center;
     font-size: 0;
     transition: 0.2s ease-in-out all;
-    color: var(--color-fg-ok);
+    color: var(--green-100);
 
     svg {
       opacity: 0;
@@ -30,7 +30,7 @@
   }
 
   input:checked + .indicator {
-    background: var(--color-bg-ok);
+    background: var(--green-900);
 
     svg {
       opacity: 1;

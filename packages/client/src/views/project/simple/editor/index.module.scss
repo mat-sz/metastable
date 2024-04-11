@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   grid-column: 1 / 3;
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
 
   .settings {
     display: flex;
@@ -33,7 +33,7 @@
 .projectActions {
   display: flex;
   align-items: center;
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
 
   button {
     font-size: 0;
@@ -65,7 +65,7 @@
 }
 
 .layers {
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
 
   .actions {
     display: flex;
@@ -85,7 +85,7 @@
 .file {
   display: flex;
   align-items: center;
-  color: var(--color-fg);
+  color: var(--grey-900);
   font-size: 0;
   cursor: pointer;
   position: relative;
@@ -93,7 +93,7 @@
   transition: 0.1s ease-in-out all;
 
   &:hover {
-    background: var(--color-bg-interactive-hover);
+    background: var(--grey-600);
   }
 
   svg {
@@ -123,11 +123,11 @@
 
   &.active,
   &:hover {
-    background: var(--color-bg-interactive);
+    background: var(--grey-400);
   }
 
   &.active {
-    border-left: 2px solid var(--color-accent);
+    border-left: 2px solid var(--accent-900);
   }
 
   .preview {
@@ -152,7 +152,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
 
   button {
     display: block;
@@ -166,11 +166,11 @@
 
     &.active,
     &:hover {
-      background: var(--color-bg-interactive-hover);
+      background: var(--grey-600);
     }
 
     &.active {
-      border-left: 2px solid var(--color-accent);
+      border-left: 2px solid var(--accent-900);
     }
 
     svg {

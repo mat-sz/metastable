@@ -17,9 +17,9 @@
 }
 
 .modal {
-  background: var(--color-bg-panel-dark);
+  background: var(--grey-200);
   position: absolute;
-  color: var(--color-fg);
+  color: var(--grey-900);
   overflow: hidden;
   font-family:
     system-ui,
@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--color-bg-panel-dark);
+  background: var(--grey-200);
   padding: 1rem;
   padding-bottom: 0;
 
@@ -93,7 +93,7 @@
 .actions {
   margin: -1rem;
   margin-top: 1rem;
-  background: var(--color-bg);
+  background: var(--grey-100);
   display: flex;
   align-items: center;
   padding: 1rem;

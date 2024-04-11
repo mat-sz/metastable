@@ -2,7 +2,8 @@ import { Model, ModelType } from '@metastable/types';
 import React, { useEffect, useState } from 'react';
 
 import { TRPC } from '$api';
-import { Modal, useModal } from '$components/modal';
+import { Button } from '$components/button';
+import { Modal, ModalActions, useModal } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
 
 interface Props {
@@ -48,14 +49,20 @@ export const ModelEdit: React.FC<Props> = ({ type, name }) => {
           />
         </VarUI>
       </div>
-      <button
-        onClick={() => {
-          metadataMutation.mutate({ name, type, metadata });
-          close();
-        }}
-      >
-        Save
-      </button>
+      <ModalActions>
+        <Button variant="secondary" onClick={() => close()}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            metadataMutation.mutate({ name, type, metadata });
+            close();
+          }}
+        >
+          Save
+        </Button>
+      </ModalActions>
     </Modal>
   );
 };

@@ -1,12 +1,12 @@
 .search {
   display: flex;
   align-items: center;
-  background: var(--color-bg-interactive);
+  background: var(--grey-400);
   border-radius: 5px;
   padding: 0 0.5rem;
 
   &:focus-within {
-    background: var(--color-bg-interactive-hover);
+    background: var(--grey-600);
   }
 
   input {

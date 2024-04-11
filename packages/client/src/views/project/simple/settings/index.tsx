@@ -45,7 +45,6 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
         <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
       </Tabs>
-      <div className={styles.actions}>{!error && actions}</div>
       <VarUI
         className={styles.prompt}
         onChange={values => {
@@ -53,27 +52,30 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         }}
         values={toJS(project.settings)}
       >
-        {!!error && (
-          <div className={styles.error}>
-            <BsXCircleFill />
-            <span>{error}</span>
-          </div>
-        )}
-        <TabPanel id="general">
-          <General />
-        </TabPanel>
-        <TabPanel id="loras">
-          <LoRAs />
-        </TabPanel>
-        <TabPanel id="controlnets">
-          <Controlnets />
-        </TabPanel>
-        <TabPanel id="ipadapters">
-          <IPAdapters />
-        </TabPanel>
-        <TabPanel id="upscale">
-          <Upscale />
-        </TabPanel>
+        <div className={styles.actions}>{!error && actions}</div>
+        <div>
+          {!!error && (
+            <div className={styles.error}>
+              <BsXCircleFill />
+              <span>{error}</span>
+            </div>
+          )}
+          <TabPanel id="general">
+            <General />
+          </TabPanel>
+          <TabPanel id="loras">
+            <LoRAs />
+          </TabPanel>
+          <TabPanel id="controlnets">
+            <Controlnets />
+          </TabPanel>
+          <TabPanel id="ipadapters">
+            <IPAdapters />
+          </TabPanel>
+          <TabPanel id="upscale">
+            <Upscale />
+          </TabPanel>
+        </div>
       </VarUI>
     </TabView>
   );

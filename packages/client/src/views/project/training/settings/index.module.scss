@@ -5,7 +5,7 @@
 .prompt {
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
   overflow-y: auto;
 }
 
@@ -14,7 +14,7 @@
   padding: 0.5rem;
   border-radius: 5px;
   font-size: 0.8rem;
-  color: var(--color-fg-error);
+  color: var(--red-900);
   background: var(--color-bg-error);
   font-weight: bold;
 }
@@ -25,7 +25,7 @@
   right: 0;
   z-index: 999999;
   display: block;
-  background: var(--color-bg-panel-dark);
+  background: var(--grey-200);
   display: flex;
 
   @media screen and (min-width: 960px) {
@@ -52,7 +52,7 @@
     }
 
     &:hover {
-      background: var(--color-bg-interactive);
+      background: var(--grey-400);
     }
   }
 }

@@ -11,6 +11,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background: var(--grey-200);
+  border-right: 1px solid var(--grey-400);
 
   .generated {
     flex: 1;
@@ -26,7 +28,7 @@
   .actions {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid var(--color-bg-interactive);
+    border-top: 1px solid var(--grey-400);
   }
 
   .queue,
@@ -59,7 +61,7 @@
   .queue {
     padding-bottom: 0.75rem;
     margin-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-bg-interactive);
+    border-bottom: 1px solid var(--grey-400);
   }
 }
 
@@ -70,11 +72,12 @@
   width: 100%;
   aspect-ratio: 1;
   border-radius: 5px;
-  background: var(--color-bg-panel);
+  background: var(--grey-300);
   position: relative;
   background-size: cover;
   cursor: pointer;
   font-size: 0;
+  transition: 0.2s ease-in-out all;
 
   &:not(:last-child) {
     margin-bottom: 0.75rem;
@@ -86,7 +89,7 @@
 
   &:hover,
   &.active {
-    background-color: var(--color-bg-interactive);
-    color: var(--color-fg);
+    background-color: var(--grey-400);
+    color: var(--grey-900);
   }
 }
