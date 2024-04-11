@@ -70,7 +70,7 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
         const state = await current.execute();
         current.stopped(state);
 
-        if (this.settings.dismissSuccessful) {
+        if (state === TaskState.SUCCESS && this.settings.dismissSuccessful) {
           this.dismiss(current.id);
         }
       } catch (e: any) {

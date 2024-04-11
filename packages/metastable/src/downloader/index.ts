@@ -85,11 +85,16 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
 
     const onClose = async () => {
       writer.close();
-      this.emitProgress();
       if (this.cancellationPending) {
         await fs.unlink(partPath);
         wrapped.resolve(TaskState.CANCELLED);
       } else {
+        this.data = {
+          ...this.data,
+          offset: this.data.size,
+          speed: 0,
+        };
+        this.progress = 1;
         await fs.rename(partPath, this.savePath);
         wrapped.resolve(TaskState.SUCCESS);
       }
