@@ -239,5 +239,5 @@ export async function getNextNumber(dirPath: string) {
     .map(name => name.split('.')[0])
     .map(name => parseInt(name))
     .filter(number => !!number);
-  return (Math.max(...numbers) || 0) + 1;
+  return Math.max(...numbers, 0) + 1;
 }
