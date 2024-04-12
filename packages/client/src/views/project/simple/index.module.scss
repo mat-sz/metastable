@@ -7,7 +7,6 @@
 }
 
 .sidebar {
-  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -27,7 +26,6 @@
 
   .actions {
     margin-top: 0.75rem;
-    padding-top: 0.75rem;
     border-top: 1px solid var(--grey-400);
   }
 
@@ -35,7 +33,7 @@
   .recent,
   .modes {
     list-style-type: none;
-    padding: 0;
+    padding: 0.75rem;
     margin: 0;
 
     .status {
@@ -60,7 +58,6 @@
 
   .queue {
     padding-bottom: 0.75rem;
-    margin-bottom: 0.75rem;
     border-bottom: 1px solid var(--grey-400);
   }
 }

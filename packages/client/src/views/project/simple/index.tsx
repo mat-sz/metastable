@@ -72,7 +72,11 @@ export const SimpleProjectView: React.FC = observer(() => {
                     output.image.url === project.currentOutput,
                 })}
                 key={output.name}
-                style={{ backgroundImage: `url(${output.image.thumbnailUrl})` }}
+                style={{
+                  backgroundImage: `url(${CSS.escape(
+                    output.image.thumbnailUrl,
+                  )})`,
+                }}
                 onClick={() => {
                   runInAction(() => {
                     project.mode = 'images';

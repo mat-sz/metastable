@@ -71,7 +71,11 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
-      if (task.type === 'prompt' && task.data.outputs) {
+      if (
+        task.type === 'prompt' &&
+        task.data.projectId === this.id &&
+        task.data.outputs
+      ) {
         this.onPromptDone(task.data.outputs);
       }
     });

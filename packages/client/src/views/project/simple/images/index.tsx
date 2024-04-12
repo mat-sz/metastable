@@ -1,8 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsPlay } from 'react-icons/bs';
 
-import { IconButton } from '$components/iconButton';
+import { Button } from '$components/button';
 import { ImagePreview } from '$components/imagePreview';
 import { ProgressBar } from '$components/progressBar';
 import styles from './index.module.scss';
@@ -44,9 +43,9 @@ export const Images: React.FC = observer(() => {
       </div>
       <Settings
         actions={
-          <IconButton title="Request image" onClick={() => project.request()}>
-            <BsPlay />
-          </IconButton>
+          <Button onClick={() => project.request()} variant="primary">
+            Generate
+          </Button>
         }
       />
     </div>

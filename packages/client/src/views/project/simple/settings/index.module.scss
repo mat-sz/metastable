@@ -38,6 +38,7 @@
   display: flex;
   border-bottom: 1px solid var(--grey-400);
   justify-content: flex-end;
+  padding: 1rem;
 
   .progress {
     display: flex;
@@ -51,15 +52,6 @@
   }
 
   button {
-    padding: 0.5rem;
-    border-radius: 0;
-
-    svg {
-      font-size: 1.4rem;
-    }
-
-    &:hover {
-      background: var(--grey-400);
-    }
+    margin-left: 0.5rem;
   }
 }

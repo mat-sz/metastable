@@ -1,7 +1,6 @@
 import React from 'react';
-import { BsBrushFill, BsImages } from 'react-icons/bs';
 
-import { IconButton } from '$components/iconButton';
+import { Button } from '$components/button';
 import { useEditor } from './context';
 import { useSimpleProject } from '../../context';
 
@@ -11,8 +10,7 @@ export const Actions: React.FC = () => {
 
   return (
     <>
-      <IconButton
-        title="Run img2img"
+      <Button
         onClick={() => {
           const url = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
@@ -23,10 +21,9 @@ export const Actions: React.FC = () => {
           project.request();
         }}
       >
-        <BsImages />
-      </IconButton>
-      <IconButton
-        title="Run inpainting"
+        IMG2IMG
+      </Button>
+      <Button
         onClick={() => {
           const url = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
@@ -37,8 +34,8 @@ export const Actions: React.FC = () => {
           project.request();
         }}
       >
-        <BsBrushFill />
-      </IconButton>
+        Inpainting
+      </Button>
     </>
   );
 };
