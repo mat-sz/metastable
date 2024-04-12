@@ -52,14 +52,16 @@ export const Settings: React.FC<SettingsProps> = observer(({ actions }) => {
         }}
         values={toJS(project.settings)}
       >
-        <div className={styles.actions}>{!error && actions}</div>
-        <div>
-          {!!error && (
+        {!error && <div className={styles.actions}>{actions}</div>}
+        {!!error && (
+          <div className={styles.errorWrapper}>
             <div className={styles.error}>
               <BsXCircleFill />
               <span>{error}</span>
             </div>
-          )}
+          </div>
+        )}
+        <div>
           <TabPanel id="general">
             <General />
           </TabPanel>
