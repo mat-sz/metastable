@@ -59,7 +59,7 @@ export class BaseProject<T = any> {
   }
 
   get queueCount() {
-    return 0;
+    return this.tasks.length;
   }
 
   get progressValue(): number | undefined {

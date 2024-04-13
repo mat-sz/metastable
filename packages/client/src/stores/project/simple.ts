@@ -98,13 +98,10 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     return this.tasks.filter(task => task.type === 'prompt');
   }
 
-  get queueCount() {
-    return this.queue.length;
-  }
-
   get firstPrompt() {
     return this.queue.find(
-      item => item.state === TaskState.RUNNING || TaskState.PREPARING,
+      item =>
+        item.state === TaskState.RUNNING || item.state === TaskState.PREPARING,
     );
   }
 
