@@ -34,24 +34,6 @@ def load_checkpoint_cached(path, embeddings_path=None):
     last_checkpoint = load_checkpoint(path, embeddings_path)
     return last_checkpoint
 
-def get_sigmas(model, scheduler, steps, denoise, discard_penultimate_sigma=False):
-    custom_schedulers = custom.get_custom_schedulers()
-    if scheduler in custom_schedulers:
-        scheduler = custom_schedulers[scheduler]
-        return scheduler(model, steps, denoise)
-    
-    sigmas = comfy.samplers.calculate_sigmas_scheduler(model.model, scheduler, steps)
-
-    if discard_penultimate_sigma:
-        sigmas = torch.cat([sigmas[:-2], sigmas[-1:]])
-
-    if denoise == 0 or denoise > 0.9999:
-        return sigmas.cpu()
-    else:
-        new_steps = int(steps/denoise)
-        sigmas = sigmas.cpu()
-        return sigmas[-(steps + 1):]
-
 def model_set_circular(model, is_circular=False):
     if isinstance(model, torch.nn.Conv2d):
         model.padding_mode = "circular" if is_circular else "zeros"
@@ -96,13 +78,40 @@ class CheckpointNamespace:
             callback = latent_preview.prepare_callback(model, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
         else:
             callback = latent_preview.prepare_callback(model, "none", steps)
-
-        discard_penultimate_sigma = False
-        if sampler_name in ['dpm_2', 'dpm_2_ancestral', 'uni_pc', 'uni_pc_bh2']:
-            steps += 1
-            discard_penultimate_sigma = True
         
         sampler = comfy.samplers.sampler_object(sampler_name)
-        sigmas = get_sigmas(model, scheduler_name, steps, denoise, discard_penultimate_sigma).cpu()
 
-        return comfy.sample.sample_custom(model, noise, cfg, sampler, sigmas, positive, negative, latent_image, noise_mask=noise_mask, callback=callback, disable_pbar=True, seed=seed)
+        custom_schedulers = custom.get_custom_schedulers()
+        if scheduler_name not in custom_schedulers:
+            return comfy.sample.sample(
+                model=model,
+                noise=noise,
+                steps=steps,
+                cfg=cfg,
+                sampler_name=sampler,
+                scheduler=scheduler_name,
+                positive=positive,
+                negative=negative,
+                latent_image=latent_image,
+                noise_mask=noise_mask,
+                callback=callback,
+                disable_pbar=True,
+                seed=seed
+            )
+        else:
+            scheduler = custom_schedulers[scheduler_name]
+            sigmas = scheduler(model, steps, denoise)
+            return comfy.sample.sample_custom(
+                model=model,
+                noise=noise,
+                cfg=cfg,
+                sampler=sampler,
+                sigmas=sigmas,
+                positive=positive,
+                negative=negative,
+                latent_image=latent_image,
+                noise_mask=noise_mask,
+                callback=callback,
+                disable_pbar=True,
+                seed=seed
+            )
