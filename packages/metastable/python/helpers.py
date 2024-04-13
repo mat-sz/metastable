@@ -1,9 +1,6 @@
-import json
-import os
 import psutil
 import torch
-import sys
-from comfy.model_management import get_torch_device, get_total_memory, vae_dtype
+from comfy.model_management import get_torch_device, get_total_memory, vae_dtype, is_intel_xpu
 
 def get_torch_device_info(device):
     if hasattr(device, 'type'):

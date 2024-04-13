@@ -37,9 +37,7 @@ if __name__ == "__main__":
 import comfy.utils
 
 import comfy.model_management
-from namespaces.checkpoint import CheckpointNamespace
-from namespaces.image import ImageNamespace
-from namespaces.instance import InstanceNamespace
+import namespaces
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
@@ -78,9 +76,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     rpc = RPC()
-    rpc.add_namespace("checkpoint", CheckpointNamespace)
-    rpc.add_namespace("image", ImageNamespace)
-    rpc.add_namespace("instance", InstanceNamespace)
+    namespaces.insert_all(rpc)
 
     cuda_malloc_warning()
 

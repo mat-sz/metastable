@@ -187,32 +187,34 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const loras = settings.models.loras;
       if (loras?.length) {
         this.step('lora');
-        for (const lora of loras) {
-          if (lora.enabled) {
-            await checkpoint.applyLora(lora.path!, lora.strength);
+        for (const loraSettings of loras) {
+          if (loraSettings.enabled) {
+            const lora = await ctx.lora(loraSettings.path!);
+            await lora.applyTo(checkpoint, loraSettings.strength);
           }
         }
       }
 
       this.step('conditioning');
-      let conditioning = await checkpoint.conditioning(
-        settings.conditioning.positive,
-        settings.conditioning.negative,
-      );
+      let conditioning = {
+        positive: await checkpoint.clipEncode(settings.conditioning.positive),
+        negative: await checkpoint.clipEncode(settings.conditioning.negative),
+      };
 
       const controlnets = settings.models.controlnets;
       if (controlnets?.length) {
         this.step('controlnet');
-        for (const controlnet of controlnets) {
-          if (controlnet.enabled) {
+        for (const controlnetSettings of controlnets) {
+          if (controlnetSettings.enabled) {
             const { image } = await ctx.loadImage({
-              $bytes: toBase64(controlnet.image),
+              $bytes: toBase64(controlnetSettings.image),
             });
-            conditioning = await checkpoint.applyControlnet(
-              conditioning,
-              controlnet.path!,
+            const controlnet = await ctx.controlnet(controlnetSettings.path!);
+            conditioning = await controlnet.applyTo(
+              conditioning.positive,
+              conditioning.negative,
               image,
-              controlnet.strength,
+              controlnetSettings.strength,
             );
           }
         }
@@ -221,16 +223,20 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const ipadapters = settings.models.ipadapters;
       if (ipadapters?.length) {
         this.step('ipadapter');
-        for (const ipadapter of ipadapters) {
-          if (ipadapter.enabled) {
+        for (const ipadapterSettings of ipadapters) {
+          if (ipadapterSettings.enabled) {
             const { image } = await ctx.loadImage({
-              $bytes: toBase64(ipadapter.image!),
+              $bytes: toBase64(ipadapterSettings.image!),
             });
-            await checkpoint.applyIpadapter(
-              ipadapter.path!,
-              ipadapter.clip_vision_path!,
+            const ipadapter = await ctx.ipadapter(ipadapterSettings.path!);
+            const clipVision = await ctx.clipVision(
+              ipadapterSettings.clip_vision_path!,
+            );
+            await ipadapter.applyTo(
+              checkpoint,
+              clipVision,
               image,
-              ipadapter.weight,
+              ipadapterSettings.weight,
             );
           }
         }
@@ -283,7 +289,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       if (settings.models.upscale?.enabled) {
         this.step('upscale');
-        images = await ctx.upscaleImages(settings.models.upscale.path!, images);
+        const upscaleModel = await ctx.upscaleModel(
+          settings.models.upscale!.path!,
+        );
+        images = await upscaleModel.applyTo(images);
       }
 
       this.step('save');

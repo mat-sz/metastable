@@ -9,6 +9,7 @@ import comfy.utils
 import comfy.model_management
 import custom
 import latent_preview
+from comfy.cli_args import LatentPreviewMethod
 
 from rpc import RPC
 
@@ -51,56 +52,6 @@ def get_sigmas(model, scheduler, steps, denoise, discard_penultimate_sigma=False
         sigmas = sigmas.cpu()
         return sigmas[-(steps + 1):]
 
-def clip_encode(clip, text):
-    tokens = clip.tokenize(text)
-    cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
-    return [[cond, {"pooled_output": pooled}]]
-
-def vae_encode_crop_pixels(pixels):
-    x = (pixels.shape[1] // 8) * 8
-    y = (pixels.shape[2] // 8) * 8
-    if pixels.shape[1] != x or pixels.shape[2] != y:
-        x_offset = (pixels.shape[1] % 8) // 2
-        y_offset = (pixels.shape[2] % 8) // 2
-        pixels = pixels[:, x_offset:x + x_offset, y_offset:y + y_offset, :]
-    return pixels
-
-def vae_encode(vae, pixels):
-    pixels = vae_encode_crop_pixels(pixels)
-    t = vae.encode(pixels[:,:,:,:3])
-    return {"samples":t}
-
-def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
-    x = (pixels.shape[1] // 8) * 8
-    y = (pixels.shape[2] // 8) * 8
-    mask = torch.nn.functional.interpolate(mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])), size=(pixels.shape[1], pixels.shape[2]), mode="bilinear")
-
-    pixels = pixels.clone()
-    if pixels.shape[1] != x or pixels.shape[2] != y:
-        x_offset = (pixels.shape[1] % 8) // 2
-        y_offset = (pixels.shape[2] % 8) // 2
-        pixels = pixels[:,x_offset:x + x_offset, y_offset:y + y_offset,:]
-        mask = mask[:,:,x_offset:x + x_offset, y_offset:y + y_offset]
-
-    #grow mask by a few pixels to keep things seamless in latent space
-    if grow_mask_by == 0:
-        mask_erosion = mask
-    else:
-        kernel_tensor = torch.ones((1, 1, grow_mask_by, grow_mask_by))
-        padding = math.ceil((grow_mask_by - 1) / 2)
-
-        mask_erosion = torch.clamp(torch.nn.functional.conv2d(mask.round(), kernel_tensor, padding=padding), 0, 1)
-
-    m = (1.0 - mask.round()).squeeze(1)
-    for i in range(3):
-        pixels[:,:,:,i] -= 0.5
-        pixels[:,:,:,i] *= m
-        pixels[:,:,:,i] += 0.5
-    t = vae.encode(pixels)
-
-    return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
-
-
 def model_set_circular(model, is_circular=False):
     if isinstance(model, torch.nn.Conv2d):
         model.padding_mode = "circular" if is_circular else "zeros"
@@ -121,94 +72,13 @@ class CheckpointNamespace:
             "clip": clip,
             "vae": vae
         }
-
-    @RPC.autoref
-    @RPC.method("clip.conditioning")
-    def clip_conditioning(clip, positive, negative):
-        return (clip_encode(clip, positive), clip_encode(clip, negative))
-
-    @RPC.autoref
-    @RPC.method("vae.decode")
-    def vae_decode(vae, samples, is_circular=False):
-        decoded = None
-        if is_circular:
-            decoded = vae_decode_circular(vae, samples)
-        else:
-            decoded = vae.decode(samples)
-        
-        return [value for value in decoded]
-
-    @RPC.autoref
-    @RPC.method("vae.encode")
-    def vae_encode(vae, image, mask=None):
-        if mask is not None:
-            return vae_encode_inpaint(vae, image, mask)
-
-        return vae_encode(vae, image)
-
-    @RPC.autoref
-    @RPC.method("lora.apply")
-    def lora_apply(model, clip, path, strength):
-        lora = comfy.utils.load_torch_file(settings["path"], safe_load=True)
-        (model, clip) = comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
-        return {
-            "model": model,
-            "clip": clip
-        }
-
-    @RPC.autoref
-    @RPC.method("controlnet.apply")
-    def controlnet_apply(conditioning, path, image, strength):
-        controlnet = comfy.controlnet.load_controlnet(path)
-
-        start_percent = 0.0
-        end_percent = 1.0
-
-        if strength == 0:
-            return (positive, negative)
-
-        control_hint = image.movedim(-1,1)
-        cnets = {}
-
-        out = []
-        for cond in conditioning:
-            c = []
-            for t in cond:
-                d = t[1].copy()
-
-                prev_cnet = d.get('control', None)
-                if prev_cnet in cnets:
-                    c_net = cnets[prev_cnet]
-                else:
-                    c_net = controlnet.copy().set_cond_hint(control_hint, strength, (start_percent, end_percent))
-                    c_net.set_previous_controlnet(prev_cnet)
-                    cnets[prev_cnet] = c_net
-
-                d['control'] = c_net
-                d['control_apply_to_uncond'] = False
-                n = [t[0], d]
-                c.append(n)
-            out.append(c)
-        return (out[0], out[1])
-
-    @RPC.autoref
-    @RPC.method("ipadapter.apply")
-    def ipadapter_apply(model, path, clip_vision_path, image, strength):
-        ipadapter_model = ipadapter.load(path)
-        clip_vision_model = comfy.clip_vision.load(clip_vision_path)
-        model = ipadapter.apply(ipadapter_model, model, strength, clip_vision_model, image)
-
-        return {
-            "model": model
-        }
     
     @RPC.autoref
     @RPC.method("sample")
-    def sample(model, latent, conditioning, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
+    def sample(model, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
         model_set_circular(model, is_circular)
 
         latent_image = latent["samples"]
-        positive, negative = conditioning
         noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
         noise_mask = None
@@ -220,10 +90,10 @@ class CheckpointNamespace:
             taesd_decoder_path = None
             if preview["method"] == LatentPreviewMethod.TAESD:
                 taesd_decoder_name = model.model.latent_format.taesd_decoder_name
-                if taesd in preview and taesd_decoder_name in preview["taesd"]:
+                if "taesd" in preview and taesd_decoder_name in preview["taesd"]:
                     taesd_decoder_path = preview["taesd"][taesd_decoder_name]
 
-            callback = latent_preview.prepare_callback(model, preview["method"], steps)
+            callback = latent_preview.prepare_callback(model, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
         else:
             callback = latent_preview.prepare_callback(model, "none", steps)
 

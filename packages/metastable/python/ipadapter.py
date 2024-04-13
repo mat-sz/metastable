@@ -1,5 +1,4 @@
 import torch
-import os
 import math
 
 import comfy.utils
@@ -8,9 +7,10 @@ from comfy.clip_vision import clip_preprocess, Output
 from comfy.ldm.modules.attention import optimized_attention
 
 import torch.nn as nn
-from PIL import Image
 import torch.nn.functional as F
 import torchvision.transforms as TT
+from einops import rearrange
+from einops.layers.torch import Rearrange
 
 # FFN
 def FeedForward(dim, mult=4):
@@ -789,11 +789,7 @@ def apply(ipadapter,
     
     ipadapter.to(device, dtype=dtype)
 
-    if is_faceid and is_plus:
-        image_prompt_embeds = ipadapter.get_image_embeds_faceid_plus(face_embed.to(device, dtype=dtype), clip_embed.to(device, dtype=dtype), weight_v2, faceid_v2)
-        uncond_image_prompt_embeds = ipadapter.get_image_embeds_faceid_plus(face_embed_zeroed.to(device, dtype=dtype), clip_embed_zeroed.to(device, dtype=dtype), weight_v2, faceid_v2)
-    else:
-        image_prompt_embeds, uncond_image_prompt_embeds = ipadapter.get_image_embeds(clip_embed.to(device, dtype=dtype), clip_embed_zeroed.to(device, dtype=dtype))
+    image_prompt_embeds, uncond_image_prompt_embeds = ipadapter.get_image_embeds(clip_embed.to(device, dtype=dtype), clip_embed_zeroed.to(device, dtype=dtype))
 
     image_prompt_embeds = image_prompt_embeds.to(device, dtype=dtype)
     uncond_image_prompt_embeds = uncond_image_prompt_embeds.to(device, dtype=dtype)

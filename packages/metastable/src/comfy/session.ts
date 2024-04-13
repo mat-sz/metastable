@@ -16,66 +16,23 @@ interface RPCBytes {
 interface ComfyLatent {
   samples: RPCRef;
 }
-type ComfyConditioning = [positive: RPCRef, negative: RPCRef];
+type ComfyConditioning = { positive: RPCRef; negative: RPCRef };
 
 export class ComfyCheckpoint {
   constructor(
     private session: ComfySession,
-    private data: {
+    public data: {
       model: RPCRef;
       clip: RPCRef;
       vae: RPCRef;
     },
   ) {}
 
-  async applyLora(path: string, strength: number) {
-    const result = (await this.session.invoke('checkpoint:lora.apply', {
-      model: this.data.model,
+  async clipEncode(text: string) {
+    return (await this.session.invoke('clip:encode', {
       clip: this.data.clip,
-      path,
-      strength,
-    })) as { model: RPCRef; clip: RPCRef };
-
-    this.data.model = result.model;
-    this.data.clip = result.clip;
-  }
-
-  async applyControlnet(
-    conditioning: ComfyConditioning,
-    path: string,
-    image: RPCRef,
-    strength: number,
-  ) {
-    return (await this.session.invoke('checkpoint:controlnet.apply', {
-      conditioning,
-      path,
-      image,
-      strength,
-    })) as ComfyConditioning;
-  }
-
-  async applyIpadapter(
-    path: string,
-    clipVisionPath: string,
-    image: RPCRef,
-    strength: number,
-  ) {
-    const result = (await this.session.invoke('checkpoint:ipadapter.apply', {
-      model: this.data.model,
-      path,
-      clip_vision_path: clipVisionPath,
-      image,
-      strength,
-    })) as { model: RPCRef };
-    this.data.model = result.model;
-  }
-
-  async conditioning(positive: string, negative: string) {
-    return (await this.session.invoke('checkpoint:clip.conditioning', {
-      clip: this.data.clip,
-      positive,
-      negative,
-    })) as ComfyConditioning;
+      text,
+    })) as RPCRef;
   }
 
   async sample(
@@ -95,7 +52,8 @@ export class ComfyCheckpoint {
     return (await this.session.invoke('checkpoint:sample', {
       model: this.data.model,
       latent,
-      conditioning,
+      positive: conditioning.positive,
+      negative: conditioning.negative,
       sampler_name: settings.samplerName,
       scheduler_name: settings.schedulerName,
       steps: settings.steps,
@@ -108,7 +66,7 @@ export class ComfyCheckpoint {
   }
 
   async decode(samples: RPCRef, isCircular?: boolean) {
-    return (await this.session.invoke('checkpoint:vae.decode', {
+    return (await this.session.invoke('vae:decode', {
       vae: this.data.vae,
       samples,
       is_circular: isCircular,
@@ -116,7 +74,7 @@ export class ComfyCheckpoint {
   }
 
   async encode(image: RPCRef, mask?: RPCRef) {
-    return (await this.session.invoke('checkpoint:vae.encode', {
+    return (await this.session.invoke('vae:encode', {
       vae: this.data.vae,
       image,
       mask,
@@ -139,6 +97,90 @@ type ComfySessionEvents = {
   progress: (event: ComfySessionProgressEvent) => void;
   log: (event: ComfySessionLogEvent) => void;
 };
+
+class ComfyControlnet {
+  constructor(
+    private session: ComfySession,
+    private ref: RPCRef,
+  ) {}
+
+  async applyTo(
+    positive: RPCRef,
+    negative: RPCRef,
+    image: RPCRef,
+    strength: number,
+  ) {
+    return (await this.session.invoke('controlnet:apply', {
+      controlnet: this.ref,
+      positive,
+      negative,
+      image,
+      strength,
+    })) as ComfyConditioning;
+  }
+}
+
+class ComfyLORA {
+  constructor(
+    private session: ComfySession,
+    private ref: RPCRef,
+  ) {}
+
+  async applyTo(checkpoint: ComfyCheckpoint, strength: number) {
+    const { model, clip } = (await this.session.invoke('lora:apply', {
+      lora: this.ref,
+      model: checkpoint.data.model,
+      clip: checkpoint.data.clip,
+      strength,
+    })) as { model: RPCRef; clip: RPCRef };
+    checkpoint.data.model = model;
+    checkpoint.data.clip = clip;
+  }
+}
+
+class ComfyIPAdapter {
+  constructor(
+    private session: ComfySession,
+    private ref: RPCRef,
+  ) {}
+
+  async applyTo(
+    checkpoint: ComfyCheckpoint,
+    clipVision: ComfyCLIPVision,
+    image: RPCRef,
+    strength: number,
+  ) {
+    const { model } = (await this.session.invoke('ipadapter:apply', {
+      ipadapter: this.ref,
+      clip_vision: clipVision.ref,
+      model: checkpoint.data.model,
+      image,
+      strength,
+    })) as { model: RPCRef };
+    checkpoint.data.model = model;
+  }
+}
+
+class ComfyCLIPVision {
+  constructor(
+    private session: ComfySession,
+    public ref: RPCRef,
+  ) {}
+}
+
+class ComfyUpscaleModel {
+  constructor(
+    private session: ComfySession,
+    private ref: RPCRef,
+  ) {}
+
+  async applyTo(images: RPCRef[]) {
+    return (await this.session.invoke('upscale_model:apply', {
+      upscale_model: this.ref,
+      images: images,
+    })) as RPCRef[];
+  }
+}
 
 export class ComfySession extends (EventEmitter as {
   new (): TypedEventEmitter<ComfySessionEvents>;
@@ -163,6 +205,41 @@ export class ComfySession extends (EventEmitter as {
     return new ComfyCheckpoint(this, data as any);
   }
 
+  async controlnet(path: string) {
+    const data = (await this.invoke('controlnet:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyControlnet(this, data);
+  }
+
+  async lora(path: string) {
+    const data = (await this.invoke('lora:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyLORA(this, data);
+  }
+
+  async clipVision(path: string) {
+    const data = (await this.invoke('clip_vision:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyCLIPVision(this, data);
+  }
+
+  async ipadapter(path: string) {
+    const data = (await this.invoke('ipadapter:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyIPAdapter(this, data);
+  }
+
+  async upscaleModel(path: string) {
+    const data = (await this.invoke('upscale_model:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyUpscaleModel(this, data);
+  }
+
   async emptyLatent(width: number, height: number, batchSize?: number) {
     return (await this.invoke('image:latent.empty', {
       width,
@@ -183,12 +260,5 @@ export class ComfySession extends (EventEmitter as {
       image: RPCRef;
       mask: RPCRef;
     };
-  }
-
-  async upscaleImages(modelPath: string, images: RPCRef[]) {
-    return (await this.invoke('image:upscale', {
-      images,
-      model_path: modelPath,
-    })) as RPCRef[];
   }
 }
