@@ -1,8 +1,7 @@
-
 import {
   createTRPCClient,
   createWSClient,
-  httpBatchLink,
+  httpLink,
   splitLink,
   wsLink,
 } from '@trpc/client';
@@ -35,7 +34,7 @@ const link = IS_ELECTRON
           },
         }),
       }),
-      false: httpBatchLink({ url: getUrl('/trpc') }),
+      false: httpLink({ url: getUrl('/trpc') }),
     });
 export const API = createTRPCClient<Router>({
   links: [link],

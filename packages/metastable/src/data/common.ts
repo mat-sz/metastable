@@ -255,10 +255,11 @@ export class ImageEntity extends FileEntity {
     await tryUnlink(this.thumbnailPath);
   }
 
-  async json() {
+  async json(withMetadata = false) {
     return {
-      ...(await super.json()),
+      name: this.name,
       image: this.image,
+      metadata: withMetadata ? await this.metadata.get() : undefined,
     };
   }
 }

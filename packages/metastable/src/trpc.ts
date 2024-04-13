@@ -297,7 +297,7 @@ export const router = t.router({
         .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
           const project = await metastable.project.get(projectId);
           const input = await project.input.get(name);
-          return await input.json();
+          return await input.json(true);
         }),
       create: t.procedure
         .input(
@@ -313,7 +313,7 @@ export const router = t.router({
             const input = await project.input.create(name);
 
             await input.write(Base64.toUint8Array(data));
-            return await input.json();
+            return await input.json(true);
           },
         ),
       update: t.procedure
@@ -334,7 +334,7 @@ export const router = t.router({
             const input = await project.input.getOrRename(name, newName);
 
             await input.metadata.update(metadata);
-            return await input.json();
+            return await input.json(true);
           },
         ),
       delete: t.procedure
@@ -370,7 +370,7 @@ export const router = t.router({
         .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
           const project = await metastable.project.get(projectId);
           const output = await project.output.get(name);
-          return await output.json();
+          return await output.json(true);
         }),
       delete: t.procedure
         .input(
