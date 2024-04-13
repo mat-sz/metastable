@@ -196,10 +196,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       this.step('conditioning');
-      let conditioning = {
-        positive: await checkpoint.clipEncode(settings.conditioning.positive),
-        negative: await checkpoint.clipEncode(settings.conditioning.negative),
-      };
+      const conditioning = await checkpoint.conditioning(
+        settings.conditioning.positive,
+        settings.conditioning.negative,
+      );
 
       const controlnets = settings.models.controlnets;
       if (controlnets?.length) {
@@ -210,9 +210,8 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
               $bytes: toBase64(controlnetSettings.image),
             });
             const controlnet = await ctx.controlnet(controlnetSettings.path!);
-            conditioning = await controlnet.applyTo(
-              conditioning.positive,
-              conditioning.negative,
+            await controlnet.applyTo(
+              conditioning,
               image,
               controlnetSettings.strength,
             );
