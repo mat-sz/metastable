@@ -1,6 +1,8 @@
 from io import BytesIO
 import base64
 import torch
+import inspect
+import output
 
 import rpc_hook
 
@@ -9,6 +11,13 @@ PRIMITIVES = (bool, str, int, float, type(None))
 def is_key(obj, key, type):
     return key in obj and isinstance(obj[key], type)
 
+class RPCContext:
+    def __init__(self, request_id, session_id):
+        self.request_id = request_id
+        self.session_id = session_id
+
+    def progress(self, value, total):
+        output.write_event("rpc.progress", { "requestId": self.request_id, "sessionId": self.session_id, "value": value, "max": total })
 class RPCNamespace:
     def __init__(self, obj):
         self.object = obj
@@ -25,7 +34,7 @@ class RPCNamespace:
                     method_autoref = getattr(func, "_rpc_autoref", False)
                     self.is_autoref[method_name] = method_autoref
 
-    def invoke(self, method_name, params, session=None):
+    def invoke(self, method_name, params, context=None, session=None):
         if method_name not in self.methods:
             raise Exception("Method not found")
 
@@ -37,12 +46,17 @@ class RPCNamespace:
             params = session.autoexpand(params)
         
         result = None
+        method = self.methods[method_name]
+        args = inspect.getfullargspec(method)
         
         with torch.inference_mode():
             if isinstance(params, dict):
-                result = self.methods[method_name](**params)
+                if "ctx" in args[0]:
+                    params["ctx"] = context
+                
+                result = method(**params)
             else:
-                result = self.methods[method_name](*params)
+                result = method(*params)
 
         if is_autoref:
             result = session.autoalloc(result)
@@ -152,7 +166,7 @@ class RPC:
                 params = request["params"]
 
             with rpc_hook.use(request_id, session_id):
-                result = namespace.invoke(method_name, params, session)
+                result = namespace.invoke(method_name, params, RPCContext(request_id, session_id), session)
 
             return {
                 "type": "rpc",
@@ -167,5 +181,4 @@ class RPC:
                     "message": type(error).__name__ + "\n" + str(error),
                 }
             }
-            traceback.print_exc()
         

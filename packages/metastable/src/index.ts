@@ -16,14 +16,14 @@ import checkDiskSpace from 'check-disk-space';
 import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
-import { PromptTask } from './comfy/task.js';
+import { PromptTask } from './comfy/tasks/prompt.js';
+import { TagTask } from './comfy/tasks/tag.js';
 import { EntityRepository } from './data/common.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectEntity } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { resolveConfigPath } from './helpers/fs.js';
 import { Kohya } from './kohya/index.js';
-import { Tagger } from './kohya/tagger.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import { Storage } from './storage/index.js';
@@ -45,7 +45,6 @@ export class Metastable extends (EventEmitter as {
   setup = new Setup(this);
   tasks = new Tasks();
   kohya?: Kohya;
-  tagger?: Tagger;
   project;
   model;
 
@@ -177,12 +176,6 @@ export class Metastable extends (EventEmitter as {
 
     this.kohya = new Kohya(this.python!);
     this.kohya.on('event', this.onEvent);
-
-    this.tagger?.removeAllListeners();
-    this.tagger?.stopAll();
-
-    this.tagger = new Tagger(this.python!);
-    this.tagger.on('event', this.onEvent);
   }
 
   async restartComfy() {
@@ -249,16 +242,15 @@ export class Metastable extends (EventEmitter as {
   }
 
   async tag(projectId: Project['id'], settings: ProjectTaggingSettings) {
-    const project = await this.project.get(projectId);
-    if (!settings.tagger.path) {
-      const model = await this.model.get(
-        ModelType.TAGGER,
-        settings.tagger.name,
-      );
-      settings.tagger.path = model.path;
+    if (this.comfy?.status !== 'ready') {
+      return undefined;
     }
 
-    return await this.tagger?.run(project, settings);
+    const project = await this.project.get(projectId);
+    const task = new TagTask(this, project, settings);
+    this.tasks.queues.project.add(task);
+
+    return { id: task.id };
   }
 
   stopTraining(projectId: Project['id']) {

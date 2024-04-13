@@ -65,7 +65,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       removeControlnet: action,
       removeIPAdapter: action,
       setSettings: action,
-      queue: computed,
+      prompts: computed,
       firstPrompt: computed,
       onPromptDone: action,
     });
@@ -94,31 +94,19 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     this.settings = settings;
   }
 
-  get queue(): Task<ProjectPromptTaskData>[] {
+  get prompts(): Task<ProjectPromptTaskData>[] {
     return this.tasks.filter(task => task.type === 'prompt');
   }
 
   get firstPrompt() {
-    return this.queue.find(
+    return this.prompts.find(
       item =>
         item.state === TaskState.RUNNING || item.state === TaskState.PREPARING,
     );
   }
 
-  get progressValue() {
-    return this.firstPrompt?.progress;
-  }
-
-  get progressMax() {
-    return this.firstPrompt ? 1 : undefined;
-  }
-
   get preview() {
     return this.firstPrompt?.data.preview;
-  }
-
-  get progressMarquee() {
-    return !!this.firstPrompt && !this.firstPrompt.progress;
   }
 
   validate() {

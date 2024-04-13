@@ -102,4 +102,24 @@ export class ComfySession extends (EventEmitter as {
       mask: RPCRef;
     };
   }
+
+  async tag(
+    modelPath: string,
+    imagePaths: string[],
+    generalThreshold: number,
+    characterThreshold: number,
+    removeUnderscore = true,
+    undesiredTags = [],
+    captionSeparator = ', ',
+  ) {
+    return (await this.invoke('tagger:tag', {
+      model_path: modelPath,
+      images: imagePaths,
+      general_threshold: generalThreshold,
+      character_threshold: characterThreshold,
+      remove_underscore: removeUnderscore,
+      undesired_tags: undesiredTags,
+      caption_separator: captionSeparator,
+    })) as Record<string, string>;
+  }
 }

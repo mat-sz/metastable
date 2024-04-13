@@ -1,6 +1,5 @@
 import torch
 from PIL import Image
-import struct
 import numpy as np
 from comfy.cli_args import LatentPreviewMethod
 from comfy.taesd.taesd import TAESD

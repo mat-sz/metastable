@@ -32,9 +32,9 @@ export const SimpleProjectView: React.FC = observer(() => {
     <div className={styles.project}>
       <div className={styles.sidebar}>
         <div className={styles.generated}>
-          {!!project.queue.length && (
+          {!!project.prompts.length && (
             <ul className={styles.queue}>
-              {project.queue.map(item => (
+              {project.prompts.map(item => (
                 <li
                   className={styles.item}
                   key={item.id}

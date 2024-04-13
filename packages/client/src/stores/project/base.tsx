@@ -1,4 +1,4 @@
-import { Project as APIProject, ImageFile } from '@metastable/types';
+import { Project as APIProject, ImageFile, TaskState } from '@metastable/types';
 import {
   action,
   computed,
@@ -44,6 +44,7 @@ export class BaseProject<T = any> {
       save: action,
       triggerAutosave: action,
       tasks: computed,
+      firstTask: computed,
       queueCount: computed,
       progressValue: computed,
       progressMax: computed,
@@ -58,20 +59,27 @@ export class BaseProject<T = any> {
     );
   }
 
+  get firstTask() {
+    return this.tasks.find(
+      item =>
+        item.state === TaskState.RUNNING || item.state === TaskState.PREPARING,
+    );
+  }
+
   get queueCount() {
     return this.tasks.length;
   }
 
   get progressValue(): number | undefined {
-    return undefined;
+    return this.firstTask?.progress;
   }
 
   get progressMax(): number | undefined {
-    return undefined;
+    return this.firstTask ? 1 : undefined;
   }
 
   get progressMarquee() {
-    return false;
+    return !!this.firstTask && !this.firstTask.progress;
   }
 
   async refresh() {

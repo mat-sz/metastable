@@ -7,8 +7,7 @@ import comfy.controlnet
 import comfy.clip_vision
 import comfy.utils
 import comfy.model_management
-import custom
-import latent_preview
+from .utils import custom, latent_preview
 from comfy.cli_args import LatentPreviewMethod
 
 from rpc import RPC

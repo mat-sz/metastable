@@ -1,15 +1,9 @@
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "rpc.py"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom.py"))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "helpers.py"))
 
 import comfy.options
 comfy.options.enable_args_parsing()
-
-import importlib.util
-import time
 
 # Main code
 import asyncio
@@ -17,8 +11,6 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 
 import comfy.samplers
-import custom
-from helpers import get_torch_info
 from comfy.cli_args import args
 from rpc import RPC
 import output
@@ -50,7 +42,7 @@ def cuda_malloc_warning():
         if cuda_malloc_warning:
             print("WARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc")
 
-def handle(request):
+def handle(rpc, request):
     try:
         response = rpc.handle(request)
         output.write_json(response)
@@ -68,7 +60,7 @@ async def run(rpc):
             break
         
         try:
-            executor.submit(handle, json.loads(request_str))
+            executor.submit(handle, rpc, json.loads(request_str))
         except:
             pass
 

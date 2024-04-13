@@ -139,8 +139,11 @@ export interface Project extends ProjectInfo {
   temporary?: boolean;
 }
 
-export interface ProjectPromptTaskData {
+export interface ProjectTaskData {
   projectId: string;
+}
+
+export interface ProjectPromptTaskData extends ProjectTaskData {
   preview?: string;
   step?: string;
   stepValue?: number;

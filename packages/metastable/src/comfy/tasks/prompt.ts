@@ -9,10 +9,10 @@ import {
   TaskState,
 } from '@metastable/types';
 
-import { ProjectEntity } from '../data/project.js';
-import { getNextNumber } from '../helpers/fs.js';
-import { Metastable } from '../index.js';
-import { BaseTask } from '../tasks/task.js';
+import { ProjectEntity } from '../../data/project.js';
+import { getNextNumber } from '../../helpers/fs.js';
+import { Metastable } from '../../index.js';
+import { BaseTask } from '../../tasks/task.js';
 
 function toBase64(url: string) {
   return url.split(',')[1];
