@@ -26,7 +26,7 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
 
     useEffect(() => {
       if (metadataQuery.data) {
-        setMetadata(metadataQuery.data.metadata);
+        setMetadata(metadataQuery.data.metadata as any);
       }
     }, [metadataQuery.data, setMetadata]);
 
