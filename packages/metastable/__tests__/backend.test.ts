@@ -10,15 +10,14 @@ const metastable = new Metastable(path.join(os.tmpdir(), 'metastable_test'), {
 
 beforeAll(() => {
   return new Promise(resolve => {
-    metastable.init().then(() => {
-      metastable.comfy?.on('event', event => {
-        if (event.event === 'backend.status' && event.data === 'ready') {
-          resolve();
-        }
-      });
+    metastable.on('event', event => {
+      if (event.event === 'backend.status' && event.data === 'ready') {
+        resolve();
+      }
     });
+    metastable.init();
   });
-});
+}, 60000);
 
 describe('backend', () => {
   it('should provide instance infomration', async () => {
