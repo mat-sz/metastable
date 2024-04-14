@@ -32,7 +32,6 @@ export const requiredPackages: PipDependency[] = [
   { name: 'psutil' },
   { name: 'diffusers', extra: 'torch' },
   { name: 'voluptuous' },
-  { name: 'opencv-python' },
   { name: 'onnx' },
   { name: 'onnxruntime' },
 ];

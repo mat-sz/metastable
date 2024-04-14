@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 import csv
 import torch
@@ -26,11 +25,9 @@ def preprocess_image(image):
     pad_t = pad_y // 2
     image = np.pad(image, ((pad_t, pad_y - pad_t), (pad_l, pad_x - pad_l), (0, 0)), mode="constant", constant_values=255)
 
-    interp = cv2.INTER_AREA if size > IMAGE_SIZE else cv2.INTER_LANCZOS4
-    image = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=interp)
-
-    image = image.astype(np.float32)
-    return image
+    image = Image.fromarray(image)
+    image.thumbnail((IMAGE_SIZE, IMAGE_SIZE), Image.Resampling.LANCZOS)
+    return np.array(image).astype(np.float32)
 
 class ImageLoadingPrepDataset(torch.utils.data.Dataset):
     def __init__(self, image_paths):
