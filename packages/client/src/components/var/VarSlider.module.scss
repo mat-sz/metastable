@@ -65,6 +65,7 @@
     padding: 0 0.2rem;
     text-align: right;
     border-radius: 0.25rem;
+    -moz-appearance: textfield;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
