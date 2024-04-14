@@ -2,20 +2,20 @@ import { MdCropLandscape, MdCropPortrait, MdCropSquare } from 'react-icons/md';
 
 import { Switch, SwitchOption } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
+import styles from './VarAspectRatio.module.scss';
 import { VarBase } from './VarBase';
-import styles from './VarSize.module.scss';
 
-export interface IVarSizeProps {
+export interface IVarAspectRatioProps {
   widthPath?: string;
   heightPath?: string;
   label?: string;
 }
 
-export const VarSize = ({
+export const VarAspectRatio = ({
   widthPath,
   heightPath,
   label,
-}: IVarSizeProps): JSX.Element => {
+}: IVarAspectRatioProps): JSX.Element => {
   const [width, setWidth] = useVarUIValue({
     path: widthPath,
     fallbackValue: 512,

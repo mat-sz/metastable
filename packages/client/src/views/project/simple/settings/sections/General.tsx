@@ -3,12 +3,12 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import {
+  VarAspectRatio,
   VarCategory,
   VarImage,
   VarModel,
   VarRandomNumber,
   VarSelect,
-  VarSize,
   VarSlider,
   VarString,
   VarToggle,
@@ -52,8 +52,8 @@ export const General: React.FC = observer(() => {
         />
         {project.settings.input.mode === 'empty' ? (
           <>
-            <VarSize
-              label="Image size"
+            <VarAspectRatio
+              label="Aspect ratio"
               widthPath="input.width"
               heightPath="input.height"
             />
