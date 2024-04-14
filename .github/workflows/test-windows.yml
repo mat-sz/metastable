@@ -19,6 +19,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - run: python -V
       - run: yarn install
       - run: yarn setup:other
       - run: yarn build

@@ -1,6 +1,6 @@
 import { Metastable } from '../src/index.js';
 
-const metastable = new Metastable('/tmp', {
+const metastable = new Metastable('.', {
   skipPythonSetup: true,
   comfyArgs: ['--cpu'],
 });
