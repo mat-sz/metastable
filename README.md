@@ -1,6 +1,23 @@
-# Metastable
+<h1>
+<center>
+<table><tr><td valign="center">
+<img src="https://raw.githubusercontent.com/mat-sz/metastable/main/packages/client/src/assets/logo.svg" height="40px" />
+&nbsp;&nbsp;
+</td>
+<td valign="center">
+Metastable
+</td>
+</tr></table>
+</center>
+</h1>
 
-A project-based Stable Diffusion Web UI, for easier organization of generated images. Work in progress.
+> [!WARNING]  
+> This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
+
+> [!NOTE]  
+> [Join the project Discord server for updates, suggestions and development.](https://discord.gg/Sf9zKaXzXe)
+
+A project-based Stable Diffusion Web UI, for easier organization of generated images. **Work in progress.**
 
 The backend is based on [ComfyUI's backend](https://github.com/comfyanonymous/ComfyUI).
 
