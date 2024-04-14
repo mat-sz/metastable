@@ -30,6 +30,16 @@ Metastable uses code from:
 
 ## Manual installation
 
+### Docker
+
+If you have an NVIDIA GPU and nvidia-container-runtime is properly configured in your system, you can use the easy Docker compose setup:
+
+```
+docker compose up
+```
+
+The UI will be accessible at https://localhost:5001/
+
 ### Requirements
 
 - node.js 20+
