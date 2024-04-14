@@ -13,3 +13,6 @@ psutil
 transformers==4.36.2
 diffusers[torch]
 voluptuous
+opencv-python
+onnx
+onnxruntime

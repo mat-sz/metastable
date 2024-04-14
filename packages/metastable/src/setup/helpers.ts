@@ -32,6 +32,9 @@ export const requiredPackages: PipDependency[] = [
   { name: 'psutil' },
   { name: 'diffusers', extra: 'torch' },
   { name: 'voluptuous' },
+  { name: 'opencv-python' },
+  { name: 'onnx' },
+  { name: 'onnxruntime' },
 ];
 
 export const REQUIRED_PYTHON_VERSION = '3.8.0 - 3.11.x';
