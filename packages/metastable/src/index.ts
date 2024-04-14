@@ -58,6 +58,7 @@ export class Metastable extends (EventEmitter as {
     private settings: {
       comfyMainPath?: string;
       skipPythonSetup?: boolean;
+      comfyArgs?: string[];
     } = {},
   ) {
     super();
@@ -140,8 +141,8 @@ export class Metastable extends (EventEmitter as {
 
   async reload() {
     await this.reloadPython();
+    await this.restartComfy();
     this.restartKohya();
-    this.restartComfy();
   }
 
   async reloadPython() {
@@ -193,7 +194,7 @@ export class Metastable extends (EventEmitter as {
     this.comfy = new Comfy(
       this.python,
       this.settings.comfyMainPath,
-      config.comfy?.args,
+      [...(config.comfy?.args || []), ...(this.settings.comfyArgs || [])],
       config.comfy?.env,
     );
 
