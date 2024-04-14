@@ -1,6 +1,9 @@
+import os from 'os';
+import path from 'path';
+
 import { Metastable } from '../src/index.js';
 
-const metastable = new Metastable('.', {
+const metastable = new Metastable(path.join(os.tmpdir(), 'metastable_test'), {
   skipPythonSetup: true,
   comfyArgs: ['--cpu'],
 });
