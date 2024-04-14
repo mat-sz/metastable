@@ -34,7 +34,7 @@ export function useVarUIValue<T>({
   const context = useContext(VarUIContext);
   const value = useMemo(
     () => context?.getValue(path) ?? fallbackValue,
-    [context, path, fallbackValue]
+    [context, path, fallbackValue],
   );
   const setValue = useCallback(
     (value: T) => {
@@ -44,7 +44,7 @@ export function useVarUIValue<T>({
 
       onChange?.(value);
     },
-    [path, context, onChange]
+    [path, context, onChange],
   );
   error ||= context?.getError(errorPath || path);
 

@@ -38,7 +38,7 @@ export const Number = ({
 
       onChange(value);
     },
-    [onChange, round]
+    [onChange, round],
   );
 
   useEffect(() => {

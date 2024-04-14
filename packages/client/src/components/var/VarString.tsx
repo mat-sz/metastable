@@ -54,7 +54,7 @@ export const VarString = ({
 
   const textareaStyle: CSSProperties | undefined = useMemo(
     () => (autoexpand ? { overflow: 'hidden', resize: 'none' } : undefined),
-    [autoexpand]
+    [autoexpand],
   );
 
   return (

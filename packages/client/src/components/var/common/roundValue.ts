@@ -3,7 +3,7 @@ export function roundValue(
   min?: number,
   max?: number,
   step?: number,
-  integer?: boolean
+  integer?: boolean,
 ): number {
   if (!isFinite(value)) {
     value = min ?? 0;
