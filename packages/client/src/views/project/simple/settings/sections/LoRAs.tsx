@@ -17,11 +17,12 @@ import { useSimpleProject } from '../../../context';
 
 export const LoRAs: React.FC = observer(() => {
   const project = useSimpleProject();
-  const defaultModel = mainStore.defaultModelName(ModelType.LORA);
+  const type = ModelType.LORA;
+  const defaultModel = mainStore.defaultModelName(type);
 
   return (
     <>
-      <VarArray path="models.loras">
+      <VarArray path="models.lora">
         {(_, i) => (
           <VarCategory
             label={
@@ -30,7 +31,7 @@ export const LoRAs: React.FC = observer(() => {
                 <IconButton
                   title="Delete"
                   onClick={() => {
-                    project.removeLora(i);
+                    project.removeModel(type, i);
                   }}
                 >
                   <BsX />
@@ -39,7 +40,7 @@ export const LoRAs: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType={ModelType.LORA} />
+            <VarModel path="name" modelType={type} />
             <VarSlider
               label="Strength"
               path="strength"
@@ -56,7 +57,7 @@ export const LoRAs: React.FC = observer(() => {
         <VarButton
           buttonLabel="Add LoRA"
           onClick={() => {
-            project.addLora(defaultModel);
+            project.addModel(type, defaultModel);
           }}
         />
       ) : (

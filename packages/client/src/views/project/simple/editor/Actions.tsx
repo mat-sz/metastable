@@ -12,11 +12,16 @@ export const Actions: React.FC = () => {
     <>
       <Button
         onClick={() => {
-          const url = editor.renderSelection();
+          const { url, width, height } = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
           project.settings.input = {
-            mode: 'image',
+            type: 'image',
             image: url,
+          };
+          project.settings.output = {
+            width,
+            height,
+            batchSize: 1,
           };
           project.request();
         }}
@@ -25,11 +30,16 @@ export const Actions: React.FC = () => {
       </Button>
       <Button
         onClick={() => {
-          const url = editor.renderSelection();
+          const { url, width, height } = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
           project.settings.input = {
-            mode: 'image_masked',
+            type: 'image_masked',
             image: url,
+          };
+          project.settings.output = {
+            width,
+            height,
+            batchSize: 1,
           };
           project.request();
         }}

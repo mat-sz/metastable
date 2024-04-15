@@ -95,6 +95,7 @@ class CheckpointNamespace:
                 noise_mask=noise_mask,
                 callback=callback,
                 disable_pbar=True,
+                denoise=denoise,
                 seed=seed
             )
         else:

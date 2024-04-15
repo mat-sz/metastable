@@ -482,7 +482,11 @@ export class Editor extends BasicEventEmitter<{
     }
 
     const canvas = this.renderArea(x, y, width, height);
-    return canvas.toDataURL('image/png');
+    return {
+      width,
+      height,
+      url: canvas.toDataURL('image/png'),
+    };
   }
 
   renderProject() {

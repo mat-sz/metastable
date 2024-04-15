@@ -14,6 +14,7 @@ import {
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 
 export const General: React.FC = observer(() => {
@@ -23,7 +24,7 @@ export const General: React.FC = observer(() => {
     <>
       <VarCategory label="Checkpoint" collapsible>
         <VarModel
-          path="models.base.name"
+          path="checkpoint.name"
           modelType={ModelType.CHECKPOINT}
           onSelect={model => {
             const samplerSettings = model.metadata?.samplerSettings;
@@ -37,67 +38,87 @@ export const General: React.FC = observer(() => {
         />
       </VarCategory>
       <VarCategory label="Prompt" collapsible>
-        <VarString label="Positive" path="conditioning.positive" multiline />
-        <VarString label="Negative" path="conditioning.negative" multiline />
+        <VarString label="Positive" path="prompt.positive" multiline />
+        <VarString label="Negative" path="prompt.negative" multiline />
       </VarCategory>
       <VarCategory label="Input" collapsible>
         <VarSelect
-          label="Mode"
-          path="input.mode"
+          label="Type"
+          path="input.type"
           options={[
-            { key: 'empty', label: 'Empty latent image' },
-            { key: 'image', label: 'Image' },
-            { key: 'image_masked', label: 'Image with mask (inpainting)' },
+            { key: 'none', label: 'None' },
+            { key: 'image', label: 'img2img' },
+            { key: 'image_masked', label: 'Inpainting' },
           ]}
+          onChange={value => {
+            if (value !== 'none' && !project.settings.input.imageMode) {
+              project.settings.input.imageMode = 'stretch';
+            }
+          }}
         />
-        {project.settings.input.mode === 'empty' ? (
-          <>
-            <VarAspectRatio
-              label="Aspect ratio"
-              widthPath="input.width"
-              heightPath="input.height"
-            />
-            <VarSlider
-              label="Width"
-              path="input.width"
-              min={64}
-              max={2048}
-              step={8}
-              defaultValue={512}
-              showInput
-              unit="px"
-            />
-            <VarSlider
-              label="Height"
-              path="input.height"
-              min={64}
-              max={2048}
-              step={8}
-              defaultValue={512}
-              showInput
-              unit="px"
-            />
-            <VarSlider
-              label="Batch size"
-              path="input.batch_size"
-              min={1}
-              max={16}
-              step={1}
-              defaultValue={1}
-              showInput
-            />
-          </>
-        ) : (
+        {project.settings.input.type !== 'none' && (
           <>
             <VarImage label="Image" path="input.image" />
+            <VarSelect
+              label="Image mode"
+              path="input.imageMode"
+              options={imageModeOptions}
+            />
+            {project.settings.input.type === 'image' && (
+              <VarSlider
+                label="Strength"
+                path="sampler.denoise"
+                min={0}
+                max={1}
+                step={0.01}
+                defaultValue={1}
+                showInput
+              />
+            )}
           </>
         )}
       </VarCategory>
-      <VarCategory label="Sampler settings" collapsible defaultCollapsed={true}>
+      <VarCategory label="Output" collapsible>
+        <VarAspectRatio
+          label="Aspect ratio"
+          widthPath="output.width"
+          heightPath="output.height"
+        />
+        <VarSlider
+          label="Width"
+          path="output.width"
+          min={64}
+          max={2048}
+          step={8}
+          defaultValue={512}
+          showInput
+          unit="px"
+        />
+        <VarSlider
+          label="Height"
+          path="output.height"
+          min={64}
+          max={2048}
+          step={8}
+          defaultValue={512}
+          showInput
+          unit="px"
+        />
+        <VarSlider
+          label="Batch size"
+          path="output.batchSize"
+          min={1}
+          max={16}
+          step={1}
+          defaultValue={1}
+          showInput
+        />
+      </VarCategory>
+      <VarCategory label="Sampler" collapsible defaultCollapsed={true}>
         <VarRandomNumber
           label="Seed"
           path="sampler.seed"
-          isRandomizedPath="sampler.seed_randomize"
+          isRandomizedPath="client.randomizeSeed"
         />
         <VarSlider
           label="CFG"
@@ -117,18 +138,9 @@ export const General: React.FC = observer(() => {
           defaultValue={20}
           showInput
         />
-        <VarSlider
-          label="Denoise"
-          path="sampler.denoise"
-          min={0}
-          max={1}
-          step={0.01}
-          defaultValue={1}
-          showInput
-        />
         <VarSelect
           label="Sampler"
-          path="sampler.sampler"
+          path="sampler.samplerName"
           options={mainStore.info.samplers.map(name => ({
             key: name,
             label: name,
@@ -136,7 +148,7 @@ export const General: React.FC = observer(() => {
         />
         <VarSelect
           label="Scheduler"
-          path="sampler.scheduler"
+          path="sampler.schedulerName"
           options={mainStore.info.schedulers.map(name => ({
             key: name,
             label: name,
@@ -144,7 +156,7 @@ export const General: React.FC = observer(() => {
         />
         <VarToggle label="Tiling" path="sampler.tiling" />
       </VarCategory>
-      <VarCategory label="Other settings" collapsible defaultCollapsed={true}>
+      <VarCategory label="Other" collapsible defaultCollapsed={true}>
         <VarSelect
           label="Format"
           path="output.format"
@@ -156,7 +168,7 @@ export const General: React.FC = observer(() => {
         />
         <VarSlider
           label="CLIP skip last layers"
-          path="models.base.clip_skip"
+          path="checkpoint.clipSkip"
           min={0}
           max={12}
           step={1}

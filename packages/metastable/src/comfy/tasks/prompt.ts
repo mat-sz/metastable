@@ -5,7 +5,7 @@ import {
   ImageFile,
   ModelType,
   ProjectPromptTaskData,
-  ProjectSettings,
+  ProjectSimpleSettings,
   TaskState,
 } from '@metastable/types';
 
@@ -13,126 +13,117 @@ import { ProjectEntity } from '../../data/project.js';
 import { getNextNumber } from '../../helpers/fs.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
+import { ComfyPreviewSettings } from '../types.js';
 
 function toBase64(url: string) {
   return url.split(',')[1];
 }
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
+  private embeddingsPath?: string;
+  private preview?: ComfyPreviewSettings;
+
   constructor(
     private metastable: Metastable,
     private project: ProjectEntity,
-    private settings: ProjectSettings,
+    private settings: ProjectSimpleSettings,
   ) {
     super('prompt', { projectId: project.name });
     this.created();
   }
 
+  private async setModelPath(
+    type: ModelType,
+    modelSettings?: { name?: string; path?: string },
+  ) {
+    if (!modelSettings) {
+      return;
+    }
+
+    if (modelSettings.name && !modelSettings.path) {
+      const model = await this.metastable.model.get(type, modelSettings.name);
+      modelSettings.path = model.path;
+    }
+  }
+
+  private async setModelPathArray(
+    type: ModelType,
+    array:
+      | { enabled: boolean; name?: string; path?: string; image?: string }[]
+      | undefined,
+    validateImage = false,
+  ) {
+    if (!array) {
+      return;
+    }
+
+    await Promise.all(
+      array.map(async modelSettings => {
+        if (!modelSettings.enabled) {
+          return;
+        }
+
+        if (validateImage && !modelSettings.image) {
+          modelSettings.enabled = false;
+          return;
+        }
+
+        await this.setModelPath(type, modelSettings);
+      }),
+    );
+  }
+
   async init() {
     const settings = this.settings;
 
-    if (!settings.models.base.path) {
-      const model = await this.metastable.model.get(
-        ModelType.CHECKPOINT,
-        settings.models.base.name,
-      );
-      settings.models.base.path = model.path;
+    if (settings.input.type !== 'none' && !settings.input.processedImage) {
+      throw new Error("Image is required if input type is not 'none'.");
     }
 
-    const embeddingsPath = await this.metastable.model.getEmbeddingsPath();
-    if (embeddingsPath) {
-      settings.models.base.embeddings_path = embeddingsPath;
-    }
+    await this.setModelPath(ModelType.CHECKPOINT, settings.checkpoint);
 
-    if (settings.models.loras) {
-      settings.models.loras = settings.models.loras.filter(
-        model => model.enabled && model.name,
-      );
+    this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
 
-      for (const modelSettings of settings.models.loras) {
-        if (!modelSettings.path) {
-          const model = await this.metastable.model.get(
-            ModelType.LORA,
-            modelSettings.name!,
-          );
-          modelSettings.path = model.path;
+    await this.setModelPathArray(ModelType.LORA, settings.models.lora);
+    await this.setModelPathArray(
+      ModelType.CONTROLNET,
+      settings.models.controlnet,
+      true,
+    );
+
+    await this.setModelPath(ModelType.UPSCALE_MODEL, settings.upscale);
+
+    if (settings.models.ipadapter) {
+      for (const modelSettings of settings.models.ipadapter) {
+        if (
+          !modelSettings.enabled ||
+          !modelSettings.image ||
+          !modelSettings.name ||
+          !modelSettings.clipVisionName
+        ) {
+          modelSettings.enabled = false;
+          continue;
         }
-      }
-    }
 
-    if (settings.models.controlnets) {
-      settings.models.controlnets = settings.models.controlnets.filter(
-        model => model.enabled && model.name && model.image,
-      );
-
-      for (const modelSettings of settings.models.controlnets) {
-        if (!modelSettings.path) {
-          const model = await this.metastable.model.get(
-            ModelType.CONTROLNET,
-            modelSettings.name!,
-          );
-          modelSettings.path = model.path;
-        }
-      }
-    }
-
-    if (settings.models.upscale?.name && settings.models.upscale?.enabled) {
-      if (!settings.models.upscale.path) {
-        const model = await this.metastable.model.get(
-          ModelType.UPSCALE_MODEL,
-          settings.models.upscale.name,
-        );
-        settings.models.upscale.path = model.path;
-      }
-    } else {
-      settings.models.upscale = undefined;
-    }
-
-    if (settings.models.ipadapters) {
-      settings.models.ipadapters = settings.models.ipadapters
-        .filter(
-          model =>
-            model.enabled &&
-            model.name &&
-            model.clip_vision_name &&
-            model.image,
-        )
-        .map(model => ({
-          ...model,
-          path:
-            model.path ||
-            this.metastable.model.getEntityPath(
-              ModelType.IPADAPTER,
-              model.name!,
-            ),
-          clip_vision_path:
-            model.path ||
-            this.metastable.model.getEntityPath(
-              ModelType.CLIP_VISION,
-              model.clip_vision_name!,
-            ),
-        }));
-
-      for (const modelSettings of settings.models.ipadapters) {
         if (!modelSettings.path) {
           const model = await this.metastable.model.get(
             ModelType.IPADAPTER,
-            modelSettings.name!,
+            modelSettings.name,
           );
           modelSettings.path = model.path;
         }
 
-        if (!modelSettings.clip_vision_path) {
+        if (!modelSettings.clipVisionPath) {
           const model = await this.metastable.model.get(
             ModelType.CLIP_VISION,
-            modelSettings.clip_vision_name!,
+            modelSettings.clipVisionName,
           );
-          modelSettings.clip_vision_path = model.path;
+          modelSettings.clipVisionPath = model.path;
         }
       }
     }
 
-    if (settings.sampler.preview?.method === 'taesd') {
+    try {
       const decoderModel = await this.metastable.model.get(
         ModelType.VAE_APPROX,
         'taesd_decoder',
@@ -141,11 +132,15 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         ModelType.VAE_APPROX,
         'taesdxl_decoder',
       );
-      settings.sampler.preview.taesd = {
-        taesd_decoder: decoderModel.path,
-        taesdxl_decoder: decoderXlModel.path,
+
+      this.preview = {
+        method: 'taesd',
+        taesd: {
+          taesd_decoder: decoderModel.path,
+          taesdxl_decoder: decoderXlModel.path,
+        },
       };
-    }
+    } catch {}
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
@@ -177,14 +172,14 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.step('checkpoint');
       const settings = this.settings;
       const checkpoint = await ctx.checkpoint(
-        settings.models.base.path!,
-        settings.models.base.embeddings_path,
-        settings.models.base.clip_skip
-          ? -1 * settings.models.base.clip_skip
+        settings.checkpoint.path!,
+        this.embeddingsPath,
+        settings.checkpoint.clipSkip
+          ? -1 * settings.checkpoint.clipSkip
           : undefined,
       );
 
-      const loras = settings.models.loras;
+      const loras = settings.models.lora;
       if (loras?.length) {
         this.step('lora');
         for (const loraSettings of loras) {
@@ -197,17 +192,17 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       this.step('conditioning');
       const conditioning = await checkpoint.conditioning(
-        settings.conditioning.positive,
-        settings.conditioning.negative,
+        settings.prompt.positive,
+        settings.prompt.negative,
       );
 
-      const controlnets = settings.models.controlnets;
+      const controlnets = settings.models.controlnet;
       if (controlnets?.length) {
         this.step('controlnet');
         for (const controlnetSettings of controlnets) {
           if (controlnetSettings.enabled) {
             const { image } = await ctx.loadImage({
-              $bytes: toBase64(controlnetSettings.image),
+              $bytes: toBase64(controlnetSettings.image!),
             });
             const controlnet = await ctx.controlnet(controlnetSettings.path!);
             await controlnet.applyTo(
@@ -219,7 +214,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         }
       }
 
-      const ipadapters = settings.models.ipadapters;
+      const ipadapters = settings.models.ipadapter;
       if (ipadapters?.length) {
         this.step('ipadapter');
         for (const ipadapterSettings of ipadapters) {
@@ -229,13 +224,13 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
             });
             const ipadapter = await ctx.ipadapter(ipadapterSettings.path!);
             const clipVision = await ctx.clipVision(
-              ipadapterSettings.clip_vision_path!,
+              ipadapterSettings.clipVisionPath!,
             );
             await ipadapter.applyTo(
               checkpoint,
               clipVision,
               image,
-              ipadapterSettings.weight,
+              ipadapterSettings.strength,
             );
           }
         }
@@ -246,18 +241,18 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       let latent = undefined;
 
       this.step('input');
-      switch (settings.input.mode) {
-        case 'empty':
+      switch (settings.input.type) {
+        case 'none':
           latent = await ctx.emptyLatent(
-            settings.input.width,
-            settings.input.height,
-            settings.input.batch_size,
+            settings.output.width,
+            settings.output.height,
+            settings.output.batchSize || 1,
           );
           break;
         case 'image':
           {
             const { image } = await ctx.loadImage({
-              $bytes: toBase64(settings.input.image),
+              $bytes: toBase64(settings.input.processedImage!),
             });
             latent = await checkpoint.encode(image);
           }
@@ -265,7 +260,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         case 'image_masked':
           {
             const { image, mask } = await ctx.loadImage({
-              $bytes: toBase64(settings.input.image),
+              $bytes: toBase64(settings.input.processedImage!),
             });
             latent = await checkpoint.encode(image, mask);
           }
@@ -279,18 +274,14 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.step('sample');
       const samples = await checkpoint.sample(latent, conditioning, {
         ...settings.sampler,
-        samplerName: settings.sampler.sampler,
-        schedulerName: settings.sampler.scheduler,
         isCircular,
       });
       let images = await checkpoint.decode(samples, isCircular);
       const outputDir = this.project!.output.path;
 
-      if (settings.models.upscale?.enabled) {
+      if (settings.upscale?.enabled) {
         this.step('upscale');
-        const upscaleModel = await ctx.upscaleModel(
-          settings.models.upscale!.path!,
-        );
+        const upscaleModel = await ctx.upscaleModel(settings.upscale.path!);
         images = await upscaleModel.applyTo(images);
       }
 

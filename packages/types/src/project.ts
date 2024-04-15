@@ -1,75 +1,72 @@
 import { ImageFile } from './file.js';
 
-export interface ProjectInputEmpty {
-  mode: 'empty';
-  batch_size: number;
-  width: number;
-  height: number;
-}
-
-export interface ProjectInputImage {
-  mode: 'image' | 'image_masked';
-  image: string;
-}
-
-export type ProjectInput = ProjectInputEmpty | ProjectInputImage;
-
-export interface ProjectSettings {
-  input: ProjectInput;
-  models: {
-    base: {
-      name: string;
-      path?: string;
-      embeddings_path?: string;
-      clip_skip?: number;
-    };
-    loras?: {
-      enabled: boolean;
-      name?: string;
-      path?: string;
-      strength: number;
-    }[];
-    upscale?: { enabled: boolean; name?: string; path?: string };
-    controlnets?: {
-      enabled: boolean;
-      name?: string;
-      path?: string;
-      strength: number;
-      image: string;
-      image_mode?: string;
-    }[];
-    ipadapters?: {
-      enabled: boolean;
-      name?: string;
-      path?: string;
-      weight: number;
-      clip_vision_name?: string;
-      clip_vision_path?: string;
-      image?: string;
-      image_mode?: string;
-    }[];
+export interface ProjectSimpleSettings {
+  version: number;
+  checkpoint: {
+    name: string;
+    path?: string;
+    clipSkip?: number;
   };
-  conditioning: {
-    positive: string;
-    negative: string;
+  input: {
+    type: 'none' | 'image' | 'image_masked';
+    image?: string;
+    imageMode?: string;
+    mask?: string;
+    processedImage?: string;
   };
-  output?: {
+  output: {
+    width: number;
+    height: number;
+    batchSize: number;
     format?: string;
     path?: string;
   };
+  models: {
+    lora?: {
+      enabled: boolean;
+      strength: number;
+      name?: string;
+      path?: string;
+    }[];
+    controlnet?: {
+      enabled: boolean;
+      strength: number;
+      name?: string;
+      path?: string;
+      image?: string;
+      imageMode?: string;
+      editor?: {
+        name: string;
+        data: any;
+      };
+    }[];
+    ipadapter?: {
+      enabled: boolean;
+      strength: number;
+      name?: string;
+      path?: string;
+      clipVisionName?: string;
+      clipVisionPath?: string;
+      image?: string;
+      imageMode?: string;
+    }[];
+  };
+  prompt: {
+    positive: string;
+    negative: string;
+  };
   sampler: {
     seed: number;
-    seed_randomize: boolean;
     steps: number;
     cfg: number;
     denoise: number;
-    sampler: string;
-    scheduler: string;
+    samplerName: string;
+    schedulerName: string;
     tiling?: boolean;
-    preview?: {
-      method: string;
-      taesd?: any;
-    };
+  };
+  upscale?: { enabled: boolean; name?: string; path?: string };
+  client: {
+    randomizeSeed: boolean;
   };
 }
 

@@ -7,7 +7,7 @@ import {
   LogItem,
   ModelType,
   Project,
-  ProjectSettings,
+  ProjectSimpleSettings,
   ProjectTaggingSettings,
   ProjectTrainingSettings,
   Utilization,
@@ -217,7 +217,7 @@ export class Metastable extends (EventEmitter as {
     }
   }
 
-  async prompt(projectId: Project['id'], settings: ProjectSettings) {
+  async prompt(projectId: Project['id'], settings: ProjectSimpleSettings) {
     if (this.comfy?.status !== 'ready') {
       return undefined;
     }

@@ -41,19 +41,25 @@ export async function base64ify(image: string) {
   return await imageUrlToBase64(image);
 }
 
+export const imageModeOptions = [
+  { key: 'stretch', label: 'Stretch' },
+  { key: 'center', label: 'Center' },
+  { key: 'cover', label: 'Cover' },
+  { key: 'contain', label: 'Contain' },
+];
+
 export async function prepareImage(
   input: string,
   width: number,
   height: number,
   mode?: 'cover' | 'contain' | 'center' | 'stretch' | string,
+  mask?: string,
 ) {
   const source = await loadImage(input);
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, width, height);
 
   if (mode === 'cover' || mode === 'contain') {
     let scale = 1;
@@ -95,6 +101,23 @@ export async function prepareImage(
       width,
       height,
     );
+  }
+
+  if (mask) {
+    const image = await loadImage(mask);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.drawImage(
+      image,
+      0,
+      0,
+      image.naturalWidth,
+      image.naturalHeight,
+      0,
+      0,
+      width,
+      height,
+    );
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   return canvas.toDataURL('image/png');

@@ -1,5 +1,5 @@
 import { ImageInfo } from './file.js';
-import { ProjectSettings } from './project.js';
+import { ProjectSimpleSettings } from './project.js';
 
 export enum ModelType {
   CHECKPOINT = 'checkpoint',
@@ -25,7 +25,7 @@ export interface ModelInfo {
   source?: string;
   sourceId?: string;
   nsfw?: boolean;
-  samplerSettings?: Partial<ProjectSettings['sampler']>;
+  samplerSettings?: Partial<ProjectSimpleSettings['sampler']>;
   homepage?: string;
   baseModel?: string;
 }

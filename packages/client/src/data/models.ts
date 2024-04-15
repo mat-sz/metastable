@@ -105,7 +105,7 @@ export const downloadable: DownloadableModelGroup[] = [
         samplerSettings: {
           steps: 1,
           cfg: 1,
-          scheduler: 'turbo',
+          schedulerName: 'turbo',
         },
         baseModel: 'SDXL Turbo',
       },

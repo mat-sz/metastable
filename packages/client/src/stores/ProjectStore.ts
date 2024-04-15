@@ -118,6 +118,9 @@ export class ProjectStore {
       }
 
       const settings = json.settings ?? defaultSettings();
+      if (settings.version !== 1) {
+        return;
+      }
 
       const project = createProject(json, settings);
       runInAction(() => {

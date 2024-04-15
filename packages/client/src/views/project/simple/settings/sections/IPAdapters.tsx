@@ -15,15 +15,17 @@ import {
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 
 export const IPAdapters: React.FC = observer(() => {
   const project = useSimpleProject();
-  const defaultModel = mainStore.defaultModelName(ModelType.IPADAPTER);
+  const type = ModelType.IPADAPTER;
+  const defaultModel = mainStore.defaultModelName(type);
 
   return (
     <>
-      <VarArray path="models.ipadapters">
+      <VarArray path="models.ipadapter">
         {(_, i) => (
           <VarCategory
             label={
@@ -32,7 +34,7 @@ export const IPAdapters: React.FC = observer(() => {
                 <IconButton
                   title="Delete"
                   onClick={() => {
-                    project.removeIPAdapter(i);
+                    project.removeModel(type, i);
                   }}
                 >
                   <BsX />
@@ -41,14 +43,11 @@ export const IPAdapters: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType={ModelType.IPADAPTER} />
-            <VarModel
-              path="clip_vision_name"
-              modelType={ModelType.CLIP_VISION}
-            />
+            <VarModel path="name" modelType={type} />
+            <VarModel path="clipVisionName" modelType={ModelType.CLIP_VISION} />
             <VarSlider
-              label="Weight"
-              path="weight"
+              label="Strength"
+              path="strength"
               min={0}
               max={1}
               step={0.01}
@@ -58,13 +57,8 @@ export const IPAdapters: React.FC = observer(() => {
             <VarImage label="Image" path="image" />
             <VarSelect
               label="Image mode"
-              path="image_mode"
-              options={[
-                { key: 'stretch', label: 'Stretch' },
-                { key: 'center', label: 'Center' },
-                { key: 'cover', label: 'Cover' },
-                { key: 'contain', label: 'Contain' },
-              ]}
+              path="imageMode"
+              options={imageModeOptions}
             />
           </VarCategory>
         )}
@@ -73,7 +67,7 @@ export const IPAdapters: React.FC = observer(() => {
         <VarButton
           buttonLabel="Add IPAdapter"
           onClick={() => {
-            project.addIPAdapter();
+            project.addModel(type, defaultModel);
           }}
         />
       ) : (

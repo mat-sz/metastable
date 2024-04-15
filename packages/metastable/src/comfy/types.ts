@@ -16,3 +16,8 @@ export interface RPCRef {
 export interface RPCBytes {
   $bytes: string;
 }
+
+export interface ComfyPreviewSettings {
+  method: string;
+  taesd?: any;
+}

@@ -10,18 +10,15 @@ export const Upscale: React.FC = observer(() => {
   const project = useSimpleProject();
   const defaultModel = mainStore.defaultModelName(ModelType.UPSCALE_MODEL);
 
-  const enabled = !!project.settings.models.upscale?.name;
-
   return (
     <VarCategory label="Upscale">
       {defaultModel ? (
         <VarToggle
           label="Enable"
-          path="models.upscale.enabled"
-          value={enabled}
+          path="upscale.enabled"
           onChange={value => {
-            if (value && !project.settings.models.upscale?.name) {
-              project.settings.models.upscale = {
+            if (value && !project.settings.upscale?.name) {
+              project.settings.upscale = {
                 enabled: true,
                 name: defaultModel,
               };
@@ -34,11 +31,8 @@ export const Upscale: React.FC = observer(() => {
           onClick={() => mainStore.openModelManager()}
         />
       )}
-      {enabled && (
-        <VarModel
-          path="models.upscale.name"
-          modelType={ModelType.UPSCALE_MODEL}
-        />
+      {project.settings.upscale?.enabled && (
+        <VarModel path="upscale.name" modelType={ModelType.UPSCALE_MODEL} />
       )}
     </VarCategory>
   );

@@ -1,7 +1,5 @@
-import { ProjectSettings } from '@metastable/types';
-
 import type { ComfySession } from './session.js';
-import type { RPCRef } from './types.js';
+import type { ComfyPreviewSettings, RPCRef } from './types.js';
 
 export interface ComfyLatent {
   samples: RPCRef;
@@ -49,8 +47,8 @@ export class ComfyCheckpoint {
       cfg: number;
       seed: number;
       isCircular?: boolean;
-      preview?: ProjectSettings['sampler']['preview'];
     },
+    preview?: ComfyPreviewSettings,
   ) {
     return (await this.session.invoke('checkpoint:sample', {
       model: this.data.model,
@@ -64,7 +62,7 @@ export class ComfyCheckpoint {
       cfg: settings.cfg,
       seed: settings.seed,
       is_circular: settings.isCircular,
-      preview: settings.preview,
+      preview,
     })) as RPCRef;
   }
 

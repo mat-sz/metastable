@@ -3,7 +3,7 @@ import {
   ImageFile,
   ModelType,
   ProjectPromptTaskData,
-  ProjectSettings,
+  ProjectSimpleSettings,
   Task,
   TaskState,
 } from '@metastable/types';
@@ -13,57 +13,61 @@ import { API } from '$api';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { randomSeed } from '$utils/comfy';
-import { base64ify, loadImage, prepareImage } from '$utils/image';
+import { base64ify, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
-export function defaultSettings(): ProjectSettings {
+export function defaultSettings(): ProjectSimpleSettings {
   return {
-    input: { mode: 'empty', batch_size: 1, width: 512, height: 512 },
-    models: {
-      base: { name: mainStore.defaultModelName(ModelType.CHECKPOINT) },
-      loras: [],
-      controlnets: [],
+    version: 1,
+    input: { type: 'none' },
+    output: {
+      width: 512,
+      height: 512,
+      batchSize: 1,
+      format: 'png',
     },
-    conditioning: {
+    checkpoint: {
+      name: mainStore.defaultModelName(ModelType.CHECKPOINT),
+    },
+    models: {
+      lora: [],
+      controlnet: [],
+    },
+    prompt: {
       positive: 'an image of a banana',
       negative: 'bad quality',
     },
     sampler: {
       seed: randomSeed(),
-      seed_randomize: true,
       steps: 20,
       cfg: 8.0,
       denoise: 1,
-      sampler: 'dpm_2',
-      scheduler: 'karras',
+      samplerName: 'dpm_2',
+      schedulerName: 'karras',
       tiling: false,
     },
-    output: {
-      format: 'png',
+    client: {
+      randomizeSeed: true,
     },
   };
 }
 
-export class SimpleProject extends BaseProject<ProjectSettings> {
+export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
 
   constructor(
     data: Omit<APIProject, 'settings'>,
-    settings: ProjectSettings = defaultSettings(),
+    settings: ProjectSimpleSettings = defaultSettings(),
   ) {
     super(data, settings);
     makeObservable(this, {
       editor: observable,
       preview: computed,
       request: action,
-      addLora: action,
-      addControlnet: action,
-      addIPAdapter: action,
-      removeLora: action,
-      removeControlnet: action,
-      removeIPAdapter: action,
+      addModel: action,
+      removeModel: action,
       setSettings: action,
       prompts: computed,
       firstPrompt: computed,
@@ -81,14 +85,12 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     });
   }
 
-  setSettings(settings: ProjectSettings) {
-    if (settings.input.mode === 'empty') {
-      settings.input.height ||= 512;
-      settings.input.width ||= 512;
-      settings.input.batch_size ||= 1;
-    }
+  setSettings(settings: ProjectSimpleSettings) {
+    settings.output.height ||= 512;
+    settings.output.width ||= 512;
+    settings.output.batchSize ||= 1;
 
-    settings.models.base.name ||= mainStore.defaultModelName(
+    settings.checkpoint.name ||= mainStore.defaultModelName(
       ModelType.CHECKPOINT,
     );
     this.settings = settings;
@@ -111,7 +113,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
 
   validate() {
     const settings = this.settings;
-    const checkpointName = settings.models.base.name;
+    const checkpointName = settings.checkpoint.name;
     if (!checkpointName) {
       return 'No checkpoint selected.';
     } else if (
@@ -120,7 +122,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       return 'Selected checkpoint does not exist.';
     }
 
-    const loras = settings.models.loras;
+    const loras = settings.models.lora;
     if (loras?.length) {
       for (const lora of loras) {
         if (!lora.enabled) {
@@ -137,7 +139,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
       }
     }
 
-    const controlnets = settings.models.controlnets;
+    const controlnets = settings.models.controlnet;
     if (controlnets?.length) {
       for (const controlnet of controlnets) {
         if (!controlnet.enabled) {
@@ -158,10 +160,7 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     }
 
     const input = settings.input;
-    if (
-      (input.mode === 'image' || input.mode === 'image_masked') &&
-      !input.image
-    ) {
+    if (input.type !== 'none' && !input.image) {
       return 'No input image selected.';
     }
 
@@ -173,49 +172,60 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
   }
 
   async request() {
-    if (this.settings.sampler.seed_randomize) {
+    if (this.settings.client.randomizeSeed) {
       this.settings.sampler.seed = randomSeed();
     }
 
     this.currentOutput = undefined;
 
     const settings = toJS(this.settings);
-    let width = 512;
-    let height = 512;
+    const width = settings.output.width;
+    const height = settings.output.height;
+
     if (
-      settings.input.mode === 'image' ||
-      settings.input.mode === 'image_masked'
+      settings.input.type === 'image' ||
+      settings.input.type === 'image_masked'
     ) {
-      const image = await loadImage(settings.input.image);
-      width = image.naturalWidth;
-      height = image.naturalHeight;
-      settings.input.image = await base64ify(settings.input.image);
-    } else if (settings.input.mode === 'empty') {
-      width = settings.input.width;
-      height = settings.input.height;
+      settings.input.processedImage = await prepareImage(
+        settings.input.image!,
+        width,
+        height,
+        settings.input.imageMode,
+        settings.input.type === 'image_masked'
+          ? settings.input.mask
+          : undefined,
+      );
     }
 
-    if (settings.models.controlnets) {
-      for (const controlnet of settings.models.controlnets) {
+    if (settings.models.controlnet) {
+      for (const controlnet of settings.models.controlnet) {
+        if (!controlnet.image) {
+          continue;
+        }
+
         controlnet.image = await base64ify(
           await prepareImage(
             controlnet.image,
             width,
             height,
-            controlnet.image_mode,
+            controlnet.imageMode,
           ),
         );
       }
     }
 
-    if (settings.models.ipadapters) {
-      for (const ipadapter of settings.models.ipadapters) {
+    if (settings.models.ipadapter) {
+      for (const ipadapter of settings.models.ipadapter) {
+        if (!ipadapter.image) {
+          continue;
+        }
+
         ipadapter.image = await base64ify(
           await prepareImage(
             ipadapter.image!,
             width,
             height,
-            ipadapter.image_mode,
+            ipadapter.imageMode,
           ),
         );
       }
@@ -228,68 +238,53 @@ export class SimpleProject extends BaseProject<ProjectSettings> {
     });
   }
 
-  addLora(name: string, strength = 1) {
+  addModel(
+    type: ModelType.CONTROLNET | ModelType.IPADAPTER | ModelType.LORA,
+    name: string,
+    strength = 1,
+  ) {
     const settings = { ...this.settings };
-
-    if (!settings.models.loras) {
-      settings.models.loras = [];
+    if (!settings.models[type]) {
+      settings.models[type] = [];
     }
 
-    settings.models.loras.push({
-      enabled: true,
-      name,
-      strength,
-    });
-    this.settings = settings;
-  }
-
-  removeLora(index: number) {
-    const settings = { ...this.settings };
-    settings.models.loras?.splice(index, 1);
-    this.settings = settings;
-  }
-
-  addControlnet(name: string, strength = 1) {
-    const settings = { ...this.settings };
-
-    if (!settings.models.controlnets) {
-      settings.models.controlnets = [];
+    switch (type) {
+      case ModelType.CONTROLNET:
+        this.settings.models[type]?.push({
+          enabled: true,
+          name,
+          strength,
+          image: '',
+          imageMode: 'cover',
+        });
+        break;
+      case ModelType.IPADAPTER:
+        this.settings.models[type]?.push({
+          enabled: true,
+          name,
+          clipVisionName: '',
+          strength,
+          image: '',
+          imageMode: 'cover',
+        });
+        break;
+      default:
+        this.settings.models[type]?.push({
+          enabled: true,
+          name,
+          strength,
+        });
     }
 
-    settings.models.controlnets.push({
-      enabled: true,
-      name,
-      strength,
-      image: '',
-      image_mode: 'cover',
-    });
     this.settings = settings;
   }
 
-  removeControlnet(index: number) {
+  removeModel(
+    type: ModelType.CONTROLNET | ModelType.IPADAPTER | ModelType.LORA,
+    index: number,
+  ) {
     const settings = { ...this.settings };
-    settings.models.controlnets?.splice(index, 1);
-    this.settings = settings;
-  }
-
-  addIPAdapter() {
-    const settings = { ...this.settings };
-
-    if (!settings.models.ipadapters) {
-      settings.models.ipadapters = [];
-    }
-
-    settings.models.ipadapters.push({
-      enabled: true,
-      weight: 1,
-      image_mode: 'cover',
-    });
-    this.settings = settings;
-  }
-
-  removeIPAdapter(index: number) {
-    const settings = { ...this.settings };
-    settings.models.ipadapters?.splice(index, 1);
+    settings.models[type]?.splice(index, 1);
     this.settings = settings;
   }
 

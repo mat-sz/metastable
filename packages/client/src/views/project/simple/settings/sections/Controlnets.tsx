@@ -15,15 +15,17 @@ import {
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 
 export const Controlnets: React.FC = observer(() => {
   const project = useSimpleProject();
-  const defaultModel = mainStore.defaultModelName(ModelType.CONTROLNET);
+  const type = ModelType.CONTROLNET;
+  const defaultModel = mainStore.defaultModelName(type);
 
   return (
     <>
-      <VarArray path="models.controlnets">
+      <VarArray path="models.controlnet">
         {(_, i) => (
           <VarCategory
             label={
@@ -32,7 +34,7 @@ export const Controlnets: React.FC = observer(() => {
                 <IconButton
                   title="Delete"
                   onClick={() => {
-                    project.removeControlnet(i);
+                    project.removeModel(type, i);
                   }}
                 >
                   <BsX />
@@ -41,7 +43,7 @@ export const Controlnets: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType={ModelType.CONTROLNET} />
+            <VarModel path="name" modelType={type} />
             <VarSlider
               label="Strength"
               path="strength"
@@ -54,13 +56,8 @@ export const Controlnets: React.FC = observer(() => {
             <VarImage label="Image" path="image" />
             <VarSelect
               label="Image mode"
-              path="image_mode"
-              options={[
-                { key: 'stretch', label: 'Stretch' },
-                { key: 'center', label: 'Center' },
-                { key: 'cover', label: 'Cover' },
-                { key: 'contain', label: 'Contain' },
-              ]}
+              path="imageMode"
+              options={imageModeOptions}
             />
           </VarCategory>
         )}
@@ -69,7 +66,7 @@ export const Controlnets: React.FC = observer(() => {
         <VarButton
           buttonLabel="Add Controlnet"
           onClick={() => {
-            project.addControlnet(defaultModel);
+            project.addModel(type, defaultModel);
           }}
         />
       ) : (
