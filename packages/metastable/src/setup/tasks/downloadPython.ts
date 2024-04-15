@@ -7,7 +7,7 @@ import { BaseDownloadTask } from '../../downloader/index.js';
 import { tryUnlink } from '../../helpers/fs.js';
 
 const GH_PYTHON_RELEASE =
-  'https://api.github.com/repos/indygreg/python-build-standalone/releases?per_page=1';
+  'https://api.github.com/repos/indygreg/python-build-standalone/releases?per_page=5';
 const REQUIRED_PYTHON_VERSION = '3.11.x';
 const REQUIRED_PYTHON_TYPE = 'install_only.tar.gz';
 
@@ -21,6 +21,8 @@ interface GithubRelease {
   url: string;
   name: string;
   assets: GithubReleaseAsset[];
+  prerelease?: boolean;
+  draft?: boolean;
 }
 
 const LINUX_X86_64_VERSION_FLAGS = {
@@ -92,10 +94,11 @@ async function getLatestReleaseInfo() {
   try {
     const res = await fetch(GH_PYTHON_RELEASE);
     const json = (await res.json()) as GithubRelease[];
-    if (!json[0]) {
+    const release = json.find(release => !release.draft && !release.prerelease);
+    if (!release) {
       throw new Error('No release data available.');
     }
-    return json[0];
+    return release;
   } catch (e) {
     throw new Error(`Unable to retrieve latest Python from GitHub, ${e}`);
   }
