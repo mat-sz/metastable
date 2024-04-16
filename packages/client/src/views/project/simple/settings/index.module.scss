@@ -3,7 +3,7 @@
   border-left: 1px solid var(--grey-400);
 }
 
-.prompt {
+.var {
   display: flex;
   flex-direction: column;
   background: var(--grey-200);
@@ -42,17 +42,6 @@
   border-bottom: 1px solid var(--grey-400);
   justify-content: flex-end;
   padding: 1rem;
-
-  .progress {
-    display: flex;
-    align-items: center;
-    width: 8rem;
-    margin-right: 0.5rem;
-
-    & > div {
-      height: 1.5rem;
-    }
-  }
 
   button {
     margin-left: 0.5rem;

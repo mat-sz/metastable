@@ -17,7 +17,11 @@ import { mainStore } from '$stores/MainStore';
 import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 
-export const General: React.FC = observer(() => {
+interface Props {
+  showPrompt?: boolean;
+}
+
+export const General: React.FC<Props> = observer(({ showPrompt }) => {
   const project = useSimpleProject();
 
   return (
@@ -37,10 +41,12 @@ export const General: React.FC = observer(() => {
           }}
         />
       </VarCategory>
-      <VarCategory label="Prompt" collapsible>
-        <VarString label="Positive" path="prompt.positive" multiline />
-        <VarString label="Negative" path="prompt.negative" multiline />
-      </VarCategory>
+      {showPrompt && (
+        <VarCategory label="Prompt" collapsible>
+          <VarString label="Positive" path="prompt.positive" multiline />
+          <VarString label="Negative" path="prompt.negative" multiline />
+        </VarCategory>
+      )}
       <VarCategory label="Input" collapsible>
         <VarSelect
           label="Type"

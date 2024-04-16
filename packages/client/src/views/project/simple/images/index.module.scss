@@ -2,18 +2,28 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 2fr 1fr;
+  grid-template-columns: [main] 1fr [settings] 500px;
+  grid-template-rows: [main] 1fr [prompt] 313px;
+}
 
-  @media screen and (min-width: 960px) {
-    grid-template-columns: 1fr 500px;
-    grid-template-rows: 100%;
-  }
+.prompt {
+  background: var(--grey-200);
+  border-top: 1px solid var(--grey-400);
+  grid-column: main;
+  grid-row: prompt;
+  overflow-y: auto;
+}
+
+.settings {
+  grid-column: settings;
+  grid-row: span 2;
 }
 
 .preview {
   display: flex;
   flex-direction: column;
+  grid-column: main;
+  grid-row: main;
 }
 
 .info {
@@ -48,5 +58,15 @@
     width: 100%;
     margin-bottom: 1rem;
     margin-top: 0.5rem;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+
+  button {
+    margin-left: 0.5rem;
   }
 }

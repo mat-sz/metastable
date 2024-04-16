@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { Button } from '$components/button';
 import { ImagePreview } from '$components/imagePreview';
 import { ProgressBar } from '$components/progressBar';
 import styles from './index.module.scss';
+import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
 import { Settings } from '../settings';
 
@@ -41,13 +41,8 @@ export const Images: React.FC = observer(() => {
           </>
         )}
       </div>
-      <Settings
-        actions={
-          <Button onClick={() => project.request()} variant="primary">
-            Generate
-          </Button>
-        }
-      />
+      <Prompt />
+      <Settings className={styles.settings} />
     </div>
   );
 });

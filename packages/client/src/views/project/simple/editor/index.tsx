@@ -45,7 +45,7 @@ export const ImageEditor: React.FC = observer(() => {
           <div className={styles.wrapper} ref={wrapperRef}></div>
           <Layers />
         </div>
-        <Settings actions={<Actions />} />
+        <Settings actions={<Actions />} showPrompt />
       </div>
     </EditorContext.Provider>
   );
