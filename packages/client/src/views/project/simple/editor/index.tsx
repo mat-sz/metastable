@@ -50,3 +50,5 @@ export const ImageEditor: React.FC = observer(() => {
     </EditorContext.Provider>
   );
 });
+
+export default ImageEditor;

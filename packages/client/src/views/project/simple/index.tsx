@@ -1,18 +1,21 @@
 import { TaskState } from '@metastable/types';
 import clsx from 'clsx';
+import { glueIsWebGLAvailable } from 'fxglue';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BsGrid, BsHourglass, BsPencil, BsXCircleFill } from 'react-icons/bs';
 
 import { ProgressCircle } from '$components/progressCircle';
-import { ImageEditor } from './editor';
 import { Grid } from './grid';
 import { Images } from './images';
 import styles from './index.module.scss';
 import { useSimpleProject } from '../context';
 
+const ImageEditor = React.lazy(() => import('./editor'));
+
 const MAX_DISPLAY_OUTPUTS = 25;
+const EDITOR_AVAILABLE = glueIsWebGLAvailable();
 
 export const SimpleProjectView: React.FC = observer(() => {
   const project = useSimpleProject();
@@ -116,23 +119,25 @@ export const SimpleProjectView: React.FC = observer(() => {
             >
               <BsGrid />
             </li>
-            <li
-              onClick={() =>
-                runInAction(() => {
-                  project.mode = 'editor';
-                })
-              }
-              className={clsx(styles.item, {
-                [styles.active]: project.mode === 'editor',
-              })}
-              title="Editor"
-            >
-              <BsPencil />
-            </li>
+            {EDITOR_AVAILABLE && (
+              <li
+                onClick={() =>
+                  runInAction(() => {
+                    project.mode = 'editor';
+                  })
+                }
+                className={clsx(styles.item, {
+                  [styles.active]: project.mode === 'editor',
+                })}
+                title="Editor"
+              >
+                <BsPencil />
+              </li>
+            )}
           </ul>
         </div>
       </div>
-      {tabs[project.mode]}
+      <Suspense fallback="Loading...">{tabs[project.mode]}</Suspense>
     </div>
   );
 });
