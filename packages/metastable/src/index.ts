@@ -73,6 +73,10 @@ export class Metastable extends (EventEmitter as {
     this.tasks.on('event', this.onEvent);
 
     setInterval(async () => {
+      if (!this.listenerCount('utilization')) {
+        return;
+      }
+
       const [graphics, cpuTemperature, currentLoad, mem, usage] =
         await Promise.all([
           si.graphics(),
