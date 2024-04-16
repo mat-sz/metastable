@@ -64,7 +64,13 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   padding: 1rem;
+
+  .hint {
+    margin-right: 1rem;
+    font-size: 0.8rem;
+  }
 
   button {
     margin-left: 0.5rem;
