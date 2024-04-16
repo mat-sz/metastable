@@ -10,7 +10,7 @@ export * from './task.js';
 export class Tasks extends EventEmitter {
   queues: Record<string, BaseQueue> = {
     downloads: new BaseQueue('downloads'),
-    setup: new BaseQueue('setup'),
+    setup: new BaseQueue('setup', { stopOnFailure: true }),
     project: new BaseQueue('project', { dismissSuccessful: true }),
   };
 
