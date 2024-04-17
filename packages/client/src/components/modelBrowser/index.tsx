@@ -7,9 +7,9 @@ import { Breadcrumbs } from '$components/breadcrumbs';
 import { Card, CardMenu, CardMenuItem, List } from '$components/list';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
+import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
-import { fuzzy } from '$utils/fuzzy';
 import { removeFileExtension, stringToColor } from '$utils/string';
 
 interface Props {
@@ -72,7 +72,7 @@ export const ModelBrowser: React.FC<Props> = observer(
         <List
           items={[...directories, ...models]}
           quickFilter={(_, search) =>
-            fuzzy(
+            mainStore.searchFn(
               allModels,
               search,
               item => `${item.name} ${removeFileExtension(item.file.name)}`,

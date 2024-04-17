@@ -4,7 +4,7 @@ import React from 'react';
 import { BsDownload, BsGearFill } from 'react-icons/bs';
 
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { VarString, VarUI } from '$components/var';
+import { VarCategory, VarString, VarToggle, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
@@ -27,9 +27,18 @@ export const Settings: React.FC = observer(() => {
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
         </Tabs>
         <TabContent>
-          <TabPanel id="general">Empty.</TabPanel>
+          <TabPanel id="general">
+            <VarCategory label="User interface">
+              <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />
+            </VarCategory>
+            <VarCategory label="Generation">
+              <VarToggle path="generation.preview" label="Enable previews" />
+            </VarCategory>
+          </TabPanel>
           <TabPanel id="downloads">
-            <VarString path="civitai.apiKey" label="CivitAI API key" />
+            <VarCategory label="CivitAI">
+              <VarString path="civitai.apiKey" label="CivitAI API key" />
+            </VarCategory>
           </TabPanel>
         </TabContent>
       </TabView>

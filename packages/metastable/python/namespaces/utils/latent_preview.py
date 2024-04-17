@@ -1,7 +1,6 @@
 import torch
 from PIL import Image
 import numpy as np
-from comfy.cli_args import LatentPreviewMethod
 from comfy.taesd.taesd import TAESD
 import comfy.utils
 
@@ -45,15 +44,15 @@ class Latent2RGBPreviewer(LatentPreviewer):
 
 def get_previewer(device, method, latent_format, taesd_decoder_path):
     previewer = None
-    if method != LatentPreviewMethod.NoPreviews:
+    if method is not None and method != "none":
         # TODO previewer methods
 
-        if method == LatentPreviewMethod.Auto:
-            method = LatentPreviewMethod.Latent2RGB
+        if method == "auto":
+            method = "latent2rgb"
             if taesd_decoder_path:
-                method = LatentPreviewMethod.TAESD
+                method = "taesd"
 
-        if method == LatentPreviewMethod.TAESD:
+        if method == "taesd":
             if taesd_decoder_path:
                 taesd = TAESD(None, taesd_decoder_path).to(device)
                 previewer = TAESDPreviewerImpl(taesd)
@@ -65,7 +64,7 @@ def get_previewer(device, method, latent_format, taesd_decoder_path):
                 previewer = Latent2RGBPreviewer(latent_format.latent_rgb_factors)
     return previewer
 
-def prepare_callback(model, steps, method, x0_output_dict=None, taesd_decoder_path=None):
+def prepare_callback(model, method, steps, x0_output_dict=None, taesd_decoder_path=None):
     previewer = get_previewer(model.load_device, method, model.model.latent_format, taesd_decoder_path)
 
     pbar = comfy.utils.ProgressBar(steps)

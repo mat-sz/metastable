@@ -6,7 +6,6 @@ import { Card, CardTag, CardTags, List } from '$components/list';
 import { Modal, useModal } from '$components/modal';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
-import { fuzzy } from '$utils/fuzzy';
 import styles from './index.module.scss';
 
 export const OpenProject: React.FC = observer(() => {
@@ -19,7 +18,7 @@ export const OpenProject: React.FC = observer(() => {
         <List
           items={data}
           quickFilter={(items, search) =>
-            fuzzy(items, search, item => item.name)
+            mainStore.searchFn(items, search, item => item.name)
           }
         >
           {item => (

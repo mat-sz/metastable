@@ -10,6 +10,7 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { API } from '$api';
 import { UnsavedProjects } from '$modals/unsavedProjects';
 import { IS_ELECTRON } from '$utils/config';
+import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { ConfigStore } from './ConfigStore';
 import { modalStore } from './ModalStore';
 import { modelStore } from './ModelStore';
@@ -217,6 +218,10 @@ class MainStore {
   defaultModelName(type: ModelType) {
     const model = modelStore.defaultModel(type);
     return model?.file.name;
+  }
+
+  get searchFn() {
+    return this.config.data?.ui?.fuzzySearch ? fuzzy : strIncludes;
   }
 }
 

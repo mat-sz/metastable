@@ -49,8 +49,13 @@ export class Metastable extends (EventEmitter as {
   model;
 
   onEvent = async (event: AnyEvent) => {
-    console.log(`[${new Date().toISOString()}]`, event);
     this.emit('event', event);
+
+    if (event.event === 'task.update' && event.data.queueId === 'project') {
+      // Hide prompt updates, so preview URLs don't obscure other important events.
+      return;
+    }
+    console.log(`[${new Date().toISOString()}]`, event);
   };
 
   constructor(

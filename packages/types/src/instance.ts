@@ -20,6 +20,12 @@ export interface ConfigType {
   civitai?: {
     apiKey?: string;
   };
+  ui?: {
+    fuzzySearch?: boolean;
+  };
+  generation?: {
+    preview?: boolean;
+  };
 }
 
 export interface Utilization {

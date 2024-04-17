@@ -5,7 +5,6 @@ import { BsClockHistory, BsFiles, BsPlus } from 'react-icons/bs';
 import { Card, List } from '$components/list';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
-import { fuzzy } from '$utils/fuzzy';
 import styles from './index.module.scss';
 
 export const Home: React.FC = observer(() => {
@@ -57,7 +56,7 @@ export const Home: React.FC = observer(() => {
               small
               items={mainStore.projects.all}
               quickFilter={(data, search) =>
-                fuzzy(data, search, item => item.name)
+                mainStore.searchFn(data, search, item => item.name)
               }
             >
               {item => (

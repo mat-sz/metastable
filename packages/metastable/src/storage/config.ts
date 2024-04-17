@@ -1,4 +1,5 @@
 import { ConfigType } from '@metastable/types';
+import { assign } from 'radash';
 
 import { JSONFile } from '../helpers/fs.js';
 
@@ -6,6 +7,12 @@ const CONFIG_DEFAULTS: ConfigType = {
   python: {
     configured: false,
     mode: 'system',
+  },
+  generation: {
+    preview: true,
+  },
+  ui: {
+    fuzzySearch: true,
   },
 };
 
@@ -19,10 +26,7 @@ export class Config {
   async all(): Promise<ConfigType> {
     const data = await this.configFile.readJson();
 
-    return {
-      ...CONFIG_DEFAULTS,
-      ...data,
-    };
+    return assign({ ...CONFIG_DEFAULTS }, { ...data });
   }
 
   async store(config: ConfigType): Promise<void> {

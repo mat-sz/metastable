@@ -21,7 +21,9 @@ function toBase64(url: string) {
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private embeddingsPath?: string;
-  private preview?: ComfyPreviewSettings;
+  private preview: ComfyPreviewSettings = {
+    method: 'auto',
+  };
 
   constructor(
     private metastable: Metastable,
@@ -123,24 +125,32 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
     }
 
-    try {
-      const decoderModel = await this.metastable.model.get(
-        ModelType.VAE_APPROX,
-        'taesd_decoder',
-      );
-      const decoderXlModel = await this.metastable.model.get(
-        ModelType.VAE_APPROX,
-        'taesdxl_decoder',
-      );
+    const config = await this.metastable.storage.config.all();
 
+    if (config.generation?.preview) {
+      try {
+        const decoderModel = await this.metastable.model.get(
+          ModelType.VAE_APPROX,
+          'taesd_decoder',
+        );
+        const decoderXlModel = await this.metastable.model.get(
+          ModelType.VAE_APPROX,
+          'taesdxl_decoder',
+        );
+
+        this.preview = {
+          method: 'taesd',
+          taesd: {
+            taesd_decoder: decoderModel.path,
+            taesdxl_decoder: decoderXlModel.path,
+          },
+        };
+      } catch {}
+    } else {
       this.preview = {
-        method: 'taesd',
-        taesd: {
-          taesd_decoder: decoderModel.path,
-          taesdxl_decoder: decoderXlModel.path,
-        },
+        method: 'none',
       };
-    } catch {}
+    }
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
@@ -272,10 +282,15 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       this.step('sample');
-      const samples = await checkpoint.sample(latent, conditioning, {
-        ...settings.sampler,
-        isCircular,
-      });
+      const samples = await checkpoint.sample(
+        latent,
+        conditioning,
+        {
+          ...settings.sampler,
+          isCircular,
+        },
+        this.preview,
+      );
       let images = await checkpoint.decode(samples, isCircular);
       const outputDir = this.project!.output.path;
 

@@ -98,3 +98,15 @@ export function fuzzy<T>(
     )
     .map(entry => entry[2]);
 }
+
+export function strIncludes<T>(
+  items: T[],
+  pattern: string,
+  toString: (item: T) => string,
+) {
+  const normalizedPattern = normalizeString(pattern);
+
+  return items.filter(item =>
+    normalizeString(toString(item)).includes(normalizedPattern),
+  );
+}
