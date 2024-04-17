@@ -1,9 +1,10 @@
 import { ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   VarAspectRatio,
+  VarButton,
   VarCategory,
   VarImage,
   VarModel,
@@ -16,6 +17,7 @@ import {
 import { mainStore } from '$stores/MainStore';
 import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
+import { MaskEditor } from '../maskEditor';
 
 interface Props {
   showPrompt?: boolean;
@@ -23,9 +25,22 @@ interface Props {
 
 export const General: React.FC<Props> = observer(({ showPrompt }) => {
   const project = useSimpleProject();
+  const [maskEditorOpen, setMaskEditorOpen] = useState(false);
 
   return (
     <>
+      {maskEditorOpen && !!project.settings.input.image && (
+        <MaskEditor
+          imageSrc={project.settings.input.image!}
+          maskSrc={project.settings.input.mask}
+          onClose={mask => {
+            setMaskEditorOpen(false);
+            if (mask) {
+              project.settings.input.mask = mask;
+            }
+          }}
+        />
+      )}
       <VarCategory label="Checkpoint" collapsible>
         <VarModel
           path="checkpoint.name"
@@ -64,12 +79,24 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         />
         {project.settings.input.type !== 'none' && (
           <>
-            <VarImage label="Image" path="input.image" />
+            <VarImage
+              label="Image"
+              path="input.image"
+              onChange={() => {
+                project.settings.input.mask = undefined;
+              }}
+            />
             <VarSelect
               label="Image mode"
               path="input.imageMode"
               options={imageModeOptions}
             />
+            {project.settings.input.type === 'image_masked' && (
+              <VarButton
+                buttonLabel="Edit mask"
+                onClick={() => setMaskEditorOpen(true)}
+              />
+            )}
             {project.settings.input.type === 'image' && (
               <VarSlider
                 label="Strength"

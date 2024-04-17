@@ -13,6 +13,7 @@ export * from './VarScope';
 export * from './VarSelect';
 export * from './VarSlider';
 export * from './VarString';
+export * from './VarSwitch';
 export * from './VarToggle';
 
 // Other
