@@ -8,11 +8,13 @@ export class ConfigStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.init();
+    this.refresh();
   }
 
-  async init() {
-    this.refresh();
+  private _autosaveTimeout: number | undefined = undefined;
+  triggerAutosave() {
+    clearTimeout(this._autosaveTimeout);
+    this._autosaveTimeout = setTimeout(() => this.save(), 1000) as any;
   }
 
   async refresh() {
@@ -22,10 +24,15 @@ export class ConfigStore {
     });
   }
 
-  async store(data: ConfigType) {
-    const newData = await API.instance.config.set.mutate(data);
+  async save() {
+    const data = await API.instance.config.set.mutate(this.data);
     runInAction(() => {
-      this.data = newData;
+      this.data = data;
     });
+  }
+
+  async set(data: ConfigType) {
+    this.data = data;
+    this.triggerAutosave();
   }
 }
