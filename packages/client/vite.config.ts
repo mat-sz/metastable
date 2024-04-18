@@ -1,8 +1,9 @@
-import { defineConfig } from 'vite';
+import path from 'path';
+
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
-import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode.includes('production');
@@ -31,7 +32,7 @@ export default defineConfig(({ mode }) => {
                       formats: ['cjs'],
                     },
                     rollupOptions: {
-                      external: ['sharp', 'chokidar', 'axios'],
+                      external: ['sharp', 'chokidar', 'axios', 'node-pty'],
                       output: {
                         inlineDynamicImports: true,
                         entryFileNames: '[name].cjs',

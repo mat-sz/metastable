@@ -4,7 +4,7 @@ import os from 'os';
 import { Requirement, SetupOS, SetupPython } from '@metastable/types';
 import semver from 'semver';
 
-import { PipDependency } from './types.js';
+import { GithubRelease, PipDependency } from './types.js';
 import { PythonInstance } from '../python/index.js';
 
 export async function isGNULibc() {
@@ -19,10 +19,9 @@ export async function isGNULibc() {
 export const requiredPackages: PipDependency[] = [
   { name: 'torch' },
   { name: 'torchvision' },
-  { name: 'torchaudio' },
   { name: 'torchsde' },
   { name: 'einops' },
-  { name: 'transformers', version: '==4.36.2' },
+  { name: 'transformers', version: '>=4.25.1' },
   { name: 'safetensors' },
   { name: 'accelerate' },
   { name: 'pyyaml' },
@@ -139,5 +138,90 @@ export async function getPython(python?: PythonInstance): Promise<SetupPython> {
     };
   } catch {
     return noPython;
+  }
+}
+
+const LINUX_X86_64_VERSION_FLAGS = {
+  v2: ['cx16', 'lahf_lm', 'popcnt', 'sse4_1', 'sse4_2', 'ssse3'],
+  v3: ['avx', 'avx2', 'bmi1', 'bmi2', 'f16c', 'fma', 'abm', 'movbe', 'xsave'],
+  v4: ['avx512f', 'avx512bw', 'avx512cd', 'avx512dq', 'avx512vl'],
+};
+
+export async function getLinuxArchitecture(simple = false) {
+  if (os.arch() !== 'x64') {
+    return undefined;
+  }
+
+  if (simple) {
+    return 'x86_64';
+  }
+
+  const cpuInfo = await fs.readFile('/proc/cpuinfo', { encoding: 'utf-8' });
+  const split = cpuInfo.split('\n');
+  const line = split.find(line => line.startsWith('flags'));
+  if (!line) {
+    return undefined;
+  }
+
+  const flags = line.split(':')[1]?.trim().split(' ');
+  if (!flags) {
+    return undefined;
+  }
+
+  let archVersion = '';
+  for (const [version, versionFlags] of Object.entries(
+    LINUX_X86_64_VERSION_FLAGS,
+  )) {
+    let allFound = true;
+    for (const flag of versionFlags) {
+      if (!flags.includes(flag)) {
+        allFound = false;
+        break;
+      }
+    }
+
+    if (allFound) {
+      archVersion = version;
+    }
+  }
+
+  return archVersion ? `x86_64_${archVersion}` : `x86_64`;
+}
+
+export async function getPlatform(simple = false) {
+  const platform = os.platform();
+  if (platform === 'darwin') {
+    if (os.arch() === 'arm64') {
+      return 'aarch64-apple-darwin';
+    } else if (os.arch() === 'x64') {
+      return 'x86_64-apple-darwin';
+    }
+  } else if (platform === 'win32' && os.arch() === 'x64') {
+    return `x86_64-pc-windows-msvc${simple ? '' : '-shared'}`;
+  } else if (platform === 'linux') {
+    const arch = await getLinuxArchitecture(simple);
+    if (!arch) {
+      throw new Error(`Unsupported architecture: ${os.arch()}`);
+    }
+
+    return `${arch}-unknown-linux-gnu`;
+  }
+
+  throw new Error(`Unsupported platform: ${platform} ${os.arch()}`);
+}
+
+export async function getLatestReleaseInfo(repository: string) {
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${repository}/releases?per_page=5`,
+    );
+    const json = (await res.json()) as GithubRelease[];
+    const release = json.find(release => !release.draft && !release.prerelease);
+    if (!release) {
+      throw new Error('No release data available.');
+    }
+    return release;
+  } catch (e) {
+    throw new Error(`Unable to retrieve latest Python from GitHub, ${e}`);
   }
 }

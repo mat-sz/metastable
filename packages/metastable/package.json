@@ -31,6 +31,7 @@
     "js-base64": "^3.7.7",
     "meta-png": "^1.0.6",
     "nanoid": "^5.0.4",
+    "node-pty": "1.1.0-beta14",
     "radash": "^12.1.0",
     "rimraf": "^5.0.5",
     "sharp": "^0.33.2",

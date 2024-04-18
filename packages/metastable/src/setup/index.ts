@@ -10,6 +10,7 @@ import { getOS, getPython } from './helpers.js';
 import { ConfigurePythonTask } from './tasks/configurePython.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { DownloadPythonTask } from './tasks/downloadPython.js';
+import { DownloadUvTask } from './tasks/downloadUv.js';
 import { ExtractPythonTask } from './tasks/extractPython.js';
 import type { Metastable } from '../index.js';
 
@@ -119,6 +120,14 @@ export class Setup extends EventEmitter {
       this.done();
     });
 
+    const uvArchivePath = path.join(
+      this.metastable.storage.dataRoot,
+      os.platform() === 'win32' ? 'uv.zip' : 'uv.tar.gz',
+    );
+    const uvTargetPath = path.join(this.metastable.storage.dataRoot, 'uv');
+    setupQueue.add(new DownloadUvTask(uvArchivePath));
+    setupQueue.add(new ExtractPythonTask(uvArchivePath, uvTargetPath));
+
     if (settings.pythonMode === 'static') {
       const archivePath = path.join(
         this.metastable.storage.dataRoot,
@@ -130,7 +139,12 @@ export class Setup extends EventEmitter {
       setupQueue.add(new DownloadPythonTask(archivePath));
       setupQueue.add(new ExtractPythonTask(archivePath, targetPath));
       setupQueue.add(
-        new ConfigurePythonTask(settings.torchMode, undefined, targetPath),
+        new ConfigurePythonTask(
+          settings.torchMode,
+          uvTargetPath,
+          undefined,
+          targetPath,
+        ),
       );
     } else {
       const packagesDir = path.join(

@@ -1,14 +1,8 @@
-FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+FROM archlinux:base-devel
 
-ENV DEBIAN_FRONTEND=noninteractive PIP_PREFER_BINARY=1
+ENV PIP_PREFER_BINARY=1
 
-RUN apt update && \
-  apt install -y ca-certificates curl gnupg && \
-  mkdir -p /etc/apt/keyrings && \
-  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-  apt update && apt install -y nodejs && \
-  apt clean
+RUN pacman -Sy nodejs npm python uv --noconfirm 
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
@@ -18,7 +12,7 @@ RUN --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.npm \
   npm install -g yarn && \
   yarn install && \
-  yarn setup:other && \
+  uv pip install -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages && \
   yarn build
 
 EXPOSE 5001

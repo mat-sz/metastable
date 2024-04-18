@@ -1,6 +1,5 @@
 torch
 torchvision
-torchaudio
 torchsde
 einops
 safetensors
@@ -10,7 +9,7 @@ Pillow
 scipy
 tqdm
 psutil
-transformers==4.36.2
+transformers
 diffusers[torch]
 voluptuous
 onnx

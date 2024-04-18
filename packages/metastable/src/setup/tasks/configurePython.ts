@@ -1,7 +1,8 @@
-import { spawn } from 'child_process';
 import os from 'os';
+import path from 'path';
 
 import { SetupSettings, TaskState } from '@metastable/types';
+import { spawn } from 'node-pty';
 
 import { WrappedPromise } from '../../helpers/promise.js';
 import { PythonInstance } from '../../python/index.js';
@@ -11,6 +12,7 @@ import { requiredPackages } from '../helpers.js';
 export class ConfigurePythonTask extends BaseTask {
   constructor(
     private torchMode: SetupSettings['torchMode'],
+    private uvDir: string,
     private packagesDir?: string,
     private pythonHome?: string,
   ) {
@@ -18,7 +20,6 @@ export class ConfigurePythonTask extends BaseTask {
   }
 
   async execute() {
-    const collecting: string[] = [];
     let required: string[] = requiredPackages.map(pkg => {
       let dependency = pkg.name;
       if (pkg.extra) {
@@ -36,6 +37,7 @@ export class ConfigurePythonTask extends BaseTask {
 
     const env = {
       PYTHONHOME: this.pythonHome!,
+      VIRTUAL_ENV: this.pythonHome!,
       PYTHONPATH: this.packagesDir!,
       FORCE_COLOR: '1',
     };
@@ -73,16 +75,21 @@ export class ConfigurePythonTask extends BaseTask {
         break;
     }
 
+    const uvBin =
+      os.platform() === 'win32'
+        ? path.join(this.uvDir, 'uv.exe')
+        : path.join(this.uvDir, 'uv');
+
     const proc = spawn(
-      python.path,
+      uvBin,
       [
-        '-m',
         'pip',
         'install',
+        '--prerelease=allow',
+        '--python',
+        python.path,
         ...(this.packagesDir ? ['--target', this.packagesDir] : []),
         ...(extraIndexUrl ? ['--extra-index-url', extraIndexUrl] : []),
-        '--disable-pip-version-check',
-        '--no-input',
         ...required,
       ],
       {
@@ -95,68 +102,28 @@ export class ConfigurePythonTask extends BaseTask {
       proc.kill('SIGTERM');
     });
 
-    const PIP_PROGRESS_STARTS_WITH = [
-      'Collecting ',
-      'Requirement already satisfied: ',
-    ];
-    proc.stdout.on('data', chunk => {
-      const trimmed = chunk.toString().trim();
-      if (PIP_PROGRESS_STARTS_WITH.find(item => trimmed.startsWith(item))) {
-        let name = trimmed;
-        for (const item of PIP_PROGRESS_STARTS_WITH) {
-          name = name.replace(item, '');
-        }
-        name = name.split(' ')[0];
-        if (name && required.includes(name)) {
-          collecting.push(name);
-
-          // TODO: Can't think of anything better.
-          if (collecting.length === 1) {
-            this.progress = 0.05;
-          } else {
-            this.progress = Math.min(
-              (collecting.length - 1) / required.length,
-              90,
-            );
-          }
-        }
+    proc.onData(data => {
+      const matches = data.match(/\[(\d+)\/(\d+)\] ([\w\s.=-]+\s{2})/g);
+      if (matches?.length) {
+        const last = matches.pop()!;
+        const split = last.split('] ');
+        const [value, max] = split[0]
+          .substring(1)
+          .split('/')
+          .map(value => parseInt(value));
+        this.progress = value / (max || 1);
+        this.appendLog(`[${value}/${max}]: ${split[1].trim()}`);
       }
-
-      if (trimmed.startsWith('\u001b[2K')) {
-        const currentPackage = collecting[collecting.length - 1];
-        if (currentPackage) {
-          const split = trimmed
-            .split('\u001b[32m')[1]
-            ?.split(' ')[0]
-            ?.split('/');
-          const progress = split
-            ? parseFloat(split[0]) / parseFloat(split[1])
-            : 0;
-          this.progress = Math.min(
-            (collecting.length - 1) / required.length +
-              progress / required.length,
-            0.9,
-          );
-        }
-      }
-
-      this.appendLog(chunk.toString().trimEnd());
-    });
-    proc.stderr.on('data', chunk => {
-      this.appendLog(chunk.toString().trimEnd());
     });
 
-    proc.on('exit', code => {
-      if (code !== 0) {
+    proc.onExit(({ exitCode }) => {
+      if (exitCode !== 0) {
         wrapped.reject(
-          new Error(`Process exited with non-zero exit code: ${code}`),
+          new Error(`Process exited with non-zero exit code: ${exitCode}`),
         );
       } else {
         wrapped.resolve(TaskState.SUCCESS);
       }
-    });
-    proc.on('error', err => {
-      wrapped.reject(err);
     });
 
     return await wrapped.promise;
