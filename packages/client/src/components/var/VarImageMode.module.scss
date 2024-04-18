@@ -1,0 +1,13 @@
+.switch {
+  & > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    span {
+      margin: 0;
+      font-weight: 400;
+    }
+  }
+}

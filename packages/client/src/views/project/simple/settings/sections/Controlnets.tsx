@@ -9,13 +9,12 @@ import {
   VarButton,
   VarCategory,
   VarImage,
+  VarImageMode,
   VarModel,
-  VarSelect,
   VarSlider,
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
-import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 
 export const Controlnets: React.FC = observer(() => {
@@ -54,11 +53,7 @@ export const Controlnets: React.FC = observer(() => {
               showInput
             />
             <VarImage label="Image" path="image" />
-            <VarSelect
-              label="Image mode"
-              path="imageMode"
-              options={imageModeOptions}
-            />
+            <VarImageMode label="Image mode" path="imageMode" />
           </VarCategory>
         )}
       </VarArray>

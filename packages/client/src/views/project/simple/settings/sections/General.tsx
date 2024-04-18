@@ -7,6 +7,8 @@ import {
   VarButton,
   VarCategory,
   VarImage,
+  VarImageMode,
+  VarInputType,
   VarModel,
   VarRandomNumber,
   VarSelect,
@@ -15,7 +17,6 @@ import {
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
-import { imageModeOptions } from '$utils/image';
 import { useSimpleProject } from '../../../context';
 import { MaskEditor } from '../maskEditor';
 
@@ -63,14 +64,9 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         </VarCategory>
       )}
       <VarCategory label="Input" collapsible>
-        <VarSelect
+        <VarInputType
           label="Type"
           path="input.type"
-          options={[
-            { key: 'none', label: 'None' },
-            { key: 'image', label: 'img2img' },
-            { key: 'image_masked', label: 'Inpainting' },
-          ]}
           onChange={value => {
             if (value !== 'none' && !project.settings.input.imageMode) {
               project.settings.input.imageMode = 'stretch';
@@ -86,11 +82,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                 project.settings.input.mask = undefined;
               }}
             />
-            <VarSelect
-              label="Image mode"
-              path="input.imageMode"
-              options={imageModeOptions}
-            />
+            <VarImageMode label="Image mode" path="input.imageMode" />
             {project.settings.input.type === 'image_masked' && (
               <VarButton
                 buttonLabel="Edit mask"
