@@ -10,6 +10,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   },
   generation: {
     preview: true,
+    imageMetadata: true,
   },
   ui: {
     fuzzySearch: true,

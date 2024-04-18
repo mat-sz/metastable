@@ -33,6 +33,7 @@
     "@trpc/react-query": "^11.0.0-next-beta.302",
     "ansi-to-react": "^6.1.6",
     "clsx": "^2.0.0",
+    "exifreader": "^4.22.1",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
     "js-base64": "^3.7.7",

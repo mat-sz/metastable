@@ -1,15 +1,27 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Button } from '$components/button';
 import { VarCategory, VarString, VarUI } from '$components/var';
+import { useFileInput } from '$hooks/useFileInput';
+import { PromptLoad } from '$modals/promptLoad';
+import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 import { useSimpleProject } from '../../context';
 
 export const Prompt: React.FC = observer(() => {
   const project = useSimpleProject();
+  const onOpen = useCallback(
+    (files: File[]) => {
+      if (files[0]) {
+        modalStore.show(<PromptLoad project={project} file={files[0]} />);
+      }
+    },
+    [project],
+  );
+  const { open } = useFileInput(onOpen);
 
   useHotkeys('Ctrl+Enter', () => {
     project.request();
@@ -28,12 +40,17 @@ export const Prompt: React.FC = observer(() => {
         <VarString label="Negative" path="prompt.negative" multiline />
       </VarCategory>
       <div className={styles.actions}>
-        <div className={styles.hint}>
-          Hint: You can use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> as well.
+        <div>
+          <Button onClick={open}>Load prompt from file</Button>
         </div>
-        <Button onClick={() => project.request()} variant="primary">
-          Generate
-        </Button>
+        <div>
+          <div className={styles.hint}>
+            Hint: You can use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> as well.
+          </div>
+          <Button onClick={() => project.request()} variant="primary">
+            Generate
+          </Button>
+        </div>
       </div>
     </VarUI>
   );

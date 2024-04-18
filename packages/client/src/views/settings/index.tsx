@@ -33,6 +33,10 @@ export const Settings: React.FC = observer(() => {
             </VarCategory>
             <VarCategory label="Generation">
               <VarToggle path="generation.preview" label="Enable previews" />
+              <VarToggle
+                path="generation.imageMetadata"
+                label="Store metadata in output image files"
+              />
             </VarCategory>
           </TabPanel>
           <TabPanel id="downloads">

@@ -4,8 +4,12 @@
   justify-content: flex-end;
   width: 100%;
 
+  & > div:first-child {
+    flex: 1;
+  }
+
   input {
-    width: 2.5rem;
+    flex: 1;
     border: none;
     -moz-appearance: textfield;
     height: 1.3rem;

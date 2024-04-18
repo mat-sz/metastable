@@ -12,6 +12,14 @@
   grid-column: main;
   grid-row: prompt;
   overflow-y: auto;
+
+  [varui-label] {
+    margin: 1rem;
+  }
+
+  [varui-category-title] {
+    padding: 0 1rem;
+  }
 }
 
 .settings {
@@ -63,16 +71,17 @@
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 1rem;
+
+  & > div {
+    display: flex;
+    align-items: center;
+  }
 
   .hint {
     margin-right: 1rem;
     font-size: 0.8rem;
-  }
-
-  button {
-    margin-left: 0.5rem;
   }
 }

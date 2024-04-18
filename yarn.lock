@@ -1216,6 +1216,7 @@ __metadata:
     electron-builder: "npm:24.12.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.3"
+    exifreader: "npm:^4.22.1"
     filesize: "npm:^10.1.0"
     fxglue: "npm:^0.2.1"
     husky: "npm:^8.0.3"
@@ -1263,6 +1264,7 @@ __metadata:
     electron: "npm:^29.0.1"
     event-stream: "npm:^4.0.1"
     js-base64: "npm:^3.7.7"
+    meta-png: "npm:^1.0.6"
     nanoid: "npm:^5.0.4"
     radash: "npm:^12.1.0"
     rimraf: "npm:^5.0.5"
@@ -2022,7 +2024,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmldom/xmldom@npm:^0.8.8":
+"@xmldom/xmldom@npm:^0.8.10, @xmldom/xmldom@npm:^0.8.8":
   version: 0.8.10
   resolution: "@xmldom/xmldom@npm:0.8.10"
   checksum: c7647c442502720182b0d65b17d45d2d95317c1c8c497626fe524bda79b4fb768a9aa4fae2da919f308e7abcff7d67c058b102a9d641097e9a57f0b80187851f
@@ -4154,6 +4156,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"exifreader@npm:^4.22.1":
+  version: 4.22.1
+  resolution: "exifreader@npm:4.22.1"
+  dependencies:
+    "@xmldom/xmldom": "npm:^0.8.10"
+  dependenciesMeta:
+    "@xmldom/xmldom":
+      optional: true
+  checksum: c76a48a958bb4350b005654c418f138e8f5a38f141b07caa3be893e99a7f50e0047942841999d246c5c939b9404c243a99e1201e48cd5f5c677e8ed3ef466086
+  languageName: node
+  linkType: hard
+
 "exponential-backoff@npm:^3.1.1":
   version: 3.1.1
   resolution: "exponential-backoff@npm:3.1.1"
@@ -5898,6 +5912,13 @@ __metadata:
   version: 1.4.1
   resolution: "merge2@npm:1.4.1"
   checksum: 254a8a4605b58f450308fc474c82ac9a094848081bf4c06778200207820e5193726dc563a0d2c16468810516a5c97d9d3ea0ca6585d23c58ccfff2403e8dbbeb
+  languageName: node
+  linkType: hard
+
+"meta-png@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "meta-png@npm:1.0.6"
+  checksum: ea8390cb3671ed62d0d5f7c728813f1948c1628848348c8b7ddfac11cf831f83f051a8819d0851dc9503577a51e6e9ad0a92a3353040d6aac7279b0199c11005
   languageName: node
   linkType: hard
 

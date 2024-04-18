@@ -8,6 +8,7 @@ import {
   ProjectSimpleSettings,
   TaskState,
 } from '@metastable/types';
+import PNG from 'meta-png';
 
 import { ProjectEntity } from '../../data/project.js';
 import { getNextNumber } from '../../helpers/fs.js';
@@ -24,6 +25,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private preview: ComfyPreviewSettings = {
     method: 'auto',
   };
+  private storeMetadata = false;
 
   constructor(
     private metastable: Metastable,
@@ -152,6 +154,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       };
     }
 
+    if (config.generation?.imageMetadata) {
+      this.storeMetadata = true;
+    }
+
     settings.sampler.tiling = !!settings.sampler.tiling;
 
     return { projectId: this.project.name };
@@ -165,6 +171,32 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       stepMax: max,
       preview: undefined,
     };
+  }
+
+  private getCleanSettings() {
+    const settings: ProjectSimpleSettings = JSON.parse(
+      JSON.stringify(this.settings),
+    );
+
+    for (const key of Object.keys(settings.models)) {
+      const array = (settings.models as any)[key] as {
+        path?: string;
+        clipVisionPath?: string;
+        image?: string;
+      }[];
+
+      for (const modelSettings of array) {
+        delete modelSettings['path'];
+        delete modelSettings['clipVisionPath'];
+        delete modelSettings['image'];
+      }
+    }
+
+    delete settings['input']['image'];
+    delete settings['input']['mask'];
+    delete settings['input']['processedImage'];
+
+    return settings;
   }
 
   async execute() {
@@ -304,16 +336,31 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       let counter = await getNextNumber(outputDir);
       const ext = settings.output?.format || 'png';
       const outputs: ImageFile[] = [];
+      const cleanSettings = this.getCleanSettings();
+
       for (const image of images) {
         const bytes = await ctx.dumpImage(image, ext);
-        const buffer = Buffer.from(bytes.$bytes, 'base64');
+        let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+
+        if (this.storeMetadata && ext === 'png') {
+          buffer = buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          );
+          buffer = PNG.addMetadata(
+            buffer,
+            'metastable',
+            JSON.stringify(cleanSettings),
+          );
+        }
+
         const filename = `${counter.toLocaleString('en-US', {
           minimumIntegerDigits: 5,
           useGrouping: false,
         })}.${ext}`;
         await writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.output.get(filename);
-        await output.metadata.set(settings);
+        await output.metadata.set(cleanSettings);
         outputs.push(await output.json());
         counter++;
       }

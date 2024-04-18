@@ -39,6 +39,7 @@ export const VarCategory = ({
 
   return (
     <div
+      varui-category=""
       className={clsx(
         styles.category,
         { [styles.collapsible]: collapsible },
@@ -47,6 +48,7 @@ export const VarCategory = ({
     >
       <div
         className={styles.title}
+        varui-category-title=""
         onClick={() => {
           if (collapsible) {
             setCollapsed(isCollapsed => !isCollapsed);

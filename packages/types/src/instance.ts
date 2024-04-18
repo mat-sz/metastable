@@ -25,6 +25,7 @@ export interface ConfigType {
   };
   generation?: {
     preview?: boolean;
+    imageMetadata?: boolean;
   };
 }
 

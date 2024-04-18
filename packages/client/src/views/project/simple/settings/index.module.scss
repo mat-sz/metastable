@@ -8,6 +8,18 @@
   flex-direction: column;
   background: var(--grey-200);
   overflow-y: auto;
+
+  [varui-category] {
+    border-bottom: 1px solid var(--grey-400);
+  }
+
+  [varui-label] {
+    margin: 1rem;
+  }
+
+  [varui-category-title] {
+    padding: 0 1rem;
+  }
 }
 
 .error {

@@ -14,7 +14,7 @@
     font-size: 0.8rem;
     user-select: none;
     font-weight: bold;
-    padding: 0 1rem;
+    padding: 0;
     margin-bottom: 1rem;
   }
 
@@ -31,5 +31,8 @@
   }
 
   padding-top: 1rem;
-  border-bottom: 1px solid var(--grey-400);
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--grey-400);
+  }
 }

@@ -88,7 +88,6 @@ export const VarNumber = ({
       readOnly={readOnly}
       className={className}
       error={currentError}
-      inline
     >
       <div className={styles.number}>
         <Number

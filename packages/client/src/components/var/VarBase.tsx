@@ -89,7 +89,10 @@ export const VarBase = ({
   inline,
 }: IVarBaseProps): JSX.Element => {
   return (
-    <div className={clsx(styles.label, { [styles.inline]: inline }, className)}>
+    <div
+      className={clsx(styles.label, { [styles.inline]: inline }, className)}
+      varui-label=""
+    >
       <div className={styles.title}>{label}</div>
       <div>{children}</div>
       {error ? <div className={styles.error}>{error}</div> : null}
