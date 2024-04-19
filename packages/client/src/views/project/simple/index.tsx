@@ -72,7 +72,7 @@ export const SimpleProjectView: React.FC = observer(() => {
                 className={clsx(styles.item, {
                   [styles.active]:
                     project.mode === 'images' &&
-                    output.image.url === project.currentOutput,
+                    output.image.url === project.currentOutput?.image.url,
                 })}
                 key={output.name}
                 style={{
@@ -83,7 +83,7 @@ export const SimpleProjectView: React.FC = observer(() => {
                 onClick={() => {
                   runInAction(() => {
                     project.mode = 'images';
-                    project.currentOutput = output.image.url;
+                    project.currentOutput = output;
                   });
                 }}
               />

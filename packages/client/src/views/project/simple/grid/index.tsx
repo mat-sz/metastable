@@ -1,6 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
+import { BsGearFill } from 'react-icons/bs';
 
+import { API } from '$api';
+import { IconButton } from '$components/iconButton';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
@@ -43,6 +46,24 @@ export const Grid: React.FC = observer(() => {
           images={outputs}
           onChange={setCurrent}
           onClose={() => setOpen(false)}
+          actions={file => {
+            return (
+              <IconButton
+                onClick={async () => {
+                  const data = await API.project.output.get.query({
+                    projectId: project.id,
+                    name: file.name,
+                  });
+                  const settings = data.metadata as any;
+                  if (settings) {
+                    project.setSettings(settings);
+                  }
+                }}
+              >
+                <BsGearFill />
+              </IconButton>
+            );
+          }}
         />
       )}
     </>

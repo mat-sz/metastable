@@ -2,15 +2,12 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: [main] 1fr [settings] 500px;
-  grid-template-rows: [main] 1fr [prompt] 313px;
+  grid-template-columns: 1fr 500px;
 }
 
 .prompt {
   background: var(--grey-200);
   border-top: 1px solid var(--grey-400);
-  grid-column: main;
-  grid-row: prompt;
   overflow-y: auto;
 
   [varui-label] {
@@ -22,16 +19,20 @@
   }
 }
 
-.settings {
-  grid-column: settings;
-  grid-row: span 2;
+.actions {
+  background: var(--grey-200);
+  border-bottom: 1px solid var(--grey-400);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
 }
 
 .preview {
   display: flex;
   flex-direction: column;
-  grid-column: main;
-  grid-row: main;
+  flex: 1;
 }
 
 .info {

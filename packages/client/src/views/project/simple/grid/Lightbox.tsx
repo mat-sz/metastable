@@ -18,6 +18,7 @@ interface Props {
   current?: number;
   onChange: (index: number) => void;
   onClose: () => void;
+  actions?: (file: ImageFile) => React.ReactNode;
 }
 
 export const Lightbox: React.FC<Props> = ({
@@ -25,6 +26,7 @@ export const Lightbox: React.FC<Props> = ({
   current = 0,
   onChange,
   onClose,
+  actions,
 }) => {
   const currentFile = images[current];
   const filename = currentFile.name;
@@ -50,6 +52,7 @@ export const Lightbox: React.FC<Props> = ({
         </div>
         <div>{filename}</div>
         <div>
+          {actions && currentFile ? actions(currentFile) : undefined}
           <IconButton href={currentFile.image.url} download={filename}>
             <BsDownload />
           </IconButton>
