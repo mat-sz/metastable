@@ -84,7 +84,7 @@ export const router = t.router({
           emit.next(data);
         };
 
-        const logItems = metastable.comfy?.logBuffer.items;
+        const logItems = metastable.logBuffer.items;
         if (logItems?.length) {
           onEvent(logItems);
         }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 import {
   AnyEvent,
-  ComfyStatus,
+  BackendStatus,
   InstanceInfo,
   LogItem,
 } from '@metastable/types';
@@ -14,7 +14,6 @@ import es from 'event-stream';
 import { nanoid } from 'nanoid/non-secure';
 
 import { ComfySession } from './session.js';
-import { CircularBuffer } from '../helpers/buffer.js';
 import type { PythonInstance } from '../python/index.js';
 import { TypedEventEmitter } from '../types.js';
 
@@ -24,10 +23,11 @@ const baseDir = path.join(
   '..',
 );
 
-type MetastableEvents = {
+type BackendEvents = {
   event: (event: AnyEvent) => void;
-  log: (data: LogItem[]) => void;
+  log: (data: LogItem) => void;
   reset: () => void;
+  status: (status: BackendStatus) => void;
 };
 
 interface RPCRequest {
@@ -49,14 +49,12 @@ interface RPCResponse {
 }
 
 export class Comfy extends (EventEmitter as {
-  new (): TypedEventEmitter<MetastableEvents>;
+  new (): TypedEventEmitter<BackendEvents>;
 }) {
   process?: ChildProcessWithoutNullStreams;
 
   sessions: Record<string, ComfySession> = {};
-  logBuffer = new CircularBuffer<LogItem>(25);
-
-  status: ComfyStatus = 'starting';
+  connected = false;
 
   rpcCallbacks: Map<
     string,
@@ -78,7 +76,7 @@ export class Comfy extends (EventEmitter as {
   }
 
   async info() {
-    if (this.status !== 'ready') {
+    if (!this.connected) {
       return undefined;
     }
 
@@ -208,9 +206,8 @@ export class Comfy extends (EventEmitter as {
       timestamp: Date.now(),
       text: text.trimEnd(),
     };
-    this.logBuffer.push(item);
     console.log(`[Backend (${type})]`, text);
-    this.emit('log', [item]);
+    this.emit('log', item);
   }
 
   reset() {
@@ -221,13 +218,13 @@ export class Comfy extends (EventEmitter as {
     this.emit('reset');
   }
 
-  setStatus(status: ComfyStatus) {
-    this.status = status;
+  setStatus(status: BackendStatus) {
+    this.connected = status === 'ready';
     if (status !== 'ready') {
       this.reset();
     }
 
-    this.emit('event', { event: 'backend.status', data: status });
+    this.emit('status', status);
   }
 
   write(data: any) {

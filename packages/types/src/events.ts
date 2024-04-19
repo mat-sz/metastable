@@ -1,11 +1,11 @@
-import { ComfyStatus } from './comfy.js';
+import { BackendStatus } from './comfy.js';
 import { SetupEvent } from './setup.js';
 import { TaskEvent } from './task.js';
 import { TrainingEvent } from './training.js';
 
 export interface BackendStatusEvent {
   event: 'backend.status';
-  data: ComfyStatus;
+  data: BackendStatus;
 }
 
 export type AnyEvent =

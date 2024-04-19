@@ -1,6 +1,6 @@
 import {
   AnyEvent,
-  ComfyStatus,
+  BackendStatus,
   InstanceInfo,
   ModelType,
   TaskState,
@@ -8,6 +8,7 @@ import {
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
+import { BackendError } from '$modals/backendError';
 import { UnsavedProjects } from '$modals/unsavedProjects';
 import { IS_ELECTRON } from '$utils/config';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
@@ -31,7 +32,7 @@ class MainStore {
   isMaximized = false;
   trainingQueue: { id: string }[] = [];
 
-  backendStatus: ComfyStatus = 'starting';
+  backendStatus: BackendStatus = 'starting';
   infoReady = false;
   view: string | undefined = 'home';
 
@@ -165,6 +166,9 @@ class MainStore {
         this.backendStatus = message.data;
         if (message.data === 'ready') {
           this.refresh();
+        }
+        if (message.data === 'error') {
+          modalStore.show(<BackendError />);
         }
         break;
       case 'setup.status':

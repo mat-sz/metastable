@@ -3,6 +3,7 @@ import path from 'path';
 
 import {
   AnyEvent,
+  BackendStatus,
   DownloadSettings,
   LogItem,
   ModelType,
@@ -22,6 +23,7 @@ import { EntityRepository } from './data/common.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectEntity } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
+import { CircularBuffer } from './helpers/buffer.js';
 import { resolveConfigPath } from './helpers/fs.js';
 import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
@@ -47,6 +49,9 @@ export class Metastable extends (EventEmitter as {
   kohya?: Kohya;
   project;
   model;
+
+  status: BackendStatus = 'starting';
+  logBuffer = new CircularBuffer<LogItem>(25);
 
   onEvent = async (event: AnyEvent) => {
     this.emit('event', event);
@@ -166,14 +171,28 @@ export class Metastable extends (EventEmitter as {
       config.python.mode === 'system' ||
       !config.python.pythonHome;
 
-    this.python = useSystemPython
-      ? await PythonInstance.fromSystem(
-          this.resolvePath(config.python.packagesDir),
-        )
-      : await PythonInstance.fromDirectory(
-          this.resolvePath(config.python.pythonHome)!,
-          this.resolvePath(config.python.packagesDir),
-        );
+    try {
+      this.python = useSystemPython
+        ? await PythonInstance.fromSystem(
+            this.resolvePath(config.python.packagesDir),
+          )
+        : await PythonInstance.fromDirectory(
+            this.resolvePath(config.python.pythonHome)!,
+            this.resolvePath(config.python.packagesDir),
+          );
+    } catch {
+      this.logBuffer.push({
+        timestamp: Date.now(),
+        text: 'Unable to find Python binary',
+        type: 'stderr',
+      });
+      this.setStatus('error');
+    }
+  }
+
+  setStatus(status: BackendStatus) {
+    this.status = status;
+    this.emit('event', { event: 'backend.status', data: status });
   }
 
   restartKohya() {
@@ -200,6 +219,7 @@ export class Metastable extends (EventEmitter as {
       return;
     }
 
+    this.setStatus('starting');
     this.comfy = new Comfy(
       this.python,
       this.settings.comfyMainPath,
@@ -209,25 +229,23 @@ export class Metastable extends (EventEmitter as {
 
     const comfy = this.comfy;
     comfy.on('event', this.onEvent);
+    comfy.on('status', status => this.setStatus(status));
 
     comfy.on('log', e => {
-      this.emit('backendLog', e);
+      this.logBuffer.push(e);
+      this.emit('backendLog', [e]);
     });
   }
 
   replayEvents(onEvent: (event: any) => void) {
-    const comfy = this.comfy;
-
-    if (comfy) {
-      onEvent({
-        event: 'backend.status',
-        data: comfy.status,
-      });
-    }
+    onEvent({
+      event: 'backend.status',
+      data: this.status,
+    });
   }
 
   async prompt(projectId: Project['id'], settings: ProjectSimpleSettings) {
-    if (this.comfy?.status !== 'ready') {
+    if (this.status !== 'ready') {
       return undefined;
     }
 
@@ -252,7 +270,7 @@ export class Metastable extends (EventEmitter as {
   }
 
   async tag(projectId: Project['id'], settings: ProjectTaggingSettings) {
-    if (this.comfy?.status !== 'ready') {
+    if (this.status !== 'ready') {
       return undefined;
     }
 

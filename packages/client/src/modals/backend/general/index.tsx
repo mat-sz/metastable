@@ -1,13 +1,11 @@
 import { LogItem } from '@metastable/types';
-import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
-import { BsArrowClockwise, BsClipboard } from 'react-icons/bs';
+import { BsArrowClockwise } from 'react-icons/bs';
 
 import { API, TRPC } from '$api';
-import { IconButton } from '$components/iconButton';
+import { Log } from '$components/log';
 import { mainStore } from '$stores/MainStore';
-import { copy } from '$utils/clipboard';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
 
@@ -73,38 +71,7 @@ export const General: React.FC = observer(() => {
           </tbody>
         </table>
       )}
-      <div className={styles.logWrapper}>
-        <IconButton
-          className={styles.copy}
-          onClick={() => {
-            copy(
-              log
-                .map(
-                  item =>
-                    `[${new Date(item.timestamp).toLocaleTimeString()}] ${
-                      item.text
-                    }`,
-                )
-                .join('\n'),
-            );
-          }}
-        >
-          <BsClipboard />
-        </IconButton>
-        <div className={styles.log} ref={logRef}>
-          {log.map((item, i) => (
-            <div
-              key={i}
-              className={clsx({ [styles.error]: item.type === 'stderr' })}
-            >
-              <span className={styles.timestamp}>
-                [{new Date(item.timestamp).toLocaleTimeString()}]
-              </span>
-              <span className={styles.text}>{item.text}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Log items={log} />
     </>
   );
 });

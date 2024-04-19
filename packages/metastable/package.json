@@ -21,7 +21,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
-    "@trpc/server": "^11.0.0-next-beta.294",
+    "@trpc/server": "^11.0.0-rc.342",
     "@types/event-stream": "^4.0.5",
     "axios": "^1.6.2",
     "check-disk-space": "^3.4.0",

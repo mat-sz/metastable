@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@metastable/metastable": "*",
-    "@tanstack/react-query": "^5.24.1",
-    "@trpc/client": "^11.0.0-next-beta.294",
-    "@trpc/react-query": "^11.0.0-next-beta.302",
+    "@tanstack/react-query": "^5.29.2",
+    "@trpc/client": "^11.0.0-rc.342",
+    "@trpc/react-query": "^11.0.0-rc.342",
     "ansi-to-react": "^6.1.6",
     "clsx": "^2.0.0",
     "exifreader": "^4.22.1",

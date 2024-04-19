@@ -14,4 +14,4 @@ export interface ComfyTorchInfo {
   };
 }
 
-export type ComfyStatus = 'ready' | 'starting' | 'error';
+export type BackendStatus = 'ready' | 'starting' | 'error';
