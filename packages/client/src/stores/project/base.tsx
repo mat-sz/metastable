@@ -14,7 +14,7 @@ import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 
 export class BaseProject<T = any> {
-  currentOutput: string | undefined = undefined;
+  currentOutput: ImageFile | undefined = undefined;
   mode: string = 'images';
   id;
   name;
@@ -29,7 +29,7 @@ export class BaseProject<T = any> {
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
-    this.currentOutput = data.lastOutput?.image.url;
+    this.currentOutput = data.lastOutput;
     this.temporary = data.temporary ?? false;
 
     makeObservable(this, {
