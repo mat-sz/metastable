@@ -2,7 +2,7 @@ import { TaskState } from '@metastable/types';
 import Ansi from 'ansi-to-react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsArchiveFill, BsDownload, BsHourglassSplit } from 'react-icons/bs';
+import { BsDownload, BsHourglassSplit } from 'react-icons/bs';
 import { FaPython } from 'react-icons/fa';
 
 import { Loading } from '$components/loading';
@@ -13,14 +13,12 @@ import styles from './index.module.scss';
 
 const TASK_ICONS: Record<string, React.ReactNode> = {
   'python.download': <BsDownload />,
-  'python.extract': <BsArchiveFill />,
   'python.configure': <FaPython />,
   'models.download': <BsDownload />,
 };
 
 const TASK_TITLE: Record<string, string> = {
   'python.download': 'Download Python',
-  'python.extract': 'Extract Python',
   'python.configure': 'Install Python dependencies',
   'models.download': 'Download models',
 };

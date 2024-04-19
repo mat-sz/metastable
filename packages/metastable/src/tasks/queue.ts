@@ -1,21 +1,44 @@
 import { EventEmitter } from 'events';
 
-import { Task, TaskQueue, TaskState } from '@metastable/types';
+import { Task, TaskEvent, TaskQueue, TaskState } from '@metastable/types';
 
 import { BaseTask } from './task.js';
+import { TypedEventEmitter } from '../types.js';
 
-export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
+export type BaseQueueEvents = {
+  event: (event: TaskEvent) => void;
+  empty: () => void;
+  failed: () => void;
+};
+
+export interface BaseQueueSettings {
+  startAutomatically?: boolean;
+  dismissSuccessful?: boolean;
+  stopOnFailure?: boolean;
+}
+
+export class BaseQueue<T = any>
+  extends (EventEmitter as {
+    new (): TypedEventEmitter<BaseQueueEvents>;
+  })
+  implements TaskQueue<T>
+{
   #tasks: BaseTask<T>[] = [];
   running = false;
+  readonly settings: BaseQueueSettings;
 
   constructor(
     public readonly id: string,
-    private readonly settings: {
-      dismissSuccessful?: boolean;
-      stopOnFailure?: boolean;
-    } = {},
+    settings?: BaseQueueSettings,
   ) {
     super();
+
+    this.settings = {
+      stopOnFailure: false,
+      dismissSuccessful: false,
+      startAutomatically: true,
+      ...settings,
+    };
   }
 
   get tasks() {
@@ -53,7 +76,9 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
       });
     });
 
-    this.next();
+    if (this.settings.startAutomatically) {
+      this.next();
+    }
   }
 
   async next() {
@@ -96,6 +121,7 @@ export class BaseQueue<T = any> extends EventEmitter implements TaskQueue<T> {
       }
 
       if (failed && this.settings.stopOnFailure) {
+        this.emit('failed');
         return;
       }
 

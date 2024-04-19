@@ -10,8 +10,6 @@ import { getOS, getPython } from './helpers.js';
 import { ConfigurePythonTask } from './tasks/configurePython.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { DownloadPythonTask } from './tasks/downloadPython.js';
-import { DownloadUvTask } from './tasks/downloadUv.js';
-import { ExtractPythonTask } from './tasks/extractPython.js';
 import type { Metastable } from '../index.js';
 
 export class Setup extends EventEmitter {
@@ -80,7 +78,7 @@ export class Setup extends EventEmitter {
 
     await this.metastable.storage.config.set('python', {
       configured: true,
-      mode: this.settings.pythonMode,
+      mode: 'static',
       pythonHome: this._pythonHome
         ? path.relative(this.metastable.storage.dataRoot, this._pythonHome)
         : undefined,
@@ -120,44 +118,20 @@ export class Setup extends EventEmitter {
       this.done();
     });
 
-    const uvArchivePath = path.join(
-      this.metastable.storage.dataRoot,
-      os.platform() === 'win32' ? 'uv.zip' : 'uv.tar.gz',
-    );
     const uvTargetPath = path.join(this.metastable.storage.dataRoot, 'uv');
-    setupQueue.add(new DownloadUvTask(uvArchivePath));
-    setupQueue.add(new ExtractPythonTask(uvArchivePath, uvTargetPath));
 
-    if (settings.pythonMode === 'static') {
-      const archivePath = path.join(
-        this.metastable.storage.dataRoot,
-        'python.tar.gz',
-      );
-      const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
-      this._packagesDir = undefined;
-      this._pythonHome = targetPath;
-      setupQueue.add(new DownloadPythonTask(archivePath));
-      setupQueue.add(new ExtractPythonTask(archivePath, targetPath));
-      setupQueue.add(
-        new ConfigurePythonTask(
-          settings.torchMode,
-          uvTargetPath,
-          undefined,
-          targetPath,
-        ),
-      );
-    } else {
-      const packagesDir = path.join(
-        this.metastable.storage.dataRoot,
-        'python',
-        'pip',
-      );
-      this._packagesDir = packagesDir;
-      this._pythonHome = undefined;
-      setupQueue.add(
-        new ConfigurePythonTask(settings.torchMode, packagesDir, undefined),
-      );
-    }
+    const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
+    this._packagesDir = undefined;
+    this._pythonHome = targetPath;
+    setupQueue.add(new DownloadPythonTask(this.metastable.storage.dataRoot));
+    setupQueue.add(
+      new ConfigurePythonTask(
+        settings.torchMode,
+        uvTargetPath,
+        undefined,
+        targetPath,
+      ),
+    );
 
     if (settings.downloads.length) {
       this.metastable.tasks.queues.setup.add(

@@ -193,7 +193,6 @@ export const router = t.router({
           downloads: z.array(
             z.object({ name: z.string(), type: z.string(), url: z.string() }),
           ),
-          pythonMode: z.string(),
           torchMode: z.string(),
         }),
       )

@@ -5,12 +5,12 @@ import { rimraf } from 'rimraf';
 import { tryUnlink } from '../../helpers/fs.js';
 import { BaseTask } from '../../tasks/task.js';
 
-export class ExtractPythonTask extends BaseTask {
+export class ExtractTask extends BaseTask {
   constructor(
     private archivePath: string,
     private targetPath: string,
   ) {
-    super('python.extract', undefined);
+    super('extract', undefined);
   }
 
   async execute() {

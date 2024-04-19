@@ -9,7 +9,6 @@ import styles from './index.module.scss';
 import { HardwareItem } from './items/HardwareItem';
 import { ModelsItem } from './items/ModelsItem';
 import { OSItem } from './items/OSItem';
-import { PythonItem } from './items/PythonItem';
 import { StorageItem } from './items/StorageItem';
 
 export const Step1: React.FC = observer(() => {
@@ -26,7 +25,6 @@ export const Step1: React.FC = observer(() => {
           <List hint="Click on an item to reveal more options.">
             <OSItem />
             <HardwareItem />
-            <PythonItem />
             <StorageItem />
             <ModelsItem />
           </List>

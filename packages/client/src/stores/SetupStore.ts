@@ -28,7 +28,6 @@ export class SetupStore {
   details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
 
-  pythonMode: SetupSettings['pythonMode'] = 'static';
   gpuIndex: number = 0;
   downloads: DownloadSettings[] = [];
 
@@ -71,7 +70,6 @@ export class SetupStore {
     }
 
     API.setup.start.mutate({
-      pythonMode: this.pythonMode,
       downloads: toJS(this.downloads),
       torchMode,
     });
@@ -81,7 +79,6 @@ export class SetupStore {
     return [
       ...this.os.requirements,
       ...this.hardware.requirements,
-      ...this.python.requirements,
       ...this.storage.requirements,
     ];
   }
@@ -217,72 +214,6 @@ export class SetupStore {
     };
   }
 
-  get python(): SetupItemState {
-    if (!this.details) {
-      return {
-        description: 'Something went wrong.',
-        status: 'error',
-        requirements: [],
-      };
-    }
-
-    let description = `We'll install and configure Python for you.`;
-    let status: SetupItemState['status'] = 'ok';
-    const requirements: Requirement[] = [];
-    const python = this.details.python;
-    const storage = 5 * GB;
-
-    if (python.version) {
-      requirements.push({
-        name: 'python',
-        expected: python.required,
-        actual: python.version,
-        satisfied: python.compatible,
-      });
-      requirements.push({
-        name: 'pip',
-        expected: true,
-        actual: python.hasPip,
-        satisfied: python.hasPip,
-      });
-      requirements.push(...(python.requirements || []));
-
-      if (this.pythonMode === 'static') {
-        description = `Python ${python.version} is installed, but we'll install and configure a separate instance.`;
-      } else if (python.compatible) {
-        description = `We'll use the system-wide Python ${python.version} installation.`;
-      } else {
-        description = `You've chosen to use an incompatible system Python installation.`;
-        status = 'error';
-      }
-    } else {
-      requirements.push({
-        name: 'python',
-        expected: python.required,
-        actual: 'unavailable',
-        satisfied: false,
-      });
-      requirements.push({
-        name: 'pip',
-        expected: true,
-        actual: false,
-        satisfied: false,
-      });
-
-      if (this.pythonMode === 'system') {
-        description = `You've chosen to use an unavailable system Python installation.`;
-        status = 'error';
-      }
-    }
-
-    return {
-      description,
-      status,
-      requirements,
-      storage,
-    };
-  }
-
   get storage(): SetupItemState {
     if (!this.details) {
       return {
@@ -354,11 +285,9 @@ export class SetupStore {
     let total = 0;
     const breakdown: Record<string, number> = {};
 
-    const pythonStorage = this.python.storage;
-    if (pythonStorage) {
-      total += pythonStorage;
-      breakdown['Python'] = pythonStorage;
-    }
+    const pythonStorage = 5 * GB;
+    total += pythonStorage;
+    breakdown['Python'] = pythonStorage;
 
     const modelsStorage = this.models.storage;
     if (modelsStorage) {

@@ -83,11 +83,16 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     const wrapped = new WrappedPromise<TaskState>();
     const writer = createWriteStream(partPath);
 
-    const onClose = async () => {
+    const onClose = async (error?: any) => {
       writer.close();
-      if (this.cancellationPending) {
+      if (this.cancellationPending || error) {
         await fs.unlink(partPath);
-        wrapped.resolve(TaskState.CANCELLED);
+
+        if (this.cancellationPending) {
+          wrapped.resolve(TaskState.CANCELLED);
+        } else {
+          wrapped.reject(error);
+        }
       } else {
         this.data = {
           ...this.data,
@@ -99,6 +104,10 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
         wrapped.resolve(TaskState.SUCCESS);
       }
     };
+
+    writer.on('error', e => {
+      onClose(e);
+    });
 
     let start = 0;
     let end = CHUNK_SIZE;
@@ -146,6 +155,10 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
           if (this.cancellationPending) {
             onClose();
           }
+        });
+        data.on('error', (e: any) => {
+          data.close();
+          onClose(e);
         });
         data.pipe(writer, { end: false });
       } catch (e) {

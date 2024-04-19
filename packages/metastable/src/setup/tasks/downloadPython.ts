@@ -1,7 +1,12 @@
+import os from 'os';
+import path from 'path';
+
 import semver, { SemVer } from 'semver';
 
+import { ExtractTask } from './extract.js';
 import { BaseDownloadTask } from '../../downloader/index.js';
 import { tryUnlink } from '../../helpers/fs.js';
+import { SuperTask } from '../../tasks/supertask.js';
 import { getLatestReleaseInfo, getPlatform } from '../helpers.js';
 
 const REQUIRED_PYTHON_VERSION = '3.11.x';
@@ -41,20 +46,64 @@ async function getPythonDownloadUrl(platform: string) {
   throw new Error('Unable to find a suitable Python build');
 }
 
-export class DownloadPythonTask extends BaseDownloadTask {
-  constructor(savePath: string) {
-    super('python.download', '', savePath);
+async function getUvDownloadUrl(platform: string) {
+  const release = await getLatestReleaseInfo('astral-sh/uv');
+  const assets = release.assets;
+
+  let findSuffix = `${platform}.tar.gz`;
+  if (platform.includes('pc-windows')) {
+    findSuffix = `${platform}.zip`;
+  }
+
+  let downloadUrl: string | undefined = undefined;
+
+  for (const asset of assets) {
+    if (!asset.name.endsWith(findSuffix)) {
+      continue;
+    }
+
+    downloadUrl = asset.browser_download_url;
+    break;
+  }
+
+  if (downloadUrl) {
+    return downloadUrl;
+  }
+
+  throw new Error('Unable to find a suitable uv build');
+}
+
+export class DownloadPythonTask extends SuperTask {
+  constructor(private saveDir: string) {
+    super('python.download', {});
+    this.created();
   }
 
   async init() {
-    tryUnlink(this.savePath);
-    const platform = await getPlatform();
-    this.appendLog('Getting download URL.');
-    const url = await getPythonDownloadUrl(platform);
-    this.appendLog(`Downloading from: ${url}`);
-    this.appendLog(`Will save to: ${this.savePath}`);
-    this.url = url;
+    const pythonArchivePath = path.join(this.saveDir, 'python.tar.gz');
+    const uvArchivePath = path.join(
+      this.saveDir,
+      os.platform() === 'win32' ? 'uv.zip' : 'uv.tar.gz',
+    );
 
-    return await super.init();
+    tryUnlink(pythonArchivePath);
+    tryUnlink(uvArchivePath);
+
+    this.appendLog('Getting download URLs.');
+    const pythonUrl = await getPythonDownloadUrl(await getPlatform());
+    const uvUrl = await getUvDownloadUrl(await getPlatform(true));
+    this.appendLog(`Downloading: ${pythonUrl} -> ${pythonArchivePath}`);
+    this.appendLog(`Downloading: ${uvUrl} -> ${uvArchivePath}`);
+    this.queue.add(
+      new BaseDownloadTask('download', pythonUrl, pythonArchivePath),
+    );
+    this.queue.add(new BaseDownloadTask('download', uvUrl, uvArchivePath));
+
+    const pythonPath = path.join(this.saveDir, 'python');
+    const uvPath = path.join(this.saveDir, 'uv');
+    this.queue.add(new ExtractTask(pythonArchivePath, pythonPath));
+    this.queue.add(new ExtractTask(uvArchivePath, uvPath));
+
+    return {};
   }
 }

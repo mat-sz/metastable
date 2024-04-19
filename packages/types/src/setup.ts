@@ -56,7 +56,6 @@ export interface SetupDetails {
 
 export interface SetupSettings {
   downloads: DownloadSettings[];
-  pythonMode: 'static' | 'system';
   torchMode: 'nvidia' | 'amd' | 'cpu';
 }
 
