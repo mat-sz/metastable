@@ -289,7 +289,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   }
 
   onPromptDone(outputs: ImageFile[]) {
-    this.currentOutput = outputs[0]?.image.url;
+    this.currentOutput = outputs[0];
     this.outputs.push(...outputs);
 
     if (this.addOutputToEditor) {
