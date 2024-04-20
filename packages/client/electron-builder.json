@@ -2,9 +2,11 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "dev.mat.metastable",
   "asar": true,
+  "electronVersion": "30.0.1",
+  "nativeRebuilder": "parallel",
   "productName": "Metastable",
   "directories": {
-    "output": "release/${version}"
+    "output": "../../release/${version}"
   },
   "files": ["dist", "dist-electron"],
   "mac": {
@@ -32,9 +34,8 @@
   },
   "extraFiles": [
     {
-      "from": "../metastable/python/**/*",
-      "to": "Resources/python",
-      "filter": "**/*"
+      "from": "../metastable/python",
+      "to": "python"
     }
   ]
 }
