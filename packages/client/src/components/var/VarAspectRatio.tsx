@@ -1,8 +1,7 @@
 import { MdCropLandscape, MdCropPortrait, MdCropSquare } from 'react-icons/md';
 
-import { Switch, SwitchOption } from '$components/switch';
+import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
-import styles from './VarAspectRatio.module.scss';
 import { VarBase } from './VarBase';
 
 export interface IVarAspectRatioProps {
@@ -56,50 +55,44 @@ export const VarAspectRatio = ({
 
   return (
     <VarBase label={label}>
-      <div className={styles.wrapper}>
-        <Switch
-          value={orientation}
-          onChange={value => {
-            switch (value) {
-              case 'square':
-                setWidth(squareWidth);
-                setHeight(squareWidth);
-                break;
-              case 'portrait':
-                setWidth(portraitWidth);
-                setHeight(portraitHeight);
-                break;
-              case 'landscape':
-                setWidth(landscapeWidth);
-                setHeight(landscapeHeight);
-                break;
-            }
-          }}
-          className={styles.switch}
-        >
-          <SwitchOption value="square">
-            <MdCropSquare />
-            <span>Square</span>
-            <span className={styles.resolution}>
-              {squareWidth} x {squareWidth}
-            </span>
-          </SwitchOption>
-          <SwitchOption value="portrait">
-            <MdCropPortrait />
-            <span>Portrait</span>
-            <span className={styles.resolution}>
-              {portraitWidth} x {portraitHeight}
-            </span>
-          </SwitchOption>
-          <SwitchOption value="landscape">
-            <MdCropLandscape />
-            <span>Landscape</span>
-            <span className={styles.resolution}>
-              {landscapeWidth} x {landscapeHeight}
-            </span>
-          </SwitchOption>
-        </Switch>
-      </div>
+      <Switch
+        value={orientation}
+        onChange={value => {
+          switch (value) {
+            case 'square':
+              setWidth(squareWidth);
+              setHeight(squareWidth);
+              break;
+            case 'portrait':
+              setWidth(portraitWidth);
+              setHeight(portraitHeight);
+              break;
+            case 'landscape':
+              setWidth(landscapeWidth);
+              setHeight(landscapeHeight);
+              break;
+          }
+        }}
+      >
+        <SwitchOptionDetails
+          value="square"
+          icon={<MdCropSquare />}
+          name="Square"
+          description={`${squareWidth} x ${squareWidth}`}
+        />
+        <SwitchOptionDetails
+          value="portrait"
+          icon={<MdCropPortrait />}
+          name="Portrait"
+          description={`${portraitWidth} x ${portraitHeight}`}
+        />
+        <SwitchOptionDetails
+          value="landscape"
+          icon={<MdCropLandscape />}
+          name="Landscape"
+          description={`${landscapeWidth} x ${landscapeHeight}`}
+        />
+      </Switch>
     </VarBase>
   );
 };

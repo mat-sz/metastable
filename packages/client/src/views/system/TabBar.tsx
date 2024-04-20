@@ -193,7 +193,8 @@ export const TabBar: React.FC = observer(() => {
   return (
     <div ref={drop} className={styles.tabs}>
       <div className={styles.logo}>
-        <img src={logo} alt="Logo" /> Metastable
+        <img src={logo} alt="Logo" />
+        <span>Metastable</span>
       </div>
       <ViewTab viewId="home">
         <BsHouseFill />

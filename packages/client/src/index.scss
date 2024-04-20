@@ -1,20 +1,18 @@
 @import 'use-context-menu/styles.css';
 
 @font-face {
-  font-family: 'Noto Sans Display';
-  src: url('./assets/NotoSansDisplay-Italic.woff2') format('woff2');
+  font-family: 'Inter Tight';
+  src: url('../fonts/InterTight-Italic.woff2') format('woff2');
   font-style: italic;
   font-weight: 100 900;
-  font-stretch: 100%;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Noto Sans Display';
-  src: url('./assets/NotoSansDisplay.woff2') format('woff2');
+  font-family: 'Inter Tight';
+  src: url('../fonts/InterTight.woff2') format('woff2');
   font-style: normal;
   font-weight: 100 900;
-  font-stretch: 100%;
   font-display: swap;
 }
 
@@ -27,7 +25,7 @@
   --grey-600: #454556;
   --grey-700: #575760;
   --grey-800: #aaa;
-  --grey-900: #ddd;
+  --grey-900: #ffffff;
 
   --accent-700: rgb(73, 73, 226);
   --accent-800: rgb(93, 93, 207);
@@ -87,13 +85,17 @@ body {
   touch-action: none;
 }
 
+h2 {
+  font-weight: 600;
+}
+
 body,
 input,
 button,
 textarea,
 a {
   font-family:
-    'Noto Sans Display',
+    'Inter Tight',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
@@ -172,7 +174,7 @@ button {
   border-radius: 5px;
   transition: 0.1s ease-in-out all;
   border: none;
-  font-weight: bold;
+  font-weight: 600;
   text-shadow: none;
 
   &:not(:disabled) {

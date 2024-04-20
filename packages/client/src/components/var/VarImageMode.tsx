@@ -1,7 +1,6 @@
-import { Switch, SwitchOption } from '$components/switch';
+import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
-import styles from './VarImageMode.module.scss';
 
 export interface IVarImageModeProps extends IVarBaseInputProps<string> {}
 
@@ -18,26 +17,12 @@ export const VarImageMode = ({
 
   return (
     <VarBase label={label}>
-      <div className={styles.wrapper}>
-        <Switch
-          value={currentValue}
-          onChange={setCurrentValue}
-          className={styles.switch}
-        >
-          <SwitchOption value="stretch">
-            <span>Stretch</span>
-          </SwitchOption>
-          <SwitchOption value="center">
-            <span>Center</span>
-          </SwitchOption>
-          <SwitchOption value="cover">
-            <span>Cover</span>
-          </SwitchOption>
-          <SwitchOption value="contain">
-            <span>Contain</span>
-          </SwitchOption>
-        </Switch>
-      </div>
+      <Switch value={currentValue} onChange={setCurrentValue}>
+        <SwitchOptionDetails value="stretch" name="Stretch" />
+        <SwitchOptionDetails value="center" name="Center" />
+        <SwitchOptionDetails value="cover" name="Cover" />
+        <SwitchOptionDetails value="contain" name="Contain" />
+      </Switch>
     </VarBase>
   );
 };

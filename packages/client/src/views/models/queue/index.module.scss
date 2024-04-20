@@ -26,4 +26,16 @@
     display: flex;
     align-items: center;
   }
+
+  &.success {
+    .progress {
+      --accent-900: var(--green-900);
+    }
+  }
+
+  &.error {
+    .progress {
+      --accent-900: var(--red-900);
+    }
+  }
 }

@@ -28,6 +28,35 @@ export const SwitchOption: React.FC<
   );
 };
 
+interface SwitchOptionDetailsProps {
+  value: string;
+  icon?: React.ReactNode;
+  name?: string;
+  description?: string;
+}
+
+export const SwitchOptionDetails: React.FC<SwitchOptionDetailsProps> = ({
+  value,
+  icon,
+  name,
+  description,
+}) => {
+  const context = React.useContext(SwitchContext);
+
+  return (
+    <button
+      className={clsx(styles.option, styles.details, {
+        [styles.active]: value === context.value,
+      })}
+      onClick={() => context.onChange(value)}
+    >
+      {icon}
+      <span className={styles.name}>{name}</span>
+      <span className={styles.description}>{description}</span>
+    </button>
+  );
+};
+
 interface SwitchProps {
   className?: string;
   value: string;

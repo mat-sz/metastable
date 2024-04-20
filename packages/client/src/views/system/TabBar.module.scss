@@ -5,7 +5,6 @@
   border-bottom: 1px solid var(--grey-400);
 
   .logo {
-    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,8 +12,13 @@
     border-right: 1px solid var(--grey-400);
 
     img {
-      height: 1.5rem;
+      height: 1.3rem;
       margin-right: 0.5rem;
+    }
+
+    span {
+      font-size: 1rem;
+      font-weight: 600;
     }
   }
 
@@ -44,7 +48,7 @@
       left: 0.4rem;
       background: var(--accent-900);
       color: white;
-      font-weight: bold;
+      font-weight: 600;
       font-size: 0.7rem;
       width: 1rem;
       height: 1rem;

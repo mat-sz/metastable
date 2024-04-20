@@ -1,4 +1,5 @@
 import { TaskState } from '@metastable/types';
+import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -19,12 +20,19 @@ export const Queue: React.FC = observer(() => {
             : undefined;
 
         return (
-          <div key={download.id} className={styles.item}>
+          <div
+            key={download.id}
+            className={clsx(styles.item, {
+              [styles.error]: download.state === TaskState.FAILED,
+              [styles.success]: download.state === TaskState.SUCCESS,
+            })}
+          >
             <div>
               <div>{download.data.name}</div>
             </div>
             <div>
               <ProgressBar
+                className={styles.progress}
                 value={download.data.offset}
                 max={download.data.size}
               >

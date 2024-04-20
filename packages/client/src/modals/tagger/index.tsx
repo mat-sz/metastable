@@ -29,8 +29,9 @@ export const Tagger: React.FC<Props> = observer(({ inputs, project }) => {
     threshold: 0.35,
     removeUnderscore: true,
   });
+
   return (
-    <Modal title="Tagger">
+    <Modal title="Tagger" size="small">
       <div className={styles.settings}>
         <VarUI
           className={styles.prompt}
