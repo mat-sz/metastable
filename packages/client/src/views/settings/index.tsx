@@ -26,7 +26,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="general" title="General" icon={<BsGearFill />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
         </Tabs>
-        <TabContent>
+        <TabContent className={styles.content}>
           <TabPanel id="general">
             <VarCategory label="User interface">
               <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />

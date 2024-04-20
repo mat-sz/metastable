@@ -172,7 +172,6 @@ export class Comfy extends (EventEmitter as {
     proc.stdin.setDefaultEncoding('utf-8');
 
     proc.on('spawn', () => this.setStatus('starting'));
-    proc.on('close', () => this.setStatus('error'));
     proc.on('exit', () => this.setStatus('error'));
 
     proc.stdout.setEncoding('utf-8');

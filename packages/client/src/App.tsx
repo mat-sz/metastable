@@ -11,6 +11,7 @@ import { Settings } from './views/settings';
 import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 import { TabBar } from './views/system/TabBar';
+import { TitleBar } from './views/system/TitleBar';
 
 const View: React.FC = observer(() => {
   switch (mainStore.view) {
@@ -33,7 +34,8 @@ export const App: React.FC = observer(() => {
   if (mainStore.setup?.status?.status !== 'done') {
     return (
       <UIWrapper>
-        <Main>
+        <Main hideStatus>
+          <TitleBar />
           <Setup />
         </Main>
       </UIWrapper>

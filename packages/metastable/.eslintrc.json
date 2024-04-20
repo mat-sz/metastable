@@ -19,6 +19,7 @@
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "no-empty": "off",
+    "no-control-regex": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "sort-imports": [
       "error",

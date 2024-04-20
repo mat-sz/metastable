@@ -82,34 +82,9 @@ export class Metastable extends (EventEmitter as {
     this.setup.on('event', this.onEvent);
     this.tasks.on('event', this.onEvent);
 
-    setInterval(async () => {
-      if (!this.listenerCount('utilization')) {
-        return;
-      }
-
-      const [graphics, cpuTemperature, currentLoad, mem, usage] =
-        await Promise.all([
-          si.graphics(),
-          si.cpuTemperature(),
-          si.currentLoad(),
-          si.mem(),
-          (checkDiskSpace as any)(this.dataRoot),
-        ]);
-
-      const gpu = graphics.controllers[0];
-      this.emit('utilization', {
-        cpuUsage: currentLoad.currentLoad,
-        hddTotal: usage.size,
-        hddUsed: usage.size - usage.free,
-        ramTotal: mem.total,
-        ramUsed: mem.used,
-        cpuTemperature: cpuTemperature.main,
-        gpuTemperature: gpu?.temperatureGpu,
-        gpuUsage: gpu?.utilizationGpu,
-        vramTotal: gpu?.memoryTotal,
-        vramUsed: gpu?.memoryUsed,
-      });
-    }, 1000);
+    setTimeout(() => {
+      this.refreshUtilization();
+    }, 2000);
 
     process.on('beforeExit', () => {
       this.handleExit();
@@ -123,6 +98,37 @@ export class Metastable extends (EventEmitter as {
     process.on('SIGUSR2', () => {
       this.handleExit();
     });
+  }
+
+  async refreshUtilization() {
+    if (!this.listenerCount('utilization')) {
+      setTimeout(() => {
+        this.refreshUtilization();
+      }, 1000);
+      return;
+    }
+
+    const graphics = await si.graphics();
+    const cpuTemperature = await si.cpuTemperature();
+    const currentLoad = await si.currentLoad();
+    const mem = await si.mem();
+    const usage = await (checkDiskSpace as any)(this.dataRoot);
+    const gpu = graphics.controllers[0];
+    this.emit('utilization', {
+      cpuUsage: currentLoad.currentLoad,
+      hddTotal: usage.size,
+      hddUsed: usage.size - usage.free,
+      ramTotal: mem.total,
+      ramUsed: mem.used,
+      cpuTemperature: cpuTemperature.main,
+      gpuTemperature: gpu?.temperatureGpu,
+      gpuUsage: gpu?.utilizationGpu,
+      vramTotal: gpu?.memoryTotal,
+      vramUsed: gpu?.memoryUsed,
+    });
+    setTimeout(() => {
+      this.refreshUtilization();
+    }, 1000);
   }
 
   async handleExit() {

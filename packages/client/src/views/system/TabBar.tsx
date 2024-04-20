@@ -6,11 +6,11 @@ import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { BsBox, BsGearFill, BsHouseFill, BsPlusLg, BsX } from 'react-icons/bs';
 
-import logo from '$/assets/logo.svg';
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import { Controls } from './Controls';
+import { Logo } from './Logo';
 import styles from './TabBar.module.scss';
 
 const TAB_ITEM = 'project_tab';
@@ -192,10 +192,7 @@ export const TabBar: React.FC = observer(() => {
 
   return (
     <div ref={drop} className={styles.tabs}>
-      <div className={styles.logo}>
-        <img src={logo} alt="Logo" />
-        <span>Metastable</span>
-      </div>
+      <Logo />
       <ViewTab viewId="home">
         <BsHouseFill />
       </ViewTab>

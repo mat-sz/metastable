@@ -1301,7 +1301,7 @@ __metadata:
     radash: "npm:^12.1.0"
     rimraf: "npm:^5.0.5"
     sharp: "npm:^0.33.2"
-    systeminformation: "npm:^5.21.22"
+    systeminformation: "npm:^5.22.7"
     typescript: "npm:^5.3.2"
     which: "npm:^4.0.0"
     zod: "npm:^3.22.4"
@@ -8575,12 +8575,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:^5.21.22":
-  version: 5.21.22
-  resolution: "systeminformation@npm:5.21.22"
+"systeminformation@npm:^5.22.7":
+  version: 5.22.7
+  resolution: "systeminformation@npm:5.22.7"
   bin:
     systeminformation: lib/cli.js
-  checksum: 483141ce10cd3e7e8f6734d9f7a63557ead5646530a955b2ed42057790b3338964eb365f89cbdf733a16192680de31a4f4f4a80b079d07ea093cb0d7fdb7967c
+  checksum: d649b89bd350a35f1be13ebcd47e25b81295a147661d5d449b8b577f4f5d34cc4194a8abe6e50458cea7dae3eae6afc874f89fd3d3d9fd4ccd1118a054c3e646
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard

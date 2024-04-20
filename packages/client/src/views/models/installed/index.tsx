@@ -1,4 +1,3 @@
-import { ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -9,7 +8,11 @@ import styles from './index.module.scss';
 
 export const InstalledModels: React.FC = observer(() => {
   const types = modelStore.types;
-  const firstKey = types[0] || ModelType.CHECKPOINT;
+  const firstKey = types[0];
+
+  if (!firstKey) {
+    return <div>No installed models found.</div>;
+  }
 
   return (
     <TabView defaultTab={firstKey} direction="vertical" className={styles.view}>

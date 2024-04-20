@@ -35,13 +35,6 @@ export class ConfigurePythonTask extends BaseTask {
       ? await PythonInstance.fromDirectory(this.pythonHome)
       : await PythonInstance.fromSystem();
 
-    const env = {
-      PYTHONHOME: this.pythonHome!,
-      VIRTUAL_ENV: this.pythonHome!,
-      PYTHONPATH: this.packagesDir!,
-      FORCE_COLOR: '1',
-    };
-
     let extraIndexUrl: string | undefined = undefined;
     const platform = os.platform();
 
@@ -85,7 +78,6 @@ export class ConfigurePythonTask extends BaseTask {
       [
         'pip',
         'install',
-        '--prerelease=allow',
         '--python',
         python.path,
         ...(this.packagesDir ? ['--target', this.packagesDir] : []),
@@ -93,17 +85,13 @@ export class ConfigurePythonTask extends BaseTask {
         ...required,
       ],
       {
-        env,
+        env: process.env,
       },
     );
 
     const wrapped = new WrappedPromise<TaskState>();
-    wrapped.on('finish', () => {
-      proc.kill('SIGTERM');
-    });
-
     proc.onData(data => {
-      const matches = data.match(/\[(\d+)\/(\d+)\] ([\w\s.=-]+\s{2})/g);
+      const matches = data.match(/\[(\d+)\/(\d+)\] ([\w\s.=-]+(\s{2}|\x1b))/g);
       if (matches?.length) {
         const last = matches.pop()!;
         const split = last.split('] ');

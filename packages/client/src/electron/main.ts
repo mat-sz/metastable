@@ -92,7 +92,9 @@ function createMenu() {
 async function createWindow() {
   const dataRoot = path.join(app.getPath('documents'), 'Metastable');
   const comfyMainPath = path.join(
-    app.isPackaged ? app.getAppPath() : path.resolve('../metastable'),
+    app.isPackaged
+      ? path.dirname(app.getPath('exe'))
+      : path.resolve('../metastable'),
     'python',
     'main.py',
   );
@@ -108,7 +110,6 @@ async function createWindow() {
     resizable: true,
     titleBarStyle: 'hidden',
     backgroundColor: '#11111a',
-    transparent: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
