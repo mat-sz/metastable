@@ -4,6 +4,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "co
 
 import comfy.options
 comfy.options.enable_args_parsing()
+from comfy.cli_args import args
+
+import torch
+if not torch.cuda.is_available() and not args.directml and not torch.backends.mps.is_available():
+    args.cpu = True
 
 # Main code
 import asyncio
@@ -11,7 +16,6 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 
 import comfy.samplers
-from comfy.cli_args import args
 from rpc import RPC
 import output
 

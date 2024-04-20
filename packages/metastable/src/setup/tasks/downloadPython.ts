@@ -100,9 +100,12 @@ export class DownloadPythonTask extends SuperTask {
     this.queue.add(new BaseDownloadTask('download', uvUrl, uvArchivePath));
 
     const pythonPath = path.join(this.saveDir, 'python');
-    const uvPath = path.join(this.saveDir, 'uv');
-    this.queue.add(new ExtractTask(pythonArchivePath, pythonPath));
-    this.queue.add(new ExtractTask(uvArchivePath, uvPath));
+    const pythonBinPath =
+      os.platform() === 'win32'
+        ? path.join(this.saveDir, 'python')
+        : path.join(this.saveDir, 'python', 'bin');
+    this.queue.add(new ExtractTask(pythonArchivePath, pythonPath, true));
+    this.queue.add(new ExtractTask(uvArchivePath, pythonBinPath));
 
     return {};
   }

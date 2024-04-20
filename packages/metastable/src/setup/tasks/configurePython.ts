@@ -12,9 +12,7 @@ import { requiredPackages } from '../helpers.js';
 export class ConfigurePythonTask extends BaseTask {
   constructor(
     private torchMode: SetupSettings['torchMode'],
-    private uvDir: string,
-    private packagesDir?: string,
-    private pythonHome?: string,
+    private pythonHome: string,
   ) {
     super('python.configure', undefined);
   }
@@ -31,10 +29,7 @@ export class ConfigurePythonTask extends BaseTask {
       return dependency;
     });
 
-    const python = this.pythonHome
-      ? await PythonInstance.fromDirectory(this.pythonHome)
-      : await PythonInstance.fromSystem();
-
+    const python = await PythonInstance.fromDirectory(this.pythonHome);
     let extraIndexUrl: string | undefined = undefined;
     const platform = os.platform();
 
@@ -70,8 +65,8 @@ export class ConfigurePythonTask extends BaseTask {
 
     const uvBin =
       os.platform() === 'win32'
-        ? path.join(this.uvDir, 'uv.exe')
-        : path.join(this.uvDir, 'uv');
+        ? path.join(this.pythonHome, 'uv.exe')
+        : path.join(this.pythonHome, 'bin', 'uv');
 
     const proc = spawn(
       uvBin,
@@ -80,7 +75,6 @@ export class ConfigurePythonTask extends BaseTask {
         'install',
         '--python',
         python.path,
-        ...(this.packagesDir ? ['--target', this.packagesDir] : []),
         ...(extraIndexUrl ? ['--extra-index-url', extraIndexUrl] : []),
         ...required,
       ],

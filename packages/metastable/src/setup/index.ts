@@ -118,20 +118,11 @@ export class Setup extends EventEmitter {
       this.done();
     });
 
-    const uvTargetPath = path.join(this.metastable.storage.dataRoot, 'uv');
-
     const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
     this._packagesDir = undefined;
     this._pythonHome = targetPath;
     setupQueue.add(new DownloadPythonTask(this.metastable.storage.dataRoot));
-    setupQueue.add(
-      new ConfigurePythonTask(
-        settings.torchMode,
-        uvTargetPath,
-        undefined,
-        targetPath,
-      ),
-    );
+    setupQueue.add(new ConfigurePythonTask(settings.torchMode, targetPath));
 
     if (settings.downloads.length) {
       this.metastable.tasks.queues.setup.add(

@@ -168,7 +168,6 @@ export class Metastable extends (EventEmitter as {
   async reloadPython() {
     const config = await this.storage.config.all();
     if (!this.settings.skipPythonSetup && !config.python.configured) {
-      this.python = await PythonInstance.fromSystem();
       return;
     }
 

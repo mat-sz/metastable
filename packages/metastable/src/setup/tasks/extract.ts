@@ -9,15 +9,18 @@ export class ExtractTask extends BaseTask {
   constructor(
     private archivePath: string,
     private targetPath: string,
+    private cleanDir = false,
   ) {
     super('extract', undefined);
   }
 
   async execute() {
-    this.appendLog('Cleaning up...');
-    try {
-      await rimraf(this.targetPath);
-    } catch {}
+    if (this.cleanDir) {
+      this.appendLog('Cleaning up...');
+      try {
+        await rimraf(this.targetPath);
+      } catch {}
+    }
 
     this.appendLog(`Extracting ${this.archivePath} to ${this.targetPath}`);
 
