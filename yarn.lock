@@ -362,7 +362,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/rebuild@npm:3.6.0":
+"@electron/rebuild@npm:3.6.0, @electron/rebuild@npm:^3.6.0":
   version: 3.6.0
   resolution: "@electron/rebuild@npm:3.6.0"
   dependencies:
@@ -1238,6 +1238,7 @@ __metadata:
     "@tanstack/react-query": "npm:^5.29.2"
     "@trpc/client": "npm:^11.0.0-rc.342"
     "@trpc/react-query": "npm:^11.0.0-rc.342"
+    "@types/node": "npm:^20.12.7"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.0.3"
@@ -1278,21 +1279,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@metastable/cppzst@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@metastable/cppzst@npm:2.1.0"
+  dependencies:
+    nan: "npm:^2.19.0"
+    node-gyp: "npm:latest"
+  checksum: 0dc7c0cd534d474a7e434aca1de0206b7f936f26ccfb0957298693c5cc9c6059447a88c69985bd65d990c8d60df97a699237740e62d361657281fdba05cd4602
+  languageName: node
+  linkType: hard
+
 "@metastable/metastable@npm:*, @metastable/metastable@workspace:packages/metastable":
   version: 0.0.0-use.local
   resolution: "@metastable/metastable@workspace:packages/metastable"
   dependencies:
+    "@electron/rebuild": "npm:^3.6.0"
+    "@metastable/cppzst": "npm:^2.1.0"
     "@metastable/types": "npm:*"
     "@trpc/server": "npm:^11.0.0-rc.342"
     "@types/decompress": "npm:^4.2.7"
     "@types/event-stream": "npm:^4.0.5"
     "@types/node": "npm:^20.10.3"
+    "@types/tar-stream": "npm:^3.1.3"
     "@types/which": "npm:^3.0.3"
     axios: "npm:^1.6.2"
     check-disk-space: "npm:^3.4.0"
     chokidar: "npm:^3.5.3"
     decompress: "npm:^4.2.1"
-    electron: "npm:^29.0.1"
+    electron: "npm:^30.0.1"
     event-stream: "npm:^4.0.1"
     js-base64: "npm:^3.7.7"
     meta-png: "npm:^1.0.6"
@@ -1302,6 +1316,7 @@ __metadata:
     rimraf: "npm:^5.0.5"
     sharp: "npm:^0.33.2"
     systeminformation: "npm:^5.22.7"
+    tar-stream: "npm:^3.1.7"
     typescript: "npm:^5.3.2"
     which: "npm:^4.0.0"
     zod: "npm:^3.22.4"
@@ -1777,6 +1792,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^20.12.7":
+  version: 20.12.7
+  resolution: "@types/node@npm:20.12.7"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: dce80d63a3b91892b321af823d624995c61e39c6a223cc0ac481a44d337640cc46931d33efb3beeed75f5c85c3bda1d97cef4c5cd4ec333caf5dee59cff6eca0
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^20.9.0":
   version: 20.11.20
   resolution: "@types/node@npm:20.11.20"
@@ -1843,6 +1867,15 @@ __metadata:
   version: 7.5.6
   resolution: "@types/semver@npm:7.5.6"
   checksum: 196dc32db5f68cbcde2e6a42bb4aa5cbb100fa2b7bd9c8c82faaaf3e03fbe063e205dbb4f03c7cdf53da2edb70a0d34c9f2e601b54281b377eb8dc1743226acd
+  languageName: node
+  linkType: hard
+
+"@types/tar-stream@npm:^3.1.3":
+  version: 3.1.3
+  resolution: "@types/tar-stream@npm:3.1.3"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 64f87d209bd2edf1a7d029a922a246ef0dcfb19e623b95714e2c074195a61ed4fe4d67d0c3c6dc33239ef7d18902fcb70df7f7e85cfbd92a6bf25d087ce531fd
   languageName: node
   linkType: hard
 
@@ -2566,10 +2599,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"b4a@npm:^1.6.4":
+  version: 1.6.6
+  resolution: "b4a@npm:1.6.6"
+  checksum: 56f30277666cb511a15829e38d369b114df7dc8cec4cedc09cc5d685bc0f27cb63c7bcfb58e09a19a1b3c4f2541069ab078b5328542e85d74a39620327709a38
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
   checksum: 9308baf0a7e4838a82bbfd11e01b1cb0f0cf2893bc1676c27c2a8c0e70cbae1c59120c3268517a8ae7fb6376b4639ef81ca22582611dbee4ed28df945134aaee
+  languageName: node
+  linkType: hard
+
+"bare-events@npm:^2.2.0":
+  version: 2.2.2
+  resolution: "bare-events@npm:2.2.2"
+  checksum: bacdaaf072f87ab5d2ed0c2fc519ef0fa8f6acd834fee50710a05f416a1b73ed99c9c6dfbefdd462ec4eb726d8f74e4a8476c2f8c3ae8812919c67eacb1f807f
   languageName: node
   linkType: hard
 
@@ -3683,19 +3730,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^29.0.1":
-  version: 29.0.1
-  resolution: "electron@npm:29.0.1"
-  dependencies:
-    "@electron/get": "npm:^2.0.0"
-    "@types/node": "npm:^20.9.0"
-    extract-zip: "npm:^2.0.1"
-  bin:
-    electron: cli.js
-  checksum: 828845b89ce8f759a38c85b7183b76ee9ef250ca6b87714dc44ede82fe6bb9f48ceb1418ed9a9ef640ec9aaa7431669a956915681808ee50a5731b8e84dcd6cd
-  languageName: node
-  linkType: hard
-
 "electron@npm:^30.0.1":
   version: 30.0.1
   resolution: "electron@npm:30.0.1"
@@ -4418,6 +4452,13 @@ __metadata:
   version: 1.3.0
   resolution: "fast-diff@npm:1.3.0"
   checksum: 5c19af237edb5d5effda008c891a18a585f74bf12953be57923f17a3a4d0979565fc64dbc73b9e20926b9d895f5b690c618cbb969af0cf022e3222471220ad29
+  languageName: node
+  linkType: hard
+
+"fast-fifo@npm:^1.1.0, fast-fifo@npm:^1.2.0":
+  version: 1.3.2
+  resolution: "fast-fifo@npm:1.3.2"
+  checksum: d53f6f786875e8b0529f784b59b4b05d4b5c31c651710496440006a398389a579c8dbcd2081311478b5bf77f4b0b21de69109c5a4eabea9d8e8783d1eb864e4c
   languageName: node
   linkType: hard
 
@@ -6255,12 +6296,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "metastable@workspace:."
   dependencies:
+    "@electron/rebuild": "npm:^3.6.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.0.0"
     "@typescript-eslint/parser": "npm:^6.0.0"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-import: "npm:^2.29.1"
     eslint-plugin-prettier: "npm:^5.1.3"
+    node-addon-api: "npm:^8.0.0"
     node-gyp: "npm:^10.1.0"
     vitest: "npm:^1.5.0"
   languageName: unknown
@@ -6557,6 +6600,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nan@npm:^2.19.0":
+  version: 2.19.0
+  resolution: "nan@npm:2.19.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: b8d05d75f92ee9d94affa50d0aa41b6c698254c848529452d7ab67c2e0d160a83f563bfe2cbd53e077944eceb48c757f83c93634c7c9ff404c9ec1ed4e5ced1a
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.7":
   version: 3.3.7
   resolution: "nanoid@npm:3.3.7"
@@ -6613,6 +6665,15 @@ __metadata:
   dependencies:
     node-gyp: "npm:latest"
   checksum: 2e096ab079e3c46d33b0e252386e9c239c352f7cc6d75363d9a3c00bdff34c1a5da170da861917512843f213c32d024ced9dc9552b968029786480d18727ec66
+  languageName: node
+  linkType: hard
+
+"node-addon-api@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "node-addon-api@npm:8.0.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 20eb231362cc07c62d9839164473744d985be5d82685214f3750d990d9f61ef366e0ba112a766c925d640ed29b2a500b83568e895dc2444dcd5db01e615aac2b
   languageName: node
   linkType: hard
 
@@ -7348,6 +7409,13 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: 900a93d3cdae3acd7d16f642c29a642aea32c2026446151f0778c62ac089d4b8e6c986811076e1ae180a694cedf077d453a11b58ff0a865629a4f82ab558e102
+  languageName: node
+  linkType: hard
+
+"queue-tick@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "queue-tick@npm:1.0.1"
+  checksum: 0db998e2c9b15215317dbcf801e9b23e6bcde4044e115155dae34f8e7454b9a783f737c9a725528d677b7a66c775eb7a955cf144fe0b87f62b575ce5bfd515a9
   languageName: node
   linkType: hard
 
@@ -8393,6 +8461,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"streamx@npm:^2.15.0":
+  version: 2.16.1
+  resolution: "streamx@npm:2.16.1"
+  dependencies:
+    bare-events: "npm:^2.2.0"
+    fast-fifo: "npm:^1.1.0"
+    queue-tick: "npm:^1.0.1"
+  dependenciesMeta:
+    bare-events:
+      optional: true
+  checksum: 202b1d7cb7ceb36cdc5d5d0e2c27deafcc8670a4934cda7a5e3d3d45b8d3a64dc43f1b982b1c1cb316f01964dd5137b7e26af3151582c7c29ad3cf4072c6dbb9
+  languageName: node
+  linkType: hard
+
 "string-argv@npm:0.3.2":
   version: 0.3.2
   resolution: "string-argv@npm:0.3.2"
@@ -8597,6 +8679,17 @@ __metadata:
     to-buffer: "npm:^1.1.1"
     xtend: "npm:^4.0.0"
   checksum: ab8528d2cc9ccd0906d1ce6d8089030b2c92a578c57645ff4971452c8c5388b34c7152c04ed64b8510d22a66ffaf0fee58bada7d6ab41ad1e816e31993d59cf3
+  languageName: node
+  linkType: hard
+
+"tar-stream@npm:^3.1.7":
+  version: 3.1.7
+  resolution: "tar-stream@npm:3.1.7"
+  dependencies:
+    b4a: "npm:^1.6.4"
+    fast-fifo: "npm:^1.2.0"
+    streamx: "npm:^2.15.0"
+  checksum: a09199d21f8714bd729993ac49b6c8efcb808b544b89f23378ad6ffff6d1cb540878614ba9d4cfec11a64ef39e1a6f009a5398371491eb1fda606ffc7f70f718
   languageName: node
   linkType: hard
 

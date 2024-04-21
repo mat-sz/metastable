@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.npm \
   npm install -g yarn && \
   yarn install && \
-  uv pip install -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages && \
+  uv pip install --extra-index-url https://download.pytorch.org/whl/cu121 -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages && \
   yarn build
 
 EXPOSE 5001

@@ -1,34 +1,80 @@
-import { TaskState } from '@metastable/types';
-import decompress from 'decompress';
-import { rimraf } from 'rimraf';
+import fs from 'fs';
+import { link, mkdir, symlink, writeFile } from 'fs/promises';
+import path from 'path';
 
-import { tryUnlink } from '../../helpers/fs.js';
+import { decompressStream } from '@metastable/cppzst';
+import { TaskState } from '@metastable/types';
+import { rimraf } from 'rimraf';
+import tarStream from 'tar-stream';
+
+import { tryMkdir, tryUnlink } from '../../helpers/fs.js';
+import { WrappedPromise } from '../../helpers/promise.js';
 import { BaseTask } from '../../tasks/task.js';
 
 export class ExtractTask extends BaseTask {
   constructor(
-    private archivePath: string,
+    private partPaths: string[],
     private targetPath: string,
-    private cleanDir = false,
   ) {
     super('extract', undefined);
   }
 
   async execute() {
-    if (this.cleanDir) {
-      this.appendLog('Cleaning up...');
-      try {
-        await rimraf(this.targetPath);
-      } catch {}
-    }
+    this.appendLog('Cleaning up...');
+    try {
+      await rimraf(path.join(this.targetPath));
+    } catch {}
 
-    this.appendLog(`Extracting ${this.archivePath} to ${this.targetPath}`);
+    await tryMkdir(this.targetPath);
 
-    await decompress(this.archivePath, this.targetPath, { strip: 1 });
-    tryUnlink(this.archivePath);
+    const wrapped = new WrappedPromise<TaskState>();
+    const parts = this.partPaths.sort();
+
+    const extract = tarStream.extract();
+
+    extract.on('entry', (header, stream, cb) => {
+      const filePath = path.join(this.targetPath, header.name);
+
+      switch (header.type) {
+        case 'file':
+          writeFile(filePath, stream, { mode: header.mode }).then(() => cb());
+          break;
+        case 'directory':
+          mkdir(filePath).then(() => cb());
+          break;
+        case 'link':
+          link(header.linkname!, filePath).then(() => cb());
+          break;
+        case 'symlink':
+          symlink(header.linkname!, filePath).then(() => cb());
+          break;
+      }
+    });
+    extract.on('finish', () => {
+      wrapped.resolve(TaskState.SUCCESS);
+    });
+
+    const decompressor = decompressStream();
+    decompressor.pipe(extract);
+
+    const next = () => {
+      const part = parts.shift();
+      if (!part) {
+        return;
+      }
+
+      const readStream = fs.createReadStream(part);
+      readStream.pipe(decompressor, { end: !parts.length });
+      readStream.on('end', () => {
+        tryUnlink(part);
+        next();
+      });
+    };
+
+    next();
 
     this.appendLog('Done.');
 
-    return TaskState.SUCCESS;
+    return await wrapped.promise;
   }
 }

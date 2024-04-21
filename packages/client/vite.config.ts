@@ -32,7 +32,13 @@ export default defineConfig(({ mode }) => {
                       formats: ['cjs'],
                     },
                     rollupOptions: {
-                      external: ['sharp', 'chokidar', 'axios', 'node-pty'],
+                      external: [
+                        'sharp',
+                        'chokidar',
+                        'axios',
+                        'node-pty',
+                        '@metastable/cppzst',
+                      ],
                       output: {
                         inlineDynamicImports: true,
                         entryFileNames: '[name].cjs',

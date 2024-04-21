@@ -63,9 +63,13 @@ export class SetupStore {
     const gpu = this.details?.graphics[this.gpuIndex];
     if (gpu) {
       if (gpu.vendor.toLowerCase().includes('nvidia')) {
-        torchMode = 'nvidia';
+        torchMode = 'cuda';
       } else if (gpu.vendor.toLowerCase().includes('amd')) {
-        torchMode = 'amd';
+        if (this.details?.os.platform.value === 'win32') {
+          torchMode = 'directml';
+        } else if (this.details?.os.platform.value === 'linux') {
+          torchMode = 'rocm';
+        }
       }
     }
 

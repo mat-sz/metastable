@@ -2,8 +2,7 @@ import { TaskState } from '@metastable/types';
 import Ansi from 'ansi-to-react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsDownload, BsHourglassSplit } from 'react-icons/bs';
-import { FaPython } from 'react-icons/fa';
+import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
@@ -12,15 +11,13 @@ import { List } from './components/List';
 import styles from './index.module.scss';
 
 const TASK_ICONS: Record<string, React.ReactNode> = {
-  'python.download': <BsDownload />,
-  'python.configure': <FaPython />,
-  'models.download': <BsDownload />,
+  download: <BsDownload />,
+  extract: <BsBox />,
 };
 
 const TASK_TITLE: Record<string, string> = {
-  'python.download': 'Download Python',
-  'python.configure': 'Install Python dependencies',
-  'models.download': 'Download models',
+  download: 'Download dependencies',
+  extract: 'Install dependencies',
 };
 
 export const Step2: React.FC = observer(() => {

@@ -56,7 +56,7 @@ export interface SetupDetails {
 
 export interface SetupSettings {
   downloads: DownloadSettings[];
-  torchMode: 'nvidia' | 'amd' | 'cpu';
+  torchMode: 'cuda' | 'rocm' | 'directml' | 'cpu';
 }
 
 export interface SetupStatusEvent {

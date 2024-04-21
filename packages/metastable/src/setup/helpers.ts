@@ -222,6 +222,6 @@ export async function getLatestReleaseInfo(repository: string) {
     }
     return release;
   } catch (e) {
-    throw new Error(`Unable to retrieve latest Python from GitHub, ${e}`);
+    throw new Error(`Unable to retrieve ${repository} from GitHub, ${e}`);
   }
 }

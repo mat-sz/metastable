@@ -6,10 +6,10 @@ import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 import checkDiskSpace from 'check-disk-space';
 import si from 'systeminformation';
 
-import { getOS, getPython } from './helpers.js';
-import { ConfigurePythonTask } from './tasks/configurePython.js';
+import { getLatestReleaseInfo, getOS, getPython } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
-import { DownloadPythonTask } from './tasks/downloadPython.js';
+import { ExtractTask } from './tasks/extract.js';
+import { BaseDownloadTask } from '../downloader/index.js';
 import type { Metastable } from '../index.js';
 
 export class Setup extends EventEmitter {
@@ -88,7 +88,7 @@ export class Setup extends EventEmitter {
     });
 
     const platform = os.platform();
-    if (platform === 'win32' && this.settings.torchMode === 'amd') {
+    if (this.settings.torchMode === 'directml') {
       await this.metastable.storage.config.set('comfy', {
         args: ['--directml'],
       });
@@ -107,22 +107,41 @@ export class Setup extends EventEmitter {
     }
 
     this.settings = settings;
-
     this._status = 'in_progress';
     this.emitStatus();
 
     const setupQueue = this.metastable.tasks.queues.setup;
-
     setupQueue.once('empty', () => {
       setupQueue.purge();
       this.done();
     });
 
+    const baseRelease = await getLatestReleaseInfo(
+      'metastable-studio/bundle-base',
+    );
+    const assets = baseRelease.assets.filter(item =>
+      item.name.startsWith(
+        `${os.platform()}-${os.arch()}-${this.settings?.torchMode || 'cpu'}`,
+      ),
+    );
+
+    for (const asset of assets) {
+      setupQueue.add(
+        new BaseDownloadTask(
+          'download',
+          asset.browser_download_url,
+          path.join(this.metastable.storage.dataRoot, asset.name),
+        ),
+      );
+    }
+
     const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
     this._packagesDir = undefined;
     this._pythonHome = targetPath;
-    setupQueue.add(new DownloadPythonTask(this.metastable.storage.dataRoot));
-    setupQueue.add(new ConfigurePythonTask(settings.torchMode, targetPath));
+    const parts = assets.map(asset =>
+      path.join(this.metastable.storage.dataRoot, asset.name),
+    );
+    setupQueue.add(new ExtractTask(parts, targetPath));
 
     if (settings.downloads.length) {
       this.metastable.tasks.queues.setup.add(
