@@ -52,6 +52,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
   const pointerStateRef = useRef<PointerState[]>([]);
   const brushPositionRef = useRef<Point>();
   const pointerActionRef = useRef<string>();
+  const lastDrawRef = useRef(0);
 
   useEffect(() => {
     brushStateRef.current = { tool, brushSettings };
@@ -89,6 +90,9 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     maskCanvas.width = image.naturalWidth;
     maskCanvas.height = image.naturalHeight;
     const ctx = maskCanvas.getContext('2d')!;
+    ctx.imageSmoothingEnabled = false;
+    ctx.strokeStyle = '#000000';
+
     if (maskSrc) {
       const mask = await loadImage(maskSrc);
       ctx.drawImage(mask, 0, 0, image.naturalWidth, image.naturalHeight);
@@ -134,6 +138,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
 
       ctx.save();
       ctx.globalAlpha = 0.75;
+      ctx.filter = 'invert(62%) sepia(45%) saturate(7242%) hue-rotate(218deg)';
       ctx.drawImage(
         maskCanvas,
         offset.x,
@@ -246,51 +251,40 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
 
       const current = p.current.clone().sub(offset).divideScalar(scale);
 
-      let points: Point[] = [current.point];
-      if (line && previous) {
-        const distance = current.distanceTo(Vector2.fromPoint(previous));
-        if (distance > Math.SQRT2) {
-          points = linePoints(previous, current);
-        }
-      }
-
       const canvas = maskCanvasRef.current!;
       const ctx = canvas.getContext('2d')!;
-      ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = '#000000';
 
       const { tool, brushSettings } = brushStateRef.current;
       const { size, type } = brushSettings;
 
-      ctx.save();
       if (tool === 'subtract') {
         ctx.globalCompositeOperation = 'destination-out';
       } else {
         ctx.globalCompositeOperation = 'source-over';
       }
 
-      for (const point of points) {
-        switch (type) {
-          case 'square':
-            {
-              const x = Math.round(point.x - size / 2);
-              const y = Math.round(point.y - size / 2);
-              ctx.fillRect(x, y, size, size);
-            }
-            break;
-          case 'circle':
-            {
-              const x = Math.round(point.x);
-              const y = Math.round(point.y);
-              ctx.beginPath();
-              ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
-              ctx.fill();
-            }
-            break;
+      if (type === 'square') {
+        let points: Point[] = [current.point];
+        if (line && previous) {
+          const distance = current.distanceTo(Vector2.fromPoint(previous));
+          if (distance > Math.SQRT2) {
+            points = linePoints(previous, current);
+          }
         }
-      }
 
-      ctx.restore();
+        for (const point of points) {
+          const x = Math.round(point.x - size / 2);
+          const y = Math.round(point.y - size / 2);
+          ctx.fillRect(x, y, size, size);
+        }
+      } else {
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y);
+        ctx.lineTo(current.x, current.y);
+        ctx.stroke();
+      }
     }
   };
 
@@ -337,6 +331,13 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
           e.preventDefault();
 
           brushPositionRef.current = { x: e.clientX, y: e.clientY };
+          if (pointerActionRef.current === 'draw') {
+            if (Date.now() - lastDrawRef.current > 20) {
+              lastDrawRef.current = Date.now();
+            } else {
+              return;
+            }
+          }
 
           const state = pointerStateRef.current;
           const i = state.findIndex(p => p.pointerId === e.pointerId);
@@ -358,6 +359,12 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
           const state = pointerStateRef.current;
           const i = state.findIndex(p => p.pointerId === e.pointerId);
           if (i !== -1) {
+            if (pointerActionRef.current === 'draw') {
+              state[i].previous = state[i].current;
+              state[i].current = Vector2.fromEvent(e);
+              draw();
+            }
+
             state.splice(i, 1);
 
             if (state.length === 1) {
