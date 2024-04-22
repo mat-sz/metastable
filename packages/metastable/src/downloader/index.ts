@@ -11,7 +11,6 @@ import { WrappedPromise } from '../helpers/promise.js';
 import { BaseTask } from '../tasks/task.js';
 
 const USER_AGENT = 'Metastable/0.0.0';
-const CHUNK_SIZE = 10 * 1024 * 1024;
 
 export class BaseDownloadTask extends BaseTask<DownloadData> {
   private downloadUrl?: string;
@@ -109,64 +108,45 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       onClose(e);
     });
 
-    let start = 0;
-    let end = CHUNK_SIZE;
+    try {
+      const { data } = await axios({
+        url: this.downloadUrl,
+        method: 'GET',
+        responseType: 'stream',
+        headers: {
+          'User-Agent': USER_AGENT,
+        },
+      });
+      data.on('data', (chunk: any) => {
+        if (this.cancellationPending) {
+          data.destroy();
+          return;
+        }
 
-    const nextChunk = async () => {
-      if (end >= this.data.size) {
-        end = 0;
-      }
-
-      try {
-        const { data } = await axios({
-          url: this.downloadUrl,
-          method: 'GET',
-          responseType: 'stream',
-          headers: {
-            'User-Agent': USER_AGENT,
-            Range: `bytes=${start}-${end || ''}`,
-          },
-        });
-        data.on('data', (chunk: any) => {
-          if (this.cancellationPending) {
-            data.destroy();
-            return;
-          }
-
-          this.#offset = chunk.length + (this.#offset || 0);
-          this.emitProgress();
-        });
-        data.on('end', () => {
-          if (this.cancellationPending) {
-            data.close();
-            return;
-          }
-
-          if (!end) {
-            onClose();
-          } else {
-            data.removeAllListeners();
-            start = end + 1;
-            end += CHUNK_SIZE;
-            nextChunk();
-          }
-        });
-        data.on('close', () => {
-          if (this.cancellationPending) {
-            onClose();
-          }
-        });
-        data.on('error', (e: any) => {
+        this.#offset = chunk.length + (this.#offset || 0);
+        this.emitProgress();
+      });
+      data.on('end', () => {
+        if (this.cancellationPending) {
           data.close();
-          onClose(e);
-        });
-        data.pipe(writer, { end: false });
-      } catch (e) {
-        wrapped.reject(e);
-      }
-    };
+          return;
+        }
 
-    nextChunk();
+        onClose();
+      });
+      data.on('close', () => {
+        if (this.cancellationPending) {
+          onClose();
+        }
+      });
+      data.on('error', (e: any) => {
+        data.close();
+        onClose(e);
+      });
+      data.pipe(writer, { end: false });
+    } catch (e) {
+      wrapped.reject(e);
+    }
 
     return wrapped.promise;
   }
