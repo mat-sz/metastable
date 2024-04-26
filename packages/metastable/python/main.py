@@ -33,7 +33,7 @@ if __name__ == "__main__":
 import comfy.utils
 
 import comfy.model_management
-import namespaces
+import namespaces_base
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     rpc = RPC()
-    namespaces.insert_all(rpc)
+    namespaces_base.insert_all(rpc)
 
     cuda_malloc_warning()
 
