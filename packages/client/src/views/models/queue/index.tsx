@@ -6,6 +6,7 @@ import React from 'react';
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
+import { timestr } from '$utils/string';
 import styles from './index.module.scss';
 
 export const Queue: React.FC = observer(() => {
@@ -43,6 +44,13 @@ export const Queue: React.FC = observer(() => {
                   {filesize(download.data.size)}]
                 </span>
                 <span>[{download.state}]</span>
+                <span>
+                  ETA:{' '}
+                  {timestr(
+                    (download.data.size - download.data.offset) /
+                      download.data.speed,
+                  )}
+                </span>
               </ProgressBar>
             </div>
             <div>

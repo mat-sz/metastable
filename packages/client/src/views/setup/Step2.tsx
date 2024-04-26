@@ -7,6 +7,7 @@ import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
+import { timestr } from '$utils/string';
 import { Item } from './components/Item';
 import { List } from './components/List';
 import styles from './index.module.scss';
@@ -53,10 +54,19 @@ export const Step2: React.FC = observer(() => {
                     <>
                       <span>{filesize(task.data.speed)}/s</span>
                       {!!(task.data.offset && task.data.size) && (
-                        <span>
-                          {filesize(task.data.offset)}/
-                          {filesize(task.data.size)}
-                        </span>
+                        <>
+                          <span>
+                            {filesize(task.data.offset)}/
+                            {filesize(task.data.size)}
+                          </span>
+                          <span>
+                            ETA:{' '}
+                            {timestr(
+                              (task.data.size - task.data.offset) /
+                                task.data.speed,
+                            )}
+                          </span>
+                        </>
                       )}
                     </>
                   ) : undefined
