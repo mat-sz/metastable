@@ -6,6 +6,7 @@ import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
+import { filesize } from '$utils/file';
 import { Item } from './components/Item';
 import { List } from './components/List';
 import styles from './index.module.scss';
@@ -45,6 +46,20 @@ export const Step2: React.FC = observer(() => {
                     : task.state === TaskState.FAILED
                       ? 'error'
                       : 'incomplete'
+                }
+                description={
+                  task.state === TaskState.RUNNING &&
+                  task.type === 'download' ? (
+                    <>
+                      <span>{filesize(task.data.speed)}/s</span>
+                      {!!(task.data.offset && task.data.size) && (
+                        <span>
+                          {filesize(task.data.offset)}/
+                          {filesize(task.data.size)}
+                        </span>
+                      )}
+                    </>
+                  ) : undefined
                 }
                 progress={(task.progress || 0) * 100}
               >

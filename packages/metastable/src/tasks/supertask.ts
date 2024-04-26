@@ -4,7 +4,16 @@ import { BaseQueue } from './queue.js';
 import { BaseTask } from './task.js';
 import { WrappedPromise } from '../helpers/promise.js';
 
-export class SuperTask extends BaseTask {
+export class SuperTask<T = any> extends BaseTask<T> {
+  constructor(
+    name: string,
+    data: T,
+    private options: {
+      forwardProgress?: boolean;
+    } = { forwardProgress: true },
+  ) {
+    super(name, data);
+  }
   protected queue = new BaseQueue(this.id, {
     stopOnFailure: true,
     startAutomatically: false,
@@ -18,20 +27,24 @@ export class SuperTask extends BaseTask {
     this.queue.on('failed', () => {
       wrapped.resolve(TaskState.FAILED);
     });
-    this.queue.on('event', event => {
-      if (event.event === 'task.update') {
-        const count = this.queue.tasks.length;
-        const completed = this.queue.tasks.filter(
-          task => task.state === TaskState.SUCCESS,
-        ).length;
 
-        if (completed >= count) {
-          this.progress = 1;
-        } else {
-          this.progress = (completed + (event.data.progress || 0)) / count;
+    if (this.options.forwardProgress) {
+      this.queue.on('event', event => {
+        if (event.event === 'task.update') {
+          const count = this.queue.tasks.length;
+          const completed = this.queue.tasks.filter(
+            task => task.state === TaskState.SUCCESS,
+          ).length;
+
+          if (completed >= count) {
+            this.progress = 1;
+          } else {
+            this.progress = (completed + (event.data.progress || 0)) / count;
+          }
         }
-      }
-    });
+      });
+    }
+
     this.queue.next();
 
     return wrapped.promise;

@@ -241,12 +241,16 @@ export interface DownloadTaskItem {
   headers?: Record<string, string>;
 }
 
-export class MultiDownloadTask extends SuperTask {
+export class MultiDownloadTask extends SuperTask<{
+  speed: number;
+  size: number;
+  offset: number;
+}> {
   constructor(
     name: string,
     private items: DownloadTaskItem[],
   ) {
-    super(name, {});
+    super(name, { speed: 0, size: 0, offset: 0 }, { forwardProgress: false });
     this.created();
   }
 
@@ -256,6 +260,23 @@ export class MultiDownloadTask extends SuperTask {
         case 'task.log':
           this.appendLog(event.data.log);
           break;
+        case 'task.update': {
+          const size = this.queue.tasks.reduce(
+            (value, task) => value + (task.data.size || 0),
+            0,
+          );
+          const offset = this.queue.tasks.reduce(
+            (value, task) => value + (task.data.offset || 0),
+            0,
+          );
+          const speed = this.queue.tasks.reduce(
+            (value, task) =>
+              task.data.speed > value ? task.data.speed : value,
+            0,
+          );
+          this.progress = size === 0 ? 0 : offset / size;
+          this.data = { speed, size, offset };
+        }
       }
     });
 
@@ -265,6 +286,6 @@ export class MultiDownloadTask extends SuperTask {
       );
     }
 
-    return {};
+    return { speed: 0, size: 0, offset: 0 };
   }
 }
