@@ -9,7 +9,7 @@ import si from 'systeminformation';
 import { getLatestReleaseInfo, getOS, getPython } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
-import { BaseDownloadTask } from '../downloader/index.js';
+import { MultiDownloadTask } from '../downloader/index.js';
 import type { Metastable } from '../index.js';
 
 export class Setup extends EventEmitter {
@@ -125,15 +125,15 @@ export class Setup extends EventEmitter {
       ),
     );
 
-    for (const asset of assets) {
-      setupQueue.add(
-        new BaseDownloadTask(
-          'download',
-          asset.browser_download_url,
-          path.join(this.metastable.storage.dataRoot, asset.name),
-        ),
-      );
-    }
+    setupQueue.add(
+      new MultiDownloadTask(
+        'download',
+        assets.map(asset => ({
+          url: asset.browser_download_url,
+          savePath: path.join(this.metastable.storage.dataRoot, asset.name),
+        })),
+      ),
+    );
 
     const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
     this._packagesDir = undefined;

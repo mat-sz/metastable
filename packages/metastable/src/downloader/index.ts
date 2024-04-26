@@ -8,6 +8,7 @@ import axios from 'axios';
 import { ModelEntity } from '../data/model.js';
 import { exists, tryMkdir } from '../helpers/fs.js';
 import { WrappedPromise } from '../helpers/promise.js';
+import { SuperTask } from '../tasks/supertask.js';
 import { BaseTask } from '../tasks/task.js';
 
 const USER_AGENT = 'Metastable/0.0.0';
@@ -231,5 +232,39 @@ export class DownloadModelTask extends BaseDownloadTask {
     }
 
     return state;
+  }
+}
+
+export interface DownloadTaskItem {
+  url: string;
+  savePath: string;
+  headers?: Record<string, string>;
+}
+
+export class MultiDownloadTask extends SuperTask {
+  constructor(
+    name: string,
+    private items: DownloadTaskItem[],
+  ) {
+    super(name, {});
+    this.created();
+  }
+
+  async init() {
+    this.queue.on('event', event => {
+      switch (event.event) {
+        case 'task.log':
+          this.appendLog(event.data.log);
+          break;
+      }
+    });
+
+    for (const item of this.items) {
+      this.queue.add(
+        new BaseDownloadTask('download', item.url, item.savePath, item.headers),
+      );
+    }
+
+    return {};
   }
 }

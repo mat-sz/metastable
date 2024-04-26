@@ -72,7 +72,7 @@ export class ExtractTask extends BaseTask {
       });
     };
 
-    this.appendLog(`Extracting to: ${this.targetPath}.`);
+    this.appendLog(`Extracting to: ${this.targetPath}`);
     next();
 
     return await wrapped.promise;
