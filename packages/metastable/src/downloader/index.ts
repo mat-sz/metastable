@@ -33,6 +33,8 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
   }
 
   async init() {
+    this.appendLog(`Downloading: ${this.url}`);
+
     const { data, headers, request } = await axios({
       url: this.url,
       method: 'GET',
@@ -50,6 +52,9 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     }
 
     this.downloadUrl = responseUrl || this.url;
+    if (this.downloadUrl !== this.url) {
+      this.appendLog(`Found redirect: ${this.downloadUrl}`);
+    }
 
     const size = parseInt(headers['content-length']);
     return { ...this.data, size };

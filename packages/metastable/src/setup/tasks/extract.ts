@@ -20,7 +20,7 @@ export class ExtractTask extends BaseTask {
   }
 
   async execute() {
-    this.appendLog('Cleaning up...');
+    this.appendLog('Removing old data...');
     try {
       await rimraf(path.join(this.targetPath));
     } catch {}
@@ -52,6 +52,7 @@ export class ExtractTask extends BaseTask {
     });
     extract.on('finish', () => {
       wrapped.resolve(TaskState.SUCCESS);
+      this.appendLog('Done.');
     });
 
     const decompressor = decompressStream();
@@ -71,9 +72,8 @@ export class ExtractTask extends BaseTask {
       });
     };
 
+    this.appendLog(`Extracting to: ${this.targetPath}.`);
     next();
-
-    this.appendLog('Done.');
 
     return await wrapped.promise;
   }

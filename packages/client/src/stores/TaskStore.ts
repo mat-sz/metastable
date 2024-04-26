@@ -81,14 +81,11 @@ export class TaskStore {
 
   appendLog(queueId: string, taskId: string, log: string) {
     const item = this.find(queueId, taskId);
-    if (item?.log) {
+    if (item) {
       const update = {
         id: taskId,
         queueId,
-        log: (log.startsWith('\b')
-          ? `${item.log.substring(0, item.log.lastIndexOf('\n'))}\n${log}`
-          : `\n${log}`
-        ).trim(),
+        log: `${item.log || ''}\n${log}`.trim(),
       };
       this.update(update);
     }
