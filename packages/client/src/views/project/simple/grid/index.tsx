@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsGearFill } from 'react-icons/bs';
+import { BsFolderFill, BsGearFill } from 'react-icons/bs';
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
+import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
@@ -48,20 +49,33 @@ export const Grid: React.FC = observer(() => {
           onClose={() => setOpen(false)}
           actions={file => {
             return (
-              <IconButton
-                onClick={async () => {
-                  const data = await API.project.output.get.query({
-                    projectId: project.id,
-                    name: file.name,
-                  });
-                  const settings = data.metadata as any;
-                  if (settings) {
-                    project.setSettings(settings);
-                  }
-                }}
-              >
-                <BsGearFill />
-              </IconButton>
+              <>
+                {IS_ELECTRON && (
+                  <IconButton
+                    title="Reveal in explorer"
+                    onClick={() => {
+                      API.electron.shell.showItemInFolder.mutate(file.path);
+                    }}
+                  >
+                    <BsFolderFill />
+                  </IconButton>
+                )}
+                <IconButton
+                  title="Load settings from current image"
+                  onClick={async () => {
+                    const data = await API.project.output.get.query({
+                      projectId: project.id,
+                      name: file.name,
+                    });
+                    const settings = data.metadata as any;
+                    if (settings) {
+                      project.setSettings(settings);
+                    }
+                  }}
+                >
+                  <BsGearFill />
+                </IconButton>
+              </>
             );
           }}
         />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BsDownload, BsGlobe, BsHddFill, BsStarFill } from 'react-icons/bs';
+import { BsDownload, BsGlobe, BsHdd, BsStar } from 'react-icons/bs';
 
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { CivitAI } from './civitai';
@@ -15,9 +15,9 @@ export const ModelManager: React.FC<Props> = ({ defaultTab = 'installed' }) => {
   return (
     <TabView defaultTab={defaultTab} variant="large" direction="vertical">
       <Tabs>
-        <Tab id="installed" title="Installed models" icon={<BsHddFill />} />
+        <Tab id="installed" title="Installed models" icon={<BsHdd />} />
         <Tab id="queue" title="Download queue" icon={<BsDownload />} />
-        <Tab id="recommended" title="Recommended" icon={<BsStarFill />} />
+        <Tab id="recommended" title="Recommended" icon={<BsStar />} />
         <Tab id="civitai" title="CivitAI" icon={<BsGlobe />} />
       </Tabs>
       <TabContent>

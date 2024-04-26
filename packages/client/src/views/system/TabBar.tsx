@@ -4,7 +4,13 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { BsBox, BsGearFill, BsHouseFill, BsPlusLg, BsX } from 'react-icons/bs';
+import {
+  BsBoxFill,
+  BsGearFill,
+  BsHouseFill,
+  BsPlusLg,
+  BsX,
+} from 'react-icons/bs';
 
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
@@ -205,7 +211,7 @@ export const TabBar: React.FC = observer(() => {
         value={downloadValue}
         max={downloadMax}
       >
-        <BsBox />
+        <BsBoxFill />
       </ViewTab>
       {mainStore.projects.projects.map(project => (
         <ProjectTab key={project.id} project={project} />

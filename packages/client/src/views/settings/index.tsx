@@ -1,7 +1,7 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsDownload, BsGearFill } from 'react-icons/bs';
+import { BsDownload, BsGear } from 'react-icons/bs';
 
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { VarCategory, VarString, VarToggle, VarUI } from '$components/var';
@@ -23,7 +23,7 @@ export const Settings: React.FC = observer(() => {
     >
       <TabView defaultTab="general" variant="large" direction="vertical">
         <Tabs>
-          <Tab id="general" title="General" icon={<BsGearFill />} />
+          <Tab id="general" title="General" icon={<BsGear />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
         </Tabs>
         <TabContent className={styles.content}>

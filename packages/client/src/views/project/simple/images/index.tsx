@@ -1,10 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { BsFolderFill, BsGearFill } from 'react-icons/bs';
 
 import { API } from '$api';
-import { Button } from '$components/button';
+import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import { ProgressBar } from '$components/progressBar';
+import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
@@ -20,24 +22,39 @@ export const Images: React.FC = observer(() => {
         {project.currentOutput && (
           <div className={styles.actions}>
             <div>{project.currentOutput.name}</div>
-            <Button
-              onClick={async () => {
-                if (!project.currentOutput) {
-                  return;
-                }
+            <div className={styles.buttons}>
+              {IS_ELECTRON && (
+                <IconButton
+                  title="Reveal in explorer"
+                  onClick={() => {
+                    API.electron.shell.showItemInFolder.mutate(
+                      project.currentOutput!.path,
+                    );
+                  }}
+                >
+                  <BsFolderFill />
+                </IconButton>
+              )}
+              <IconButton
+                title="Load settings from current image"
+                onClick={async () => {
+                  if (!project.currentOutput) {
+                    return;
+                  }
 
-                const data = await API.project.output.get.query({
-                  projectId: project.id,
-                  name: project.currentOutput.name,
-                });
-                const settings = data.metadata as any;
-                if (settings) {
-                  project.setSettings(settings);
-                }
-              }}
-            >
-              Load settings from current image
-            </Button>
+                  const data = await API.project.output.get.query({
+                    projectId: project.id,
+                    name: project.currentOutput.name,
+                  });
+                  const settings = data.metadata as any;
+                  if (settings) {
+                    project.setSettings(settings);
+                  }
+                }}
+              >
+                <BsGearFill />
+              </IconButton>
+            </div>
           </div>
         )}
         <div className={styles.preview}>

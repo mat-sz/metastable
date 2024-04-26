@@ -458,6 +458,20 @@ export const router = t.router({
         win.close();
       }),
     },
+    shell: {
+      showItemInFolder: electronProcedure
+        .input(z.string())
+        .mutation(async ({ input }) => {
+          const { shell } = await import('electron');
+          shell.showItemInFolder(input);
+        }),
+      openPath: electronProcedure
+        .input(z.string())
+        .mutation(async ({ input }) => {
+          const { shell } = await import('electron');
+          shell.openPath(input);
+        }),
+    },
   },
 });
 

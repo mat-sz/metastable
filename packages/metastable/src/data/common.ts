@@ -259,6 +259,7 @@ export class ImageEntity extends FileEntity {
     return {
       name: this.name,
       image: this.image,
+      path: this.path,
       metadata: withMetadata ? await this.metadata.get() : undefined,
     };
   }

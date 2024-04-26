@@ -11,6 +11,7 @@ export interface ImageInfo {
 
 export interface ImageFile {
   name: string;
+  path: string;
   image: ImageInfo;
   metadata?: any;
 }

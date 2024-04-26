@@ -17,11 +17,10 @@
   [varui-category-title] {
     padding: 0 1rem;
   }
-}
 
-.actions {
-  background: var(--grey-200);
-  border-bottom: 1px solid var(--grey-400);
+  .actions {
+    border: none;
+  }
 }
 
 .center {
@@ -71,6 +70,8 @@
 }
 
 .actions {
+  background: var(--grey-200);
+  border-bottom: 1px solid var(--grey-400);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -84,5 +85,11 @@
   .hint {
     margin-right: 1rem;
     font-size: 0.8rem;
+  }
+
+  .buttons {
+    button {
+      margin-left: 1rem;
+    }
   }
 }
