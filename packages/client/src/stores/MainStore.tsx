@@ -71,6 +71,20 @@ class MainStore {
         this.onMessage(data as any);
       },
     });
+    API.instance.onBackendStatus.subscribe(undefined, {
+      onData: status => {
+        this.backendStatus = status;
+
+        switch (status) {
+          case 'ready':
+            this.refresh();
+            break;
+          case 'error':
+            modalStore.show(<BackendError />);
+            break;
+        }
+      },
+    });
     window.addEventListener('beforeunload', e => {
       if (this.forceExit) {
         return true;
@@ -161,15 +175,6 @@ class MainStore {
         this.trainingQueue = this.trainingQueue.filter(
           item => item.id !== message.data.projectId,
         );
-        break;
-      case 'backend.status':
-        this.backendStatus = message.data;
-        if (message.data === 'ready') {
-          this.refresh();
-        }
-        if (message.data === 'error') {
-          modalStore.show(<BackendError />);
-        }
         break;
       case 'setup.status':
         this.setup.status = message.data;

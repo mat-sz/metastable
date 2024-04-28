@@ -1,5 +1,6 @@
 import {
   AnyEvent,
+  BackendStatus,
   LogItem,
   Model,
   ModelType,
@@ -57,7 +58,6 @@ export const router = t.router({
           emit.next(data);
         };
 
-        metastable.replayEvents(onEvent);
         metastable.on('event', onEvent);
 
         return () => {
@@ -93,6 +93,20 @@ export const router = t.router({
 
         return () => {
           metastable.off('backendLog', onEvent);
+        };
+      });
+    }),
+    onBackendStatus: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<BackendStatus>(emit => {
+        const onEvent = (data: BackendStatus) => {
+          emit.next(data);
+        };
+
+        onEvent(metastable.status);
+        metastable.on('backendStatus', onEvent);
+
+        return () => {
+          metastable.off('backendStatus', onEvent);
         };
       });
     }),

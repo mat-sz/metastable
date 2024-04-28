@@ -36,6 +36,7 @@ type MetastableEvents = {
   event: (event: AnyEvent) => void;
   utilization: (data: Utilization) => void;
   backendLog: (data: LogItem[]) => void;
+  backendStatus: (status: BackendStatus) => void;
 };
 
 export class Metastable extends (EventEmitter as {
@@ -196,8 +197,10 @@ export class Metastable extends (EventEmitter as {
   }
 
   setStatus(status: BackendStatus) {
+    if (this.status !== status) {
+      this.emit('backendStatus', status);
+    }
     this.status = status;
-    this.emit('event', { event: 'backend.status', data: status });
   }
 
   restartKohya() {
@@ -239,13 +242,6 @@ export class Metastable extends (EventEmitter as {
     comfy.on('log', e => {
       this.logBuffer.push(e);
       this.emit('backendLog', [e]);
-    });
-  }
-
-  replayEvents(onEvent: (event: any) => void) {
-    onEvent({
-      event: 'backend.status',
-      data: this.status,
     });
   }
 

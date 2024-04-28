@@ -10,8 +10,8 @@ const metastable = new Metastable(path.join(os.tmpdir(), 'metastable_test'), {
 
 beforeAll(() => {
   return new Promise(resolve => {
-    metastable.on('event', event => {
-      if (event.event === 'backend.status' && event.data === 'ready') {
+    metastable.on('backendStatus', status => {
+      if (status === 'ready') {
         resolve();
       }
     });
