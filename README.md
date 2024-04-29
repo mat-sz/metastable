@@ -9,15 +9,15 @@
 </p>
 </h1>
 
-<p align="center">
-<img src="./assets/screenshot.png" />
-</p>
-
 > [!WARNING]  
 > This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
 
 > [!NOTE]  
-> [Join the project Discord server for updates, suggestions and development.](https://discord.gg/Sf9zKaXzXe)
+> [Join the project's Discord server for updates, suggestions and development.](https://discord.gg/Sf9zKaXzXe)
+
+<p align="center">
+<img src="./assets/screenshot.png" />
+</p>
 
 A project-based Stable Diffusion Web UI, for easier organization of generated images. **Work in progress.**
 
