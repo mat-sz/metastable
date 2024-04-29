@@ -1,15 +1,17 @@
 <h1>
-<center>
-<table><tr><td valign="center">
-<img src="https://raw.githubusercontent.com/mat-sz/metastable/main/packages/client/src/assets/logo.svg" height="40px" />
-&nbsp;&nbsp;
-</td>
-<td valign="center">
-Metastable
-</td>
-</tr></table>
-</center>
+<p align="center">
+<a href="https://metastable.studio">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="./assets/logo_dark_mode.svg">
+<img alt="Metastable" src="./assets/logo_light_mode.svg" width="66%" />
+</picture>
+</a>
+</p>
 </h1>
+
+<p align="center">
+<img src="./assets/screenshot.png" />
+</p>
 
 > [!WARNING]  
 > This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
