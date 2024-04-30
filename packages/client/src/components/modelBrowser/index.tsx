@@ -99,7 +99,7 @@ export const ModelBrowser: React.FC<Props> = observer(
               <Card
                 name={item.name}
                 key={item.file.name}
-                color={stringToColor(removeFileExtension(item.file.name))}
+                color={stringToColor(item.file.name)}
                 imageUrl={item.image?.thumbnailUrl}
                 onClick={() => {
                   onSelect(item);
