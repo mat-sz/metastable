@@ -7,6 +7,14 @@
   min-height: 3rem;
   max-height: 3rem;
 
+  &.mac {
+    padding-left: 5rem;
+
+    .tab:first-child {
+      border-left: 1px solid var(--grey-400);
+    }
+  }
+
   .tab {
     padding-left: 1rem;
     padding-top: 0.8rem;

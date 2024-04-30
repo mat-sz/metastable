@@ -15,6 +15,7 @@ import {
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
+import { IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
 import styles from './TabBar.module.scss';
@@ -197,8 +198,8 @@ export const TabBar: React.FC = observer(() => {
   );
 
   return (
-    <div ref={drop} className={styles.tabs}>
-      <Logo />
+    <div ref={drop} className={clsx(styles.tabs, { [styles.mac]: IS_MAC })}>
+      {!IS_MAC && <Logo />}
       <ViewTab viewId="home">
         <BsHouseFill />
       </ViewTab>
