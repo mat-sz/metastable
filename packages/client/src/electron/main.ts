@@ -93,7 +93,10 @@ async function createWindow() {
   const dataRoot = path.join(app.getPath('documents'), 'Metastable');
   const comfyMainPath = path.join(
     app.isPackaged
-      ? path.dirname(app.getPath('exe'))
+      ? path.join(
+          path.dirname(app.getPath('exe')),
+          os.platform() === 'darwin' ? '..' : '.',
+        )
       : path.resolve('../metastable'),
     'python',
     'main.py',
