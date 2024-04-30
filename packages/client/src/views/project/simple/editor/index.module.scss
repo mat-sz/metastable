@@ -196,13 +196,14 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 1;
   }
 
   .background {
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
+    z-index: 0;
   }
 
   button {

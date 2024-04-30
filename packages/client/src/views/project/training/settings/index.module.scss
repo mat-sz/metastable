@@ -20,17 +20,9 @@
 }
 
 .actions {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 999999;
   display: block;
   background: var(--grey-200);
   display: flex;
-
-  @media screen and (min-width: 960px) {
-    top: -2.4rem;
-  }
 
   .progress {
     display: flex;
