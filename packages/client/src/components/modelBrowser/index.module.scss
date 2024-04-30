@@ -1,0 +1,16 @@
+.models {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &.small {
+    margin: 1rem;
+    padding: 1rem;
+    background: var(--grey-300-transparent);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--grey-400);
+    border-radius: 5px;
+    width: 500px;
+    height: 400px;
+  }
+}

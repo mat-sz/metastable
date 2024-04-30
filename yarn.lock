@@ -1265,6 +1265,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-hotkeys-hook: "npm:^4.4.4"
     react-icons: "npm:^4.11.0"
+    react-tiny-popover: "npm:^8.0.4"
     react-use-pointer-drag: "npm:^0.1.2"
     sass: "npm:^1.66.1"
     tree-kill: "npm:^1.2.2"
@@ -7523,6 +7524,16 @@ __metadata:
   version: 0.14.0
   resolution: "react-refresh@npm:0.14.0"
   checksum: b8ae07ad153357d77830928a7f1fc2df837aabefee907fa273ba04c7643f3b860e986f1d4b7ada9b721c8d79b8c24b5b911a314a1a2398b105f1b13d19ea2b8d
+  languageName: node
+  linkType: hard
+
+"react-tiny-popover@npm:^8.0.4":
+  version: 8.0.4
+  resolution: "react-tiny-popover@npm:8.0.4"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 431d13bdf4900a516bdf9b2e31a4f8670d9071aa7725990f6084cf62942494e704754f56640bbf8848e572c72c02fa270254712026be6e740229f01e7fd6c0ee
   languageName: node
   linkType: hard
 

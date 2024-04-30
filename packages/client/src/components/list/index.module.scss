@@ -125,7 +125,7 @@
 
       .details {
         display: grid;
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: 1fr auto;
         align-items: center;
       }
 
@@ -146,8 +146,6 @@
       .info {
         display: flex;
         align-items: center;
-        grid-column: 2 / 3;
-        grid-row: 1 / 2;
         margin-left: 1rem;
       }
     }
@@ -158,10 +156,23 @@
       display: grid;
       grid-template-columns: 50px 1fr;
 
-      .image,
-      .icon {
+      .image img,
+      .icon div {
         aspect-ratio: 1;
         border-radius: 5px;
+        width: 50px;
+      }
+    }
+
+    &.small {
+      .card {
+        grid-template-columns: 25px 1fr;
+        padding: 0 0.25rem;
+      }
+
+      .image img,
+      .icon div {
+        width: 25px;
       }
     }
   }

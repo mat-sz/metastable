@@ -1,9 +1,10 @@
 import { Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import { BsChevronRight } from 'react-icons/bs';
+import { Popover } from 'react-tiny-popover';
 
-import { ModelSelect } from '$modals/modelSelect';
-import { modalStore } from '$stores/ModalStore';
+import { ModelBrowser } from '$components/modelBrowser';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
 import { useVarUIValue } from './common/VarUIContext';
@@ -35,6 +36,7 @@ export const VarModel = observer(
       error,
       errorPath,
     });
+    const [isOpen, setIsOpen] = useState(false);
 
     const model = currentValue
       ? modelStore.find(modelType, currentValue)
@@ -48,45 +50,53 @@ export const VarModel = observer(
         className={className}
         error={currentError}
       >
-        <span className="react-var-ui-button">
-          <button
-            className={styles.selection}
-            onClick={() => {
-              modalStore.show(
-                <ModelSelect
-                  value={model}
-                  type={modelType}
-                  onSelect={model => {
-                    setCurrentValue(model.file.name);
-                    onSelect?.(model);
-                  }}
-                />,
-              );
-            }}
-          >
-            {model ? (
-              <>
-                <div
-                  style={{ backgroundColor: stringToColor(currentValue) }}
-                  className={styles.icon}
-                >
-                  {model.image && <img src={model.image.thumbnailUrl} />}
-                </div>
-                <span className={styles.name}>{model.name}</span>
-                <div className={styles.chevron}>
-                  <BsChevronRight />
-                </div>
-              </>
-            ) : (
-              <>
-                <span className={styles.name}>(none)</span>
-                <div className={styles.chevron}>
-                  <BsChevronRight />
-                </div>
-              </>
-            )}
-          </button>
-        </span>
+        <Popover
+          isOpen={isOpen}
+          positions={['bottom', 'left', 'right', 'top']}
+          containerStyle={{ zIndex: '10' }}
+          onClickOutside={() => setIsOpen(false)}
+          content={
+            <ModelBrowser
+              variant="small"
+              defaultParts={model?.file.parts}
+              type={modelType}
+              onSelect={model => {
+                setCurrentValue(model.file.name);
+                onSelect?.(model);
+                setIsOpen(false);
+              }}
+            />
+          }
+        >
+          <span className="react-var-ui-button">
+            <button
+              className={styles.selection}
+              onClick={() => setIsOpen(current => !current)}
+            >
+              {model ? (
+                <>
+                  <div
+                    style={{ backgroundColor: stringToColor(currentValue) }}
+                    className={styles.icon}
+                  >
+                    {model.image && <img src={model.image.thumbnailUrl} />}
+                  </div>
+                  <span className={styles.name}>{model.name}</span>
+                  <div className={styles.chevron}>
+                    <BsChevronRight />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className={styles.name}>(none)</span>
+                  <div className={styles.chevron}>
+                    <BsChevronRight />
+                  </div>
+                </>
+              )}
+            </button>
+          </span>
+        </Popover>
       </VarBase>
     );
   },

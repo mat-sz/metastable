@@ -12,6 +12,8 @@ interface ListProps<T> {
   children: (item: T) => JSX.Element;
   quickFilter?: (data: T[], search: string) => T[];
   header?: React.ReactNode;
+  view?: string;
+  searchAutoFocus?: boolean;
 }
 
 export function List<T>({
@@ -20,9 +22,11 @@ export function List<T>({
   items,
   small,
   quickFilter,
+  view,
+  searchAutoFocus,
 }: ListProps<T>): JSX.Element {
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<string>('grid');
+  const [selectedView, setSelectedView] = useState<string>('grid');
 
   let displayItems = items;
   if (quickFilter && search) {
@@ -34,22 +38,30 @@ export function List<T>({
       <div className={styles.options}>
         {!!header && <div>{header}</div>}
         <div>
-          {!!quickFilter && <Search value={search} onChange={setSearch} />}
+          {!!quickFilter && (
+            <Search
+              value={search}
+              onChange={setSearch}
+              autoFocus={searchAutoFocus}
+            />
+          )}
         </div>
-        <Switch value={view} onChange={setView}>
-          <SwitchOption value="grid">
-            <BsGrid />
-          </SwitchOption>
-          <SwitchOption value="list">
-            <BsListUl />
-          </SwitchOption>
-          <SwitchOption value="details">
-            <BsList />
-          </SwitchOption>
-        </Switch>
+        {!view && (
+          <Switch value={selectedView} onChange={setSelectedView}>
+            <SwitchOption value="grid">
+              <BsGrid />
+            </SwitchOption>
+            <SwitchOption value="list">
+              <BsListUl />
+            </SwitchOption>
+            <SwitchOption value="details">
+              <BsList />
+            </SwitchOption>
+          </Switch>
+        )}
       </div>
       <div
-        className={clsx(styles.list, styles[`view_${view}`], {
+        className={clsx(styles.list, styles[`view_${view || selectedView}`], {
           [styles.small]: small,
         })}
       >

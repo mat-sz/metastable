@@ -24,7 +24,6 @@ export const Home: React.FC = observer(() => {
           <TabPanel id="recent">
             <List
               header={<h2>Recent</h2>}
-              small
               items={['new', ...mainStore.projects.recent]}
             >
               {item =>
@@ -53,7 +52,6 @@ export const Home: React.FC = observer(() => {
           <TabPanel id="all">
             <List
               header={<h2>All projects</h2>}
-              small
               items={mainStore.projects.all}
               quickFilter={(data, search) =>
                 mainStore.searchFn(data, search, item => item.name)

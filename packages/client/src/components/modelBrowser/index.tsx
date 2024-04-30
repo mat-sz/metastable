@@ -1,4 +1,5 @@
 import { Model, ModelType } from '@metastable/types';
+import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsFolder } from 'react-icons/bs';
@@ -11,11 +12,13 @@ import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { removeFileExtension, stringToColor } from '$utils/string';
+import styles from './index.module.scss';
 
 interface Props {
   type: ModelType;
   defaultParts?: string[];
   onSelect: (model: Model) => void;
+  variant?: 'default' | 'small';
 }
 
 function listFiles(data: Model[], parts: string[], all = false) {
@@ -58,7 +61,7 @@ function listDirectories(data: Model[], index: number) {
 }
 
 export const ModelBrowser: React.FC<Props> = observer(
-  ({ type, onSelect, defaultParts = [] }) => {
+  ({ type, onSelect, defaultParts = [], variant = 'default' }) => {
     const data = modelStore.type(type) || [];
     const [parts, setParts] = useState<string[]>(defaultParts);
 
@@ -67,10 +70,12 @@ export const ModelBrowser: React.FC<Props> = observer(
     const directories = listDirectories(data, parts.length);
 
     return (
-      <>
+      <div className={clsx(styles.models, styles[variant])}>
         <Breadcrumbs value={parts} onChange={setParts} />
         <List
+          small={variant === 'small'}
           items={[...directories, ...models]}
+          view={variant === 'small' ? 'list' : undefined}
           quickFilter={(_, search) =>
             mainStore.searchFn(
               allModels,
@@ -78,6 +83,7 @@ export const ModelBrowser: React.FC<Props> = observer(
               item => `${item.name} ${removeFileExtension(item.file.name)}`,
             )
           }
+          searchAutoFocus={variant === 'small'}
         >
           {item =>
             typeof item === 'string' ? (
@@ -99,31 +105,36 @@ export const ModelBrowser: React.FC<Props> = observer(
                   onSelect(item);
                 }}
               >
-                <CardMenu>
-                  <CardMenuItem
-                    onClick={() => {
-                      modalStore.show(
-                        <ModelEdit name={item.file.name} type={item.type} />,
-                      );
-                    }}
-                  >
-                    Edit
-                  </CardMenuItem>
-                  <CardMenuItem
-                    onClick={() => {
-                      modalStore.show(
-                        <ModelDelete name={item.file.name} type={item.type} />,
-                      );
-                    }}
-                  >
-                    Delete
-                  </CardMenuItem>
-                </CardMenu>
+                {variant !== 'small' && (
+                  <CardMenu>
+                    <CardMenuItem
+                      onClick={() => {
+                        modalStore.show(
+                          <ModelEdit name={item.file.name} type={item.type} />,
+                        );
+                      }}
+                    >
+                      Edit
+                    </CardMenuItem>
+                    <CardMenuItem
+                      onClick={() => {
+                        modalStore.show(
+                          <ModelDelete
+                            name={item.file.name}
+                            type={item.type}
+                          />,
+                        );
+                      }}
+                    >
+                      Delete
+                    </CardMenuItem>
+                  </CardMenu>
+                )}
               </Card>
             )
           }
         </List>
-      </>
+      </div>
     );
   },
 );

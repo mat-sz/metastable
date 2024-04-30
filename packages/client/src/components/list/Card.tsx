@@ -30,8 +30,8 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
           />
         </div>
       ) : (
-        <div className={styles.icon} style={{ backgroundColor: color }}>
-          {!imageUrl && icon}
+        <div className={styles.icon}>
+          <div style={{ backgroundColor: color }}>{!imageUrl && icon}</div>
         </div>
       )}
       <div className={styles.details}>
