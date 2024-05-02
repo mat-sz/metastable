@@ -44,13 +44,14 @@ export const Queue: React.FC = observer(() => {
                   {filesize(download.data.size)}]
                 </span>
                 <span>[{download.state}]</span>
-                <span>
-                  ETA:{' '}
-                  {timestr(
-                    (download.data.size - download.data.offset) /
-                      download.data.speed,
-                  )}
-                </span>
+                {!!speed && (
+                  <span>
+                    ETA:{' '}
+                    {timestr(
+                      (download.data.size - download.data.offset) / speed,
+                    )}
+                  </span>
+                )}
               </ProgressBar>
             </div>
             <div>

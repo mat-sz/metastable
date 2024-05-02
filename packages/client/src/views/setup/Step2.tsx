@@ -59,13 +59,15 @@ export const Step2: React.FC = observer(() => {
                             {filesize(task.data.offset)}/
                             {filesize(task.data.size)}
                           </span>
-                          <span>
-                            ETA:{' '}
-                            {timestr(
-                              (task.data.size - task.data.offset) /
-                                task.data.speed,
-                            )}
-                          </span>
+                          {!!task.data.speed && (
+                            <span>
+                              ETA:{' '}
+                              {timestr(
+                                (task.data.size - task.data.offset) /
+                                  task.data.speed,
+                              )}
+                            </span>
+                          )}
                         </>
                       )}
                     </>
