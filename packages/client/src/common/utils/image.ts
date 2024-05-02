@@ -57,8 +57,8 @@ export async function prepareImage(
 ) {
   const source = await loadImage(input);
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext('2d')!;
 
   if (mode === 'cover' || mode === 'contain') {
