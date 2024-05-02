@@ -30,7 +30,7 @@
       "target": "dmg",
       "arch": ["arm64", "x64"]
     },
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "artifactName": "${productName}-darwin-${arch}-${version}.${ext}",
     "category": "public.app-category.utilities"
   },
   "win": {
@@ -38,7 +38,7 @@
       "target": "nsis",
       "arch": ["x64"]
     },
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-win32-${arch}-${version}.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -51,7 +51,7 @@
       "target": "AppImage",
       "arch": ["x64"]
     },
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "artifactName": "${productName}-linux-${arch}-${version}.${ext}"
   },
   "extraFiles": [
     {
