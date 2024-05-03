@@ -90,7 +90,7 @@ function createMenu() {
 }
 
 async function createWindow() {
-  const dataRoot = path.join(app.getPath('documents'), 'Metastable');
+  const dataRoot = path.join(app.getPath('userData'), 'data');
   const comfyMainPath = path.join(
     app.isPackaged
       ? path.join(
