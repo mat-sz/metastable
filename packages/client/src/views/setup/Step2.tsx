@@ -1,5 +1,4 @@
 import { TaskState } from '@metastable/types';
-import Ansi from 'ansi-to-react';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
@@ -75,9 +74,7 @@ export const Step2: React.FC = observer(() => {
                 }
                 progress={(task.progress || 0) * 100}
               >
-                <pre>
-                  <Ansi>{task.log}</Ansi>
-                </pre>
+                <pre>{task.log}</pre>
               </Item>
             ))}
           </List>

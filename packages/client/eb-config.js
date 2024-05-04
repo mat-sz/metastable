@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const { glob } = require('glob');
 const { rimraf } = require('rimraf');
 
@@ -5,6 +7,8 @@ const globalIgnore = [
   '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}',
   '!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}',
   '!**/node_modules/.bin',
+  '!**/node_modules/**/*.map',
+  '!**/node_modules/@metastable/metastable/python_kohya',
   '!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}',
   '!.editorconfig',
   '!**/._*',
@@ -15,10 +19,8 @@ const globalIgnore = [
 ];
 
 const removeFiles = [
-  '**/node_modules/@metastable/cppzst/{deps,src,build}',
+  '**/node_modules/@metastable/cppzst/{deps,src}',
   '**/node_modules/sharp/{src,node-addon-api,install}',
-  '**/node_modules/node-pty/{src,scripts,deps,build}',
-  '**/node_modules/**/*.map',
   '**/LICENSE*',
 ];
 
