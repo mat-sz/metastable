@@ -112,6 +112,7 @@ async function createWindow() {
     height: 1000,
     resizable: true,
     titleBarStyle: 'hidden',
+    frame: false,
     trafficLightPosition: { x: 16, y: 16 },
     backgroundColor: '#11111a',
     webPreferences: {
