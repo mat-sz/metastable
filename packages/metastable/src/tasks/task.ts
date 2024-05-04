@@ -24,7 +24,6 @@ export class BaseTask<T = any>
   #state: TaskState;
   #progress: number | undefined = undefined;
   #data: T;
-  protected cancellationPending = false;
 
   init?(): Promise<T>;
 
@@ -114,8 +113,7 @@ export class BaseTask<T = any>
   }
 
   cancel() {
-    this.state = TaskState.CANCELLING;
-    this.cancellationPending = true;
+    //
   }
 
   get data(): T {

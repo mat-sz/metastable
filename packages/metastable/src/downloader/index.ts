@@ -1,13 +1,12 @@
 import { createWriteStream } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
+import { ReadableStream } from 'stream/web';
 
 import { DownloadData, DownloadSettings, TaskState } from '@metastable/types';
-import axios from 'axios';
 
 import { ModelEntity } from '../data/model.js';
-import { exists, tryMkdir } from '../helpers/fs.js';
-import { WrappedPromise } from '../helpers/promise.js';
+import { exists, tryMkdir, tryUnlink } from '../helpers/fs.js';
 import { SuperTask } from '../tasks/supertask.js';
 import { BaseTask } from '../tasks/task.js';
 
@@ -15,6 +14,7 @@ const USER_AGENT = 'Metastable/0.0.0';
 
 export class BaseDownloadTask extends BaseTask<DownloadData> {
   private downloadUrl?: string;
+  private controller = new AbortController();
   #offset = 0;
 
   constructor(
@@ -33,31 +33,38 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
     this.created();
   }
 
+  cancel() {
+    this.state = TaskState.CANCELLING;
+    this.controller.abort();
+  }
+
   async init() {
     this.appendLog(`Downloading: ${this.url}`);
 
-    const { data, headers, request } = await axios({
-      url: this.url,
-      method: 'GET',
+    const res = await fetch(this.url, {
       headers: {
         'User-Agent': USER_AGENT,
         ...this.headers,
       },
-      responseType: 'stream',
     });
 
-    data.destroy();
-    const responseUrl = request?.res?.responseUrl;
-    if (responseUrl?.includes('/login')) {
-      throw new Error('Login required');
+    if (res.url?.includes('/login')) {
+      throw new Error('Unable to download file: Login required');
     }
 
-    this.downloadUrl = responseUrl || this.url;
+    this.downloadUrl = res.url || this.url;
     if (this.downloadUrl !== this.url) {
       this.appendLog(`Found redirect: ${this.downloadUrl}`);
     }
 
-    const size = parseInt(headers['content-length']);
+    const contentLength = res.headers.get('content-length');
+    if (!contentLength) {
+      throw new Error(
+        "Unable to download file: response lacks 'Content-Length' header",
+      );
+    }
+
+    const size = parseInt(contentLength);
     return { ...this.data, size };
   }
 
@@ -85,76 +92,58 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       await fs.mkdir(path.dirname(partPath), { recursive: true });
     }
 
-    const wrapped = new WrappedPromise<TaskState>();
     const writer = createWriteStream(partPath);
 
-    const onClose = async (error?: any) => {
-      writer.close();
-      if (this.cancellationPending || error) {
-        await fs.unlink(partPath);
-
-        if (this.cancellationPending) {
-          wrapped.resolve(TaskState.CANCELLED);
-        } else {
-          wrapped.reject(error);
-        }
-      } else {
-        this.data = {
-          ...this.data,
-          offset: this.data.size,
-          speed: 0,
-        };
-        this.progress = 1;
-        await fs.rename(partPath, this.savePath);
-        wrapped.resolve(TaskState.SUCCESS);
-      }
-    };
-
     writer.on('error', e => {
-      onClose(e);
+      this.controller.abort(e);
     });
 
     try {
-      const { data } = await axios({
-        url: this.downloadUrl,
-        method: 'GET',
-        responseType: 'stream',
+      const res = await fetch(this.downloadUrl!, {
         headers: {
           'User-Agent': USER_AGENT,
         },
+        signal: this.controller.signal,
       });
-      data.on('data', (chunk: any) => {
-        if (this.cancellationPending) {
-          data.destroy();
-          return;
-        }
 
-        this.#offset = chunk.length + (this.#offset || 0);
-        this.emitProgress();
-      });
-      data.on('end', () => {
-        if (this.cancellationPending) {
-          data.close();
-          return;
-        }
+      const reader = (res.body as ReadableStream<Uint8Array>)?.getReader();
+      if (!reader) {
+        throw new Error('Unable to create body reader.');
+      }
 
-        onClose();
-      });
-      data.on('close', () => {
-        if (this.cancellationPending) {
-          onClose();
+      let done = false;
+      let value;
+      while (!done) {
+        ({ value, done } = await reader!.read());
+
+        if (value) {
+          writer.write(value);
+          this.#offset += value.byteLength;
+          this.emitProgress();
         }
-      });
-      data.on('error', (e: any) => {
-        data.close();
-        onClose(e);
-      });
-      data.pipe(writer, { end: false });
+      }
+
+      this.data = {
+        ...this.data,
+        offset: this.data.size,
+        speed: 0,
+      };
+      this.progress = 1;
+
+      writer.close();
+      await fs.rename(partPath, this.savePath);
     } catch (e) {
-      wrapped.reject(e);
+      writer.close();
+      await tryUnlink(partPath);
+
+      if (e instanceof Error && e.name === 'AbortError') {
+        return TaskState.CANCELLED;
+      }
+
+      throw e;
     }
 
-    return wrapped.promise;
+    return TaskState.SUCCESS;
   }
 }
 
@@ -199,17 +188,17 @@ export class DownloadModelTask extends BaseDownloadTask {
 
       if (imageUrl) {
         try {
-          const { data, headers } = await axios({
-            url: imageUrl,
-            method: 'GET',
-            responseType: 'arraybuffer',
+          const res = await fetch(imageUrl, {
             headers: {
               'User-Agent': USER_AGENT,
             },
           });
 
+          const data = await res.arrayBuffer();
+          const type = res.headers.get('content-type');
+
           let ext: string | undefined = undefined;
-          switch (headers['content-type']) {
+          switch (type) {
             case 'image/jpeg':
               ext = 'jpg';
               break;
@@ -219,7 +208,7 @@ export class DownloadModelTask extends BaseDownloadTask {
           }
 
           if (ext) {
-            await model.writeImage(data, ext);
+            await model.writeImage(new Uint8Array(data), ext);
           }
         } catch {}
       }
