@@ -28,7 +28,9 @@ import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import { Storage } from './storage/index.js';
+import * as cpu from './sysinfo/cpu.js';
 import * as disk from './sysinfo/disk.js';
+import * as ram from './sysinfo/ram.js';
 import { Tasks } from './tasks/index.js';
 import { TypedEventEmitter } from './types.js';
 
@@ -109,19 +111,19 @@ export class Metastable extends (EventEmitter as {
       return;
     }
 
+    const [load, free, usage] = await Promise.all([
+      cpu.load(),
+      ram.free(),
+      disk.usage(this.dataRoot),
+    ]);
     const graphics = await si.graphics();
-    const cpuTemperature = await si.cpuTemperature();
-    const currentLoad = await si.currentLoad();
-    const mem = await si.mem();
-    const usage = await disk.usage(this.dataRoot);
     const gpu = graphics.controllers[0];
     this.emit('utilization', {
-      cpuUsage: currentLoad.currentLoad,
+      cpuUsage: load,
       hddTotal: usage.size,
       hddUsed: usage.used,
-      ramTotal: mem.total,
-      ramUsed: mem.used,
-      cpuTemperature: cpuTemperature.main,
+      ramTotal: free.total,
+      ramUsed: free.used,
       gpuTemperature: gpu?.temperatureGpu,
       gpuUsage: gpu?.utilizationGpu,
       vramTotal: gpu?.memoryTotal,
