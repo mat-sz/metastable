@@ -6,7 +6,7 @@ import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 import checkDiskSpace from 'check-disk-space';
 import si from 'systeminformation';
 
-import { getLatestReleaseInfo, getOS, getPython } from './helpers.js';
+import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
@@ -51,7 +51,6 @@ export class Setup extends EventEmitter {
         vendor: item.vendor || 'unknown',
         vram: item.vram ? item.vram * 1024 * 1024 : 0,
       })),
-      python: await getPython(this.metastable.python),
       storage: {
         dataRoot,
         diskPath: usage.diskPath,

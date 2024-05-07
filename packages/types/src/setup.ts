@@ -28,14 +28,6 @@ export interface SetupOS {
   isGlibc?: boolean;
 }
 
-export interface SetupPython {
-  hasPip: boolean;
-  version?: string;
-  required: string;
-  compatible: boolean;
-  requirements?: Requirement[];
-}
-
 export interface SetupGraphics {
   vendor: string;
   vram: number;
@@ -50,7 +42,6 @@ export interface SetupStorage {
 export interface SetupDetails {
   os: SetupOS;
   graphics: SetupGraphics[];
-  python: SetupPython;
   storage: SetupStorage;
 }
 

@@ -4,8 +4,6 @@ import path from 'path';
 
 import which from 'which';
 
-import { stdout } from '../helpers/spawn.js';
-
 const PYTHON_COMMANDS = [
   'python3.11',
   'python3.10',
@@ -25,35 +23,6 @@ async function getPythonCommand() {
 
   return undefined;
 }
-
-interface PythonVersion {
-  version: string;
-}
-
-const PYTHON_VERSION = `
-from platform import python_version
-import json
-
-print(json.dumps({
-  "version": python_version()
-}))
-`;
-
-const PYTHON_PACKAGES = `
-from importlib.metadata import version
-import json
-
-names = %NAMES
-output = {}
-
-for name in names:
-  try:
-    output[name] = version(name)
-  except:
-    output[name] = None
-
-print(json.dumps(output))
-`;
 
 export class PythonInstance {
   constructor(
@@ -95,33 +64,6 @@ export class PythonInstance {
     return proc;
   }
 
-  private async stdout(args: string[]) {
-    return await stdout(this.path, ['-u', ...args], this.env);
-  }
-
-  private async runPython(code: string) {
-    return JSON.parse(await this.stdout(['-c', code]));
-  }
-
-  async version(): Promise<PythonVersion> {
-    return await this.runPython(PYTHON_VERSION);
-  }
-
-  async packages(names: string[]): Promise<Record<string, string | null>> {
-    return await this.runPython(
-      PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
-    );
-  }
-
-  async hasPip(): Promise<boolean> {
-    try {
-      const out = await this.stdout(['-m', 'pip', '--version']);
-      return out.startsWith('pip ');
-    } catch {
-      return false;
-    }
-  }
-
   static async fromDirectory(dir: string, packagesDir?: string) {
     dir = path.resolve(dir);
     const pythonBin =
@@ -129,12 +71,7 @@ export class PythonInstance {
         ? path.join(dir, 'python.exe')
         : path.join(dir, 'bin', 'python3');
 
-    const instance = new PythonInstance(pythonBin, dir, packagesDir);
-
-    // Ensure everything works.
-    await instance.version();
-
-    return instance;
+    return new PythonInstance(pythonBin, dir, packagesDir);
   }
 
   static async fromSystem(packagesDir?: string) {

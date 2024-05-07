@@ -1,9 +1,3 @@
-export interface PipDependency {
-  name: string;
-  extra?: string;
-  version?: string;
-}
-
 export interface GithubReleaseAsset {
   id: number;
   name: string;

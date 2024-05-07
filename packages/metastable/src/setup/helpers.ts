@@ -1,11 +1,10 @@
 import fs from 'fs/promises';
 import os from 'os';
 
-import { Requirement, SetupOS, SetupPython } from '@metastable/types';
+import { SetupOS } from '@metastable/types';
 import semver from 'semver';
 
-import { GithubRelease, PipDependency } from './types.js';
-import { PythonInstance } from '../python/index.js';
+import { GithubRelease } from './types.js';
 
 export async function isGNULibc() {
   try {
@@ -15,25 +14,6 @@ export async function isGNULibc() {
     return false;
   }
 }
-
-export const requiredPackages: PipDependency[] = [
-  { name: 'torch' },
-  { name: 'torchvision' },
-  { name: 'torchsde' },
-  { name: 'einops' },
-  { name: 'transformers', version: '>=4.25.1' },
-  { name: 'safetensors' },
-  { name: 'accelerate' },
-  { name: 'pyyaml' },
-  { name: 'Pillow' },
-  { name: 'scipy' },
-  { name: 'tqdm' },
-  { name: 'psutil' },
-  // { name: 'diffusers', extra: 'torch' },
-  // { name: 'voluptuous' },
-  // { name: 'onnx' },
-  // { name: 'onnxruntime' },
-];
 
 export const REQUIRED_PYTHON_VERSION = '3.8.0 - 3.11.x';
 
@@ -83,62 +63,6 @@ export async function getOS(): Promise<SetupOS> {
     },
     isGlibc,
   };
-}
-
-export async function getPython(python?: PythonInstance): Promise<SetupPython> {
-  const noPython = {
-    required: REQUIRED_PYTHON_VERSION,
-    compatible: false,
-    hasPip: false,
-  };
-  if (!python) {
-    return noPython;
-  }
-
-  try {
-    const version = await python.version();
-    const compatible = semver.satisfies(
-      version.version,
-      REQUIRED_PYTHON_VERSION,
-    );
-
-    let packageVersions: Record<string, string | null> = {};
-
-    if (compatible && python) {
-      try {
-        packageVersions = await python.packages(
-          requiredPackages.map(pkg => pkg.name),
-        );
-      } catch {}
-    }
-
-    const requirements: Requirement[] = [];
-    for (const pkg of requiredPackages) {
-      const version = packageVersions[pkg.name];
-
-      requirements.push({
-        name: pkg.name,
-        expected: pkg.version || 'any',
-        actual: version || 'Not installed',
-        satisfied: version
-          ? pkg.version
-            ? semver.satisfies(version, pkg.version.replace('==', ''))
-            : true
-          : false,
-      });
-    }
-
-    const hasPip = await python.hasPip();
-    return {
-      hasPip,
-      version: version.version,
-      required: REQUIRED_PYTHON_VERSION,
-      compatible: compatible && hasPip,
-      requirements,
-    };
-  } catch {
-    return noPython;
-  }
 }
 
 const LINUX_X86_64_VERSION_FLAGS = {
