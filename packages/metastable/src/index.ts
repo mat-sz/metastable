@@ -13,7 +13,6 @@ import {
   ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
-import checkDiskSpace from 'check-disk-space';
 import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
@@ -29,6 +28,7 @@ import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import { Storage } from './storage/index.js';
+import * as disk from './sysinfo/disk.js';
 import { Tasks } from './tasks/index.js';
 import { TypedEventEmitter } from './types.js';
 
@@ -113,12 +113,12 @@ export class Metastable extends (EventEmitter as {
     const cpuTemperature = await si.cpuTemperature();
     const currentLoad = await si.currentLoad();
     const mem = await si.mem();
-    const usage = await (checkDiskSpace as any)(this.dataRoot);
+    const usage = await disk.usage(this.dataRoot);
     const gpu = graphics.controllers[0];
     this.emit('utilization', {
       cpuUsage: currentLoad.currentLoad,
       hddTotal: usage.size,
-      hddUsed: usage.size - usage.free,
+      hddUsed: usage.used,
       ramTotal: mem.total,
       ramUsed: mem.used,
       cpuTemperature: cpuTemperature.main,
