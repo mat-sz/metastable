@@ -2,7 +2,6 @@ import fs from 'fs';
 import { link, mkdir, symlink, writeFile } from 'fs/promises';
 import path from 'path';
 
-import { decompressStream } from '@metastable/cppzst';
 import { TaskState } from '@metastable/types';
 import { rimraf } from 'rimraf';
 import tarStream from 'tar-stream';
@@ -20,6 +19,8 @@ export class ExtractTask extends BaseTask {
   }
 
   async execute() {
+    const { decompressStream } = await import('@metastable/cppzst');
+
     this.appendLog('Removing old data...');
     try {
       await rimraf(path.join(this.targetPath));
