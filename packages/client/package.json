@@ -36,8 +36,8 @@
   "devDependencies": {
     "@metastable/types": "*",
     "@tanstack/react-query": "^5.29.2",
-    "@trpc/client": "^11.0.0-rc.364",
-    "@trpc/react-query": "^11.0.0-rc.364",
+    "@trpc/client": "^11.0.0-rc.373",
+    "@trpc/react-query": "^11.0.0-rc.373",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
