@@ -12,12 +12,15 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import { API } from '$api';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
+import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
 import { base64ify, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
 export function defaultSettings(): ProjectSimpleSettings {
+  const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
+
   return {
     version: 1,
     input: { type: 'none' },
@@ -28,7 +31,7 @@ export function defaultSettings(): ProjectSimpleSettings {
       format: 'png',
     },
     checkpoint: {
-      name: mainStore.defaultModelName(ModelType.CHECKPOINT),
+      name: checkpoint?.file.name,
     },
     models: {
       lora: [],
@@ -46,6 +49,7 @@ export function defaultSettings(): ProjectSimpleSettings {
       samplerName: 'dpm_2',
       schedulerName: 'karras',
       tiling: false,
+      ...checkpoint?.metadata?.samplerSettings,
     },
     client: {
       randomizeSeed: true,
