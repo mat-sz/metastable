@@ -446,18 +446,23 @@ export const router = t.router({
   electron: {
     window: {
       onResize: electronProcedure.subscription(({ ctx: { win } }) => {
-        return observable<{ isMaximized: boolean }>(emit => {
-          const refresh = () => {
-            emit.next({ isMaximized: win.isMaximized() });
-          };
+        return observable<{ isMaximized: boolean; isFullScreen: boolean }>(
+          emit => {
+            const refresh = () => {
+              emit.next({
+                isMaximized: win.isMaximized(),
+                isFullScreen: win.isFullScreen(),
+              });
+            };
 
-          refresh();
-          win.on('resize', refresh);
+            refresh();
+            win.on('resize', refresh);
 
-          return () => {
-            win.off('resize', refresh);
-          };
-        });
+            return () => {
+              win.off('resize', refresh);
+            };
+          },
+        );
       }),
       minimize: electronProcedure.mutation(({ ctx: { win } }) => {
         win.minimize();

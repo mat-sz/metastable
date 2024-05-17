@@ -30,6 +30,7 @@ class MainStore {
   setup = new SetupStore();
 
   isMaximized = false;
+  isFullScreen = false;
   trainingQueue: { id: string }[] = [];
 
   backendStatus: BackendStatus = 'starting';
@@ -46,9 +47,10 @@ class MainStore {
 
     if (IS_ELECTRON) {
       API.electron.window.onResize.subscribe(undefined, {
-        onData: ({ isMaximized }) => {
+        onData: ({ isMaximized, isFullScreen }) => {
           runInAction(() => {
             this.isMaximized = isMaximized;
+            this.isFullScreen = isFullScreen;
           });
         },
       });

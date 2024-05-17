@@ -197,8 +197,13 @@ export const TabBar: React.FC = observer(() => {
     0,
   );
 
+  const areTrafficLightsVisible = IS_MAC && !mainStore.isFullScreen;
+
   return (
-    <div ref={drop} className={clsx(styles.tabs, { [styles.mac]: IS_MAC })}>
+    <div
+      ref={drop}
+      className={clsx(styles.tabs, { [styles.mac]: areTrafficLightsVisible })}
+    >
       {!IS_MAC && <Logo />}
       <ViewTab viewId="home">
         <BsHouseFill />
