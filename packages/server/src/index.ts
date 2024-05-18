@@ -27,7 +27,7 @@ const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });
 const maxAge = 30 * 24 * 60 * 60 * 1000;
 
 app.register(fastifyStatic, {
-  root: metastable.storage.dataRoot,
+  root: metastable.dataRoot,
   prefix: '/temp',
   cacheControl: false,
   decorateReply: true,
