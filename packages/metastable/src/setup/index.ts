@@ -27,7 +27,7 @@ export class Setup extends EventEmitter {
 
   async status(): Promise<SetupStatus> {
     if (!this._checked) {
-      const python = await this.metastable.storage.config.get('python');
+      const python = await this.metastable.config.get('python');
 
       if (python?.configured || this.skipPythonSetup) {
         this._status = 'done';
@@ -41,7 +41,7 @@ export class Setup extends EventEmitter {
 
   async details(): Promise<SetupDetails> {
     const graphics = await si.graphics();
-    const dataRoot = this.metastable.storage.dataRoot;
+    const dataRoot = this.metastable.dataRoot;
     const usage = await disk.usage(dataRoot);
 
     return {
@@ -74,24 +74,24 @@ export class Setup extends EventEmitter {
     this._status = 'done';
     this.emitStatus();
 
-    await this.metastable.storage.config.set('python', {
+    await this.metastable.config.set('python', {
       configured: true,
       mode: 'static',
       pythonHome: this._pythonHome
-        ? path.relative(this.metastable.storage.dataRoot, this._pythonHome)
+        ? path.relative(this.metastable.dataRoot, this._pythonHome)
         : undefined,
       packagesDir: this._packagesDir
-        ? path.relative(this.metastable.storage.dataRoot, this._packagesDir)
+        ? path.relative(this.metastable.dataRoot, this._packagesDir)
         : undefined,
     });
 
     const platform = os.platform();
     if (this.settings.torchMode === 'directml') {
-      await this.metastable.storage.config.set('comfy', {
+      await this.metastable.config.set('comfy', {
         args: ['--directml'],
       });
     } else if (platform === 'darwin' && os.arch() === 'arm64') {
-      await this.metastable.storage.config.set('comfy', {
+      await this.metastable.config.set('comfy', {
         args: ['--force-fp16'],
       });
     }
@@ -128,16 +128,16 @@ export class Setup extends EventEmitter {
         'download',
         assets.map(asset => ({
           url: asset.browser_download_url,
-          savePath: path.join(this.metastable.storage.dataRoot, asset.name),
+          savePath: path.join(this.metastable.dataRoot, asset.name),
         })),
       ),
     );
 
-    const targetPath = path.join(this.metastable.storage.dataRoot, 'python');
+    const targetPath = path.join(this.metastable.dataRoot, 'python');
     this._packagesDir = undefined;
     this._pythonHome = targetPath;
     const parts = assets.map(asset =>
-      path.join(this.metastable.storage.dataRoot, asset.name),
+      path.join(this.metastable.dataRoot, asset.name),
     );
     setupQueue.add(new ExtractTask(parts, targetPath));
 

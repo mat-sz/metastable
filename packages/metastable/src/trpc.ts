@@ -124,15 +124,15 @@ export const router = t.router({
     }),
     config: {
       get: t.procedure.query(async ({ ctx: { metastable } }) => {
-        return await metastable.storage.config.all();
+        return await metastable.config.all();
       }),
       set: t.procedure
         .input(z.any())
         .mutation(async ({ ctx: { metastable }, input }) => {
           if (typeof input === 'object') {
-            await metastable.storage.config.store(input);
+            await metastable.config.store(input);
           }
-          return await metastable.storage.config.all();
+          return await metastable.config.all();
         }),
     },
   },

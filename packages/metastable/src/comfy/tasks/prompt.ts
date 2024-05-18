@@ -127,7 +127,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
     }
 
-    const config = await this.metastable.storage.config.all();
+    const config = await this.metastable.config.all();
 
     if (config.generation?.preview) {
       try {

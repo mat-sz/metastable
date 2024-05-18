@@ -18,6 +18,7 @@ import si from 'systeminformation';
 import { Comfy } from './comfy/index.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
 import { TagTask } from './comfy/tasks/tag.js';
+import { Config } from './config/index.js';
 import { EntityRepository } from './data/common.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectEntity } from './data/project.js';
@@ -27,7 +28,6 @@ import { resolveConfigPath } from './helpers/fs.js';
 import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
-import { Storage } from './storage/index.js';
 import * as cpu from './sysinfo/cpu.js';
 import * as disk from './sysinfo/disk.js';
 import * as ram from './sysinfo/ram.js';
@@ -44,7 +44,7 @@ type MetastableEvents = {
 export class Metastable extends (EventEmitter as {
   new (): TypedEventEmitter<MetastableEvents>;
 }) {
-  storage;
+  config;
   python?: PythonInstance;
   comfy?: Comfy;
   setup = new Setup(this);
@@ -67,7 +67,7 @@ export class Metastable extends (EventEmitter as {
   };
 
   constructor(
-    private dataRoot: string,
+    public readonly dataRoot: string,
     private settings: {
       comfyMainPath?: string;
       skipPythonSetup?: boolean;
@@ -76,7 +76,7 @@ export class Metastable extends (EventEmitter as {
   ) {
     super();
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
-    this.storage = new Storage(dataRoot);
+    this.config = new Config(path.join(dataRoot, 'config.json'));
     this.project = new EntityRepository(
       path.join(this.dataRoot, 'projects'),
       ProjectEntity,
@@ -169,7 +169,7 @@ export class Metastable extends (EventEmitter as {
   }
 
   async reloadPython() {
-    const config = await this.storage.config.all();
+    const config = await this.config.all();
     if (!this.settings.skipPythonSetup && !config.python.configured) {
       return;
     }
@@ -221,7 +221,7 @@ export class Metastable extends (EventEmitter as {
     this.comfy?.removeAllListeners();
     this.comfy?.stop(true);
 
-    const config = await this.storage.config.all();
+    const config = await this.config.all();
     if (
       !this.python ||
       (!this.settings.skipPythonSetup && !config.python.configured)
@@ -310,7 +310,7 @@ export class Metastable extends (EventEmitter as {
 
     const headers: Record<string, string> = {};
     if (url.hostname.includes('civitai')) {
-      const settings = await this.storage.config.get('civitai');
+      const settings = await this.config.get('civitai');
       if (settings?.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
       }
