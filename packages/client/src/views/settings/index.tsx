@@ -11,6 +11,7 @@ import {
 
 import logo from '$/assets/logo.svg';
 import { Button } from '$components/button';
+import { Link } from '$components/link';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import {
   VarButton,
@@ -114,6 +115,26 @@ export const Settings: React.FC = observer(() => {
                 )}
               </VarCategory>
             )}
+            <VarCategory label="Credits">
+              <div className={styles.info}>
+                {import.meta.env.VITE_APP_NAME} is based on the following open
+                source projects:
+                <ul>
+                  <li>
+                    <Link href="https://github.com/comfyanonymous/ComfyUI">
+                      ComfyUI
+                    </Link>{' '}
+                    - backend for image generation
+                  </li>
+                  <li>
+                    <Link href="https://github.com/Stability-AI/stablediffusion">
+                      Stable Diffusion
+                    </Link>{' '}
+                    - open source models for image generation
+                  </li>
+                </ul>
+              </div>
+            </VarCategory>
           </TabPanel>
         </TabContent>
       </TabView>
