@@ -9,7 +9,7 @@ import {
 } from '@metastable/types';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
-import type { BrowserWindow } from 'electron';
+import { type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
 import { gte } from 'semver';
@@ -153,8 +153,8 @@ export const router = t.router({
               isUpToDate = gte(metastable.settings.version, json.version);
             }
           }
-        } catch {
-          //
+        } catch (e) {
+          console.error('Unable to fetch update info', e);
         }
 
         return {
@@ -538,18 +538,24 @@ export const router = t.router({
         }),
     },
     autoUpdater: {
-      onEvent: autoUpdaterProcedure.subscription(({ ctx: { autoUpdater } }) => {
-        return observable<{ updateAvailable: boolean }>(emit => {
-          const refresh = () => {
-            emit.next({
-              updateAvailable: autoUpdater.isUpdaterActive(),
-            });
-          };
+      onUpdateDownloaded: autoUpdaterProcedure.subscription(
+        ({ ctx: { autoUpdater } }) => {
+          return observable<{ updateDownloaded: boolean; version?: string }>(
+            emit => {
+              autoUpdater.on('update-downloaded', info => {
+                emit.next({
+                  updateDownloaded: true,
+                  version: info.version,
+                });
+              });
 
-          refresh();
-
-          return () => {};
-        });
+              return () => {};
+            },
+          );
+        },
+      ),
+      install: autoUpdaterProcedure.mutation(({ ctx: { autoUpdater } }) => {
+        autoUpdater.quitAndInstall();
       }),
     },
   },

@@ -31,6 +31,10 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
+autoUpdater.autoInstallOnAppQuit = true;
+autoUpdater.autoDownload = true;
+autoUpdater.autoRunAppAfterInstall = true;
+
 function createMenu() {
   const menu = new Menu();
 
@@ -109,6 +113,7 @@ async function createWindow() {
   await metastable.init();
 
   const config = await metastable.config.get('app');
+
   if (config?.autoUpdate) {
     autoUpdater.checkForUpdates();
   }

@@ -18,8 +18,12 @@ import {
   staticRoot,
   useProxy,
 } from './config.js';
+import info from '../../client/package.json';
 
-const metastable = new Metastable(dataRoot, { skipPythonSetup });
+const metastable = new Metastable(dataRoot, {
+  skipPythonSetup,
+  version: info.version,
+});
 await metastable.init();
 
 const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });

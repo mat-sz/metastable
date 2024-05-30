@@ -11,6 +11,7 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { API } from '$api';
 import { BackendError } from '$modals/backendError';
 import { UnsavedProjects } from '$modals/unsavedProjects';
+import { UpdateAvailable } from '$modals/updateAvailable';
 import { IS_ELECTRON } from '$utils/config';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { ConfigStore } from './ConfigStore';
@@ -58,6 +59,13 @@ class MainStore {
             this.isMaximized = isMaximized;
             this.isFullScreen = isFullScreen;
           });
+        },
+      });
+      API.electron.autoUpdater.onUpdateDownloaded.subscribe(undefined, {
+        onData: ({ updateDownloaded, version }) => {
+          if (updateDownloaded) {
+            modalStore.show(<UpdateAvailable version={version!} />);
+          }
         },
       });
       this.connected = true;
