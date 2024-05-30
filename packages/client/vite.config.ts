@@ -5,9 +5,17 @@ import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
 
+import info from './package.json';
+
 export default defineConfig(({ mode }) => {
   const isProduction = mode.includes('production');
   const isElectron = mode.includes('electron');
+
+  process.env = {
+    ...process.env,
+    VITE_APP_VERSION: info.version,
+    VITE_APP_NAME: info.displayName,
+  };
 
   return {
     server: {
