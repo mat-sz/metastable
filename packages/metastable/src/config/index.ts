@@ -17,6 +17,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   },
   app: {
     autoUpdate: true,
+    hideWelcome: false,
   },
 };
 

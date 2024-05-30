@@ -1,16 +1,9 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import {
-  BsDiscord,
-  BsDownload,
-  BsGear,
-  BsGithub,
-  BsTwitter,
-} from 'react-icons/bs';
+import { BsDownload, BsGear } from 'react-icons/bs';
 
 import logo from '$/assets/logo.svg';
-import { Button } from '$components/button';
 import { Link } from '$components/link';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import {
@@ -22,6 +15,7 @@ import {
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
+import { Social } from '../common/Social';
 
 export const Settings: React.FC = observer(() => {
   const config = mainStore.config;
@@ -71,20 +65,7 @@ export const Settings: React.FC = observer(() => {
                   {import.meta.env.VITE_APP_NAME}{' '}
                   {import.meta.env.VITE_APP_VERSION}
                 </div>
-                <div className={styles.social}>
-                  <Button href="https://discord.gg/Sf9zKaXzXe">
-                    <BsDiscord />
-                    <span>Join Metastable Discord for updates</span>
-                  </Button>
-                  <Button href="https://github.com/mat-sz/metastable">
-                    <BsGithub />
-                    <span>Source code</span>
-                  </Button>
-                  <Button href="https://twitter.com/get_metastable">
-                    <BsTwitter />
-                    <span>Twitter</span>
-                  </Button>
-                </div>
+                <Social />
               </div>
             </VarCategory>
             {(mainStore.updateInfo.isAutoUpdateAvailable ||

@@ -1,11 +1,13 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsClockHistory, BsFiles, BsPlus } from 'react-icons/bs';
+import { BsClockHistory, BsFiles, BsPlus, BsXLg } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { Card, List } from '$components/list';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
+import { Social } from '../common/Social';
 
 export const Home: React.FC = observer(() => {
   return (
@@ -22,6 +24,27 @@ export const Home: React.FC = observer(() => {
         </Tabs>
         <TabContent>
           <TabPanel id="recent">
+            {!mainStore.config.data?.app?.hideWelcome && (
+              <div className={styles.welcome}>
+                <div className={styles.welcomeHeader}>
+                  <h2>Welcome to {import.meta.env.VITE_APP_NAME}</h2>
+                  <Button
+                    onClick={async () => {
+                      const config = mainStore.config;
+                      await config.refresh();
+                      config.set({
+                        ...config.data!,
+                        app: { ...config.data!.app, hideWelcome: true },
+                      });
+                    }}
+                  >
+                    <BsXLg />
+                    <span>Close</span>
+                  </Button>
+                </div>
+                <Social />
+              </div>
+            )}
             <List
               header={<h2>Recent</h2>}
               items={['new', ...mainStore.projects.recent]}

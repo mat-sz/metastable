@@ -36,6 +36,7 @@ export interface ConfigType {
   };
   app?: {
     autoUpdate?: boolean;
+    hideWelcome?: boolean;
   };
 }
 

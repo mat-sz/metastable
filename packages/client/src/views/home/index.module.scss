@@ -28,3 +28,16 @@
     font-weight: 600;
   }
 }
+
+.welcome {
+  margin-bottom: 1rem;
+  background: var(--grey-200);
+  padding: 1rem;
+  border-radius: 5px;
+
+  .welcomeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
