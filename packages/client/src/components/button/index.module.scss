@@ -1,4 +1,30 @@
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--grey-400);
+  color: var(--grey-900);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  transition: 0.1s ease-in-out all;
+  border: none;
+  font-weight: 600;
+  text-shadow: none;
+  text-decoration: none;
+
+  &:not(:disabled) {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--grey-600);
+    }
+  }
+
+  span {
+    margin-left: 0.5rem;
+  }
+
   &.danger {
     background: var(--red-900);
     color: white;

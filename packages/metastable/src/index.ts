@@ -68,10 +68,11 @@ export class Metastable extends (EventEmitter as {
 
   constructor(
     public readonly dataRoot: string,
-    private settings: {
+    public readonly settings: {
       comfyMainPath?: string;
       skipPythonSetup?: boolean;
       comfyArgs?: string[];
+      version?: string;
     } = {},
   ) {
     super();

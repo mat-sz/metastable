@@ -4,12 +4,15 @@ import {
   LogItem,
   Model,
   ModelType,
+  UpdateInfo,
   Utilization,
 } from '@metastable/types';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
 import type { BrowserWindow } from 'electron';
+import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
+import { gte } from 'semver';
 import { z } from 'zod';
 
 import type { Metastable } from './index.js';
@@ -17,11 +20,12 @@ import type { Metastable } from './index.js';
 export interface TRPCContext {
   metastable: Metastable;
   win?: BrowserWindow;
+  autoUpdater?: AppUpdater;
 }
 
 export const t = initTRPC.context<TRPCContext>().create();
 
-const electronProcedure = t.procedure.use(function isElectron(opts) {
+const electronProcedure = t.procedure.use(opts => {
   const win = opts.ctx.win;
   if (!win) {
     throw new TRPCError({ code: 'PRECONDITION_FAILED' });
@@ -34,6 +38,22 @@ const electronProcedure = t.procedure.use(function isElectron(opts) {
     },
   });
 });
+
+const autoUpdaterProcedure = t.procedure.use(opts => {
+  const autoUpdater = opts.ctx.autoUpdater;
+  if (!autoUpdater) {
+    throw new TRPCError({ code: 'PRECONDITION_FAILED' });
+  }
+
+  return opts.next({
+    ctx: {
+      ...opts.ctx,
+      autoUpdater: autoUpdater,
+    },
+  });
+});
+
+const versionEndpointUrl = 'https://api.metastable.studio/version';
 
 export const router = t.router({
   download: {
@@ -119,6 +139,32 @@ export const router = t.router({
         }
       );
     }),
+    updateInfo: t.procedure.query(
+      async ({ ctx: { metastable, autoUpdater } }) => {
+        let latestVersion: string | undefined = undefined;
+        let isUpToDate: boolean | undefined = undefined;
+
+        try {
+          const req = await fetch(versionEndpointUrl);
+          const json = (await req.json()) as any;
+          if (typeof json.version === 'string') {
+            latestVersion = json.version;
+            if (metastable.settings.version) {
+              isUpToDate = gte(metastable.settings.version, json.version);
+            }
+          }
+        } catch {
+          //
+        }
+
+        return {
+          canCheckForUpdate: true,
+          isAutoUpdateAvailable: !!autoUpdater?.isUpdaterActive(),
+          latestVersion,
+          isUpToDate,
+        } as UpdateInfo;
+      },
+    ),
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
     }),
@@ -490,6 +536,21 @@ export const router = t.router({
           const { shell } = await import('electron');
           shell.openPath(input);
         }),
+    },
+    autoUpdater: {
+      onEvent: autoUpdaterProcedure.subscription(({ ctx: { autoUpdater } }) => {
+        return observable<{ updateAvailable: boolean }>(emit => {
+          const refresh = () => {
+            emit.next({
+              updateAvailable: autoUpdater.isUpdaterActive(),
+            });
+          };
+
+          refresh();
+
+          return () => {};
+        });
+      }),
     },
   },
 });

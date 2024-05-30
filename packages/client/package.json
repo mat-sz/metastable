@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@metastable/metastable": "*",
+    "electron-updater": "6.1.8",
     "nanoid": "^5.0.4",
     "trpc-electron": "^0.1.1"
   },

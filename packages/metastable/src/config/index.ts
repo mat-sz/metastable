@@ -15,6 +15,9 @@ const CONFIG_DEFAULTS: ConfigType = {
   ui: {
     fuzzySearch: true,
   },
+  app: {
+    autoUpdate: true,
+  },
 };
 
 export class Config {

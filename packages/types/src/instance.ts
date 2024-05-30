@@ -6,6 +6,13 @@ export interface InstanceInfo {
   torch?: ComfyTorchInfo;
 }
 
+export interface UpdateInfo {
+  isAutoUpdateAvailable: boolean;
+  canCheckForUpdate: boolean;
+  latestVersion?: string;
+  isUpToDate?: boolean;
+}
+
 export interface ConfigType {
   python: {
     configured: boolean;
@@ -26,6 +33,9 @@ export interface ConfigType {
   generation?: {
     preview?: boolean;
     imageMetadata?: boolean;
+  };
+  app?: {
+    autoUpdate?: boolean;
   };
 }
 

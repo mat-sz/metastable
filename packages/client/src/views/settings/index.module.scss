@@ -10,3 +10,17 @@
   width: 100%;
   margin: 0 auto;
 }
+
+.info {
+  margin-bottom: 1rem;
+
+  .social {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+
+    a {
+      margin-right: 0.5rem;
+    }
+  }
+}

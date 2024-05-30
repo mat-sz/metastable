@@ -1227,6 +1227,7 @@ __metadata:
     clsx: "npm:^2.0.0"
     electron: "npm:^30.0.1"
     electron-builder: "npm:^25.0.0-alpha.6"
+    electron-updater: "npm:6.1.8"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.3"
     exifreader: "npm:^4.22.1"
@@ -1281,16 +1282,19 @@ __metadata:
     "@trpc/server": "npm:^11.0.0-rc.373"
     "@types/event-stream": "npm:^4.0.5"
     "@types/node": "npm:^20.10.3"
+    "@types/semver": "npm:^7.5.8"
     "@types/tar-stream": "npm:^3.1.3"
     "@types/which": "npm:^3.0.3"
     chokidar: "npm:^3.5.3"
     electron: "npm:^30.0.1"
+    electron-updater: "npm:6.1.8"
     event-stream: "npm:^4.0.1"
     js-base64: "npm:^3.7.7"
     meta-png: "npm:^1.0.6"
     nanoid: "npm:^5.0.4"
     radash: "npm:^12.1.0"
     rimraf: "npm:^5.0.5"
+    semver: "npm:^7.6.2"
     sharp: "npm:^0.33.2"
     systeminformation: "npm:^5.22.7"
     tar-stream: "npm:^3.1.7"
@@ -1834,6 +1838,13 @@ __metadata:
   version: 7.5.6
   resolution: "@types/semver@npm:7.5.6"
   checksum: 196dc32db5f68cbcde2e6a42bb4aa5cbb100fa2b7bd9c8c82faaaf3e03fbe063e205dbb4f03c7cdf53da2edb70a0d34c9f2e601b54281b377eb8dc1743226acd
+  languageName: node
+  linkType: hard
+
+"@types/semver@npm:^7.5.8":
+  version: 7.5.8
+  resolution: "@types/semver@npm:7.5.8"
+  checksum: 8663ff927234d1c5fcc04b33062cb2b9fcfbe0f5f351ed26c4d1e1581657deebd506b41ff7fdf89e787e3d33ce05854bc01686379b89e9c49b564c4cfa988efa
   languageName: node
   linkType: hard
 
@@ -2677,6 +2688,16 @@ __metadata:
     base64-js: "npm:^1.3.1"
     ieee754: "npm:^1.2.1"
   checksum: 2a905fbbcde73cc5d8bd18d1caa23715d5f83a5935867c2329f0ac06104204ba7947be098fe1317fbd8830e26090ff8e764f08cd14fefc977bb248c3487bcbd0
+  languageName: node
+  linkType: hard
+
+"builder-util-runtime@npm:9.2.3":
+  version: 9.2.3
+  resolution: "builder-util-runtime@npm:9.2.3"
+  dependencies:
+    debug: "npm:^4.3.4"
+    sax: "npm:^1.2.4"
+  checksum: e166a29fcacefb6c76367acbb08e7328f9005d957314e3b14d849249f9053a4dcb5420a1ce3641f4b39b039a36036bc8c7c7b23a06b82b7757e29b172f805d47
   languageName: node
   linkType: hard
 
@@ -3533,6 +3554,22 @@ __metadata:
   version: 1.4.612
   resolution: "electron-to-chromium@npm:1.4.612"
   checksum: 4afeae778beb67e81a47e362b72847efc24161b7673818b3d5a36fa0678f006629436a5cfa6b0bb0291927c61d01e58b66330942cc7f4109f170bdec6bfafd73
+  languageName: node
+  linkType: hard
+
+"electron-updater@npm:6.1.8":
+  version: 6.1.8
+  resolution: "electron-updater@npm:6.1.8"
+  dependencies:
+    builder-util-runtime: "npm:9.2.3"
+    fs-extra: "npm:^10.1.0"
+    js-yaml: "npm:^4.1.0"
+    lazy-val: "npm:^1.0.5"
+    lodash.escaperegexp: "npm:^4.1.2"
+    lodash.isequal: "npm:^4.5.0"
+    semver: "npm:^7.3.8"
+    tiny-typed-emitter: "npm:^2.1.0"
+  checksum: e73db73cd46bbee46a118d22369fbd0c5beb854536cd78364d291f274c5b5711876a8951ad745f08974b55783ee7e5bc83d6912955d20db65cf455a1fd050822
   languageName: node
   linkType: hard
 
@@ -5823,6 +5860,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.escaperegexp@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "lodash.escaperegexp@npm:4.1.2"
+  checksum: 484ad4067fa9119bb0f7c19a36ab143d0173a081314993fe977bd00cf2a3c6a487ce417a10f6bac598d968364f992153315f0dbe25c9e38e3eb7581dd333e087
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: dfdb2356db19631a4b445d5f37868a095e2402292d59539a987f134a8778c62a2810c2452d11ae9e6dcac71fc9de40a6fedcb20e2952a15b431ad8b29e50e28f
+  languageName: node
+  linkType: hard
+
 "lodash.merge@npm:^4.6.2":
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
@@ -7612,6 +7663,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:^7.6.2":
+  version: 7.6.2
+  resolution: "semver@npm:7.6.2"
+  bin:
+    semver: bin/semver.js
+  checksum: 97d3441e97ace8be4b1976433d1c32658f6afaff09f143e52c593bae7eef33de19e3e369c88bd985ce1042c6f441c80c6803078d1de2a9988080b66684cbb30c
+  languageName: node
+  linkType: hard
+
 "serialize-error@npm:^7.0.1":
   version: 7.0.1
   resolution: "serialize-error@npm:7.0.1"
@@ -8285,6 +8345,13 @@ __metadata:
   version: 11.2.5
   resolution: "tiny-lru@npm:11.2.5"
   checksum: bda6de074035ca108ce179ba4ceb02a3eca6aab78b5cf161736035f2af562644594435d8fa4c07f098eee96e1a483992025af72f25e6033d54a66cf270fa8372
+  languageName: node
+  linkType: hard
+
+"tiny-typed-emitter@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "tiny-typed-emitter@npm:2.1.0"
+  checksum: 522bed4c579ee7ee16548540cb693a3d098b137496110f5a74bff970b54187e6b7343a359b703e33f77c5b4b90ec6cebc0d0ec3dbdf1bd418723c5c3ce36d8a2
   languageName: node
   linkType: hard
 

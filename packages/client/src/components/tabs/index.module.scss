@@ -21,8 +21,9 @@
 }
 
 .tabs {
-  &.normal {
-    & > .tab svg {
+  &.normal > .tab {
+    svg,
+    img {
       margin-right: 0.5rem;
     }
   }
@@ -31,8 +32,10 @@
     & > .tab {
       padding: 0.5rem;
 
-      svg {
+      svg,
+      img {
         font-size: 1.4rem;
+        height: 1.4rem;
       }
 
       span {
@@ -146,8 +149,10 @@
             background: var(--grey-400);
           }
 
-          svg {
+          svg,
+          img {
             font-size: 1rem;
+            height: 1rem;
             margin-right: 0.5rem;
           }
 

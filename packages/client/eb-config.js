@@ -57,6 +57,10 @@ const config = {
       filter: ['**/*', '!**/__pycache__'],
     },
   ],
+  publish: {
+    provider: 'generic',
+    url: 'https://api.metastable.studio/electron/update',
+  },
 
   // Windows
   win: {

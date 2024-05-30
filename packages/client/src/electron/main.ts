@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { app, BrowserWindow, Menu, MenuItem } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
 
 setUseFileUrl(true);
@@ -101,8 +102,16 @@ async function createWindow() {
     'python',
     'main.py',
   );
-  const metastable = new Metastable(dataRoot, { comfyMainPath });
+  const metastable = new Metastable(dataRoot, {
+    comfyMainPath,
+    version: process.env.VITE_APP_VERSION,
+  });
   await metastable.init();
+
+  const config = await metastable.config.get('app');
+  if (config?.autoUpdate) {
+    autoUpdater.checkForUpdates();
+  }
 
   const win = new BrowserWindow({
     title: 'Metastable',
@@ -128,7 +137,7 @@ async function createWindow() {
     router,
     windows: [win],
     createContext: async () => {
-      return { metastable, win };
+      return { metastable, win, autoUpdater };
     },
   });
 

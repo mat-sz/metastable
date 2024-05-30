@@ -1,10 +1,24 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsDownload, BsGear } from 'react-icons/bs';
+import {
+  BsDiscord,
+  BsDownload,
+  BsGear,
+  BsGithub,
+  BsTwitter,
+} from 'react-icons/bs';
 
+import logo from '$/assets/logo.svg';
+import { Button } from '$components/button';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { VarCategory, VarString, VarToggle, VarUI } from '$components/var';
+import {
+  VarButton,
+  VarCategory,
+  VarString,
+  VarToggle,
+  VarUI,
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
@@ -25,6 +39,11 @@ export const Settings: React.FC = observer(() => {
         <Tabs>
           <Tab id="general" title="General" icon={<BsGear />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
+          <Tab
+            id="about"
+            title={`About ${import.meta.env.VITE_APP_NAME}`}
+            icon={<img src={logo} alt="Logo" />}
+          />
         </Tabs>
         <TabContent className={styles.content}>
           <TabPanel id="general">
@@ -43,6 +62,58 @@ export const Settings: React.FC = observer(() => {
             <VarCategory label="CivitAI">
               <VarString path="civitai.apiKey" label="CivitAI API key" />
             </VarCategory>
+          </TabPanel>
+          <TabPanel id="about">
+            <VarCategory label="About Metastable">
+              <div className={styles.info}>
+                <div>
+                  {import.meta.env.VITE_APP_NAME}{' '}
+                  {import.meta.env.VITE_APP_VERSION}
+                </div>
+                <div className={styles.social}>
+                  <Button href="https://discord.gg/Sf9zKaXzXe">
+                    <BsDiscord />
+                    <span>Join Metastable Discord for updates</span>
+                  </Button>
+                  <Button href="https://github.com/mat-sz/metastable">
+                    <BsGithub />
+                    <span>Source code</span>
+                  </Button>
+                  <Button href="https://twitter.com/get_metastable">
+                    <BsTwitter />
+                    <span>Twitter</span>
+                  </Button>
+                </div>
+              </div>
+            </VarCategory>
+            {(mainStore.updateInfo.isAutoUpdateAvailable ||
+              mainStore.updateInfo.canCheckForUpdate) && (
+              <VarCategory label="Updates">
+                {mainStore.updateInfo.isAutoUpdateAvailable && (
+                  <VarToggle
+                    path="app.autoUpdate"
+                    label="Enable automatic updates"
+                  />
+                )}
+                {mainStore.updateInfo.canCheckForUpdate && (
+                  <>
+                    <VarButton
+                      buttonLabel="Check for updates"
+                      onClick={() => mainStore.checkForUpdates()}
+                    />
+                    <div className={styles.info}>
+                      {mainStore.updateInfoReady
+                        ? typeof mainStore.updateInfo.isUpToDate === 'undefined'
+                          ? 'Unable to check for updates.'
+                          : mainStore.updateInfo.isUpToDate
+                            ? 'Up to date.'
+                            : `New version available: ${mainStore.updateInfo.latestVersion}.`
+                        : 'Loading...'}
+                    </div>
+                  </>
+                )}
+              </VarCategory>
+            )}
           </TabPanel>
         </TabContent>
       </TabView>

@@ -4,6 +4,7 @@ import {
   InstanceInfo,
   ModelType,
   TaskState,
+  UpdateInfo,
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
@@ -26,6 +27,10 @@ class MainStore {
     samplers: [],
     schedulers: [],
   };
+  updateInfo: UpdateInfo = {
+    canCheckForUpdate: false,
+    isAutoUpdateAvailable: false,
+  };
 
   setup = new SetupStore();
 
@@ -35,6 +40,7 @@ class MainStore {
 
   backendStatus: BackendStatus = 'starting';
   infoReady = false;
+  updateInfoReady = false;
   view: string | undefined = 'home';
 
   tasks = new TaskStore();
@@ -142,9 +148,21 @@ class MainStore {
   }
 
   async init() {
+    this.checkForUpdates();
     await this.refresh();
     runInAction(() => {
       this.infoReady = true;
+    });
+  }
+
+  async checkForUpdates() {
+    runInAction(() => {
+      this.updateInfoReady = false;
+    });
+    const data = await API.instance.updateInfo.query();
+    runInAction(() => {
+      this.updateInfo = data;
+      this.updateInfoReady = true;
     });
   }
 
