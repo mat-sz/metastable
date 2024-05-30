@@ -1,3 +1,4 @@
+import { createRequire } from 'module';
 import path from 'path';
 
 import fastifyMultipart from '@fastify/multipart';
@@ -18,7 +19,9 @@ import {
   staticRoot,
   useProxy,
 } from './config.js';
-import info from '../../client/package.json';
+
+const req = createRequire(import.meta.url);
+const info = req('../../client/package.json');
 
 const metastable = new Metastable(dataRoot, {
   skipPythonSetup,
