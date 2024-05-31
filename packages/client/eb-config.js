@@ -1,8 +1,5 @@
 /* eslint-disable */
 
-const { glob } = require('glob');
-const { rimraf } = require('rimraf');
-
 const globalIgnore = [
   '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}',
   '!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}',
@@ -19,12 +16,6 @@ const globalIgnore = [
   '!**/node_modules/@metastable/cppzst/bin/**/*.node',
 ];
 
-const removeFiles = [
-  '**/node_modules/@metastable/cppzst/{deps,src}',
-  '**/node_modules/sharp/{src,node-addon-api,install}',
-  '**/LICENSE*',
-];
-
 const globalFiles = ['dist', 'dist-electron', ...globalIgnore];
 
 const config = {
@@ -36,20 +27,6 @@ const config = {
   productName: 'Metastable',
   directories: {
     output: '../../release/${version}',
-  },
-  afterSign: async context => {
-    for (const pattern of removeFiles) {
-      const files = await glob(pattern, {
-        absolute: true,
-        cwd: context.appOutDir,
-      });
-      try {
-        await rimraf(files, {});
-      } catch (e) {
-        console.log(e);
-        //
-      }
-    }
   },
   extraFiles: [
     {

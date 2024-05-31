@@ -13,7 +13,7 @@
     "lint": "run -T eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "electron:start": "vite --mode electron",
-    "electron:build": "vite build --mode production-electron && electron-builder --config eb-config.js",
+    "electron:build": "yarn build:deps && vite build --mode production-electron && electron-builder --config eb-config.js",
     "analyze": "vite-bundle-visualizer"
   },
   "husky": {
@@ -52,7 +52,6 @@
     "exifreader": "^4.22.1",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
-    "glob": "^10.3.12",
     "husky": "^8.0.3",
     "js-base64": "^3.7.7",
     "lint-staged": "^14.0.1",
