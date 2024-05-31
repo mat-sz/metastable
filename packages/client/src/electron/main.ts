@@ -2,7 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
-import { app, BrowserWindow, Menu, MenuItem } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
 
@@ -36,62 +36,27 @@ autoUpdater.autoDownload = true;
 autoUpdater.autoRunAppAfterInstall = true;
 
 function createMenu() {
-  const menu = new Menu();
+  const menuTemplate: (
+    | Electron.MenuItem
+    | Electron.MenuItemConstructorOptions
+  )[] = [
+    {
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    },
+  ];
 
-  const menuMain = new MenuItem({
-    id: 'metastable',
-    label: 'Metastable',
-    type: 'submenu',
-    submenu: new Menu(),
-  });
-  menuMain.submenu?.append(
-    new MenuItem({
-      id: 'metastable:quit',
-      label: 'Quit Metastable',
-      type: 'normal',
-    }),
-  );
-  menu.append(menuMain);
-
-  const menuProject = new MenuItem({
-    id: 'project',
-    label: 'Project',
-    type: 'submenu',
-    submenu: new Menu(),
-  });
-
-  menuProject.submenu?.append(
-    new MenuItem({
-      id: 'project:new',
-      label: 'New',
-      type: 'normal',
-    }),
-  );
-  menuProject.submenu?.append(
-    new MenuItem({
-      id: 'project:open',
-      label: 'Open',
-      type: 'normal',
-    }),
-  );
-  menu.append(menuProject);
-
-  const menuView = new MenuItem({
-    id: 'view',
-    label: 'View',
-    type: 'submenu',
-    submenu: new Menu(),
-  });
-  menuView.submenu?.append(
-    new MenuItem({
-      id: 'view:modelManager',
-      label: 'Model manager',
-      type: 'normal',
-    }),
-  );
-  menu.append(menuView);
-
-  return menu;
+  return Menu.buildFromTemplate(menuTemplate);
 }
 
 async function createWindow() {
