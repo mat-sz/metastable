@@ -16,6 +16,7 @@ const globalIgnore = [
   '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}',
   '!**/{appveyor.yml,.travis.yml,circle.yml}',
   '!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}',
+  '!**/node_modules/@metastable/cppzst/bin/**/*.node',
 ];
 
 const removeFiles = [
@@ -36,7 +37,7 @@ const config = {
   directories: {
     output: '../../release/${version}',
   },
-  afterPack: async context => {
+  afterSign: async context => {
     for (const pattern of removeFiles) {
       const files = await glob(pattern, {
         absolute: true,
@@ -90,7 +91,7 @@ const config = {
   mac: {
     target: {
       target: 'dmg',
-      arch: ['arm64', 'x64'],
+      arch: ['universal'],
     },
     artifactName: '${productName}-darwin-${arch}-${version}.${ext}',
     category: 'public.app-category.graphics-design',

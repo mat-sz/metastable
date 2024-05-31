@@ -1,5 +1,6 @@
 {
   "name": "@metastable/client",
+  "productName": "Metastable",
   "displayName": "Metastable",
   "description": "AI image generation made easy",
   "author": "Mat Sz <contact@mat.dev>",

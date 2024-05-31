@@ -15,6 +15,7 @@ const VRAM_MIN = 2 * GB;
 const VRAM_RECOMMENDED = 6 * GB;
 const STORAGE_MIN = 16 * GB;
 const STORAGE_RECOMMENDED = 64 * GB;
+const GPU_VENDORS = ['NVIDIA', 'AMD', 'Apple'];
 
 interface SetupItemState {
   description: string;
@@ -182,9 +183,9 @@ export class SetupStore {
 
     requirements.push({
       name: 'GPU Vendor',
-      expected: 'NVIDIA',
+      expected: GPU_VENDORS.join(', '),
       actual: vendor,
-      satisfied: vendor.includes('NVIDIA'),
+      satisfied: GPU_VENDORS.some(item => vendor.includes(item)),
     });
     requirements.push({
       name: 'GPU VRAM',

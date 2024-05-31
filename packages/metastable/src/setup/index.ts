@@ -43,12 +43,17 @@ export class Setup extends EventEmitter {
     const graphics = await si.graphics();
     const dataRoot = this.metastable.dataRoot;
     const usage = await disk.usage(dataRoot);
+    const memory = os.totalmem();
 
     return {
       os: await getOS(),
       graphics: graphics.controllers.map(item => ({
         vendor: item.vendor || 'unknown',
-        vram: item.vram ? item.vram * 1024 * 1024 : 0,
+        vram: item.vram
+          ? item.vram * 1024 * 1024
+          : item.vendor.includes('Apple')
+            ? memory
+            : 0,
       })),
       storage: {
         dataRoot,
