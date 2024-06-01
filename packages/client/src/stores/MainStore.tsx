@@ -27,6 +27,7 @@ class MainStore {
   info: InstanceInfo = {
     samplers: [],
     schedulers: [],
+    vram: 0,
   };
   updateInfo: UpdateInfo = {
     canCheckForUpdate: false,
