@@ -14,6 +14,7 @@ import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
+import { filesize } from '$utils/file';
 import { base64ify, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
@@ -115,15 +116,67 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     return this.firstPrompt?.data.preview;
   }
 
-  validate() {
+  get memoryUsage() {
     const settings = this.settings;
+    let totalVram = 0;
+
+    const checkpointName = settings.checkpoint.name;
+    if (checkpointName) {
+      const model = modelStore.find(ModelType.CHECKPOINT, checkpointName);
+      totalVram += model?.file.size ?? 0;
+    }
+
+    if (settings.models.lora) {
+      for (const lora of settings.models.lora) {
+        if (lora.enabled && lora.name) {
+          const model = modelStore.find(ModelType.LORA, lora.name);
+          totalVram += model?.file.size ?? 0;
+        }
+      }
+    }
+
+    if (settings.models.controlnet) {
+      for (const controlnet of settings.models.controlnet) {
+        if (controlnet.enabled && controlnet.name) {
+          const model = modelStore.find(ModelType.CONTROLNET, controlnet.name);
+          totalVram += model?.file.size ?? 0;
+        }
+      }
+    }
+
+    if (settings.models.ipadapter) {
+      for (const ipadapter of settings.models.ipadapter) {
+        if (ipadapter.enabled && ipadapter.name) {
+          const model = modelStore.find(ModelType.IPADAPTER, ipadapter.name);
+          totalVram += model?.file.size ?? 0;
+        }
+      }
+    }
+
+    if (settings.upscale?.enabled && settings.upscale?.name) {
+      const model = modelStore.find(
+        ModelType.UPSCALE_MODEL,
+        settings.upscale.name,
+      );
+      totalVram += model?.file.size ?? 0;
+    }
+
+    return totalVram;
+  }
+
+  validate(): { errors: string[]; warnings: string[] } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    const settings = this.settings;
+
     const checkpointName = settings.checkpoint.name;
     if (!checkpointName) {
-      return 'No checkpoint selected.';
-    } else if (
-      mainStore.hasFile(ModelType.CHECKPOINT, checkpointName) !== 'downloaded'
-    ) {
-      return 'Selected checkpoint does not exist.';
+      errors.push('No checkpoint selected.');
+    } else {
+      const checkpoint = modelStore.find(ModelType.CHECKPOINT, checkpointName);
+      if (!checkpoint) {
+        errors.push('Selected checkpoint does not exist.');
+      }
     }
 
     const loras = settings.models.lora;
@@ -134,11 +187,12 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
         }
 
         if (!lora.name) {
-          return 'No LoRA selected.';
-        } else if (
-          mainStore.hasFile(ModelType.LORA, lora.name) !== 'downloaded'
-        ) {
-          return 'Selected LoRA does not exist.';
+          errors.push('No LoRA model selected.');
+        } else {
+          const model = modelStore.find(ModelType.LORA, lora.name);
+          if (!model) {
+            errors.push('Selected LoRA does not exist.');
+          }
         }
       }
     }
@@ -151,28 +205,83 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
         }
 
         if (!controlnet.name) {
-          return 'No ControlNet selected.';
-        } else if (
-          mainStore.hasFile(ModelType.CONTROLNET, controlnet.name) !==
-          'downloaded'
-        ) {
-          return 'Selected ControlNet does not exist.';
-        } else if (!controlnet.image) {
-          return 'No image input for ControlNet selected.';
+          errors.push('No ControlNet model selected.');
+        } else {
+          const model = modelStore.find(ModelType.CONTROLNET, controlnet.name);
+          if (!model) {
+            errors.push('Selected ControlNet does not exist.');
+          }
+        }
+
+        if (!controlnet.image) {
+          errors.push('No image input for ControlNet selected.');
+        }
+      }
+    }
+
+    const ipadapters = settings.models.ipadapter;
+    if (ipadapters?.length) {
+      for (const ipadapter of ipadapters) {
+        if (!ipadapter.enabled) {
+          continue;
+        }
+
+        if (!ipadapter.name) {
+          errors.push('No IPAdapter model selected.');
+        } else {
+          const model = modelStore.find(ModelType.IPADAPTER, ipadapter.name);
+          if (!model) {
+            errors.push('Selected IPAdapter model does not exist.');
+          }
+        }
+
+        if (!ipadapter.clipVisionName) {
+          errors.push('No CLIP Vision model for IPAdapter selected.');
+        } else {
+          const model = modelStore.find(
+            ModelType.CLIP_VISION,
+            ipadapter.clipVisionName,
+          );
+          if (!model) {
+            errors.push('Selected CLIP Vision model does not exist.');
+          }
+        }
+
+        if (!ipadapter.image) {
+          errors.push('No image input for IPAdapter selected.');
         }
       }
     }
 
     const input = settings.input;
     if (input.type !== 'none' && !input.image) {
-      return 'No input image selected.';
+      errors.push('No input image selected.');
     }
 
     if (mainStore.status !== 'ready') {
-      return 'Backend is not ready.';
+      errors.push('Backend is not ready.');
     }
 
-    return undefined;
+    const memroyUsage = this.memoryUsage;
+    if (memroyUsage > mainStore.info.vram) {
+      warnings.push(
+        `This project requires ${filesize(
+          memroyUsage,
+        )} of memory, this is higher than system memory: ${filesize(
+          mainStore.info.vram,
+        )}.`,
+      );
+    } else if (memroyUsage > mainStore.info.vram * 0.8) {
+      warnings.push(
+        `This project requires ${filesize(
+          memroyUsage,
+        )} of memory to generate an image. System memory: ${filesize(
+          mainStore.info.vram,
+        )}.`,
+      );
+    }
+
+    return { errors, warnings };
   }
 
   async request() {

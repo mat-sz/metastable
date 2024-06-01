@@ -131,13 +131,21 @@ export const router = t.router({
       });
     }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
-      return (
-        (await metastable.comfy?.info()) || {
-          schedulers: [],
-          samplers: [],
-          torch: undefined,
-        }
-      );
+      const info = (await metastable.comfy?.info()) || {
+        schedulers: [],
+        samplers: [],
+        torch: undefined,
+      };
+
+      let vram = metastable.vram;
+      if (info.torch?.memory.vram) {
+        vram = info.torch.memory.vram;
+      }
+
+      return {
+        ...info,
+        vram,
+      };
     }),
     updateInfo: t.procedure.query(
       async ({ ctx: { metastable, autoUpdater } }) => {

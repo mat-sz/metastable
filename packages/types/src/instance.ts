@@ -4,6 +4,7 @@ export interface InstanceInfo {
   samplers: string[];
   schedulers: string[];
   torch?: ComfyTorchInfo;
+  vram: number;
 }
 
 export interface UpdateInfo {

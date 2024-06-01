@@ -22,6 +22,8 @@ export const Prompt: React.FC = observer(() => {
     [project],
   );
   const { open } = useFileInput(onOpen);
+  const validationResult = project.validate();
+  const isValid = !validationResult.errors.length;
 
   useHotkeys('Ctrl+Enter', () => {
     project.request();
@@ -47,7 +49,11 @@ export const Prompt: React.FC = observer(() => {
           <div className={styles.hint}>
             Hint: You can use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> as well.
           </div>
-          <Button onClick={() => project.request()} variant="primary">
+          <Button
+            disabled={!isValid}
+            onClick={() => project.request()}
+            variant="primary"
+          >
             Generate
           </Button>
         </div>

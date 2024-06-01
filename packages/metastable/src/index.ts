@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import os from 'os';
 import path from 'path';
 
 import {
@@ -52,6 +53,7 @@ export class Metastable extends (EventEmitter as {
   kohya?: Kohya;
   project;
   model;
+  vram = 0;
 
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(25);
@@ -143,6 +145,7 @@ export class Metastable extends (EventEmitter as {
   }
 
   async init() {
+    this.updateVram();
     this.cleanup();
     await this.reload();
   }
@@ -161,6 +164,31 @@ export class Metastable extends (EventEmitter as {
         }
       } catch {}
     }
+  }
+
+  async updateVram() {
+    const graphics = await si.graphics();
+    let vram = 0;
+    for (const gpu of graphics.controllers) {
+      if (gpu.vendor.toLowerCase().includes('apple')) {
+        vram = os.totalmem();
+        break;
+      }
+
+      let gpuVram = gpu.memoryTotal;
+      if (!gpuVram) {
+        if (gpu.vram) {
+          gpuVram = gpu.vram * 1024 * 1024;
+        } else {
+          gpuVram = 0;
+        }
+      }
+      if (gpuVram > vram) {
+        vram = gpuVram;
+      }
+    }
+
+    this.vram = vram;
   }
 
   async reload() {

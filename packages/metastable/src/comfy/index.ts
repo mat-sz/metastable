@@ -167,7 +167,10 @@ export class Comfy extends (EventEmitter as {
     }
 
     const args: string[] = [...this.args];
-    const proc = this.python.spawn([this.mainPath, ...args], this.env);
+    const proc = this.python.spawn([this.mainPath, ...args], {
+      ...this.env,
+      PYTORCH_MPS_HIGH_WATERMARK_RATIO: '0.0',
+    });
 
     proc.stdin.setDefaultEncoding('utf-8');
 

@@ -12,12 +12,19 @@
   font-weight: 600;
   text-shadow: none;
   text-decoration: none;
+  cursor: pointer;
 
-  &:not(:disabled) {
-    cursor: pointer;
+  &:hover {
+    background-color: var(--grey-600);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background-color: var(--grey-600) !important;
 
     &:hover {
-      background-color: var(--grey-600);
+      background-color: var(--grey-600) !important;
     }
   }
 
