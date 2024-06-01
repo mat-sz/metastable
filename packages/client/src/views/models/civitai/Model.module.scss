@@ -20,9 +20,13 @@
   align-items: center;
   justify-content: space-between;
   background: var(--grey-400);
-  margin: -0.5rem;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin: -1rem;
+  padding: 0.25rem 1rem;
+  margin-bottom: 1rem;
+
+  button {
+    padding: 0.25rem;
+  }
 }
 
 .main {

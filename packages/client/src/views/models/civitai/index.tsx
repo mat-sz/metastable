@@ -5,6 +5,7 @@ import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
 
 import { IconButton } from '$components/iconButton';
+import { Label } from '$components/label';
 import { Card, CardTag, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
 import { Pagination } from '$components/pagination';
@@ -32,6 +33,7 @@ interface CivitAIArgs {
   sort?: string;
   limit?: number;
   page?: number;
+  baseModels?: string;
 }
 
 async function fetchCivitAI({
@@ -41,11 +43,15 @@ async function fetchCivitAI({
   sort = 'Highest Rated',
   limit = 48,
   page = 1,
+  baseModels,
 }: CivitAIArgs): Promise<CivitAIResponse> {
   const url = new URL('https://civitai.com/api/v1/models');
   url.searchParams.append('query', query);
   if (type) {
     url.searchParams.append('types', type);
+  }
+  if (baseModels) {
+    url.searchParams.append('baseModels', `${baseModels}`);
   }
   url.searchParams.append('nsfw', `${nsfw}`);
   url.searchParams.append('sort', sort);
@@ -64,6 +70,29 @@ const CivitAICategories = {
   Controlnet: 'Controlnet',
 };
 
+const CivitAIBaseModels = [
+  'SD 1.4',
+  'SD 1.5',
+  'SD 1.5 LCM',
+  'SD 1.5 Hyper',
+  'SD 2.0',
+  'SD 2.1',
+  'SDXL 1.0',
+  'SD 3',
+  'Pony',
+  'SDXL 1.0 LCM',
+  'SDXL Turbo',
+  'SDXL Lightning',
+  'SDXL Hyper',
+  'Stable Cascade',
+  'SVD',
+  'SVD XT',
+  'Playground V2',
+  'PixArt A',
+  'PixArt E',
+  'Other',
+];
+
 export const CivitAI: React.FC = observer(() => {
   const [query, setQuery] = useState('');
 
@@ -75,7 +104,14 @@ export const CivitAI: React.FC = observer(() => {
   });
   const [item, setItem] = useState<CivitAIModel | undefined>();
   const { data, error, isLoading } = useQuery({
-    queryKey: ['fetchModels', args.query, args.type, args.page, args.nsfw],
+    queryKey: [
+      'fetchModels',
+      args.query,
+      args.type,
+      args.page,
+      args.nsfw,
+      args.baseModels,
+    ],
     queryFn: () => fetchCivitAI(args),
   });
 
@@ -84,8 +120,9 @@ export const CivitAI: React.FC = observer(() => {
   }
 
   return (
-    <>
+    <div className={styles.wrapper}>
       <div className={styles.search}>
+        <div className={styles.searchTitle}>Filters</div>
         <form
           className={styles.searchInput}
           onSubmit={e => {
@@ -103,74 +140,98 @@ export const CivitAI: React.FC = observer(() => {
             <BsSearch />
           </IconButton>
         </form>
-        <select
-          value={args.type}
-          onChange={e => setArgs(args => ({ ...args, type: e.target.value }))}
-        >
-          {Object.entries(CivitAICategories).map(([key, name]) => (
-            <option key={key} value={key}>
-              {name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={args.sort}
-          onChange={e => setArgs(args => ({ ...args, sort: e.target.value }))}
-        >
-          {CivitAISort.map(value => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
+        <Label label="Model type">
+          <select
+            value={args.type}
+            onChange={e => setArgs(args => ({ ...args, type: e.target.value }))}
+          >
+            {Object.entries(CivitAICategories).map(([key, name]) => (
+              <option key={key} value={key}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </Label>
+        <Label label="Base model">
+          <select
+            value={args.baseModels || ''}
+            onChange={e =>
+              setArgs(args => ({
+                ...args,
+                baseModels: e.target.value || undefined,
+              }))
+            }
+          >
+            <option value="">Any</option>
+            {CivitAIBaseModels.map(name => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </Label>
+        <Label label="Sort by">
+          <select
+            value={args.sort}
+            onChange={e => setArgs(args => ({ ...args, sort: e.target.value }))}
+          >
+            {CivitAISort.map(value => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </Label>
         <Toggle
           label="NSFW"
           value={!!args.nsfw}
           onChange={value => setArgs(args => ({ ...args, nsfw: value }))}
         />
       </div>
-      {isLoading && (
-        <div className={styles.loading}>
-          <Loading />
-        </div>
-      )}
-      {error && <div className={styles.info}>{`${error}`}</div>}
-      {data?.items && (
-        <>
-          <List items={data.items}>
-            {item => (
-              <Card
-                name={item.name}
-                imageUrl={item.modelVersions?.[0]?.images[0]?.url}
-                onClick={() => setItem(item)}
-                key={item.id}
-                icon={<MdNoPhotography />}
-              >
-                <CardTags>
-                  <CardTag icon={<Rating value={item.stats.rating} small />}>
-                    ({item.stats.ratingCount})
-                  </CardTag>
-                </CardTags>
-                <CardTags>
-                  <CardTag icon={<BsDownload />}>
-                    ({item.stats.downloadCount})
-                  </CardTag>
-                  <CardTag icon={<BsHeartFill />}>
-                    ({item.stats.favoriteCount})
-                  </CardTag>
-                </CardTags>
-              </Card>
-            )}
-          </List>
-          <Pagination
-            current={data.metadata.currentPage}
-            max={data.metadata.totalPages}
-            onSelect={i => {
-              setArgs(args => ({ ...args, page: i }));
-            }}
-          />
-        </>
-      )}
-    </>
+      <div className={styles.results}>
+        {isLoading && (
+          <div className={styles.loading}>
+            <Loading />
+          </div>
+        )}
+        {error && <div className={styles.info}>{`${error}`}</div>}
+        {data?.items && (
+          <>
+            <List items={data.items}>
+              {item => (
+                <Card
+                  name={item.name}
+                  imageUrl={item.modelVersions?.[0]?.images[0]?.url}
+                  onClick={() => setItem(item)}
+                  key={item.id}
+                  icon={<MdNoPhotography />}
+                >
+                  <CardTags>
+                    <CardTag icon={<Rating value={item.stats.rating} small />}>
+                      ({item.stats.ratingCount})
+                    </CardTag>
+                  </CardTags>
+                  <CardTags>
+                    <CardTag icon={<BsDownload />}>
+                      ({item.stats.downloadCount})
+                    </CardTag>
+                    <CardTag icon={<BsHeartFill />}>
+                      ({item.stats.favoriteCount})
+                    </CardTag>
+                  </CardTags>
+                </Card>
+              )}
+            </List>
+            <Pagination
+              current={data.metadata.currentPage}
+              max={data.metadata.totalPages}
+              onSelect={i => {
+                setArgs(args => ({ ...args, page: i }));
+              }}
+            />
+          </>
+        )}
+      </div>
+    </div>
   );
 });
