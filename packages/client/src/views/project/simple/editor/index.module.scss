@@ -16,16 +16,24 @@
   display: flex;
   align-items: center;
   grid-column: 1 / 3;
-  background: var(--grey-300);
+  background: var(--grey-100);
+  padding: 0 1rem;
 
   .settings {
     display: flex;
     flex-direction: row;
     align-items: center;
+    height: 100%;
 
     & > div {
-      min-width: 300px;
+      height: 100%;
       border: none;
+      margin: 0;
+      border-right: 1px solid var(--grey-400);
+      padding-right: 1rem;
+      margin-right: 1rem;
+      padding-top: 0.4rem;
+      min-width: 300px;
     }
   }
 }
@@ -33,7 +41,7 @@
 .projectActions {
   display: flex;
   align-items: center;
-  background: var(--grey-300);
+  background: var(--grey-100);
 
   button {
     font-size: 0;
@@ -65,7 +73,7 @@
 }
 
 .layers {
-  background: var(--grey-300);
+  background: var(--grey-100);
 
   .actions {
     display: flex;
@@ -152,13 +160,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--grey-300);
+  background: var(--grey-100);
 
   button {
     display: block;
     padding: 0.5rem 0;
     font-size: 0;
-    margin-bottom: 2px;
     background: transparent;
     width: 100%;
     border-left: 2px solid transparent;
