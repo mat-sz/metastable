@@ -56,6 +56,9 @@ const config = {
       '!**/node_modules/@img/*-{darwin,linux}-*/**/*',
       '!**/node_modules/@img/*-arm64/**/*',
     ],
+    certificateSubjectName: 'Mat',
+    rfc3161TimeStampServer: 'http://time.certum.pl/',
+    timeStampServer: 'http://time.certum.pl/',
   },
   nsis: {
     oneClick: false,
