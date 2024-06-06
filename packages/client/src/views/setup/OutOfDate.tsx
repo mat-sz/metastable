@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Link } from '$components/link';
 import styles from './index.module.scss';
 
-export const OutOfDate: React.FC = observer(() => {
+export const OutOfDate: React.FC = () => {
   return (
     <div className={styles.setup}>
       <div className={styles.header}>
@@ -19,4 +18,4 @@ export const OutOfDate: React.FC = observer(() => {
       </div>
     </div>
   );
-});
+};

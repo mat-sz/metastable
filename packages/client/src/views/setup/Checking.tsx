@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Loading } from '$components/loading';
 import styles from './index.module.scss';
 
-export const Checking: React.FC = observer(() => {
+export const Checking: React.FC = () => {
   return (
     <div className={styles.setup}>
       <div className={styles.header}>
@@ -13,4 +12,4 @@ export const Checking: React.FC = observer(() => {
       <Loading />
     </div>
   );
-});
+};

@@ -1,9 +1,10 @@
-import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { BsArrowRepeat } from 'react-icons/bs';
 
+import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
-export const ConnectionError: React.FC = observer(() => {
+export const ConnectionError: React.FC = () => {
   return (
     <div className={styles.setup}>
       <div className={styles.header}>
@@ -13,6 +14,15 @@ export const ConnectionError: React.FC = observer(() => {
           connection and try again.
         </div>
       </div>
+      <div className={styles.footer}>
+        <button
+          className={styles.cta}
+          onClick={() => mainStore.checkForUpdates()}
+        >
+          <span>Refresh</span>
+          <BsArrowRepeat />
+        </button>
+      </div>
     </div>
   );
-});
+};
