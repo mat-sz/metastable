@@ -18,6 +18,7 @@ export class Setup extends EventEmitter {
   private _status: SetupStatus['status'] = 'required';
   private _pythonHome: string | undefined = undefined;
   private _packagesDir: string | undefined = undefined;
+  private _bundleVersion: string | undefined = undefined;
 
   private _checked = false;
 
@@ -88,6 +89,7 @@ export class Setup extends EventEmitter {
       packagesDir: this._packagesDir
         ? path.relative(this.metastable.dataRoot, this._packagesDir)
         : undefined,
+      bundleVersion: this._bundleVersion,
     });
 
     const platform = os.platform();
@@ -122,6 +124,8 @@ export class Setup extends EventEmitter {
     const baseRelease = await getLatestReleaseInfo(
       'metastable-studio/bundle-base',
     );
+    this._bundleVersion = baseRelease.name;
+
     const assets = baseRelease.assets.filter(item =>
       item.name.startsWith(
         `${os.platform()}-${os.arch()}-${this.settings?.torchMode || 'cpu'}`,

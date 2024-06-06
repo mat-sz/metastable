@@ -20,6 +20,7 @@ export interface ConfigType {
     mode: 'system' | 'static';
     pythonHome?: string;
     packagesDir?: string;
+    bundleVersion?: string;
   };
   comfy?: {
     args?: string[];
