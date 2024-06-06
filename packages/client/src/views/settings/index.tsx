@@ -36,7 +36,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
           <Tab
             id="about"
-            title={`About ${import.meta.env.VITE_APP_NAME}`}
+            title={`About ${__APP_NAME__}`}
             icon={<img src={logo} alt="Logo" />}
           />
         </Tabs>
@@ -62,8 +62,7 @@ export const Settings: React.FC = observer(() => {
             <VarCategory label="About Metastable">
               <div className={styles.info}>
                 <div>
-                  {import.meta.env.VITE_APP_NAME}{' '}
-                  {import.meta.env.VITE_APP_VERSION}
+                  {__APP_NAME__} {__APP_VERSION__}
                 </div>
                 <Social />
               </div>
@@ -98,8 +97,7 @@ export const Settings: React.FC = observer(() => {
             )}
             <VarCategory label="Credits">
               <div className={styles.info}>
-                {import.meta.env.VITE_APP_NAME} is based on the following open
-                source projects:
+                {__APP_NAME__} is based on the following open source projects:
                 <ul>
                   <li>
                     <Link href="https://github.com/comfyanonymous/ComfyUI">

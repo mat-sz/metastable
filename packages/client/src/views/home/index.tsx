@@ -27,7 +27,7 @@ export const Home: React.FC = observer(() => {
             {!mainStore.config.data?.app?.hideWelcome && (
               <div className={styles.welcome}>
                 <div className={styles.welcomeHeader}>
-                  <h2>Welcome to {import.meta.env.VITE_APP_NAME}</h2>
+                  <h2>Welcome to {__APP_NAME__}</h2>
                   <Button
                     onClick={async () => {
                       const config = mainStore.config;

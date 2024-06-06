@@ -73,7 +73,7 @@ async function createWindow() {
   );
   const metastable = new Metastable(dataRoot, {
     comfyMainPath,
-    version: process.env.VITE_APP_VERSION,
+    version: __APP_VERSION__,
   });
   await metastable.init();
 

@@ -17,6 +17,11 @@ export default defineConfig(({ mode }) => {
     VITE_APP_NAME: info.displayName,
   };
 
+  const define = {
+    __APP_VERSION__: JSON.stringify(info.version),
+    __APP_NAME__: JSON.stringify(info.displayName),
+  };
+
   return {
     server: {
       port: 3000,
@@ -47,6 +52,7 @@ export default defineConfig(({ mode }) => {
                       },
                     },
                   },
+                  define,
                 },
               },
               {
@@ -60,6 +66,7 @@ export default defineConfig(({ mode }) => {
           ]
         : []),
     ],
+    define,
     resolve: {
       ...(isProduction
         ? {

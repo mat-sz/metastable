@@ -14,7 +14,7 @@ export const UpdateAvailable: React.FC<Props> = ({ version }) => {
   return (
     <Modal title="Update available" size="small">
       <div>
-        New version of {import.meta.env.VITE_APP_NAME} is available: {version}
+        New version of {__APP_NAME__} is available: {version}
       </div>
       <div>Would you like to install and restart?</div>
       <ModalActions>
