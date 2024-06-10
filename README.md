@@ -13,6 +13,9 @@
 > This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
 
 > [!NOTE]  
+> [Download Metastable for Windows, macOS and Linux.](https://metastable.studio/download)
+
+> [!NOTE]  
 > [Join the project's Discord server for updates, suggestions and development.](https://discord.gg/Sf9zKaXzXe)
 
 <p align="center">
@@ -29,6 +32,16 @@ Metastable uses code from:
 
 - [comfyanonymous/ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 - [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts)
+
+## Automatic installation
+
+Download an installer from: https://metastable.studio/download
+
+Builds are available for:
+
+- Windows (64-bit only; installer)
+- macOS (64-bit and Apple Silicon; dmg)
+- Linux (64-bit only; AppImage)
 
 ## Manual installation
 
