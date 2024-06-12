@@ -28,6 +28,7 @@ class MainStore {
     samplers: [],
     schedulers: [],
     vram: 0,
+    dataRoot: '/',
   };
   updateInfo: UpdateInfo = {
     canCheckForUpdate: false,
