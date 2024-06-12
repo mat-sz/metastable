@@ -9,3 +9,10 @@ scipy
 tqdm
 psutil
 transformers
+segment_anything
+yapf
+addict
+timm
+spandrel
+sentencepiece
+accelerate
