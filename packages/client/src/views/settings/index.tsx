@@ -4,6 +4,7 @@ import React from 'react';
 import { BsDownload, BsGear } from 'react-icons/bs';
 
 import logo from '$/assets/logo.svg';
+import { API } from '$api';
 import { Link } from '$components/link';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import {
@@ -14,6 +15,7 @@ import {
   VarUI,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Social } from '../common/Social';
 
@@ -66,6 +68,24 @@ export const Settings: React.FC = observer(() => {
                 </div>
                 <Social />
               </div>
+            </VarCategory>
+            <VarCategory label="Storage">
+              <div className={styles.info}>
+                <div>
+                  <strong>Application data is stored at:</strong>{' '}
+                  {mainStore.info.dataRoot}
+                </div>
+              </div>
+              {IS_ELECTRON && (
+                <VarButton
+                  buttonLabel="Reveal in explorer"
+                  onClick={() =>
+                    API.electron.shell.showItemInFolder.mutate(
+                      mainStore.info.dataRoot,
+                    )
+                  }
+                />
+              )}
             </VarCategory>
             {(mainStore.updateInfo.isAutoUpdateAvailable ||
               mainStore.updateInfo.canCheckForUpdate) && (

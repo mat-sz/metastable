@@ -3,6 +3,17 @@
   flex-direction: column;
   overflow: hidden;
 
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > button {
+      margin-top: -0.5rem;
+      padding: 0.5rem;
+    }
+  }
+
   &.small {
     margin: 1rem;
     padding: 1rem;

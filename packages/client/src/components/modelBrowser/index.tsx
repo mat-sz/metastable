@@ -2,15 +2,18 @@ import { Model, ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsFolder } from 'react-icons/bs';
+import { BsFolder, BsFolderFill } from 'react-icons/bs';
 
+import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
+import { IconButton } from '$components/iconButton';
 import { Card, CardMenu, CardMenuItem, List } from '$components/list';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
+import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import styles from './index.module.scss';
 
@@ -71,7 +74,19 @@ export const ModelBrowser: React.FC<Props> = observer(
 
     return (
       <div className={clsx(styles.models, styles[variant])}>
-        <Breadcrumbs value={parts} onChange={setParts} />
+        <div className={styles.header}>
+          <Breadcrumbs value={parts} onChange={setParts} />
+          {IS_ELECTRON && models[0] && (
+            <IconButton
+              title="Reveal in explorer"
+              onClick={() => {
+                API.electron.shell.showItemInFolder.mutate(models[0].file.path);
+              }}
+            >
+              <BsFolderFill />
+            </IconButton>
+          )}
+        </div>
         <List
           small={variant === 'small'}
           items={[...directories, ...models]}

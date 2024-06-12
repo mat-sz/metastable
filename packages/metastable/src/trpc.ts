@@ -145,6 +145,7 @@ export const router = t.router({
       return {
         ...info,
         vram,
+        dataRoot: metastable.dataRoot,
       };
     }),
     updateInfo: t.procedure.query(
