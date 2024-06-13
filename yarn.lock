@@ -1303,6 +1303,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@metastable/model-info@workspace:packages/model-info":
+  version: 0.0.0-use.local
+  resolution: "@metastable/model-info@workspace:packages/model-info"
+  dependencies:
+    "@types/node": "npm:^20.10.3"
+    fflate: "npm:^0.8.2"
+    tsx: "npm:^4.6.2"
+    typescript: "npm:^5.3.2"
+  languageName: unknown
+  linkType: soft
+
 "@metastable/server@workspace:packages/server":
   version: 0.0.0-use.local
   resolution: "@metastable/server@workspace:packages/server"
@@ -4417,6 +4428,13 @@ __metadata:
   dependencies:
     pend: "npm:~1.2.0"
   checksum: 304dd70270298e3ffe3bcc05e6f7ade2511acc278bc52d025f8918b48b6aa3b77f10361bddfadfe2a28163f7af7adbdce96f4d22c31b2f648ba2901f0c5fc20e
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "fflate@npm:0.8.2"
+  checksum: 03448d630c0a583abea594835a9fdb2aaf7d67787055a761515bf4ed862913cfd693b4c4ffd5c3f3b355a70cf1e19033e9ae5aedcca103188aaff91b8bd6e293
   languageName: node
   linkType: hard
 
