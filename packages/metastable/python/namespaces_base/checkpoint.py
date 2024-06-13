@@ -9,6 +9,7 @@ import comfy.utils
 import comfy.model_management
 from .utils import custom, latent_preview
 from comfy.cli_args import LatentPreviewMethod
+from comfy.model_base import ModelType
 
 from rpc import RPC
 
@@ -47,11 +48,16 @@ class CheckpointNamespace:
             clip.clip_layer(None)
         else:
             clip.clip_layer(clip_layer)
+
+        latent_type = "sd"
+        if model.model.model_type == ModelType.FLOW:
+            latent_type = "sd3"
         
         return {
             "model": model,
             "clip": clip,
-            "vae": vae
+            "vae": vae,
+            "latent_type": latent_type
         }
     
     @RPC.autoref

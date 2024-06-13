@@ -81,11 +81,17 @@ export class ComfySession extends (EventEmitter as {
     return new ComfyUpscaleModel(this, data);
   }
 
-  async emptyLatent(width: number, height: number, batchSize?: number) {
+  async emptyLatent(
+    width: number,
+    height: number,
+    batchSize?: number,
+    latentType?: string,
+  ) {
     return (await this.invoke('image:latent.empty', {
       width,
       height,
       batch_size: batchSize,
+      latent_type: latentType,
     })) as ComfyLatent;
   }
 

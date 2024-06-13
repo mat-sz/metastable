@@ -19,6 +19,7 @@ export class ComfyCheckpoint {
       model: RPCRef;
       clip: RPCRef;
       vae: RPCRef;
+      latent_type: string;
     },
   ) {}
 

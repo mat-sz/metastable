@@ -289,6 +289,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
             settings.output.width,
             settings.output.height,
             settings.output.batchSize || 1,
+            checkpoint.data.latent_type,
           );
           break;
         case 'image':
