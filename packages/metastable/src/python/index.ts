@@ -40,6 +40,7 @@ export class PythonInstance {
 
     if (this.pythonHome) {
       env.PYTHONHOME = this.pythonHome;
+      env.PYTHONNOUSERSITE = 'true';
     }
 
     return env;
