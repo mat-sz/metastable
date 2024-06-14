@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { BsUpload } from 'react-icons/bs';
 
 import { useVarUIValue } from './common/VarUIContext';
