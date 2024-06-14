@@ -7,6 +7,16 @@ import styles from './VarImage.module.scss';
 
 export interface IVarImageProps extends IVarBaseInputProps<string> {}
 
+function filterItems(items: DataTransferItemList) {
+  for (const item of items) {
+    if (item.kind === 'file' && item.type.startsWith('image/')) {
+      return item;
+    }
+  }
+
+  return undefined;
+}
+
 /**
  * Image input component. Accepts and provides a blob URL.
  */
@@ -29,13 +39,8 @@ export const VarImage = ({
     errorPath,
   });
 
-  const onFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!e.target.files?.length) {
-        return;
-      }
-
-      const file = e.target.files[0];
+  const onFile = useCallback(
+    (file: File) => {
       const url = URL.createObjectURL(file);
       setCurrentValue(url);
     },
@@ -51,7 +56,28 @@ export const VarImage = ({
       error={currentError}
       column
     >
-      <div className={styles.image}>
+      <div
+        className={styles.image}
+        onDragEnter={e => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const item = filterItems(e.dataTransfer.items);
+          if (item) {
+            e.dataTransfer.dropEffect = 'copy';
+          }
+        }}
+        onDrop={e => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const item = filterItems(e.dataTransfer.items);
+          const file = item?.getAsFile();
+          if (file) {
+            onFile(file);
+          }
+        }}
+      >
         <div
           className={styles.background}
           style={{
@@ -65,7 +91,13 @@ export const VarImage = ({
         <input
           type="file"
           accept="image/*"
-          onChange={onFileChange}
+          onChange={e => {
+            if (!e.target.files?.length) {
+              return;
+            }
+
+            onFile(e.target.files[0]);
+          }}
           title="Image upload"
         />
       </div>
