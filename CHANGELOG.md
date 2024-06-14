@@ -7,6 +7,7 @@
 - In output image displays, a button to select the image as input in the current project was added.
 - In output image displays, a button to delete the image was added.
 - A button to reveal the model directory in file explorer was added.
+- In inpainting mask editor, the right mouse button now erases the mask.
 
 ## Bug fixes
 

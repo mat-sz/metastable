@@ -52,6 +52,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
   const pointerStateRef = useRef<PointerState[]>([]);
   const brushPositionRef = useRef<Point>();
   const pointerActionRef = useRef<string>();
+  const brushOverrideRef = useRef<string>();
   const lastDrawRef = useRef(0);
 
   useEffect(() => {
@@ -257,7 +258,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
       const { tool, brushSettings } = brushStateRef.current;
       const { size, type } = brushSettings;
 
-      if (tool === 'subtract') {
+      if (tool === 'subtract' || brushOverrideRef.current === 'subtract') {
         ctx.globalCompositeOperation = 'destination-out';
       } else {
         ctx.globalCompositeOperation = 'source-over';
@@ -294,10 +295,19 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
       <canvas
         onWheel={zoom}
         onClick={e => e.stopPropagation()}
+        onContextMenu={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         onPointerDown={e => {
           e.preventDefault();
           if (e.pointerType === 'mouse' && e.button !== 1) {
             pointerActionRef.current = 'draw';
+            if (e.button !== 0) {
+              brushOverrideRef.current = 'subtract';
+            } else {
+              brushOverrideRef.current = undefined;
+            }
           } else {
             pointerActionRef.current = 'pan';
           }
@@ -373,6 +383,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
             }
           }
 
+          brushOverrideRef.current = undefined;
           pointerActionRef.current = undefined;
         }}
         draggable={false}
