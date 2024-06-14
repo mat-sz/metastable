@@ -1,19 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import {
-  BsArrowRightSquareFill,
-  BsFolderFill,
-  BsGearFill,
-} from 'react-icons/bs';
 
-import { API } from '$api';
-import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import { ProgressBar } from '$components/progressBar';
-import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
+import { ImageActions } from '../common/ImageActions';
 import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
@@ -27,49 +20,7 @@ export const Images: React.FC = observer(() => {
           <div className={styles.actions}>
             <div>{project.currentOutput.name}</div>
             <div className={styles.buttons}>
-              <IconButton
-                title="Use as input image"
-                onClick={async () => {
-                  if (!project.currentOutput) {
-                    return;
-                  }
-
-                  project.useInputImage(project.currentOutput.image.url);
-                }}
-              >
-                <BsArrowRightSquareFill />
-              </IconButton>
-              {IS_ELECTRON && (
-                <IconButton
-                  title="Reveal in explorer"
-                  onClick={() => {
-                    API.electron.shell.showItemInFolder.mutate(
-                      project.currentOutput!.path,
-                    );
-                  }}
-                >
-                  <BsFolderFill />
-                </IconButton>
-              )}
-              <IconButton
-                title="Load settings from current image"
-                onClick={async () => {
-                  if (!project.currentOutput) {
-                    return;
-                  }
-
-                  const data = await API.project.output.get.query({
-                    projectId: project.id,
-                    name: project.currentOutput.name,
-                  });
-                  const settings = data.metadata as any;
-                  if (settings) {
-                    project.setSettings(settings);
-                  }
-                }}
-              >
-                <BsGearFill />
-              </IconButton>
+              <ImageActions file={project.currentOutput} />
             </div>
           </div>
         )}
