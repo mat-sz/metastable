@@ -4,6 +4,7 @@ import {
   BsArrowRightSquareFill,
   BsFolderFill,
   BsGearFill,
+  BsTrashFill,
 } from 'react-icons/bs';
 
 import { API } from '$api';
@@ -21,8 +22,16 @@ export const ImageActions: React.FC<Props> = ({ file }) => {
   return (
     <>
       <IconButton
+        title="Delete image"
+        onClick={() => {
+          project.deleteOutput(file.name);
+        }}
+      >
+        <BsTrashFill />
+      </IconButton>
+      <IconButton
         title="Use as input image"
-        onClick={async () => {
+        onClick={() => {
           project.useInputImage(file.image.url);
         }}
       >

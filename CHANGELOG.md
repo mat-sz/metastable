@@ -4,8 +4,9 @@
 
 - Support for Stable Diffusion 3 was added.
 - Drag and drop is now supported in image input fields.
-- In image displays, a new button to select an image as input in the current project was added.
-- A button to reveal model directory in explorer was added.
+- In output image displays, a button to select the image as input in the current project was added.
+- In output image displays, a button to delete the image was added.
+- A button to reveal the model directory in file explorer was added.
 
 ## Bug fixes
 

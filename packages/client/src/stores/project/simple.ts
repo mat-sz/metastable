@@ -90,6 +90,15 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     });
   }
 
+  async deleteOutput(name: string) {
+    this.outputs = this.outputs.filter(output => output.name !== name);
+    if (this.currentOutput?.name === name) {
+      this.currentOutput = this.outputs[this.outputs.length - 1];
+    }
+
+    await API.project.output.delete.mutate({ name, projectId: this.id });
+  }
+
   async useInputImage(url: string) {
     const settings = this.settings;
     const res = await fetch(url);
