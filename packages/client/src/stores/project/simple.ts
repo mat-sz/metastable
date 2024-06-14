@@ -90,6 +90,21 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     });
   }
 
+  async useInputImage(url: string) {
+    const settings = this.settings;
+    const res = await fetch(url);
+    const blob = await res.blob();
+
+    if (settings.input.type === 'none') {
+      settings.input.type = 'image';
+    } else {
+      settings.input.mask = undefined;
+    }
+    settings.input.image = URL.createObjectURL(blob);
+
+    this.setSettings(settings);
+  }
+
   setSettings(settings: ProjectSimpleSettings) {
     settings.output.height ||= 512;
     settings.output.width ||= 512;

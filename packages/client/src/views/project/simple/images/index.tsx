@@ -1,6 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsFolderFill, BsGearFill } from 'react-icons/bs';
+import {
+  BsArrowRightSquareFill,
+  BsFolderFill,
+  BsGearFill,
+} from 'react-icons/bs';
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
@@ -23,6 +27,18 @@ export const Images: React.FC = observer(() => {
           <div className={styles.actions}>
             <div>{project.currentOutput.name}</div>
             <div className={styles.buttons}>
+              <IconButton
+                title="Use as input image"
+                onClick={async () => {
+                  if (!project.currentOutput) {
+                    return;
+                  }
+
+                  project.useInputImage(project.currentOutput.image.url);
+                }}
+              >
+                <BsArrowRightSquareFill />
+              </IconButton>
               {IS_ELECTRON && (
                 <IconButton
                   title="Reveal in explorer"

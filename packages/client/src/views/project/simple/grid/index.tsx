@@ -1,6 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsFolderFill, BsGearFill } from 'react-icons/bs';
+import {
+  BsArrowRightSquareFill,
+  BsFolderFill,
+  BsGearFill,
+} from 'react-icons/bs';
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
@@ -50,6 +54,14 @@ export const Grid: React.FC = observer(() => {
           actions={file => {
             return (
               <>
+                <IconButton
+                  title="Use as input image"
+                  onClick={async () => {
+                    project.useInputImage(file.image.url);
+                  }}
+                >
+                  <BsArrowRightSquareFill />
+                </IconButton>
                 {IS_ELECTRON && (
                   <IconButton
                     title="Reveal in explorer"
