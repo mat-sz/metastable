@@ -22,6 +22,12 @@ export const UpdateAvailable: React.FC<Props> = ({ version }) => {
           Close
         </Button>
         <Button
+          variant="secondary"
+          href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md"
+        >
+          View changelog
+        </Button>
+        <Button
           variant="primary"
           onClick={() => {
             API.electron.autoUpdater.install.mutate();

@@ -5,6 +5,7 @@ import { BsDownload, BsGear } from 'react-icons/bs';
 
 import logo from '$/assets/logo.svg';
 import { API } from '$api';
+import { Button } from '$components/button';
 import { Link } from '$components/link';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import {
@@ -97,12 +98,8 @@ export const Settings: React.FC = observer(() => {
                   />
                 )}
                 {mainStore.updateInfo.canCheckForUpdate && (
-                  <>
-                    <VarButton
-                      buttonLabel="Check for updates"
-                      onClick={() => mainStore.checkForUpdates()}
-                    />
-                    <div className={styles.info}>
+                  <div className={styles.info}>
+                    <div>
                       {mainStore.updateInfoReady
                         ? typeof mainStore.updateInfo.isUpToDate === 'undefined'
                           ? 'Unable to check for updates.'
@@ -111,7 +108,15 @@ export const Settings: React.FC = observer(() => {
                             : `New version available: ${mainStore.updateInfo.latestVersion}.`
                         : 'Loading...'}
                     </div>
-                  </>
+                    <div className={styles.buttons}>
+                      <Button onClick={() => mainStore.checkForUpdates()}>
+                        Check for updates
+                      </Button>
+                      <Button href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md">
+                        Changelog
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </VarCategory>
             )}
