@@ -107,7 +107,6 @@ export function unpickle(data: Buffer) {
   let offset = 0;
   while (offset < data.byteLength) {
     const opcode = data.readUInt8(offset++) as PickleOpcode;
-    console.log(PickleOpcode[opcode]);
     switch (opcode) {
       case PickleOpcode.PROTO:
         {

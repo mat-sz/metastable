@@ -29,7 +29,14 @@ function getHeader(stream: ReadStream): Promise<any> {
         buffer.set(chunk.subarray(0, length - offset), offset);
         stream.close();
         const data = textDecoder.decode(buffer);
-        resolve(JSON.parse(data));
+        const json = JSON.parse(data);
+        const metadata = json['__metadata__'];
+        delete json['__metadata__'];
+
+        resolve({
+          metadata,
+          state_dict: json,
+        });
       } else {
         buffer.set(chunk, offset);
         offset += chunk.byteLength;
