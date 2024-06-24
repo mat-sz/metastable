@@ -122,19 +122,33 @@ export const Settings: React.FC = observer(() => {
             )}
             <VarCategory label="Credits">
               <div className={styles.info}>
-                {__APP_NAME__} is based on the following open source projects:
+                {__APP_NAME__} includes code from the following open source
+                projects:
                 <ul>
                   <li>
                     <Link href="https://github.com/comfyanonymous/ComfyUI">
                       ComfyUI
-                    </Link>{' '}
-                    - backend for image generation
+                    </Link>
                   </li>
                   <li>
                     <Link href="https://github.com/Stability-AI/stablediffusion">
                       Stable Diffusion
-                    </Link>{' '}
-                    - open source models for image generation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="https://github.com/cubiq/ComfyUI_IPAdapter_plus">
+                      ComfyUI IPAdapter Plus
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="https://github.com/tencent-ailab/IP-Adapter">
+                      IPAdapter
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="https://github.com/kohya-ss/sd-scripts">
+                      Kohya SD Scripts
+                    </Link>
                   </li>
                 </ul>
               </div>

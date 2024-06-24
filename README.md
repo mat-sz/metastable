@@ -28,9 +28,11 @@ The backend is based on [ComfyUI's backend](https://github.com/comfyanonymous/Co
 
 ## Credits
 
-Metastable uses code from:
+Metastable bundles code from:
 
 - [comfyanonymous/ComfyUI](https://github.com/comfyanonymous/ComfyUI)
+- [cubiq/ComfyUI_IPAdapter_plus](https://github.com/cubiq/ComfyUI_IPAdapter_plus)
+- [tencent-ailab/IP-Adapter](https://github.com/tencent-ailab/IP-Adapter)
 - [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts)
 
 ## Automatic installation
