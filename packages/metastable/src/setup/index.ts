@@ -48,14 +48,29 @@ export class Setup extends EventEmitter {
 
     return {
       os: await getOS(),
-      graphics: graphics.controllers.map(item => ({
-        vendor: item.vendor || 'unknown',
-        vram: item.vram
-          ? item.vram * 1024 * 1024
-          : item.vendor.includes('Apple')
-            ? memory
-            : 0,
-      })),
+      graphics: graphics.controllers.map(item => {
+        const normalized = item.vendor.toLowerCase();
+        let vendor = 'unknown';
+        if (normalized.includes('apple')) {
+          vendor = 'Apple';
+        } else if (
+          normalized.includes('advanced') ||
+          normalized.includes('amd')
+        ) {
+          vendor = 'AMD';
+        } else if (normalized.includes('nvidia')) {
+          vendor = 'NVIDIA';
+        }
+
+        return {
+          vendor,
+          vram: item.vram
+            ? item.vram * 1024 * 1024
+            : vendor === 'Apple'
+              ? memory
+              : 0,
+        };
+      }),
       storage: {
         dataRoot,
         diskPath: usage.diskPath,
