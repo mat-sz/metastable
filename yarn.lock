@@ -1277,6 +1277,7 @@ __metadata:
   resolution: "@metastable/metastable@workspace:packages/metastable"
   dependencies:
     "@metastable/cppzst": "npm:^2.1.0"
+    "@metastable/model-info": "workspace:^"
     "@metastable/types": "npm:*"
     "@trpc/server": "npm:^11.0.0-rc.373"
     "@types/event-stream": "npm:^4.0.5"
@@ -1303,7 +1304,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metastable/model-info@workspace:packages/model-info":
+"@metastable/model-info@workspace:^, @metastable/model-info@workspace:packages/model-info":
   version: 0.0.0-use.local
   resolution: "@metastable/model-info@workspace:packages/model-info"
   dependencies:

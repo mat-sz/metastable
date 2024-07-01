@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@metastable/cppzst": "^2.1.0",
+    "@metastable/model-info": "workspace:^",
     "@trpc/server": "^11.0.0-rc.373",
     "chokidar": "^3.5.3",
     "event-stream": "^4.0.1",

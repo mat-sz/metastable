@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
+import { getModelDetails, ModelDetails } from '@metastable/model-info';
 import { ImageInfo, Model, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
@@ -22,6 +23,7 @@ export class ModelEntity extends FileEntity {
   imageName: string | undefined = undefined;
   simpleName: string;
   modelBaseDir: string | undefined = undefined;
+  details: ModelDetails | undefined = undefined;
 
   constructor(_path: string) {
     super(_path);
@@ -51,6 +53,10 @@ export class ModelEntity extends FileEntity {
     const imagePath = this.imagePath;
     if (imagePath) {
       await generateThumbnail(imagePath);
+    }
+
+    if (this.type === ModelType.CHECKPOINT) {
+      this.details = await getModelDetails(this.path);
     }
   }
 
@@ -107,6 +113,7 @@ export class ModelEntity extends FileEntity {
         size: (await stat(this.path)).size,
       },
       image: this.image,
+      details: this.details,
     };
 
     return json;

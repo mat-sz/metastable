@@ -42,4 +42,5 @@ export interface Model {
   };
   metadata?: ModelInfo;
   image?: ImageInfo;
+  details?: any;
 }

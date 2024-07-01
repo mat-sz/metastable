@@ -2,12 +2,19 @@ import { Model, ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsFolder, BsFolderFill } from 'react-icons/bs';
+import { BsBoxFill, BsFolder, BsFolderFill } from 'react-icons/bs';
 
 import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { IconButton } from '$components/iconButton';
-import { Card, CardMenu, CardMenuItem, List } from '$components/list';
+import {
+  Card,
+  CardMenu,
+  CardMenuItem,
+  CardTag,
+  CardTags,
+  List,
+} from '$components/list';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
 import { mainStore } from '$stores/MainStore';
@@ -120,6 +127,13 @@ export const ModelBrowser: React.FC<Props> = observer(
                   onSelect(item);
                 }}
               >
+                <CardTags>
+                  {item.details?.baseType && (
+                    <CardTag icon={<BsBoxFill />}>
+                      {item.details?.baseType?.toUpperCase()}
+                    </CardTag>
+                  )}
+                </CardTags>
                 {variant !== 'small' && (
                   <CardMenu>
                     <CardMenuItem
