@@ -23,11 +23,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
     <div className={styles.card} onClick={onClick}>
       {imageUrl ? (
         <div className={styles.image} style={{ backgroundColor: color }}>
-          <img
-            crossOrigin="anonymous"
-            className={styles.background}
-            src={imageUrl}
-          />
+          <img crossOrigin="anonymous" src={imageUrl} />
         </div>
       ) : (
         <div className={styles.icon}>
