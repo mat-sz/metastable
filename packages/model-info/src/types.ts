@@ -3,6 +3,7 @@ export enum ModelType {
   SD2,
   SD3,
   SDXL,
+  SVD,
   STABLE_CASCADE,
   PIXART,
   UNKNOWN,

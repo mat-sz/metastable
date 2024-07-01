@@ -26,6 +26,10 @@ export async function getModelInfo(modelPath: string) {
     if (state['y_embedder.y_embedding']) {
       type = ModelType.PIXART;
     } else if (
+      state['model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight']
+    ) {
+      type = ModelType.SVD;
+    } else if (
       state['model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight']
     ) {
       type = ModelType.SD3;
