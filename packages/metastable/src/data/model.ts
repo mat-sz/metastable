@@ -55,8 +55,16 @@ export class ModelEntity extends FileEntity {
       await generateThumbnail(imagePath);
     }
 
-    if (this.type === ModelType.CHECKPOINT) {
-      this.details = await getModelDetails(this.path);
+    if (
+      this.type === ModelType.CHECKPOINT ||
+      this.type === ModelType.LORA ||
+      this.type === ModelType.CONTROLNET
+    ) {
+      try {
+        this.details = await getModelDetails(this.path);
+      } catch (e) {
+        console.warn(e);
+      }
     }
   }
 

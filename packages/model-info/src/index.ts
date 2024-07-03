@@ -1,4 +1,4 @@
-import { CheckpointType, ModelDetails } from '@metastable/types';
+import { CheckpointType, ModelDetails, ModelType } from '@metastable/types';
 
 import { readPytorch } from './pytorch.js';
 import { readSafetensors } from './safetensors.js';
@@ -17,45 +17,107 @@ async function getDict(modelPath: string) {
   }
 }
 
+interface StatePattern {
+  key: string;
+  details: ModelDetails;
+}
+
+const PATTERNS: StatePattern[] = [
+  {
+    key: 'add_embedding.linear_1.bias',
+    details: {
+      checkpointType: CheckpointType.SDXL,
+      type: ModelType.CONTROLNET,
+    },
+  },
+  {
+    key: 'input_blocks.4.0.emb_layers.1.bias',
+    details: {
+      checkpointType: CheckpointType.SD1,
+      type: ModelType.CONTROLNET,
+    },
+  },
+  {
+    key: 'lora_unet_down_blocks_0_downsamplers_0_conv.alpha',
+    details: {
+      checkpointType: CheckpointType.SD2,
+      type: ModelType.LORA,
+    },
+  },
+  {
+    key: 'lora_te_text_model_encoder_layers_0_mlp_fc1.alpha',
+    details: {
+      checkpointType: CheckpointType.SD1,
+      type: ModelType.LORA,
+    },
+  },
+  {
+    key: 'lora_te1_text_model_encoder_layers_0_mlp_fc1.alpha',
+    details: {
+      checkpointType: CheckpointType.SDXL,
+      type: ModelType.LORA,
+    },
+  },
+  {
+    key: 'y_embedder.y_embedding',
+    details: {
+      checkpointType: CheckpointType.PIXART,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+  {
+    key: 'model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight',
+    details: {
+      checkpointType: CheckpointType.SVD,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+  {
+    key: 'model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight',
+    details: {
+      checkpointType: CheckpointType.SD3,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+  {
+    key: 'conditioner.embedders.1.model.transformer.resblocks.21.attn.out_proj.bias',
+    details: {
+      checkpointType: CheckpointType.SDXL,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+  {
+    key: 'cond_stage_model.model.transformer.resblocks.14.attn.out_proj.weight',
+    details: {
+      checkpointType: CheckpointType.SD2,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+  {
+    key: 'model.diffusion_model.output_blocks.9.1.transformer_blocks.0.norm3.weight',
+    details: {
+      checkpointType: CheckpointType.SD1,
+      type: ModelType.CHECKPOINT,
+    },
+  },
+];
+
 export async function getModelDetails(
   modelPath: string,
 ): Promise<ModelDetails> {
   const dict = await getDict(modelPath);
-  let checkpointType: CheckpointType | undefined = undefined;
+  let details: ModelDetails = {};
 
   if (dict['state_dict']) {
     const state = dict['state_dict'];
 
-    if (state['y_embedder.y_embedding']) {
-      checkpointType = CheckpointType.PIXART;
-    } else if (
-      state['model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight']
-    ) {
-      checkpointType = CheckpointType.SVD;
-    } else if (
-      state['model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight']
-    ) {
-      checkpointType = CheckpointType.SD3;
-    } else if (
-      state[
-        'conditioner.embedders.1.model.transformer.resblocks.21.attn.out_proj.bias'
-      ]
-    ) {
-      checkpointType = CheckpointType.SDXL;
-    } else if (
-      state[
-        'cond_stage_model.model.transformer.resblocks.14.attn.out_proj.weight'
-      ]
-    ) {
-      checkpointType = CheckpointType.SD2;
-    } else if (
-      state[
-        'model.diffusion_model.output_blocks.9.1.transformer_blocks.0.norm3.weight'
-      ]
-    ) {
-      checkpointType = CheckpointType.SD1;
+    for (const pattern of PATTERNS) {
+      if (state[pattern.key]) {
+        details = { ...details, ...pattern.details };
+        break;
+      }
     }
   }
 
-  return { checkpointType };
+  return details;
 }

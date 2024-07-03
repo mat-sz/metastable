@@ -22,11 +22,22 @@ function getHeader(stream: ReadStream): Promise<any> {
       if (!length) {
         length = Number(chunk.readBigUint64LE(0));
         buffer = Buffer.alloc(length);
-        buffer.set(chunk.subarray(8), 0);
-        offset += chunk.byteLength - 8;
+        if (chunk.byteLength - 8 >= length) {
+          buffer.set(chunk.subarray(8, 8 + length), 0);
+          done = true;
+        } else {
+          buffer.set(chunk.subarray(8), 0);
+          offset += chunk.byteLength - 8;
+        }
       } else if (offset + chunk.byteLength > length) {
         done = true;
         buffer.set(chunk.subarray(0, length - offset), offset);
+      } else {
+        buffer.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+
+      if (done) {
         stream.close();
         const data = textDecoder.decode(buffer);
         const json = JSON.parse(data);
@@ -37,9 +48,6 @@ function getHeader(stream: ReadStream): Promise<any> {
           metadata,
           state_dict: json,
         });
-      } else {
-        buffer.set(chunk, offset);
-        offset += chunk.byteLength;
       }
     });
   });
