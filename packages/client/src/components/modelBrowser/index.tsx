@@ -128,9 +128,9 @@ export const ModelBrowser: React.FC<Props> = observer(
                 }}
               >
                 <CardTags>
-                  {item.details?.baseType && (
+                  {item.details?.checkpointType && (
                     <CardTag icon={<BsBoxFill />}>
-                      {item.details?.baseType?.toUpperCase()}
+                      {item.details?.checkpointType?.toUpperCase()}
                     </CardTag>
                   )}
                 </CardTags>

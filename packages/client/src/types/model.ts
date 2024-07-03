@@ -1,6 +1,6 @@
-import { DownloadSettings, ModelInfo, ModelType } from '@metastable/types';
+import { DownloadSettings, ModelMetadata, ModelType } from '@metastable/types';
 
-export interface DownloadableModel extends ModelInfo {
+export interface DownloadableModel extends ModelMetadata {
   type: ModelType;
   downloads: DownloadSettings[];
   recommended?: boolean;

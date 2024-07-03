@@ -181,7 +181,7 @@ export class DownloadModelTask extends BaseDownloadTask {
     const state = await super.execute();
 
     if (state === TaskState.SUCCESS) {
-      const { imageUrl, info } = this.settings;
+      const { imageUrl, metadata } = this.settings;
 
       const model = new ModelEntity(this.savePath);
       await tryMkdir(path.join(path.dirname(this.savePath), '.metastable'));
@@ -213,9 +213,9 @@ export class DownloadModelTask extends BaseDownloadTask {
         } catch {}
       }
 
-      if (info) {
+      if (metadata) {
         try {
-          await model.metadata.set(info);
+          await model.metadata.set(metadata);
         } catch {}
       }
     }

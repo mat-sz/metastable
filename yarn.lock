@@ -1308,6 +1308,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/model-info@workspace:packages/model-info"
   dependencies:
+    "@metastable/types": "workspace:^"
     "@types/node": "npm:^20.10.3"
     fflate: "npm:^0.8.2"
     tsx: "npm:^4.6.2"
@@ -1340,7 +1341,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metastable/types@npm:*, @metastable/types@workspace:packages/types":
+"@metastable/types@npm:*, @metastable/types@workspace:^, @metastable/types@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@metastable/types@workspace:packages/types"
   dependencies:

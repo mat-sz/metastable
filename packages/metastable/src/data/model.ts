@@ -2,8 +2,8 @@ import EventEmitter from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
-import { getModelDetails, ModelDetails } from '@metastable/model-info';
-import { ImageInfo, Model, ModelType } from '@metastable/types';
+import { getModelDetails } from '@metastable/model-info';
+import { ImageInfo, Model, ModelDetails, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
 import { FileEntity } from './common.js';

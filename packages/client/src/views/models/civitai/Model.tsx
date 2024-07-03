@@ -37,7 +37,7 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                   url: primaryFile.downloadUrl,
                   size: primaryFile.sizeKB * 1024,
                   imageUrl,
-                  info: {
+                  metadata: {
                     name: model.name,
                     nsfw: model.nsfw,
                     description: model.description,

@@ -19,7 +19,17 @@ export enum ModelType {
   VAE_APPROX = 'vae_approx',
 }
 
-export interface ModelInfo {
+export enum CheckpointType {
+  SD1 = 'sd1',
+  SD2 = 'sd2',
+  SD3 = 'sd3',
+  SDXL = 'sdxl',
+  SVD = 'svd',
+  STABLE_CASCADE = 'stable_cascade',
+  PIXART = 'pixart',
+}
+
+export interface ModelMetadata {
   name?: string;
   description?: string;
   source?: string;
@@ -28,6 +38,11 @@ export interface ModelInfo {
   samplerSettings?: Partial<ProjectSimpleSettings['sampler']>;
   homepage?: string;
   baseModel?: string;
+}
+
+export interface ModelDetails {
+  checkpointType?: CheckpointType;
+  type?: ModelType;
 }
 
 export interface Model {
@@ -40,7 +55,7 @@ export interface Model {
     parts: string[];
     size: number;
   };
-  metadata?: ModelInfo;
+  metadata?: ModelMetadata;
   image?: ImageInfo;
-  details?: any;
+  details?: ModelDetails;
 }
