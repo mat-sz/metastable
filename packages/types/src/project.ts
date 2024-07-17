@@ -145,5 +145,6 @@ export interface ProjectPromptTaskData extends ProjectTaskData {
   step?: string;
   stepValue?: number;
   stepMax?: number;
+  stepTime?: Record<string, number>;
   outputs?: ImageFile[];
 }

@@ -163,13 +163,24 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return { projectId: this.project.name };
   }
 
+  private stepStart: number | undefined;
+  private stepName: string | undefined;
+
   private step(name: string, max?: number) {
+    const stepTime = { ...this.data.stepTime };
+    if (this.stepStart && this.stepName) {
+      stepTime[this.stepName] = Date.now() - this.stepStart;
+    }
+    this.stepStart = Date.now();
+    this.stepName = name;
+
     this.data = {
       ...this.data,
       step: name,
       stepValue: 0,
       stepMax: max,
       preview: undefined,
+      stepTime,
     };
   }
 

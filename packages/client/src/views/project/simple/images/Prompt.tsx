@@ -24,6 +24,7 @@ export const Prompt: React.FC = observer(() => {
   const { open } = useFileInput(onOpen);
   const validationResult = project.validate();
   const isValid = !validationResult.errors.length;
+  const sampleTime = project.stepTime?.sample;
 
   useHotkeys('Ctrl+Enter', () => {
     project.request();
@@ -44,6 +45,9 @@ export const Prompt: React.FC = observer(() => {
       <div className={styles.actions}>
         <div>
           <Button onClick={open}>Load prompt from file</Button>
+          {!!sampleTime && (
+            <div className={styles.hint}>Last sample time: {sampleTime} ms</div>
+          )}
         </div>
         <div>
           <div className={styles.hint}>

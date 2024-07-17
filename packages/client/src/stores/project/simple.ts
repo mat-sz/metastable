@@ -1,6 +1,5 @@
 import {
   Project as APIProject,
-  ImageFile,
   ModelType,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
@@ -61,6 +60,7 @@ export function defaultSettings(): ProjectSimpleSettings {
 export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
+  stepTime: Record<string, number> | undefined = undefined;
 
   constructor(
     data: Omit<APIProject, 'settings'>,
@@ -77,6 +77,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       prompts: computed,
       firstPrompt: computed,
       onPromptDone: action,
+      stepTime: observable,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -85,7 +86,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
         task.data.projectId === this.id &&
         task.data.outputs
       ) {
-        this.onPromptDone(task.data.outputs);
+        this.onPromptDone(task);
       }
     });
   }
@@ -425,9 +426,12 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     this.settings = settings;
   }
 
-  onPromptDone(outputs: ImageFile[]) {
+  onPromptDone(task: Task<ProjectPromptTaskData>) {
+    const outputs = task.data.outputs!;
     this.currentOutput = outputs[0];
     this.outputs.push(...outputs);
+
+    this.stepTime = task.data.stepTime;
 
     if (this.addOutputToEditor) {
       this.editor?.addImage(outputs[0].image.url, {
