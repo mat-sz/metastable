@@ -1,12 +1,13 @@
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import {
   BsArrowRepeat,
   BsBrush,
   BsCircleFill,
   BsEraser,
+  BsSaveFill,
   BsSquareFill,
-  BsXLg,
 } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
@@ -54,6 +55,23 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
   const pointerActionRef = useRef<string>();
   const brushOverrideRef = useRef<string>();
   const lastDrawRef = useRef(0);
+
+  const reset = useCallback(() => {
+    const maskCanvas = maskCanvasRef.current;
+    if (!maskCanvas) {
+      return;
+    }
+
+    const ctx = maskCanvas.getContext('2d')!;
+    ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }, []);
+
+  const saveAndClose = useCallback(() => {
+    onClose(maskCanvasRef.current?.toDataURL());
+  }, [onClose]);
+
+  useHotkeys('escape', saveAndClose);
+  useHotkeys('backspace', reset);
 
   useEffect(() => {
     brushStateRef.current = { tool, brushSettings };
@@ -436,25 +454,11 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
           />
         </VarUI>
         <div className={styles.actions}>
-          <IconButton
-            onClick={() => {
-              const maskCanvas = maskCanvasRef.current;
-              if (!maskCanvas) {
-                return;
-              }
-
-              const ctx = maskCanvas.getContext('2d')!;
-              ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-            }}
-          >
+          <IconButton onClick={reset}>
             <BsArrowRepeat />
           </IconButton>
-          <IconButton
-            onClick={() => {
-              onClose(maskCanvasRef.current?.toDataURL());
-            }}
-          >
-            <BsXLg />
+          <IconButton onClick={saveAndClose}>
+            <BsSaveFill />
           </IconButton>
         </div>
       </div>
