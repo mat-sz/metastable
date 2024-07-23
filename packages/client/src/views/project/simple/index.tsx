@@ -47,10 +47,11 @@ export const SimpleProjectView: React.FC = observer(() => {
                       : undefined,
                   }}
                   onClick={() => {
-                    runInAction(() => {
-                      project.mode = 'images';
-                      project.currentOutput = undefined;
-                    });
+                    if (item.state === TaskState.FAILED) {
+                      project.selectTask(item);
+                    } else {
+                      project.selectOutput(undefined);
+                    }
                   }}
                 >
                   <div className={styles.status}>
@@ -81,10 +82,7 @@ export const SimpleProjectView: React.FC = observer(() => {
                   )})`,
                 }}
                 onClick={() => {
-                  runInAction(() => {
-                    project.mode = 'images';
-                    project.currentOutput = output;
-                  });
+                  project.selectOutput(output);
                 }}
               />
             ))}

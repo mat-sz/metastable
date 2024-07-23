@@ -1,5 +1,6 @@
 import {
   Project as APIProject,
+  ImageFile,
   ModelType,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
@@ -61,6 +62,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
   stepTime: Record<string, number> | undefined = undefined;
+  currentTask: Task<ProjectPromptTaskData> | undefined = undefined;
 
   constructor(
     data: Omit<APIProject, 'settings'>,
@@ -78,6 +80,9 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       firstPrompt: computed,
       onPromptDone: action,
       stepTime: observable,
+      currentTask: observable,
+      selectOutput: action,
+      selectTask: action,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -314,7 +319,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       this.settings.sampler.seed = randomSeed();
     }
 
-    this.currentOutput = undefined;
+    this.selectOutput(undefined);
 
     const settings = toJS(this.settings);
     const width = settings.output.width;
@@ -426,9 +431,21 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     this.settings = settings;
   }
 
+  selectTask(task?: Task<ProjectPromptTaskData>) {
+    this.mode = 'images';
+    this.currentTask = task;
+    this.currentOutput = undefined;
+  }
+
+  selectOutput(output?: ImageFile) {
+    this.mode = 'images';
+    this.currentOutput = output;
+    this.currentTask = undefined;
+  }
+
   onPromptDone(task: Task<ProjectPromptTaskData>) {
     const outputs = task.data.outputs!;
-    this.currentOutput = outputs[0];
+    this.selectOutput(outputs[0]);
     this.outputs.push(...outputs);
 
     this.stepTime = task.data.stepTime;

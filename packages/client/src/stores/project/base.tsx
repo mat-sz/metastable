@@ -54,9 +54,11 @@ export class BaseProject<T = any> {
   }
 
   get tasks() {
-    return mainStore.tasks.queues.project?.filter(
-      task => task.data?.projectId === this.id,
-    );
+    return [
+      ...mainStore.tasks.queues.project?.filter(
+        task => task.data?.projectId === this.id,
+      ),
+    ].reverse();
   }
 
   get firstTask() {
