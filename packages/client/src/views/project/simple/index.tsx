@@ -39,7 +39,9 @@ export const SimpleProjectView: React.FC = observer(() => {
             <ul className={styles.queue}>
               {project.prompts.map(item => (
                 <li
-                  className={styles.item}
+                  className={clsx(styles.item, {
+                    [styles.failed]: item.state === TaskState.FAILED,
+                  })}
                   key={item.id}
                   style={{
                     backgroundImage: item.data.preview

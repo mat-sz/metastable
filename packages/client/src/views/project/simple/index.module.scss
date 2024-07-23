@@ -89,4 +89,8 @@
     background-color: var(--grey-400);
     color: var(--grey-900);
   }
+
+  &.failed {
+    color: var(--red-900);
+  }
 }
