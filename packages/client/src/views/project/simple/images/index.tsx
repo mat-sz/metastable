@@ -1,8 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
+import { Button } from '$components/button';
 import { ImagePreview } from '$components/imagePreview';
 import { ProgressBar } from '$components/progressBar';
+import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
@@ -47,7 +49,18 @@ export const Images: React.FC = observer(() => {
             <div className={styles.progressPreview}>
               <div>
                 <div>Image generation failed.</div>
-                <pre>{project.currentTask?.log}...</pre>
+                <pre>{project.currentTask?.log}</pre>
+                <div>
+                  <Button
+                    onClick={() => {
+                      const id = project.currentTask!.id;
+                      project.selectTask(undefined);
+                      mainStore.tasks.dismiss('project', id);
+                    }}
+                  >
+                    Dismiss
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
