@@ -40,7 +40,6 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                   metadata: {
                     name: model.name,
                     nsfw: model.nsfw,
-                    description: model.description,
                     source: 'civitai',
                     sourceId: `${model.id}`,
                     homepage: `https://civitai.com/models/${model.id}`,

@@ -64,7 +64,7 @@ export const router = t.router({
           type: z.nativeEnum(ModelType),
           name: z.string(),
           imageUrl: z.string().optional(),
-          info: z.any().optional(),
+          metadata: z.any().optional(),
         }),
       )
       .mutation(async ({ input, ctx: { metastable } }) => {
