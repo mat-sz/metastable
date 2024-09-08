@@ -1,0 +1,46 @@
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+
+import { Button } from '$components/button';
+import { Label } from '$components/label';
+import { Modal, ModalActions, useModal } from '$components/modal';
+import { BaseProject } from '$stores/project';
+
+interface Props {
+  project: BaseProject;
+}
+
+export const ProjectDuplicate: React.FC<Props> = observer(({ project }) => {
+  const { close } = useModal();
+  const [projectName, setProjectName] = useState(project.name);
+
+  return (
+    <Modal title="Duplicate project" size="small">
+      <div>Choose a name for the new project.</div>
+      <div>
+        <Label label="New name" required>
+          <input
+            type="text"
+            value={projectName}
+            onChange={e => setProjectName(e.target.value)}
+          />
+        </Label>
+      </div>
+      <ModalActions>
+        <Button variant="secondary" onClick={() => close()}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            close();
+            const name = projectName.trim();
+            project.duplicate(name);
+          }}
+        >
+          Update
+        </Button>
+      </ModalActions>
+    </Modal>
+  );
+});

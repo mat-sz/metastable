@@ -101,7 +101,9 @@ export class BaseProject<T = any> {
 
   async delete() {
     mainStore.projects.close(this.id);
+    mainStore.projects.removeRecent(this.id);
     await API.project.delete.mutate({ projectId: this.id });
+    mainStore.projects.refresh();
   }
 
   async close(force = false) {
@@ -111,6 +113,15 @@ export class BaseProject<T = any> {
     }
 
     mainStore.projects.close(this.id);
+  }
+
+  async duplicate(name?: string) {
+    await mainStore.projects.create(
+      name ?? this.name,
+      this.type,
+      this.temporary,
+      this.settings,
+    );
   }
 
   async save(name?: string, temporary?: boolean) {
@@ -133,6 +144,7 @@ export class BaseProject<T = any> {
         }
 
         if (!json.temporary) {
+          mainStore.projects.removeRecent(id);
           mainStore.projects.pushRecent(json.id);
         }
 

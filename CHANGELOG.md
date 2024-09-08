@@ -1,3 +1,19 @@
+# 0.0.3 (upcoming)
+
+## Features
+
+- Added base model (e.g. SD1, SDXL) detection for models.
+- Added display of error logs for failed generation tasks.
+- Added sampling time statistics display.
+- Added keyboard shortcuts to mask editor.
+- Added menu to projects that allows the user to rename, delete and duplicate the project.
+
+## Bug fixes
+
+- Resolved an issue with AMD GPU detection.
+- Fixed model metadata saving in downloads.
+- Fixed usage of `Ctrl+Enter` shortcut in prompt fields.
+
 # 0.0.2 (2024-06-15)
 
 ## Features

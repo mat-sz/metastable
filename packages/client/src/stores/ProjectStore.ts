@@ -69,7 +69,24 @@ export class ProjectStore {
     );
   }
 
-  async create(name: string = 'Untitled', type = 'simple', temporary = false) {
+  removeRecent(id: string) {
+    const recentArray: string[] =
+      tryParse(localStorage.getItem(LS_RECENT)) || [];
+    const recent = Array.isArray(recentArray)
+      ? recentArray.filter(itemId => itemId !== id)
+      : [];
+    localStorage.setItem(
+      LS_RECENT,
+      JSON.stringify(recent.slice(0, MAX_RECENT_ITEMS)),
+    );
+  }
+
+  async create(
+    name: string = 'Untitled',
+    type = 'simple',
+    temporary = false,
+    settings: any = defaultSettings(),
+  ) {
     if (this.loading) {
       return;
     }
@@ -79,7 +96,6 @@ export class ProjectStore {
     }
 
     this.loading = true;
-    const settings = defaultSettings();
     const project = {
       name,
       type,

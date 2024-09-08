@@ -1,12 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsClockHistory, BsFiles, BsPlus, BsXLg } from 'react-icons/bs';
+import { BsClockHistory, BsFiles, BsXLg } from 'react-icons/bs';
 
 import { Button } from '$components/button';
-import { Card, List } from '$components/list';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
+import { ProjectList } from './ProjectList';
 import { Social } from '../common/Social';
 
 export const Home: React.FC = observer(() => {
@@ -45,52 +45,17 @@ export const Home: React.FC = observer(() => {
                 <Social />
               </div>
             )}
-            <List
-              header={<h2>Recent</h2>}
-              items={['new', ...mainStore.projects.recent]}
-            >
-              {item =>
-                typeof item === 'string' ? (
-                  <Card
-                    key={item}
-                    name="New empty project"
-                    icon={<BsPlus />}
-                    onClick={() =>
-                      mainStore.projects.create(undefined, 'simple', true)
-                    }
-                  />
-                ) : (
-                  <Card
-                    name={item.name}
-                    key={item.id}
-                    imageUrl={item.lastOutput?.image.thumbnailUrl}
-                    onClick={() => {
-                      mainStore.projects.open(item.id);
-                    }}
-                  />
-                )
-              }
-            </List>
+            <ProjectList
+              title="Recent"
+              projects={['new', ...mainStore.projects.recent]}
+            />
           </TabPanel>
           <TabPanel id="all">
-            <List
-              header={<h2>All projects</h2>}
-              items={mainStore.projects.all}
-              quickFilter={(data, search) =>
-                mainStore.searchFn(data, search, item => item.name)
-              }
-            >
-              {item => (
-                <Card
-                  name={item.name}
-                  key={item.id}
-                  imageUrl={item.lastOutput?.image.thumbnailUrl}
-                  onClick={() => {
-                    mainStore.projects.open(item.id);
-                  }}
-                />
-              )}
-            </List>
+            <ProjectList
+              title="All projects"
+              searchable
+              projects={mainStore.projects.all}
+            />
           </TabPanel>
         </TabContent>
       </TabView>
