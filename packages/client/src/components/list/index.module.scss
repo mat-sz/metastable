@@ -231,23 +231,6 @@
   }
 }
 
-.menu {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-}
-
-.menuItems {
-  position: absolute;
-  top: 2rem;
-  right: 0.25rem;
-  background: var(--grey-300);
-  border-radius: 5px;
-  overflow: hidden;
-  padding: 0.25rem;
-}
-
 .menuToggle {
   position: absolute;
   top: 0;
@@ -255,14 +238,9 @@
   background: none;
   padding: 0.25rem 0.5rem;
   font-size: 1.5rem;
+  z-index: 999;
 
   &:hover {
     background: none !important;
   }
-}
-
-.menuItem {
-  width: 100%;
-  background: none;
-  justify-content: flex-start;
 }

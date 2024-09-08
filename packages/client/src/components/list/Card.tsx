@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
+import { useContextMenu } from 'use-context-menu';
 
 import styles from './index.module.scss';
 
@@ -9,6 +10,7 @@ interface CardProps {
   icon?: React.ReactNode;
   onClick?: () => void;
   color?: string;
+  menu?: React.ReactNode;
 }
 
 export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
@@ -18,9 +20,16 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   icon,
   onClick,
   color,
+  menu,
 }) => {
+  const { contextMenu, onContextMenu } = useContextMenu(menu);
+
   return (
-    <div className={styles.card} onClick={onClick}>
+    <div
+      className={styles.card}
+      onClick={onClick}
+      onContextMenu={menu ? onContextMenu : undefined}
+    >
       {imageUrl ? (
         <div className={styles.image} style={{ backgroundColor: color }}>
           <img crossOrigin="anonymous" src={imageUrl} />
@@ -34,6 +43,14 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
         <div className={styles.info}>{children}</div>
         <div className={styles.name}>{name}</div>
       </div>
+      {!!menu && (
+        <>
+          <button onClick={onContextMenu} className={styles.menuToggle}>
+            <BsThreeDots />
+          </button>
+          {contextMenu}
+        </>
+      )}
     </div>
   );
 };

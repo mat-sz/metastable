@@ -3,18 +3,12 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsBoxFill, BsFolder, BsFolderFill } from 'react-icons/bs';
+import { ContextMenuItem } from 'use-context-menu';
 
 import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { IconButton } from '$components/iconButton';
-import {
-  Card,
-  CardMenu,
-  CardMenuItem,
-  CardTag,
-  CardTags,
-  List,
-} from '$components/list';
+import { Card, CardTag, CardTags, List } from '$components/list';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
 import { mainStore } from '$stores/MainStore';
@@ -126,6 +120,36 @@ export const ModelBrowser: React.FC<Props> = observer(
                 onClick={() => {
                   onSelect(item);
                 }}
+                menu={
+                  variant !== 'small' ? (
+                    <>
+                      <ContextMenuItem
+                        onSelect={() => {
+                          modalStore.show(
+                            <ModelEdit
+                              name={item.file.name}
+                              type={item.type}
+                            />,
+                          );
+                        }}
+                      >
+                        Edit
+                      </ContextMenuItem>
+                      <ContextMenuItem
+                        onSelect={() => {
+                          modalStore.show(
+                            <ModelDelete
+                              name={item.file.name}
+                              type={item.type}
+                            />,
+                          );
+                        }}
+                      >
+                        Delete
+                      </ContextMenuItem>
+                    </>
+                  ) : undefined
+                }
               >
                 <CardTags>
                   {item.details?.checkpointType && (
@@ -134,31 +158,6 @@ export const ModelBrowser: React.FC<Props> = observer(
                     </CardTag>
                   )}
                 </CardTags>
-                {variant !== 'small' && (
-                  <CardMenu>
-                    <CardMenuItem
-                      onClick={() => {
-                        modalStore.show(
-                          <ModelEdit name={item.file.name} type={item.type} />,
-                        );
-                      }}
-                    >
-                      Edit
-                    </CardMenuItem>
-                    <CardMenuItem
-                      onClick={() => {
-                        modalStore.show(
-                          <ModelDelete
-                            name={item.file.name}
-                            type={item.type}
-                          />,
-                        );
-                      }}
-                    >
-                      Delete
-                    </CardMenuItem>
-                  </CardMenu>
-                )}
               </Card>
             )
           }
