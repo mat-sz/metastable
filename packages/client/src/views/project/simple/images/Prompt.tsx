@@ -26,9 +26,13 @@ export const Prompt: React.FC = observer(() => {
   const isValid = !validationResult.errors.length;
   const sampleTime = project.stepTime?.sample;
 
-  useHotkeys('Ctrl+Enter', () => {
-    project.request();
-  });
+  useHotkeys(
+    'ctrl+enter',
+    () => {
+      project.request();
+    },
+    { enableOnFormTags: true },
+  );
 
   return (
     <VarUI
