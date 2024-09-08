@@ -4,13 +4,11 @@ import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 
-export interface IVarInputTypeProps extends IVarBaseInputProps<string> {}
-
 export const VarInputType = ({
   path,
   onChange,
   label,
-}: IVarInputTypeProps): JSX.Element => {
+}: IVarBaseInputProps<string>): JSX.Element => {
   const [currentValue, setCurrentValue] = useVarUIValue({
     path,
     onChange,

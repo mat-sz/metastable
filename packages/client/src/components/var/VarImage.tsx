@@ -5,8 +5,6 @@ import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarImage.module.scss';
 
-export interface IVarImageProps extends IVarBaseInputProps<string> {}
-
 function filterItems(items: DataTransferItemList) {
   for (const item of items) {
     if (item.kind === 'file' && item.type.startsWith('image/')) {
@@ -30,7 +28,7 @@ export const VarImage = ({
   className,
   error,
   errorPath,
-}: IVarImageProps): JSX.Element => {
+}: IVarBaseInputProps<string>): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
     fallbackValue: value,

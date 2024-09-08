@@ -11,7 +11,7 @@
     "setup:amd": "yarn setup:amd:rocm5.6",
     "rebuild": "electron-rebuild",
     "build": "tsc",
-    "lint": "run -T eslint src --ext ts,tsx"
+    "lint": "run -T eslint src"
   },
   "devDependencies": {
     "@metastable/types": "*",

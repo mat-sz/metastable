@@ -2,13 +2,11 @@ import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 
-export interface IVarImageModeProps extends IVarBaseInputProps<string> {}
-
 export const VarImageMode = ({
   path,
   onChange,
   label,
-}: IVarImageModeProps): JSX.Element => {
+}: IVarBaseInputProps<string>): JSX.Element => {
   const [currentValue, setCurrentValue] = useVarUIValue({
     path,
     onChange,

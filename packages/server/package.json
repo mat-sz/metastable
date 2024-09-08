@@ -7,7 +7,7 @@
     "start": "node lib/index.js",
     "dev": "SERVER_USE_PROXY=1 tsx src/index.ts",
     "build": "tsc",
-    "lint": "run -T eslint src --ext ts,tsx"
+    "lint": "run -T eslint src"
   },
   "devDependencies": {
     "@fastify/http-proxy": "^9.4.0",

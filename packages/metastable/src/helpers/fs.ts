@@ -203,7 +203,6 @@ export function getMetadataDirectory(filePath: string) {
   return path.join(dirName, METADATA_DIRECTORY_NAME);
 }
 
-// eslint-disable-next-line no-control-regex
 const FILENAME_REPLACE = /[<>:"/\\|?*\u0000-\u001F]/g;
 const FILENAME_NEEDS_PREFIX = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 

@@ -10,7 +10,7 @@ export async function isGNULibc() {
   try {
     const text = await fs.readFile('/usr/bin/ldd', { encoding: 'utf8' });
     return text.includes('Free Software Foundation');
-  } catch (e) {
+  } catch {
     return false;
   }
 }

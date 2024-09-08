@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "lint": "run -T eslint src --ext ts,tsx"
+    "lint": "run -T eslint src"
   },
   "devDependencies": {
     "@types/node": "^20.10.3",
