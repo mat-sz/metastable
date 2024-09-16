@@ -8,6 +8,7 @@
 - Added keyboard shortcuts to mask editor.
 - Added menu to projects that allows the user to rename, delete and duplicate the project.
 - Added a progress bar to app icon to display the current prompt progress.
+- Added notifications to be displayed after prompt completion.
 
 ## Bug fixes
 

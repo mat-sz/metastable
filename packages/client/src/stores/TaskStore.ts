@@ -1,7 +1,14 @@
-import { DownloadData, DownloadSettings, Task } from '@metastable/types';
+import {
+  DownloadData,
+  DownloadSettings,
+  Task,
+  TaskState,
+  TaskUpdateEvent,
+} from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
+import { mainStore } from './MainStore';
 
 export class TaskStore {
   queues: Record<string, Task<any>[]> = {
@@ -36,6 +43,7 @@ export class TaskStore {
         const task = this.find(event.queueId, event.id);
         if (task) {
           this.emit('update', task);
+          this.dispatchNotification(event, task);
         }
       },
     });
@@ -128,6 +136,25 @@ export class TaskStore {
   emit(event: 'update' | 'delete', data: Task<any>) {
     for (const listener of this.eventListeners[event]) {
       listener(data);
+    }
+  }
+
+  dispatchNotification(event: TaskUpdateEvent, task: Task<any>) {
+    if (event.queueId === 'project' && task.data?.projectId) {
+      if (
+        event.state === TaskState.SUCCESS ||
+        event.state === TaskState.FAILED
+      ) {
+        mainStore.notify(
+          `${task.data.projectId}`,
+          `Generation ${
+            event.state === TaskState.SUCCESS ? 'successful' : 'failed'
+          }`,
+          () => {
+            mainStore.projects.select(task.data.projectId);
+          },
+        );
+      }
     }
   }
 }
