@@ -2,6 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
+import { TaskState } from '@metastable/types';
 import { app, BrowserWindow, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
@@ -129,4 +130,30 @@ async function createWindow() {
   }
 
   win.setBackgroundColor('#11111a');
+
+  const PROGRESS_BAR_INDETERMINATE = os.platform() === 'win32' ? 2 : 0;
+  let lastTaskId: string | undefined = undefined;
+  metastable.tasks.on('update', e => {
+    if (e.queueId === 'project') {
+      if (e.data?.stepMax || e.state === TaskState.RUNNING) {
+        let progress = PROGRESS_BAR_INDETERMINATE;
+        if (e.data?.stepValue && e.data?.stepMax) {
+          progress = e.data.stepValue / e.data.stepMax;
+        }
+
+        lastTaskId = e.id;
+        win.setProgressBar(progress);
+      }
+
+      if (e.state && e.state !== TaskState.RUNNING && lastTaskId === e.id) {
+        win.setProgressBar(-1);
+      }
+    }
+  });
+
+  metastable.tasks.on('delete', e => {
+    if (lastTaskId === e.id) {
+      win.setProgressBar(-1);
+    }
+  });
 }
