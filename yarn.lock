@@ -39,7 +39,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.24.5":
+"@babel/core@npm:^7.24.5, @babel/core@npm:^7.24.7":
   version: 7.25.2
   resolution: "@babel/core@npm:7.25.2"
   dependencies:
@@ -179,6 +179,17 @@ __metadata:
   bin:
     parser: ./bin/babel-parser.js
   checksum: f88a0e895dbb096fd37c4527ea97d12b5fc013720602580a941ac3a339698872f0c911e318c292b184c36b5fbe23b612f05aff9d24071bc847c7b1c21552c41d
+  languageName: node
+  linkType: hard
+
+"@babel/plugin-transform-arrow-functions@npm:^7.24.7":
+  version: 7.24.7
+  resolution: "@babel/plugin-transform-arrow-functions@npm:7.24.7"
+  dependencies:
+    "@babel/helper-plugin-utils": "npm:^7.24.7"
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 6ac05a54e5582f34ac6d5dc26499e227227ec1c7fa6fc8de1f3d40c275f140d3907f79bbbd49304da2d7008a5ecafb219d0b71d78ee3290ca22020d878041245
   languageName: node
   linkType: hard
 
@@ -1236,6 +1247,7 @@ __metadata:
     electron: "npm:^31.6.0"
     electron-builder: "npm:25.0.5"
     electron-updater: "npm:6.1.8"
+    electron-vite: "npm:^2.3.0"
     eslint-plugin-react-hooks: "npm:^4.6.2"
     eslint-plugin-react-refresh: "npm:^0.4.11"
     exifreader: "npm:^4.22.1"
@@ -1264,8 +1276,6 @@ __metadata:
     use-context-menu: "npm:^0.4.13"
     vite: "npm:^5.4.5"
     vite-bundle-visualizer: "npm:^1.1.0"
-    vite-plugin-electron: "npm:^0.28.7"
-    vite-plugin-electron-renderer: "npm:^0.14.5"
     vite-plugin-native: "npm:^2.2.2"
   languageName: unknown
   linkType: soft
@@ -3783,6 +3793,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-vite@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "electron-vite@npm:2.3.0"
+  dependencies:
+    "@babel/core": "npm:^7.24.7"
+    "@babel/plugin-transform-arrow-functions": "npm:^7.24.7"
+    cac: "npm:^6.7.14"
+    esbuild: "npm:^0.21.5"
+    magic-string: "npm:^0.30.10"
+    picocolors: "npm:^1.0.1"
+  peerDependencies:
+    "@swc/core": ^1.0.0
+    vite: ^4.0.0 || ^5.0.0
+  peerDependenciesMeta:
+    "@swc/core":
+      optional: true
+  bin:
+    electron-vite: bin/electron-vite.js
+  checksum: 7a8e4358a9b2053bd90c530f001b28837044ced7b8579bedb6002eb2be94d206d986d7f177da9ff93d805facf60e78d1e487ed88b097e4a6afab06f33afef6ac
+  languageName: node
+  linkType: hard
+
 "electron@npm:^31.6.0":
   version: 31.6.0
   resolution: "electron@npm:31.6.0"
@@ -3983,7 +4015,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.21.3":
+"esbuild@npm:^0.21.3, esbuild@npm:^0.21.5":
   version: 0.21.5
   resolution: "esbuild@npm:0.21.5"
   dependencies:
@@ -6244,7 +6276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:^0.30.5":
+"magic-string@npm:^0.30.10, magic-string@npm:^0.30.5":
   version: 0.30.11
   resolution: "magic-string@npm:0.30.11"
   dependencies:
@@ -9132,25 +9164,6 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: 0807e6501ac7763e0efa2b4bd484ce99fb207e92c98624c9f8999d1f6727ac026e457994260fa7fdb7060d87546d197081e46a705d05b0136a38b6f03715cbc2
-  languageName: node
-  linkType: hard
-
-"vite-plugin-electron-renderer@npm:^0.14.5":
-  version: 0.14.5
-  resolution: "vite-plugin-electron-renderer@npm:0.14.5"
-  checksum: b00a75799b9c8088887877feaf62a1cc05074ffb87bc1785ceb7283bb0b7e5d97db4630c866b13820eee9054d6faef4db471296a4589cd61f0a5704fbe2b7397
-  languageName: node
-  linkType: hard
-
-"vite-plugin-electron@npm:^0.28.7":
-  version: 0.28.7
-  resolution: "vite-plugin-electron@npm:0.28.7"
-  peerDependencies:
-    vite-plugin-electron-renderer: "*"
-  peerDependenciesMeta:
-    vite-plugin-electron-renderer:
-      optional: true
-  checksum: c80a1cba6a0c0c556319781816e0c8b0f3a3baec21a81484b6dff480fe5604e94c800b0d56a506cde3c8b361f05dde3614c6a00df9b11d740453ec880034f081
   languageName: node
   linkType: hard
 

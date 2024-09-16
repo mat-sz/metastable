@@ -8,12 +8,12 @@ import { createIPCHandler } from 'trpc-electron/main';
 
 setUseFileUrl(true);
 
-process.env.DIST = path.join(__dirname, '../dist');
+process.env.DIST = path.join(import.meta.dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
   ? process.env.DIST
   : path.join(process.env.DIST, '../public');
 
-const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+const ELECTRON_RENDERER_URL = process.env['ELECTRON_RENDERER_URL'];
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -95,7 +95,7 @@ async function createWindow() {
     trafficLightPosition: { x: 16, y: 16 },
     backgroundColor: '#11111a',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(import.meta.dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
       devTools: true,
@@ -122,8 +122,8 @@ async function createWindow() {
     app.quit();
   });
 
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
+  if (ELECTRON_RENDERER_URL) {
+    win.loadURL(ELECTRON_RENDERER_URL);
   } else {
     win.loadFile(path.join(process.env.DIST!, 'index.html'));
   }

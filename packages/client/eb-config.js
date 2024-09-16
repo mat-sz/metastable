@@ -16,7 +16,7 @@ const globalIgnore = [
   '!**/node_modules/@metastable/cppzst/bin/**/*.node',
 ];
 
-const globalFiles = ['dist', 'dist-electron', ...globalIgnore];
+const globalFiles = ['dist', 'out', ...globalIgnore];
 
 const config = {
   appId: 'studio.metastable.main',

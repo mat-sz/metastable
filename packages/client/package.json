@@ -7,14 +7,14 @@
   "private": true,
   "type": "module",
   "version": "0.0.2",
-  "main": "dist-electron/main.cjs",
+  "main": "out/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --mode production",
     "lint": "run -T eslint src",
     "preview": "vite preview",
-    "electron:start": "vite --mode electron",
-    "electron:build": "yarn build:deps && vite build --mode production-electron && electron-builder --config eb-config.js",
+    "electron:start": "electron-vite dev",
+    "electron:build": "yarn build:deps && electron-vite build --mode production && electron-builder --config eb-config.js",
     "analyze": "vite-bundle-visualizer"
   },
   "husky": {
@@ -48,6 +48,7 @@
     "clsx": "^2.0.0",
     "electron": "^31.6.0",
     "electron-builder": "25.0.5",
+    "electron-vite": "^2.3.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.11",
     "exifreader": "^4.22.1",
@@ -74,8 +75,6 @@
     "use-context-menu": "^0.4.13",
     "vite": "^5.4.5",
     "vite-bundle-visualizer": "^1.1.0",
-    "vite-plugin-electron": "^0.28.7",
-    "vite-plugin-electron-renderer": "^0.14.5",
     "vite-plugin-native": "^2.2.2"
   }
 }
