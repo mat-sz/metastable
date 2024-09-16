@@ -575,6 +575,24 @@ export const router = t.router({
           },
         );
       }),
+      onFocusChange: electronProcedure.subscription(({ ctx: { win } }) => {
+        return observable<{ isFocused: boolean }>(emit => {
+          const refresh = () => {
+            emit.next({
+              isFocused: win.isFocused(),
+            });
+          };
+
+          refresh();
+          win.on('focus', refresh);
+          win.on('blur', refresh);
+
+          return () => {
+            win.off('focus', refresh);
+            win.off('blur', refresh);
+          };
+        });
+      }),
       minimize: electronProcedure.mutation(({ ctx: { win } }) => {
         win.minimize();
       }),

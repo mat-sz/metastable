@@ -32,6 +32,7 @@ export interface ConfigType {
   };
   ui?: {
     fuzzySearch?: boolean;
+    notifications?: boolean;
   };
   generation?: {
     preview?: boolean;

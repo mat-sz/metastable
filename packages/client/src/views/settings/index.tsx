@@ -47,6 +47,31 @@ export const Settings: React.FC = observer(() => {
           <TabPanel id="general">
             <VarCategory label="User interface">
               <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />
+              {mainStore.notificationPermission !== 'denied' ? (
+                <VarToggle
+                  path="ui.notifications"
+                  label="Enable notifications"
+                  onChange={value => {
+                    if (value) {
+                      mainStore.checkNotificationPermission();
+                    }
+                  }}
+                />
+              ) : (
+                <>
+                  <VarToggle
+                    disabled
+                    value={false}
+                    label="Enable notifications"
+                  />
+                  <div className={styles.info}>
+                    <div>
+                      Notification permission has been rejected. To enable
+                      notifications, check your system settings.
+                    </div>
+                  </div>
+                </>
+              )}
             </VarCategory>
             <VarCategory label="Generation">
               <VarToggle path="generation.preview" label="Enable previews" />

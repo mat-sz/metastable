@@ -36,9 +36,12 @@ class MainStore {
 
   setup = new SetupStore();
 
+  isFocused = false;
   isMaximized = false;
   isFullScreen = false;
   trainingQueue: { id: string }[] = [];
+
+  notificationPermission = Notification.permission;
 
   backendStatus: BackendStatus = 'starting';
   infoReady = false;
@@ -59,6 +62,13 @@ class MainStore {
           runInAction(() => {
             this.isMaximized = isMaximized;
             this.isFullScreen = isFullScreen;
+          });
+        },
+      });
+      API.electron.window.onFocusChange.subscribe(undefined, {
+        onData: ({ isFocused }) => {
+          runInAction(() => {
+            this.isFocused = isFocused;
           });
         },
       });
@@ -133,6 +143,14 @@ class MainStore {
     return '(Unknown)';
   }
 
+  get focused() {
+    if (IS_ELECTRON) {
+      return this.isFocused;
+    }
+
+    return document.visibilityState === 'visible';
+  }
+
   get project() {
     return this.projects.current;
   }
@@ -144,6 +162,36 @@ class MainStore {
     }
 
     return true;
+  }
+
+  async checkNotificationPermission() {
+    try {
+      await Notification.requestPermission();
+    } catch {
+      //
+    }
+
+    runInAction(() => {
+      this.notificationPermission = Notification.permission;
+    });
+  }
+
+  notify(title: string, body: string, onClick?: () => void) {
+    if (
+      Notification.permission !== 'granted' ||
+      !this.config.data?.ui?.notifications
+    ) {
+      return;
+    }
+
+    if (this.focused) {
+      return;
+    }
+
+    const notification = new Notification(title, { body });
+    if (onClick) {
+      notification.addEventListener('click', onClick);
+    }
   }
 
   exit(force = false) {

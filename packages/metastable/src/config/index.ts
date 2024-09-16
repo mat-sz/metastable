@@ -14,6 +14,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   },
   ui: {
     fuzzySearch: true,
+    notifications: false,
   },
   app: {
     autoUpdate: true,
