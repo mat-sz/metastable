@@ -1,4 +1,6 @@
 .category {
+  padding-top: 1rem;
+
   &.collapsible {
     .title {
       cursor: pointer;
@@ -29,8 +31,6 @@
       font-size: 0.8rem;
     }
   }
-
-  padding-top: 1rem;
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--grey-400);
