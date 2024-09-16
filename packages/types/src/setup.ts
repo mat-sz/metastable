@@ -7,9 +7,7 @@ export interface Requirement {
   satisfied: boolean;
 }
 
-export interface SetupStatus {
-  status: 'required' | 'done' | 'in_progress';
-}
+export type SetupStatus = 'required' | 'done' | 'in_progress';
 
 export interface SetupOS {
   version: {
@@ -49,10 +47,3 @@ export interface SetupSettings {
   downloads: DownloadSettings[];
   torchMode: 'cuda' | 'rocm' | 'directml' | 'cpu';
 }
-
-export interface SetupStatusEvent {
-  event: 'setup.status';
-  data: SetupStatus;
-}
-
-export type SetupEvent = SetupStatusEvent;

@@ -29,18 +29,16 @@ export class SuperTask<T = any> extends BaseTask<T> {
     });
 
     if (this.options.forwardProgress) {
-      this.queue.on('event', event => {
-        if (event.event === 'task.update') {
-          const count = this.queue.tasks.length;
-          const completed = this.queue.tasks.filter(
-            task => task.state === TaskState.SUCCESS,
-          ).length;
+      this.queue.on('update', event => {
+        const count = this.queue.tasks.length;
+        const completed = this.queue.tasks.filter(
+          task => task.state === TaskState.SUCCESS,
+        ).length;
 
-          if (completed >= count) {
-            this.progress = 1;
-          } else {
-            this.progress = (completed + (event.data.progress || 0)) / count;
-          }
+        if (completed >= count) {
+          this.progress = 1;
+        } else {
+          this.progress = (completed + (event.progress || 0)) / count;
         }
       });
     }

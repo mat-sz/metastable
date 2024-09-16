@@ -1,9 +1,13 @@
 import {
-  AnyEvent,
   BackendStatus,
   LogItem,
   Model,
   ModelType,
+  SetupStatus,
+  TaskCreateEvent,
+  TaskDeleteEvent,
+  TaskLogEvent,
+  TaskUpdateEvent,
   UpdateInfo,
   Utilization,
 } from '@metastable/types';
@@ -72,19 +76,6 @@ export const router = t.router({
       }),
   },
   instance: {
-    onEvent: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<AnyEvent>(emit => {
-        const onEvent = (data: AnyEvent) => {
-          emit.next(data);
-        };
-
-        metastable.on('event', onEvent);
-
-        return () => {
-          metastable.off('event', onEvent);
-        };
-      });
-    }),
     onUtilization: t.procedure.subscription(({ ctx: { metastable } }) => {
       return observable<Utilization>(emit => {
         const onEvent = (data: Utilization) => {
@@ -250,6 +241,19 @@ export const router = t.router({
       }),
   },
   setup: {
+    onStatus: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<SetupStatus>(emit => {
+        const onEvent = (status: SetupStatus) => {
+          emit.next(status);
+        };
+
+        metastable.setup.on('status', onEvent);
+
+        return () => {
+          metastable.setup.off('status', onEvent);
+        };
+      });
+    }),
     status: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.status();
     }),
@@ -479,6 +483,58 @@ export const router = t.router({
     },
   },
   task: {
+    onCreate: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<TaskCreateEvent>(emit => {
+        const onEvent = (event: TaskCreateEvent) => {
+          emit.next(event);
+        };
+
+        metastable.tasks.on('create', onEvent);
+
+        return () => {
+          metastable.tasks.off('create', onEvent);
+        };
+      });
+    }),
+    onUpdate: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<TaskUpdateEvent>(emit => {
+        const onEvent = (event: TaskUpdateEvent) => {
+          emit.next(event);
+        };
+
+        metastable.tasks.on('update', onEvent);
+
+        return () => {
+          metastable.tasks.off('update', onEvent);
+        };
+      });
+    }),
+    onDelete: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<TaskDeleteEvent>(emit => {
+        const onEvent = (event: TaskDeleteEvent) => {
+          emit.next(event);
+        };
+
+        metastable.tasks.on('delete', onEvent);
+
+        return () => {
+          metastable.tasks.off('delete', onEvent);
+        };
+      });
+    }),
+    onLog: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<TaskLogEvent>(emit => {
+        const onEvent = (event: TaskLogEvent) => {
+          emit.next(event);
+        };
+
+        metastable.tasks.on('log', onEvent);
+
+        return () => {
+          metastable.tasks.off('log', onEvent);
+        };
+      });
+    }),
     all: t.procedure.query(({ ctx: { metastable } }) => {
       return metastable.tasks.all();
     }),

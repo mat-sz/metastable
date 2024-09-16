@@ -244,29 +244,25 @@ export class MultiDownloadTask extends SuperTask<{
   }
 
   async init() {
-    this.queue.on('event', event => {
-      switch (event.event) {
-        case 'task.log':
-          this.appendLog(event.data.log);
-          break;
-        case 'task.update': {
-          const size = this.queue.tasks.reduce(
-            (value, task) => value + (task.data.size || 0),
-            0,
-          );
-          const offset = this.queue.tasks.reduce(
-            (value, task) => value + (task.data.offset || 0),
-            0,
-          );
-          const speed = this.queue.tasks.reduce(
-            (value, task) =>
-              task.data.speed > value ? task.data.speed : value,
-            0,
-          );
-          this.progress = size === 0 ? 0 : offset / size;
-          this.data = { speed, size, offset };
-        }
-      }
+    this.queue.on('log', event => {
+      this.appendLog(event.log);
+    });
+
+    this.queue.on('update', () => {
+      const size = this.queue.tasks.reduce(
+        (value, task) => value + (task.data.size || 0),
+        0,
+      );
+      const offset = this.queue.tasks.reduce(
+        (value, task) => value + (task.data.offset || 0),
+        0,
+      );
+      const speed = this.queue.tasks.reduce(
+        (value, task) => (task.data.speed > value ? task.data.speed : value),
+        0,
+      );
+      this.progress = size === 0 ? 0 : offset / size;
+      this.data = { speed, size, offset };
     });
 
     for (const item of this.items) {

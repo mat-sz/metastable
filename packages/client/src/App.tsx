@@ -31,7 +31,7 @@ export const App: React.FC = observer(() => {
     return <div className="app">Loading...</div>;
   }
 
-  if (mainStore.setup?.status?.status !== 'done') {
+  if (mainStore.setup?.status !== 'done') {
     return (
       <UIWrapper>
         <Main hideStatus>

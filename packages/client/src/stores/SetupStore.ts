@@ -25,7 +25,7 @@ interface SetupItemState {
 }
 
 export class SetupStore {
-  status: SetupStatus | undefined = undefined;
+  status: SetupStatus = 'required';
   details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
 
@@ -53,6 +53,17 @@ export class SetupStore {
 
   async refresh() {
     const status = await API.setup.status.query();
+
+    if (status !== 'done') {
+      API.setup.onStatus.subscribe(undefined, {
+        onData: status => {
+          runInAction(() => {
+            this.status = status;
+          });
+        },
+      });
+    }
+
     runInAction(() => {
       this.status = status;
     });

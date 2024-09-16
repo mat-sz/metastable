@@ -39,41 +39,23 @@ export interface TaskQueue<T = any> {
   tasks: Task<T>[];
 }
 
-export interface TaskCreateEvent<T = any> {
-  event: 'task.create';
-  data: {
-    id: string;
-    queueId: string;
-  } & Task<T>;
+export interface TaskCreateEvent<T = any> extends Task<T> {
+  id: string;
+  queueId: string;
 }
 
-export interface TaskUpdateEvent<T = any> {
-  event: 'task.update';
-  data: {
-    id: string;
-    queueId: string;
-  } & Partial<Task<T>>;
+export interface TaskUpdateEvent<T = any> extends Partial<Task<T>> {
+  id: string;
+  queueId: string;
 }
 
 export interface TaskDeleteEvent {
-  event: 'task.delete';
-  data: {
-    id: string;
-    queueId: string;
-  };
+  id: string;
+  queueId: string;
 }
 
 export interface TaskLogEvent {
-  event: 'task.log';
-  data: {
-    id: string;
-    queueId: string;
-    log: string;
-  };
+  id: string;
+  queueId: string;
+  log: string;
 }
-
-export type TaskEvent =
-  | TaskCreateEvent
-  | TaskUpdateEvent
-  | TaskDeleteEvent
-  | TaskLogEvent;

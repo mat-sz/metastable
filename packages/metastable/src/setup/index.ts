@@ -11,11 +11,18 @@ import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
 import type { Metastable } from '../index.js';
 import * as disk from '../sysinfo/disk.js';
+import { TypedEventEmitter } from '../types.js';
 
-export class Setup extends EventEmitter {
+export type SetupEvents = {
+  status: (status: SetupStatus) => void;
+};
+
+export class Setup extends (EventEmitter as {
+  new (): TypedEventEmitter<SetupEvents>;
+}) {
   settings: SetupSettings | undefined = undefined;
   skipPythonSetup: boolean = false;
-  private _status: SetupStatus['status'] = 'required';
+  private _status: SetupStatus = 'required';
   private _pythonHome: string | undefined = undefined;
   private _packagesDir: string | undefined = undefined;
   private _bundleVersion: string | undefined = undefined;
@@ -35,9 +42,7 @@ export class Setup extends EventEmitter {
       }
     }
 
-    return {
-      status: this._status,
-    };
+    return this._status;
   }
 
   async details(): Promise<SetupDetails> {
@@ -81,10 +86,7 @@ export class Setup extends EventEmitter {
   }
 
   private async emitStatus() {
-    this.emit('event', {
-      event: 'setup.status',
-      data: await this.status(),
-    });
+    this.emit('status', await this.status());
   }
 
   private async done() {

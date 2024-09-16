@@ -4,12 +4,7 @@ import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
 
-import {
-  AnyEvent,
-  BackendStatus,
-  InstanceInfo,
-  LogItem,
-} from '@metastable/types';
+import { BackendStatus, InstanceInfo, LogItem } from '@metastable/types';
 import es from 'event-stream';
 import { nanoid } from 'nanoid/non-secure';
 
@@ -24,7 +19,6 @@ const baseDir = path.join(
 );
 
 type BackendEvents = {
-  event: (event: AnyEvent) => void;
   log: (data: LogItem) => void;
   reset: () => void;
   status: (status: BackendStatus) => void;

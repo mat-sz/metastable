@@ -2,12 +2,22 @@ import EventEmitter from 'events';
 
 import { Task } from '@metastable/types';
 
-import { BaseQueue } from './queue.js';
+import { BaseQueue, QueueTaskEvents } from './queue.js';
+import { TypedEventEmitter } from '../types.js';
 
 export * from './queue.js';
 export * from './task.js';
 
-export class Tasks extends EventEmitter {
+const FORWARDED_EVENTS: (keyof QueueTaskEvents)[] = [
+  'create',
+  'update',
+  'delete',
+  'log',
+];
+
+export class Tasks extends (EventEmitter as {
+  new (): TypedEventEmitter<QueueTaskEvents>;
+}) {
   queues: Record<string, BaseQueue> = {
     downloads: new BaseQueue('downloads'),
     setup: new BaseQueue('setup', { stopOnFailure: true }),
@@ -18,7 +28,11 @@ export class Tasks extends EventEmitter {
     super();
 
     for (const value of Object.values(this.queues)) {
-      value.on('event', event => this.emit('event', event));
+      for (const eventName of FORWARDED_EVENTS) {
+        value.on(eventName, (event: any) => {
+          this.emit(eventName, event);
+        });
+      }
     }
   }
 

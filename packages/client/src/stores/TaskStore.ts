@@ -1,9 +1,4 @@
-import {
-  DownloadData,
-  DownloadSettings,
-  Task,
-  TaskEvent,
-} from '@metastable/types';
+import { DownloadData, DownloadSettings, Task } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
@@ -24,6 +19,45 @@ export class TaskStore {
   constructor() {
     makeAutoObservable(this);
     this.refresh();
+
+    API.task.onCreate.subscribe(undefined, {
+      onData: event => {
+        this.updateQueue(event.queueId, queue => [
+          ...queue,
+          event as Task<any>,
+        ]);
+      },
+    });
+
+    API.task.onUpdate.subscribe(undefined, {
+      onData: event => {
+        this.update(event);
+
+        const task = this.find(event.queueId, event.id);
+        if (task) {
+          this.emit('update', task);
+        }
+      },
+    });
+
+    API.task.onDelete.subscribe(undefined, {
+      onData: event => {
+        const task = this.find(event.queueId, event.id);
+        if (task) {
+          this.emit('delete', task);
+        }
+
+        this.updateQueue(event.queueId, queue =>
+          queue.filter(item => item.id !== event.id),
+        );
+      },
+    });
+
+    API.task.onLog.subscribe(undefined, {
+      onData: event => {
+        this.appendLog(event.queueId, event.id, event.log);
+      },
+    });
   }
 
   on(event: 'update' | 'delete', listener: (task: Task<any>) => void) {
@@ -94,41 +128,6 @@ export class TaskStore {
   emit(event: 'update' | 'delete', data: Task<any>) {
     for (const listener of this.eventListeners[event]) {
       listener(data);
-    }
-  }
-
-  onMessage({ event, data }: TaskEvent) {
-    switch (event) {
-      case 'task.create':
-        this.updateQueue(data.queueId, queue => [...queue, data]);
-        break;
-      case 'task.log':
-        this.appendLog(data.queueId, data.id, data.log);
-        break;
-      case 'task.update':
-        this.update(data);
-        {
-          const task = this.queues[data.queueId].find(
-            task => task.id === data.id,
-          );
-          if (task) {
-            this.emit('update', task);
-          }
-        }
-        break;
-      case 'task.delete':
-        {
-          const task = this.queues[data.queueId].find(
-            task => task.id === data.id,
-          );
-          if (task) {
-            this.emit('delete', task);
-          }
-        }
-        this.updateQueue(data.queueId, queue =>
-          queue.filter(item => item.id !== data.id),
-        );
-        break;
     }
   }
 }

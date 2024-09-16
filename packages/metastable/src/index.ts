@@ -3,7 +3,6 @@ import os from 'os';
 import path from 'path';
 
 import {
-  AnyEvent,
   BackendStatus,
   DownloadSettings,
   LogItem,
@@ -36,7 +35,6 @@ import { Tasks } from './tasks/index.js';
 import { TypedEventEmitter } from './types.js';
 
 type MetastableEvents = {
-  event: (event: AnyEvent) => void;
   utilization: (data: Utilization) => void;
   backendLog: (data: LogItem[]) => void;
   backendStatus: (status: BackendStatus) => void;
@@ -58,16 +56,6 @@ export class Metastable extends (EventEmitter as {
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(25);
 
-  onEvent = async (event: AnyEvent) => {
-    this.emit('event', event);
-
-    if (event.event === 'task.update' && event.data.queueId === 'project') {
-      // Hide prompt updates, so preview URLs don't obscure other important events.
-      return;
-    }
-    console.log(`[${new Date().toISOString()}]`, event);
-  };
-
   constructor(
     public readonly dataRoot: string,
     public readonly settings: {
@@ -85,8 +73,6 @@ export class Metastable extends (EventEmitter as {
       ProjectEntity,
     );
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
-    this.setup.on('event', this.onEvent);
-    this.tasks.on('event', this.onEvent);
 
     setTimeout(() => {
       this.refreshUtilization();
@@ -243,7 +229,7 @@ export class Metastable extends (EventEmitter as {
     this.kohya?.stopAll();
 
     this.kohya = new Kohya(this.python!);
-    this.kohya.on('event', this.onEvent);
+    // this.kohya.on('event', this.onEvent);
   }
 
   async restartComfy() {
@@ -267,7 +253,6 @@ export class Metastable extends (EventEmitter as {
     );
 
     const comfy = this.comfy;
-    comfy.on('event', this.onEvent);
     comfy.on('status', status => this.setStatus(status));
 
     comfy.on('log', e => {

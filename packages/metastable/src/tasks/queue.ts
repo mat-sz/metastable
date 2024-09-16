@@ -1,12 +1,26 @@
 import { EventEmitter } from 'events';
 
-import { Task, TaskEvent, TaskQueue, TaskState } from '@metastable/types';
+import {
+  Task,
+  TaskCreateEvent,
+  TaskDeleteEvent,
+  TaskLogEvent,
+  TaskQueue,
+  TaskState,
+  TaskUpdateEvent,
+} from '@metastable/types';
 
 import { BaseTask } from './task.js';
 import { TypedEventEmitter } from '../types.js';
 
-export type BaseQueueEvents = {
-  event: (event: TaskEvent) => void;
+export type QueueTaskEvents = {
+  create: (event: TaskCreateEvent) => void;
+  update: (event: TaskUpdateEvent) => void;
+  delete: (event: TaskDeleteEvent) => void;
+  log: (event: TaskLogEvent) => void;
+};
+
+export type BaseQueueEvents = QueueTaskEvents & {
   empty: () => void;
   failed: () => void;
 };
@@ -47,32 +61,23 @@ export class BaseQueue<T = any>
 
   add(task: BaseTask<T>) {
     this.#tasks.push(task);
-    this.emit('event', {
-      event: 'task.create',
-      data: {
-        queueId: this.id,
-        ...task.toJSON(),
-      },
+    this.emit('create', {
+      queueId: this.id,
+      ...task.toJSON(),
     });
 
     task.on('update', (data: Partial<Task<T>>) => {
-      this.emit('event', {
-        event: 'task.update',
-        data: {
-          id: task.id,
-          queueId: this.id,
-          ...data,
-        },
+      this.emit('update', {
+        id: task.id,
+        queueId: this.id,
+        ...data,
       });
     });
     task.on('log', (data: string) => {
-      this.emit('event', {
-        event: 'task.log',
-        data: {
-          id: task.id,
-          queueId: this.id,
-          log: data,
-        },
+      this.emit('log', {
+        id: task.id,
+        queueId: this.id,
+        log: data,
       });
     });
 
@@ -146,12 +151,9 @@ export class BaseQueue<T = any>
       item.state !== TaskState.CANCELLING
     ) {
       this.#tasks = this.#tasks.filter(item => item.id !== id);
-      this.emit('event', {
-        event: 'task.delete',
-        data: {
-          id: item.id,
-          queueId: this.id,
-        },
+      this.emit('delete', {
+        id: item.id,
+        queueId: this.id,
       });
     }
   }

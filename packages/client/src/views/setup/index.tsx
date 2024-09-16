@@ -17,7 +17,7 @@ export const Setup: React.FC = observer(() => {
     return <OutOfDate />;
   }
 
-  if (mainStore.setup.status?.status == 'in_progress') {
+  if (mainStore.setup.status == 'in_progress') {
     return <Step2 />;
   } else {
     return <Step1 />;

@@ -1,5 +1,4 @@
 import {
-  AnyEvent,
   BackendStatus,
   InstanceInfo,
   ModelType,
@@ -84,11 +83,6 @@ class MainStore {
       };
     }
 
-    API.instance.onEvent.subscribe(undefined, {
-      onData: data => {
-        this.onMessage(data as any);
-      },
-    });
     API.instance.onBackendStatus.subscribe(undefined, {
       onData: status => {
         this.backendStatus = status;
@@ -197,25 +191,6 @@ class MainStore {
     }
 
     return this.backendStatus;
-  }
-
-  onMessage(message: AnyEvent) {
-    switch (message.event) {
-      case 'training.end':
-        this.trainingQueue = this.trainingQueue.filter(
-          item => item.id !== message.data.projectId,
-        );
-        break;
-      case 'setup.status':
-        this.setup.status = message.data;
-        break;
-      case 'task.create':
-      case 'task.log':
-      case 'task.update':
-      case 'task.delete':
-        this.tasks.onMessage(message);
-        break;
-    }
   }
 
   hasFile(type: ModelType, name: string) {
