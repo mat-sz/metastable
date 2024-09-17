@@ -11,8 +11,10 @@ import {
   BsPlusLg,
   BsX,
 } from 'react-icons/bs';
+import { useContextMenu } from 'use-context-menu';
 
 import { ProgressBar } from '$components/progressBar';
+import { ProjectMenu } from '$components/projectMenu';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import { IS_MAC } from '$utils/config';
@@ -31,6 +33,7 @@ interface BaseTabProps {
   opacity?: number;
   onClick?: () => void;
   onClose?: () => void;
+  menu?: React.ReactNode;
 }
 
 export const BaseTab = React.forwardRef<
@@ -48,15 +51,20 @@ export const BaseTab = React.forwardRef<
       onClick,
       onClose,
       opacity,
+      menu,
     },
     ref,
   ) => {
+    const { contextMenu, onContextMenu, onKeyDown } = useContextMenu(menu);
+
     return (
       <div
         ref={ref}
         className={clsx(styles.tab, {
           [styles.selected]: isSelected,
         })}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
         onClick={onClick}
         onPointerUp={e => {
           if (e.pointerType === 'mouse' && e.button === 1) {
@@ -86,6 +94,7 @@ export const BaseTab = React.forwardRef<
             <BsX />
           </button>
         )}
+        {contextMenu}
       </div>
     );
   },
@@ -132,6 +141,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         value={value}
         max={max}
         marquee={marquee}
+        menu={<ProjectMenu project={project} />}
       >
         {project.name}
       </BaseTab>

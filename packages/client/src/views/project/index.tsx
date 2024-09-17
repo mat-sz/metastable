@@ -7,7 +7,11 @@ import { SimpleProjectView } from './simple';
 import { TrainingProjectView } from './training';
 
 export const Project: React.FC = observer(() => {
-  const project = mainStore.project!;
+  const project = mainStore.project;
+
+  if (!project) {
+    return null;
+  }
 
   return (
     <ProjectContext.Provider value={project}>

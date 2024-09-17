@@ -14,7 +14,7 @@ interface Props {
 export const ProjectRename: React.FC<Props> = observer(
   ({ project, closeAfterRenaming }) => {
     const { close } = useModal();
-    const [projectName, setProjectName] = useState('');
+    const [projectName, setProjectName] = useState(project.name);
 
     return (
       <Modal title="Rename project" size="small">

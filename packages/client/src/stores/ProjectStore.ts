@@ -56,6 +56,18 @@ export class ProjectStore {
     });
   }
 
+  async get(id: string) {
+    const project = this.projects.find(project => project.id === id);
+    if (project) {
+      return project;
+    }
+
+    const projectData = await API.project.get.query({
+      projectId: id,
+    });
+    return createProject(projectData, projectData.settings);
+  }
+
   pushRecent(id: string) {
     const recentArray: string[] =
       tryParse(localStorage.getItem(LS_RECENT)) || [];
