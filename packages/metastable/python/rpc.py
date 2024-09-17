@@ -3,6 +3,7 @@ import base64
 import torch
 import inspect
 import output
+import traceback
 
 import rpc_hook
 
@@ -173,12 +174,12 @@ class RPC:
                 "id": request_id,
                 "result": result
             }
-        except Exception as error:
+        except Exception:
             return {
                 "type": "rpc",
                 "id": request_id,
                 "error": {
-                    "message": type(error).__name__ + "\n" + str(error),
+                    "message": traceback.format_exc(),
                 }
             }
         

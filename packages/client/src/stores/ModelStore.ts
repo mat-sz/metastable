@@ -39,8 +39,21 @@ class ModelStore {
     return !!this.find(type, name);
   }
 
-  find(type: ModelType, name: string) {
+  find(type: ModelType, name?: string) {
+    if (!name) {
+      return undefined;
+    }
+
     return this.models[type]?.find(({ file }) => file.name === name);
+  }
+
+  size(type: ModelType, name?: string) {
+    if (!name) {
+      return 0;
+    }
+
+    const model = this.find(type, name);
+    return model?.file.size ?? 0;
   }
 
   type(type: ModelType) {

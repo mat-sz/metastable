@@ -1,5 +1,7 @@
 import EventEmitter from 'events';
 
+import { CheckpointType } from '@metastable/types';
+
 import type { Comfy } from './index.js';
 import {
   ComfyCheckpoint,
@@ -44,6 +46,36 @@ export class ComfySession extends (EventEmitter as {
       clip_layer: clipLayer,
     });
     return new ComfyCheckpoint(this, data as any);
+  }
+
+  async checkpointAdvanced({
+    type,
+    unetPath,
+    clipPaths,
+    vaePath,
+    embeddingsPath,
+  }: {
+    type: CheckpointType;
+    unetPath: string;
+    clipPaths: string[];
+    vaePath: string;
+    embeddingsPath?: string;
+  }) {
+    const model = await this.invoke('unet:load', { path: unetPath });
+    const clip = await this.invoke('clip:load', {
+      paths: clipPaths,
+      type,
+      embeddings_path: embeddingsPath,
+    });
+    const vae = await this.invoke('vae:load', {
+      path: vaePath,
+    });
+    return new ComfyCheckpoint(this, {
+      clip,
+      model,
+      vae,
+      latent_type: 'sd',
+    } as any);
   }
 
   async controlnet(path: string) {

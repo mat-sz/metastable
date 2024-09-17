@@ -1,6 +1,9 @@
 import torch
 import math
 
+import comfy.sd
+import comfy.utils
+
 from rpc import RPC
 
 def vae_decode_circular(vae, samples):
@@ -64,6 +67,12 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
     return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
 
 class VAENamespace:
+    @RPC.autoref
+    @RPC.method("load")
+    def load(path):
+        sd = comfy.utils.load_torch_file(path)
+        return comfy.sd.VAE(sd=sd)
+    
     @RPC.autoref
     @RPC.method("decode")
     def decode(vae, samples, is_circular=False):

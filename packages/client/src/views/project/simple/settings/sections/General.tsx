@@ -14,6 +14,7 @@ import {
   VarSelect,
   VarSlider,
   VarString,
+  VarSwitch,
   VarToggle,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
@@ -43,19 +44,53 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         />
       )}
       <VarCategory label="Checkpoint" collapsible>
-        <VarModel
-          path="checkpoint.name"
-          modelType={ModelType.CHECKPOINT}
-          onSelect={model => {
-            const samplerSettings = model.metadata?.samplerSettings;
-            if (samplerSettings) {
-              project.settings.sampler = {
-                ...project.settings.sampler,
-                ...samplerSettings,
-              };
-            }
-          }}
+        <VarSwitch
+          label="Mode"
+          path="checkpoint.mode"
+          defaultValue="simple"
+          options={[
+            { key: 'simple', label: 'Simple' },
+            { key: 'advanced', label: 'Advanced' },
+          ]}
         />
+        {project.settings.checkpoint.mode === 'advanced' ? (
+          <>
+            <VarModel
+              path="checkpoint.unet.name"
+              modelType={ModelType.UNET}
+              label="UNET"
+            />
+            <VarModel
+              path="checkpoint.clip1.name"
+              modelType={ModelType.CLIP}
+              label="CLIP 1"
+            />
+            <VarModel
+              path="checkpoint.clip2.name"
+              modelType={ModelType.CLIP}
+              label="CLIP 2"
+            />
+            <VarModel
+              path="checkpoint.vae.name"
+              modelType={ModelType.VAE}
+              label="VAE"
+            />
+          </>
+        ) : (
+          <VarModel
+            path="checkpoint.name"
+            modelType={ModelType.CHECKPOINT}
+            onSelect={model => {
+              const samplerSettings = model.metadata?.samplerSettings;
+              if (samplerSettings) {
+                project.settings.sampler = {
+                  ...project.settings.sampler,
+                  ...samplerSettings,
+                };
+              }
+            }}
+          />
+        )}
       </VarCategory>
       {showPrompt && (
         <VarCategory label="Prompt" collapsible>

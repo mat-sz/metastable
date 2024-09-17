@@ -13,8 +13,9 @@ export enum ModelType {
   IPADAPTER = 'ipadapter',
   LORA = 'lora',
   STYLE_MODEL = 'style_model',
-  UPSCALE_MODEL = 'upscale_model',
   TAGGER = 'tagger',
+  UNET = 'unet',
+  UPSCALE_MODEL = 'upscale_model',
   VAE = 'vae',
   VAE_APPROX = 'vae_approx',
 }
@@ -27,6 +28,7 @@ export enum CheckpointType {
   SVD = 'svd',
   STABLE_CASCADE = 'stable_cascade',
   PIXART = 'pixart',
+  FLUX1 = 'flux1',
 }
 
 export interface ModelMetadata {

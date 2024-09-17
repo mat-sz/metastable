@@ -66,6 +66,7 @@ class CheckpointNamespace:
         model_set_circular(model, is_circular)
 
         latent_image = latent["samples"]
+        latent_image = comfy.sample.fix_empty_latent_channels(model, latent_image)
         noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
         noise_mask = None

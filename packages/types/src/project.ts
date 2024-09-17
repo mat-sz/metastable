@@ -1,12 +1,26 @@
 import { ImageFile } from './file.js';
 
+export interface ProjectModel {
+  name?: string;
+  path?: string;
+}
+
 export interface ProjectSimpleSettings {
   version: number;
-  checkpoint: {
-    name: string;
-    path?: string;
-    clipSkip?: number;
-  };
+  checkpoint:
+    | {
+        mode: 'simple';
+        name?: string;
+        path?: string;
+        clipSkip?: number;
+      }
+    | {
+        mode: 'advanced';
+        unet: ProjectModel;
+        clip1: ProjectModel;
+        clip2?: ProjectModel;
+        vae: ProjectModel;
+      };
   input: {
     type: 'none' | 'image' | 'image_masked';
     image?: string;

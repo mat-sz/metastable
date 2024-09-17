@@ -3,6 +3,7 @@ import {
   CheckpointType,
   ImageFile,
   ModelType,
+  ProjectModel,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
   Task,
@@ -20,6 +21,95 @@ import { base64ify, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
+class SimpleProjectValidator {
+  errors: string[] = [];
+  warnings: string[] = [];
+
+  constructor(settings: ProjectSimpleSettings) {
+    if (settings.checkpoint.mode === 'advanced') {
+      this.validateModel(ModelType.UNET, settings.checkpoint.unet);
+      this.validateModel(ModelType.CLIP, settings.checkpoint.clip1);
+      this.validateModel(ModelType.VAE, settings.checkpoint.vae);
+
+      if (settings.checkpoint.clip2?.name) {
+        this.validateModel(ModelType.CLIP, settings.checkpoint.clip2);
+
+        if (settings.checkpoint.clip1.name === settings.checkpoint.clip2.name) {
+          this.errors.push('CLIP1 must be a different model from CLIP2.');
+        }
+      }
+    } else {
+      this.validateModel(ModelType.CHECKPOINT, settings.checkpoint);
+    }
+
+    const loras = settings.models.lora;
+    if (loras?.length) {
+      for (const lora of loras) {
+        if (!lora.enabled) {
+          continue;
+        }
+
+        this.validateModel(ModelType.LORA, lora);
+      }
+    }
+
+    const controlnets = settings.models.controlnet;
+    if (controlnets?.length) {
+      for (const controlnet of controlnets) {
+        if (!controlnet.enabled) {
+          continue;
+        }
+
+        this.validateModel(ModelType.CONTROLNET, controlnet);
+
+        if (!controlnet.image) {
+          this.errors.push('No image input for ControlNet selected.');
+        }
+      }
+    }
+
+    const ipadapters = settings.models.ipadapter;
+    if (ipadapters?.length) {
+      for (const ipadapter of ipadapters) {
+        if (!ipadapter.enabled) {
+          continue;
+        }
+
+        this.validateModel(ModelType.IPADAPTER, ipadapter);
+
+        if (!ipadapter.clipVisionName) {
+          this.errors.push('No CLIP Vision model for IPAdapter selected.');
+        } else {
+          const model = modelStore.find(
+            ModelType.CLIP_VISION,
+            ipadapter.clipVisionName,
+          );
+          if (!model) {
+            this.errors.push('Selected CLIP Vision model does not exist.');
+          }
+        }
+
+        if (!ipadapter.image) {
+          this.errors.push('No image input for IPAdapter selected.');
+        }
+      }
+    }
+
+    const input = settings.input;
+    if (input.type !== 'none' && !input.image) {
+      this.errors.push('No input image selected.');
+    }
+  }
+
+  validateModel(type: ModelType, model: ProjectModel) {
+    if (!model.name) {
+      this.errors.push(`No ${type} model selected.`);
+    } else if (!modelStore.find(type, model.name)) {
+      this.errors.push(`Selected ${type} does not exist.`);
+    }
+  }
+}
+
 export function defaultSettings(): ProjectSimpleSettings {
   const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
 
@@ -33,6 +123,7 @@ export function defaultSettings(): ProjectSimpleSettings {
       format: 'png',
     },
     checkpoint: {
+      mode: 'simple',
       name: checkpoint?.file.name,
     },
     models: {
@@ -127,15 +218,28 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     settings.output.width ||= 512;
     settings.output.batchSize ||= 1;
 
-    settings.checkpoint.name ||= mainStore.defaultModelName(
-      ModelType.CHECKPOINT,
-    );
+    if (settings.checkpoint.mode === 'advanced') {
+      settings.checkpoint.unet ??= {};
+      settings.checkpoint.clip1 ??= {};
+      settings.checkpoint.vae ??= {};
+
+      settings.checkpoint.unet.name ||= mainStore.defaultModelName(
+        ModelType.UNET,
+      );
+    } else {
+      settings.checkpoint.name ||= mainStore.defaultModelName(
+        ModelType.CHECKPOINT,
+      );
+    }
     this.settings = settings;
   }
 
   get checkpointType(): CheckpointType | undefined {
     const data = this.settings.checkpoint;
-    const model = modelStore.find(ModelType.CHECKPOINT, data.name);
+    const model =
+      data.mode === 'advanced'
+        ? modelStore.find(ModelType.UNET, data.unet.name)
+        : modelStore.find(ModelType.CHECKPOINT, data.name);
     return model?.details?.checkpointType;
   }
 
@@ -158,17 +262,31 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     const settings = this.settings;
     let totalVram = 0;
 
-    const checkpointName = settings.checkpoint.name;
-    if (checkpointName) {
-      const model = modelStore.find(ModelType.CHECKPOINT, checkpointName);
-      totalVram += model?.file.size ?? 0;
+    if (settings.checkpoint.mode === 'advanced') {
+      totalVram += modelStore.size(
+        ModelType.UNET,
+        settings.checkpoint.unet.name,
+      );
+      totalVram += modelStore.size(
+        ModelType.CLIP,
+        settings.checkpoint.clip1.name,
+      );
+      totalVram += modelStore.size(
+        ModelType.CLIP,
+        settings.checkpoint.clip2?.name,
+      );
+      totalVram += modelStore.size(ModelType.VAE, settings.checkpoint.vae.name);
+    } else {
+      totalVram += modelStore.size(
+        ModelType.CHECKPOINT,
+        settings.checkpoint.name,
+      );
     }
 
     if (settings.models.lora) {
       for (const lora of settings.models.lora) {
         if (lora.enabled && lora.name) {
-          const model = modelStore.find(ModelType.LORA, lora.name);
-          totalVram += model?.file.size ?? 0;
+          totalVram += modelStore.size(ModelType.LORA, lora.name);
         }
       }
     }
@@ -176,8 +294,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     if (settings.models.controlnet) {
       for (const controlnet of settings.models.controlnet) {
         if (controlnet.enabled && controlnet.name) {
-          const model = modelStore.find(ModelType.CONTROLNET, controlnet.name);
-          totalVram += model?.file.size ?? 0;
+          totalVram += modelStore.size(ModelType.CONTROLNET, controlnet.name);
         }
       }
     }
@@ -185,141 +302,49 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     if (settings.models.ipadapter) {
       for (const ipadapter of settings.models.ipadapter) {
         if (ipadapter.enabled && ipadapter.name) {
-          const model = modelStore.find(ModelType.IPADAPTER, ipadapter.name);
-          totalVram += model?.file.size ?? 0;
+          totalVram += modelStore.size(ModelType.IPADAPTER, ipadapter.name);
         }
       }
     }
 
     if (settings.upscale?.enabled && settings.upscale?.name) {
-      const model = modelStore.find(
+      totalVram += modelStore.size(
         ModelType.UPSCALE_MODEL,
         settings.upscale.name,
       );
-      totalVram += model?.file.size ?? 0;
     }
 
     return totalVram;
   }
 
   validate(): { errors: string[]; warnings: string[] } {
-    const errors: string[] = [];
-    const warnings: string[] = [];
-    const settings = this.settings;
-
-    const checkpointName = settings.checkpoint.name;
-    if (!checkpointName) {
-      errors.push('No checkpoint selected.');
-    } else {
-      const checkpoint = modelStore.find(ModelType.CHECKPOINT, checkpointName);
-      if (!checkpoint) {
-        errors.push('Selected checkpoint does not exist.');
-      }
-    }
-
-    const loras = settings.models.lora;
-    if (loras?.length) {
-      for (const lora of loras) {
-        if (!lora.enabled) {
-          continue;
-        }
-
-        if (!lora.name) {
-          errors.push('No LoRA model selected.');
-        } else {
-          const model = modelStore.find(ModelType.LORA, lora.name);
-          if (!model) {
-            errors.push('Selected LoRA does not exist.');
-          }
-        }
-      }
-    }
-
-    const controlnets = settings.models.controlnet;
-    if (controlnets?.length) {
-      for (const controlnet of controlnets) {
-        if (!controlnet.enabled) {
-          continue;
-        }
-
-        if (!controlnet.name) {
-          errors.push('No ControlNet model selected.');
-        } else {
-          const model = modelStore.find(ModelType.CONTROLNET, controlnet.name);
-          if (!model) {
-            errors.push('Selected ControlNet does not exist.');
-          }
-        }
-
-        if (!controlnet.image) {
-          errors.push('No image input for ControlNet selected.');
-        }
-      }
-    }
-
-    const ipadapters = settings.models.ipadapter;
-    if (ipadapters?.length) {
-      for (const ipadapter of ipadapters) {
-        if (!ipadapter.enabled) {
-          continue;
-        }
-
-        if (!ipadapter.name) {
-          errors.push('No IPAdapter model selected.');
-        } else {
-          const model = modelStore.find(ModelType.IPADAPTER, ipadapter.name);
-          if (!model) {
-            errors.push('Selected IPAdapter model does not exist.');
-          }
-        }
-
-        if (!ipadapter.clipVisionName) {
-          errors.push('No CLIP Vision model for IPAdapter selected.');
-        } else {
-          const model = modelStore.find(
-            ModelType.CLIP_VISION,
-            ipadapter.clipVisionName,
-          );
-          if (!model) {
-            errors.push('Selected CLIP Vision model does not exist.');
-          }
-        }
-
-        if (!ipadapter.image) {
-          errors.push('No image input for IPAdapter selected.');
-        }
-      }
-    }
-
-    const input = settings.input;
-    if (input.type !== 'none' && !input.image) {
-      errors.push('No input image selected.');
-    }
+    const validator = new SimpleProjectValidator(this.settings);
+    const { errors, warnings } = validator;
 
     if (mainStore.status !== 'ready') {
       errors.push('Backend is not ready.');
     }
 
-    const memroyUsage = this.memoryUsage;
-    if (memroyUsage > mainStore.info.vram) {
+    const memoryUsage = this.memoryUsage;
+    if (memoryUsage > mainStore.info.vram) {
       warnings.push(
         `This project requires ${filesize(
-          memroyUsage,
+          memoryUsage,
         )} of memory, this is higher than system memory: ${filesize(
           mainStore.info.vram,
         )}.`,
       );
-    } else if (memroyUsage > mainStore.info.vram * 0.8) {
+    } else if (memoryUsage > mainStore.info.vram * 0.8) {
       warnings.push(
         `This project requires ${filesize(
-          memroyUsage,
+          memoryUsage,
         )} of memory to generate an image. System memory: ${filesize(
           mainStore.info.vram,
         )}.`,
       );
     }
 
-    return { errors, warnings };
+    return { errors: errors.filter(error => !!error) as string[], warnings };
   }
 
   async request() {

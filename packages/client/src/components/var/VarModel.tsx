@@ -29,6 +29,7 @@ export const VarModel = observer(
     errorPath,
     modelType,
     onSelect,
+    label = 'Model',
     checkpointType,
   }: IVarModelProps): JSX.Element => {
     const [currentValue, setCurrentValue, currentError] = useVarUIValue({
@@ -46,7 +47,7 @@ export const VarModel = observer(
 
     return (
       <VarBase
-        label="Model"
+        label={label}
         disabled={disabled}
         readOnly={readOnly}
         className={className}

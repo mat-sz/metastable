@@ -2,6 +2,7 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 
 import {
+  CheckpointType,
   ImageFile,
   ModelType,
   ProjectPromptTaskData,
@@ -14,6 +15,7 @@ import { ProjectEntity } from '../../data/project.js';
 import { getNextNumber } from '../../helpers/fs.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
+import type { ComfySession } from '../session.js';
 import { ComfyPreviewSettings } from '../types.js';
 
 function toBase64(url: string) {
@@ -84,7 +86,16 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       throw new Error("Image is required if input type is not 'none'.");
     }
 
-    await this.setModelPath(ModelType.CHECKPOINT, settings.checkpoint);
+    if (settings.checkpoint.mode === 'advanced') {
+      await this.setModelPath(ModelType.UNET, settings.checkpoint.unet);
+      await this.setModelPath(ModelType.CLIP, settings.checkpoint.clip1);
+      if (settings.checkpoint.clip2?.name) {
+        await this.setModelPath(ModelType.CLIP, settings.checkpoint.clip2);
+      }
+      await this.setModelPath(ModelType.VAE, settings.checkpoint.vae);
+    } else {
+      await this.setModelPath(ModelType.CHECKPOINT, settings.checkpoint);
+    }
 
     this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
 
@@ -210,6 +221,30 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return settings;
   }
 
+  async checkpoint(ctx: ComfySession) {
+    const data = this.settings.checkpoint;
+    if (data.mode === 'advanced') {
+      const clipPaths = [data.clip1.path!];
+      if (data.clip2?.path) {
+        clipPaths.push(data.clip2.path);
+      }
+
+      return await ctx.checkpointAdvanced({
+        type: CheckpointType.FLUX1,
+        unetPath: data.unet.path!,
+        clipPaths,
+        vaePath: data.vae.path!,
+        embeddingsPath: this.embeddingsPath,
+      });
+    } else {
+      return await ctx.checkpoint(
+        data.path!,
+        this.embeddingsPath,
+        data.clipSkip ? -1 * data.clipSkip : undefined,
+      );
+    }
+  }
+
   async execute() {
     await this.metastable.comfy!.session(async ctx => {
       ctx.on('progress', e => {
@@ -224,13 +259,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       this.step('checkpoint');
       const settings = this.settings;
-      const checkpoint = await ctx.checkpoint(
-        settings.checkpoint.path!,
-        this.embeddingsPath,
-        settings.checkpoint.clipSkip
-          ? -1 * settings.checkpoint.clipSkip
-          : undefined,
-      );
+      const checkpoint = await this.checkpoint(ctx);
 
       const loras = settings.models.lora;
       if (loras?.length) {

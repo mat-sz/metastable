@@ -90,6 +90,8 @@ const CivitAIBaseModels = [
   'Playground V2',
   'PixArt A',
   'PixArt E',
+  'Flux.1 S',
+  'Flux.1 D',
   'Other',
 ];
 

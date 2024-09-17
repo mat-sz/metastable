@@ -38,6 +38,7 @@ export const VarSwitch = ({
   label,
   path,
   value,
+  defaultValue,
   onChange,
   options,
   disabled,
@@ -49,7 +50,7 @@ export const VarSwitch = ({
 }: IVarSwitchProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
-    fallbackValue: value,
+    fallbackValue: value ?? defaultValue,
     onChange,
     error,
     errorPath,

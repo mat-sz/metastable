@@ -17,7 +17,17 @@ import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
 import { getStaticUrl } from '../helpers/url.js';
 import { TypedEventEmitter } from '../types.js';
 
-const MODEL_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth', 'safetensors', 'onnx'];
+const MODEL_EXTENSIONS = [
+  'ckpt',
+  'pt',
+  'bin',
+  'pth',
+  'safetensors',
+  'onnx',
+  'st',
+  'sft',
+];
+
 export class ModelEntity extends FileEntity {
   type: ModelType | undefined = undefined;
   imageName: string | undefined = undefined;
@@ -58,7 +68,8 @@ export class ModelEntity extends FileEntity {
     if (
       this.type === ModelType.CHECKPOINT ||
       this.type === ModelType.LORA ||
-      this.type === ModelType.CONTROLNET
+      this.type === ModelType.CONTROLNET ||
+      this.type === ModelType.UNET
     ) {
       try {
         this.details = await getModelDetails(this.path);
