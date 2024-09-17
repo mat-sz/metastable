@@ -40,7 +40,11 @@ export const LoRAs: React.FC = observer(() => {
             }
           >
             <VarToggle label="Enable" path="enabled" />
-            <VarModel path="name" modelType={type} />
+            <VarModel
+              path="name"
+              modelType={type}
+              checkpointType={project.checkpointType}
+            />
             <VarSlider
               label="Strength"
               path="strength"

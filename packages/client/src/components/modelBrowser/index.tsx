@@ -1,4 +1,4 @@
-import { Model, ModelType } from '@metastable/types';
+import { CheckpointType, Model, ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
@@ -9,6 +9,7 @@ import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { IconButton } from '$components/iconButton';
 import { Card, CardTag, CardTags, List } from '$components/list';
+import { Toggle } from '$components/toggle';
 import { ModelDelete } from '$modals/modelDelete';
 import { ModelEdit } from '$modals/modelEdit';
 import { mainStore } from '$stores/MainStore';
@@ -23,6 +24,7 @@ interface Props {
   defaultParts?: string[];
   onSelect: (model: Model) => void;
   variant?: 'default' | 'small';
+  checkpointType?: CheckpointType;
 }
 
 function listFiles(data: Model[], parts: string[], all = false) {
@@ -65,9 +67,22 @@ function listDirectories(data: Model[], index: number) {
 }
 
 export const ModelBrowser: React.FC<Props> = observer(
-  ({ type, onSelect, defaultParts = [], variant = 'default' }) => {
-    const data = modelStore.type(type) || [];
+  ({
+    type,
+    onSelect,
+    defaultParts = [],
+    variant = 'default',
+    checkpointType,
+  }) => {
     const [parts, setParts] = useState<string[]>(defaultParts);
+    const [compatibleOnly, setCompatibleOnly] = useState(true);
+
+    let data = modelStore.type(type) || [];
+    if (checkpointType && compatibleOnly) {
+      data = data.filter(
+        item => item.details?.checkpointType === checkpointType,
+      );
+    }
 
     const models = listFiles(data, parts, false);
     const allModels = listFiles(data, parts, true);
@@ -86,6 +101,15 @@ export const ModelBrowser: React.FC<Props> = observer(
             >
               <BsFolderFill />
             </IconButton>
+          )}
+          {!!checkpointType && (
+            <div>
+              <Toggle
+                label="Compatibility filter"
+                value={compatibleOnly}
+                onChange={setCompatibleOnly}
+              />
+            </div>
           )}
         </div>
         <List

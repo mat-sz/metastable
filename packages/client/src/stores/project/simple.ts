@@ -1,5 +1,6 @@
 import {
   Project as APIProject,
+  CheckpointType,
   ImageFile,
   ModelType,
   ProjectPromptTaskData,
@@ -83,6 +84,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       currentTask: observable,
       selectOutput: action,
       selectTask: action,
+      checkpointType: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -129,6 +131,12 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       ModelType.CHECKPOINT,
     );
     this.settings = settings;
+  }
+
+  get checkpointType(): CheckpointType | undefined {
+    const data = this.settings.checkpoint;
+    const model = modelStore.find(ModelType.CHECKPOINT, data.name);
+    return model?.details?.checkpointType;
   }
 
   get prompts(): Task<ProjectPromptTaskData>[] {
