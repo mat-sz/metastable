@@ -198,29 +198,36 @@ export const CivitAI: React.FC = observer(() => {
         {data?.items && (
           <>
             <List items={data.items}>
-              {item => (
-                <Card
-                  name={item.name}
-                  imageUrl={item.modelVersions?.[0]?.images[0]?.url}
-                  onClick={() => setItem(item)}
-                  key={item.id}
-                  icon={<MdNoPhotography />}
-                >
-                  <CardTags>
-                    <CardTag icon={<Rating value={item.stats.rating} small />}>
-                      ({item.stats.ratingCount})
-                    </CardTag>
-                  </CardTags>
-                  <CardTags>
-                    <CardTag icon={<BsDownload />}>
-                      ({item.stats.downloadCount})
-                    </CardTag>
-                    <CardTag icon={<BsHeartFill />}>
-                      ({item.stats.favoriteCount})
-                    </CardTag>
-                  </CardTags>
-                </Card>
-              )}
+              {item => {
+                const image = item.modelVersions?.[0]?.images[0];
+
+                return (
+                  <Card
+                    name={item.name}
+                    imageUrl={image?.url}
+                    isVideo={image?.type === 'video'}
+                    onClick={() => setItem(item)}
+                    key={item.id}
+                    icon={<MdNoPhotography />}
+                  >
+                    <CardTags>
+                      <CardTag
+                        icon={<Rating value={item.stats.rating} small />}
+                      >
+                        ({item.stats.ratingCount})
+                      </CardTag>
+                    </CardTags>
+                    <CardTags>
+                      <CardTag icon={<BsDownload />}>
+                        ({item.stats.downloadCount})
+                      </CardTag>
+                      <CardTag icon={<BsHeartFill />}>
+                        ({item.stats.favoriteCount})
+                      </CardTag>
+                    </CardTags>
+                  </Card>
+                );
+              }}
             </List>
             <Pagination
               current={data.metadata.currentPage}

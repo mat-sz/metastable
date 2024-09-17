@@ -7,6 +7,7 @@ import styles from './index.module.scss';
 interface CardProps {
   name?: string;
   imageUrl?: string;
+  isVideo?: boolean;
   icon?: React.ReactNode;
   onClick?: () => void;
   color?: string;
@@ -16,6 +17,7 @@ interface CardProps {
 export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   children,
   imageUrl,
+  isVideo,
   name,
   icon,
   onClick,
@@ -32,7 +34,18 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
     >
       {imageUrl ? (
         <div className={styles.image} style={{ backgroundColor: color }}>
-          <img crossOrigin="anonymous" src={imageUrl} />
+          {isVideo ? (
+            <video
+              crossOrigin="anonymous"
+              src={imageUrl}
+              autoPlay
+              muted
+              playsInline
+              loop
+            />
+          ) : (
+            <img crossOrigin="anonymous" src={imageUrl} />
+          )}
         </div>
       ) : (
         <div className={styles.icon}>

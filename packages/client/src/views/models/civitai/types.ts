@@ -22,6 +22,7 @@ export interface CivitAIModelVersionImage {
   width: number;
   height: number;
   hash: string;
+  type: 'image' | 'video';
   meta?: Record<string, string | number> | null;
 }
 
