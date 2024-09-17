@@ -14,10 +14,11 @@ export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.IPADAPTER]: 'IPAdapter',
   [ModelType.LORA]: 'LoRA',
   [ModelType.STYLE_MODEL]: 'Style model',
+  [ModelType.TAGGER]: 'Tagger',
+  [ModelType.UNET]: 'UNET',
   [ModelType.UPSCALE_MODEL]: 'Upscale model',
   [ModelType.VAE]: 'VAE',
   [ModelType.VAE_APPROX]: 'VAE Approximation',
-  [ModelType.TAGGER]: 'Tagger',
 };
 
 export const downloadable: DownloadableModelGroup[] = [

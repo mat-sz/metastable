@@ -14,7 +14,7 @@
     "lint": "run -T eslint src",
     "preview": "vite preview",
     "electron:start": "electron-vite dev",
-    "electron:build": "yarn build:deps && electron-vite build --mode production && electron-builder --config eb-config.js",
+    "electron:build": "yarn build:deps && electron-vite build --mode production && electron-builder --config eb-config.cjs",
     "analyze": "vite-bundle-visualizer"
   },
   "husky": {
@@ -47,7 +47,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "clsx": "^2.0.0",
     "electron": "^31.6.0",
-    "electron-builder": "25.0.5",
+    "electron-builder": "25.0.0-alpha.9",
     "electron-vite": "^2.3.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.11",
