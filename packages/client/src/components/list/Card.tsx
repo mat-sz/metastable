@@ -33,7 +33,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
       onContextMenu={menu ? onContextMenu : undefined}
     >
       {imageUrl ? (
-        <div className={styles.image} style={{ backgroundColor: color }}>
+        <div className={styles.image}>
           {isVideo ? (
             <video
               crossOrigin="anonymous"
@@ -58,7 +58,13 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
       </div>
       {!!menu && (
         <>
-          <button onClick={onContextMenu} className={styles.menuToggle}>
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              onContextMenu(e);
+            }}
+            className={styles.menuToggle}
+          >
             <BsThreeDots />
           </button>
           {contextMenu}

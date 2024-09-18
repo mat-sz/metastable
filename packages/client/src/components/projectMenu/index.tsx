@@ -1,6 +1,6 @@
 import { Project } from '@metastable/types';
 import React from 'react';
-import { ContextMenuItem } from 'use-context-menu';
+import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
 import { ProjectDelete } from '$modals/projectDelete';
 import { ProjectDuplicate } from '$modals/projectDuplicate';
@@ -33,6 +33,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({ project }) => {
       >
         Rename
       </ContextMenuItem>
+      <ContextMenuDivider />
       <ContextMenuItem
         onSelect={async () => {
           modalStore.show(<ProjectDelete project={await getProjectObj()} />);
