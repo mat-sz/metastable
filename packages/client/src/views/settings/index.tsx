@@ -15,7 +15,9 @@ import {
   VarToggle,
   VarUI,
 } from '$components/var';
+import { BundleReset } from '$modals/bundleReset';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Social } from '../common/Social';
@@ -145,6 +147,16 @@ export const Settings: React.FC = observer(() => {
                 )}
               </VarCategory>
             )}
+            <VarCategory label="Reset">
+              <div className={styles.info}>
+                <div className={styles.buttons}>
+                  <Button onClick={() => modalStore.show(<BundleReset />)}>
+                    Reset settings and Python dependencies
+                  </Button>
+                </div>
+                <p>This action will not delete your models or projects.</p>
+              </div>
+            </VarCategory>
             <VarCategory label="Credits">
               <div className={styles.info}>
                 {__APP_NAME__} includes code from the following open source

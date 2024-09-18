@@ -13,6 +13,7 @@ import {
   ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
+import { rimraf } from 'rimraf';
 import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
@@ -232,9 +233,24 @@ export class Metastable extends (EventEmitter as {
     // this.kohya.on('event', this.onEvent);
   }
 
-  async restartComfy() {
+  async stopComfy() {
     this.comfy?.removeAllListeners();
     this.comfy?.stop(true);
+  }
+
+  async deleteBundle() {
+    this.stopComfy();
+    const pythonDir = this.python?.pythonHome;
+    this.python = undefined;
+    if (pythonDir) {
+      try {
+        await rimraf(pythonDir);
+      } catch {}
+    }
+  }
+
+  async restartComfy() {
+    this.stopComfy();
 
     const config = await this.config.all();
     if (

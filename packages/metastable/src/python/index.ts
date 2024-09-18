@@ -27,7 +27,7 @@ async function getPythonCommand() {
 export class PythonInstance {
   constructor(
     public path: string,
-    private pythonHome?: string,
+    public pythonHome?: string,
     private packagesDir?: string,
   ) {}
 

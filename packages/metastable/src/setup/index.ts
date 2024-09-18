@@ -85,7 +85,7 @@ export class Setup extends (EventEmitter as {
     };
   }
 
-  private async emitStatus() {
+  async emitStatus() {
     this.emit('status', await this.status());
   }
 

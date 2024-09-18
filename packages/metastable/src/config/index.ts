@@ -53,4 +53,8 @@ export class Config {
     const all = await this.all();
     await this.store({ ...all, [key]: value });
   }
+
+  async reset() {
+    await this.store({ ...CONFIG_DEFAULTS });
+  }
 }

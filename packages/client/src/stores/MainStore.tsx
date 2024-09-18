@@ -218,6 +218,11 @@ class MainStore {
     });
   }
 
+  async resetBundle() {
+    this.setup.status = 'required';
+    await API.instance.resetBundle.mutate();
+  }
+
   async refresh() {
     const data = await API.instance.info.query();
     runInAction(() => {
