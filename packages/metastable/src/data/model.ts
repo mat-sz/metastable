@@ -158,7 +158,7 @@ export class ModelRepository extends (EventEmitter as {
 
     let timeout: any = undefined;
     chokidar.watch(baseDir, {}).on('all', (event: string) => {
-      if (event !== 'add' && event !== 'unlink') {
+      if (!['add', 'change', 'unlink'].includes(event)) {
         return;
       }
 
