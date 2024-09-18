@@ -2,7 +2,8 @@
 
 ## Features
 
-- Added base model (e.g. SD1, SDXL) detection for models.
+- Added support for FLUX.1.
+- Added architecture (e.g. SD1, SDXL) detection for models.
 - Added display of error logs for failed generation tasks.
 - Added sampling time statistics display.
 - Added keyboard shortcuts to mask editor.
