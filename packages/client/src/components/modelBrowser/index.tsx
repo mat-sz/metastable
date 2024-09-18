@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsBoxFill, BsFolder, BsFolderFill } from 'react-icons/bs';
-import { ContextMenuItem } from 'use-context-menu';
+import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
 import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
@@ -147,6 +147,19 @@ export const ModelBrowser: React.FC<Props> = observer(
                 menu={
                   variant !== 'small' ? (
                     <>
+                      {!!item.metadata?.homepage && (
+                        <ContextMenuItem
+                          onSelect={() => {
+                            window.open(
+                              item.metadata?.homepage,
+                              '_blank',
+                              'noopener noreferrer',
+                            );
+                          }}
+                        >
+                          View homepage
+                        </ContextMenuItem>
+                      )}
                       <ContextMenuItem
                         onSelect={() => {
                           modalStore.show(
@@ -159,6 +172,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                       >
                         Edit
                       </ContextMenuItem>
+                      <ContextMenuDivider />
                       <ContextMenuItem
                         onSelect={() => {
                           modalStore.show(
