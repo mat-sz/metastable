@@ -11,6 +11,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   generation: {
     preview: true,
     imageMetadata: true,
+    memoryWarnings: true,
   },
   ui: {
     fuzzySearch: true,

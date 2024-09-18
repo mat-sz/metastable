@@ -37,6 +37,7 @@ export interface ConfigType {
   generation?: {
     preview?: boolean;
     imageMetadata?: boolean;
+    memoryWarnings?: boolean;
   };
   app?: {
     autoUpdate?: boolean;

@@ -325,23 +325,25 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       errors.push('Backend is not ready.');
     }
 
-    const memoryUsage = this.memoryUsage;
-    if (memoryUsage > mainStore.info.vram) {
-      warnings.push(
-        `This project requires ${filesize(
-          memoryUsage,
-        )} of memory, this is higher than system memory: ${filesize(
-          mainStore.info.vram,
-        )}.`,
-      );
-    } else if (memoryUsage > mainStore.info.vram * 0.8) {
-      warnings.push(
-        `This project requires ${filesize(
-          memoryUsage,
-        )} of memory to generate an image. System memory: ${filesize(
-          mainStore.info.vram,
-        )}.`,
-      );
+    if (mainStore.config.data?.generation?.memoryWarnings) {
+      const memoryUsage = this.memoryUsage;
+      if (memoryUsage > mainStore.info.vram) {
+        warnings.push(
+          `This project requires ${filesize(
+            memoryUsage,
+          )} of memory, this is higher than system memory: ${filesize(
+            mainStore.info.vram,
+          )}.`,
+        );
+      } else if (memoryUsage > mainStore.info.vram * 0.8) {
+        warnings.push(
+          `This project requires ${filesize(
+            memoryUsage,
+          )} of memory to generate an image. System memory: ${filesize(
+            mainStore.info.vram,
+          )}.`,
+        );
+      }
     }
 
     return { errors: errors.filter(error => !!error) as string[], warnings };

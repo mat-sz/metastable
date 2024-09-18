@@ -81,6 +81,10 @@ export const Settings: React.FC = observer(() => {
                 path="generation.imageMetadata"
                 label="Store metadata in output image files"
               />
+              <VarToggle
+                path="generation.memoryWarnings"
+                label="Enable memory warnings"
+              />
             </VarCategory>
           </TabPanel>
           <TabPanel id="downloads">
