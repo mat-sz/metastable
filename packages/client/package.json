@@ -17,19 +17,6 @@
     "electron:build": "yarn build:deps && electron-vite build --mode production && electron-builder --config eb-config.cjs",
     "analyze": "vite-bundle-visualizer"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
-    ],
-    "__tests__/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@metastable/metastable": "*",
     "electron-updater": "6.1.8",
@@ -54,12 +41,9 @@
     "exifreader": "^4.22.1",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
-    "husky": "^8.0.3",
     "js-base64": "^3.7.7",
-    "lint-staged": "^14.0.1",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.4",
-    "prettier": "^3.0.3",
     "radash": "^12.1.0",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
