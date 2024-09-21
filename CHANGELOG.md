@@ -3,6 +3,7 @@
 ## Features
 
 - Added display of download errors in the download queue view.
+- Added a list of recommended resolutions per model type and aspect ratio.
 
 ## Bug fixes
 

@@ -1,0 +1,35 @@
+button.selection {
+  height: 2.5rem;
+  padding: 0.75rem;
+  width: 100%;
+
+  .chevron {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
+
+.label {
+  display: block;
+  margin: 1rem;
+}
+
+.select {
+  margin: 1rem;
+  padding: 1rem;
+  background: var(--grey-300-transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  width: 300px;
+
+  button {
+    width: 100%;
+
+    &:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

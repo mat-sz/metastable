@@ -19,6 +19,7 @@ import {
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
+import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { MaskEditor } from '../maskEditor';
 
 interface Props {
@@ -144,6 +145,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           widthPath="output.width"
           heightPath="output.height"
         />
+        <ResolutionSelect />
         <VarSlider
           label="Width"
           path="output.width"
