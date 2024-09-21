@@ -10,6 +10,7 @@ import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
 import { ImageActions } from '../common/ImageActions';
 import { Settings } from '../settings';
+import { LogSimple } from '$components/log';
 
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();
@@ -49,7 +50,9 @@ export const Images: React.FC = observer(() => {
             <div className={styles.progressPreview}>
               <div>
                 <div>Image generation failed.</div>
-                <pre>{project.currentTask?.log}</pre>
+                {project.currentTask?.log && (
+                  <LogSimple log={project.currentTask?.log} />
+                )}
                 <div>
                   <Button
                     onClick={() => {

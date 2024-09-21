@@ -58,3 +58,23 @@ export const Log: React.FC<Props> = ({ items }) => {
     </div>
   );
 };
+
+interface SimpleProps {
+  log: string;
+}
+
+export const LogSimple: React.FC<SimpleProps> = ({ log }) => {
+  return (
+    <div className={styles.logWrapper}>
+      <IconButton
+        className={styles.copy}
+        onClick={() => {
+          copy(log);
+        }}
+      >
+        <BsClipboard />
+      </IconButton>
+      <div className={styles.log}>{log}</div>
+    </div>
+  );
+};

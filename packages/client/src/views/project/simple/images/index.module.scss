@@ -47,13 +47,6 @@
   align-items: center;
   flex: 1;
 
-  pre {
-    user-select: text;
-    overflow: auto;
-    max-width: 100%;
-    max-height: 50vh;
-  }
-
   & > div {
     display: flex;
     justify-content: center;
