@@ -1,3 +1,14 @@
+# 0.0.4 (Upcoming)
+
+## Features
+
+- Added display of download errors in the download queue view.
+
+## Bug fixes
+
+- Fixed crashes when corrupt model files are present.
+- Fixed CivitAI authorization requirement detection for downloads.
+
 # 0.0.3 (2024-09-18)
 
 ## Features

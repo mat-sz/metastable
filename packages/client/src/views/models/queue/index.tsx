@@ -19,6 +19,7 @@ export const Queue: React.FC = observer(() => {
           download.startedAt && download.state === TaskState.RUNNING
             ? download.data.speed
             : undefined;
+        const log = download.log?.split('\n');
 
         return (
           <div
@@ -43,7 +44,13 @@ export const Queue: React.FC = observer(() => {
                   [{filesize(download.data.offset)} /{' '}
                   {filesize(download.data.size)}]
                 </span>
-                <span>[{download.state}]</span>
+                <span>
+                  [{download.state}
+                  {download.state === TaskState.FAILED && log
+                    ? `: ${log[log.length - 1]}`
+                    : ''}
+                  ]
+                </span>
                 {!!speed && (
                   <span>
                     ETA:{' '}
