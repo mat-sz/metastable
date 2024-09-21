@@ -16,14 +16,18 @@ export const Images: React.FC = observer(() => {
   const project = useSimpleProject();
   const preview = project.preview;
 
-  const mode =
-    !project.currentOutput && project.firstPrompt
-      ? 'progress'
-      : project.currentTask
-        ? 'task'
-        : project.currentOutput
-          ? 'image'
-          : undefined;
+  let mode: string | undefined = undefined;
+  const task =
+    project.currentTask ||
+    (!project.currentOutput ? project.prompts[0] : undefined);
+
+  if (!project.currentTask && !project.currentOutput && project.firstPrompt) {
+    mode = 'progress';
+  } else if (task) {
+    mode = 'task';
+  } else if (project.currentOutput) {
+    mode = 'image';
+  }
 
   return (
     <div className={styles.main}>
@@ -50,15 +54,12 @@ export const Images: React.FC = observer(() => {
             <div className={styles.progressPreview}>
               <div>
                 <div>Image generation failed.</div>
-                {project.currentTask?.log && (
-                  <LogSimple log={project.currentTask?.log} />
-                )}
+                {task!.log && <LogSimple log={task!.log} />}
                 <div>
                   <Button
                     onClick={() => {
-                      const id = project.currentTask!.id;
                       project.selectTask(undefined);
-                      mainStore.tasks.dismiss('project', id);
+                      mainStore.tasks.dismiss('project', task!.id);
                     }}
                   >
                     Dismiss
