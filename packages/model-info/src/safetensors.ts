@@ -1,3 +1,4 @@
+import { constants } from 'buffer';
 import { createReadStream, ReadStream } from 'fs';
 
 export async function readSafetensors(modelPath: string) {
@@ -11,7 +12,7 @@ function getHeader(stream: ReadStream): Promise<any> {
   let buffer: Buffer;
   let offset = 0;
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     let done = false;
 
     stream.on('data', (chunk: Buffer) => {
@@ -21,6 +22,13 @@ function getHeader(stream: ReadStream): Promise<any> {
 
       if (!length) {
         length = Number(chunk.readBigUint64LE(0));
+        if (length > constants.MAX_LENGTH) {
+          reject(new Error('Buffer limit exceeded'));
+          stream.close();
+          done = true;
+          return;
+        }
+
         buffer = Buffer.alloc(length);
         if (chunk.byteLength - 8 >= length) {
           buffer.set(chunk.subarray(8, 8 + length), 0);
