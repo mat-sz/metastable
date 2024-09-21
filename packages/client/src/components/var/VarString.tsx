@@ -68,7 +68,6 @@ export const VarString = ({
     >
       {multiline ? (
         <textarea
-          className="react-var-ui-string-multiline"
           value={currentValue}
           onChange={e => setCurrentValue(e.target.value)}
           onInput={autoexpand ? autoexpandOnInput : undefined}
@@ -77,16 +76,14 @@ export const VarString = ({
           readOnly={readOnly}
         />
       ) : (
-        <span className="react-var-ui-string">
-          <input
-            type="text"
-            maxLength={maxLength}
-            value={currentValue}
-            onChange={e => setCurrentValue(e.target.value)}
-            disabled={disabled}
-            readOnly={readOnly}
-          />
-        </span>
+        <input
+          type="text"
+          maxLength={maxLength}
+          value={currentValue}
+          onChange={e => setCurrentValue(e.target.value)}
+          disabled={disabled}
+          readOnly={readOnly}
+        />
       )}
     </VarBase>
   );

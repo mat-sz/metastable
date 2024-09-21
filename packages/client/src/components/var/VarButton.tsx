@@ -37,11 +37,9 @@ export const VarButton = ({
       className={className}
       error={error}
     >
-      <span className="react-var-ui-button">
-        <button onClick={() => onClick?.()} disabled={disabled}>
-          {buttonLabel}
-        </button>
-      </span>
+      <button onClick={() => onClick?.()} disabled={disabled}>
+        {buttonLabel}
+      </button>
     </VarBase>
   );
 };

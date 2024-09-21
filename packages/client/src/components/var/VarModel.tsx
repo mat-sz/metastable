@@ -72,34 +72,32 @@ export const VarModel = observer(
             />
           }
         >
-          <span className="react-var-ui-button">
-            <button
-              className={styles.selection}
-              onClick={() => setIsOpen(current => !current)}
-            >
-              {model ? (
-                <>
-                  <div
-                    style={{ backgroundColor: stringToColor(currentValue) }}
-                    className={styles.icon}
-                  >
-                    {model.image && <img src={model.image.thumbnailUrl} />}
-                  </div>
-                  <span className={styles.name}>{model.name}</span>
-                  <div className={styles.chevron}>
-                    <BsChevronRight />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <span className={styles.name}>(none)</span>
-                  <div className={styles.chevron}>
-                    <BsChevronRight />
-                  </div>
-                </>
-              )}
-            </button>
-          </span>
+          <button
+            className={styles.selection}
+            onClick={() => setIsOpen(current => !current)}
+          >
+            {model ? (
+              <>
+                <div
+                  style={{ backgroundColor: stringToColor(currentValue) }}
+                  className={styles.icon}
+                >
+                  {model.image && <img src={model.image.thumbnailUrl} />}
+                </div>
+                <span className={styles.name}>{model.name}</span>
+                <div className={styles.chevron}>
+                  <BsChevronRight />
+                </div>
+              </>
+            ) : (
+              <>
+                <span className={styles.name}>(none)</span>
+                <div className={styles.chevron}>
+                  <BsChevronRight />
+                </div>
+              </>
+            )}
+          </button>
         </Popover>
       </VarBase>
     );

@@ -16,7 +16,6 @@ export const VarArray = ({
   path,
   value,
   onChange,
-  disabled,
   className,
   children,
   error,
@@ -31,13 +30,7 @@ export const VarArray = ({
   });
 
   return (
-    <div
-      className={
-        'react-var-ui-array ' +
-        (disabled ? 'react-var-ui-disabled ' : '') +
-        (className ?? '')
-      }
-    >
+    <div className={className ?? ''}>
       {currentValue?.map((element, index, array) => {
         return (
           <VarUIContext.Provider
