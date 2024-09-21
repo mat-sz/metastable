@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { ImagePreview } from '$components/imagePreview';
+import { LogSimple } from '$components/log';
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
@@ -10,7 +11,6 @@ import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
 import { ImageActions } from '../common/ImageActions';
 import { Settings } from '../settings';
-import { LogSimple } from '$components/log';
 
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();

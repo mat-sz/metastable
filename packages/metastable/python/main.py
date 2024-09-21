@@ -68,6 +68,8 @@ async def run(rpc):
             pass
 
 if __name__ == "__main__":
+    print("Starting ComfyUI server")
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     rpc = RPC()
@@ -76,6 +78,7 @@ if __name__ == "__main__":
     cuda_malloc_warning()
 
     try:
+        print("Ready!")
         output.write_event("ready")
         loop.run_until_complete(run(rpc))
     except KeyboardInterrupt:
