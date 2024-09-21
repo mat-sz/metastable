@@ -1,32 +1,106 @@
 import { DownloadSettings, TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsDownload, BsHourglass } from 'react-icons/bs';
+import { BsDownload, BsHourglass, BsXCircleFill } from 'react-icons/bs';
 
 import { mainStore } from '$stores/MainStore';
+import { modelStore } from '$stores/ModelStore';
 import { filesize } from '$utils/file';
 
 interface DownloadButtonProps {
   files: DownloadSettings[];
 }
 
+interface DownloadFileState {
+  settings: DownloadSettings;
+  state: 'downloaded' | 'queued' | 'failed' | 'not_queued';
+  size?: number;
+  offset?: number;
+  error?: string;
+}
+
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
   ({ files }) => {
-    const fileState = files.map(file =>
-      mainStore.hasFile(file.type, file.name),
-    );
-    const allDownloaded = fileState.every(state => state === 'downloaded');
-    const allQueued = fileState.every(
-      state => state === 'queued' || state === 'downloaded',
-    );
-    const remaining = files.filter(
-      (_, i) => typeof fileState[i] === 'undefined',
-    );
-    const isWaiting = files.some(file =>
-      mainStore.tasks.waiting.has(file.name),
-    );
+    const fileState: DownloadFileState[] = files.map(file => {
+      const model = modelStore.find(file.type, file.name);
+      if (model) {
+        return {
+          settings: file,
+          state: 'downloaded',
+          size: model.file.size,
+        };
+      }
 
-    if (isWaiting) {
+      const item = mainStore.tasks.queues.downloads?.find(
+        item => item.data.name === file.name,
+      );
+
+      if (!item) {
+        return {
+          settings: file,
+          state: 'not_queued',
+        };
+      }
+
+      switch (item.state) {
+        case TaskState.SUCCESS:
+          return {
+            settings: file,
+            state: 'downloaded',
+            size: item.data?.size,
+          };
+        case TaskState.RUNNING:
+        case TaskState.QUEUED:
+        case TaskState.PREPARING:
+          return {
+            settings: file,
+            state: 'queued',
+            offset: item.data?.offset,
+            size: item.data?.size,
+          };
+        case TaskState.FAILED: {
+          const log = item.log?.split('\n');
+          return {
+            settings: file,
+            state: 'failed',
+            error:
+              log && log[log.length - 1].includes('Authorization required')
+                ? 'Authorization required'
+                : 'Download failed',
+          };
+        }
+        case TaskState.CANCELLED:
+        case TaskState.CANCELLING:
+          return {
+            settings: file,
+            state: 'failed',
+            error: 'Cancelled',
+          };
+      }
+
+      return {
+        settings: file,
+        state: 'queued',
+      };
+    });
+    const allDownloaded = fileState.every(item => item.state === 'downloaded');
+    const allQueued = fileState.every(
+      item => item.state === 'queued' || item.state === 'downloaded',
+    );
+    const remaining = fileState.filter(item => item.state === 'queued');
+    const isWaiting = fileState.some(file =>
+      mainStore.tasks.waiting.has(file.settings.name),
+    );
+    const failed = fileState.find(file => file.state === 'failed');
+
+    if (failed) {
+      return (
+        <button disabled>
+          <BsXCircleFill />
+          <span>{failed.error}</span>
+        </button>
+      );
+    } else if (isWaiting) {
       return (
         <button disabled>
           <BsHourglass />
@@ -41,22 +115,14 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
         </button>
       );
     } else if (allQueued) {
-      const items = mainStore.tasks.downloads.filter(
-        item =>
-          !!files.find(file => file.name === item.data.name) &&
-          [
-            TaskState.SUCCESS,
-            TaskState.RUNNING,
-            TaskState.QUEUED,
-            TaskState.PREPARING,
-          ].includes(item.state),
-      );
-
-      if (items.length) {
+      if (remaining.length) {
         const percent =
           Math.round(
-            (items.reduce((progress, item) => progress + item.data.offset, 0) /
-              items.reduce((size, item) => size + item.data.size, 0)) *
+            (remaining.reduce(
+              (progress, item) => progress + (item.offset || 0),
+              0,
+            ) /
+              remaining.reduce((size, item) => size + (item.size || 0), 0)) *
               100,
           ) || 0;
 
@@ -82,7 +148,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       <button
         onClick={() => {
           for (const file of remaining) {
-            mainStore.tasks.download(file);
+            mainStore.tasks.download(file.settings);
           }
         }}
       >

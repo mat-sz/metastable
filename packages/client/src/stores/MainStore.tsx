@@ -2,7 +2,6 @@ import {
   BackendStatus,
   InstanceInfo,
   ModelType,
-  TaskState,
   UpdateInfo,
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -244,33 +243,6 @@ class MainStore {
     }
 
     return this.backendStatus;
-  }
-
-  hasFile(type: ModelType, name: string) {
-    if (modelStore.has(type, name)) {
-      return 'downloaded';
-    }
-
-    const item = this.tasks.queues.downloads?.find(
-      item =>
-        item.data.name === name &&
-        [
-          TaskState.SUCCESS,
-          TaskState.RUNNING,
-          TaskState.QUEUED,
-          TaskState.PREPARING,
-        ].includes(item.state),
-    );
-
-    if (item) {
-      if (item.state === TaskState.SUCCESS) {
-        return 'downloaded';
-      } else {
-        return 'queued';
-      }
-    }
-
-    return undefined;
   }
 
   get hasCheckpoint() {

@@ -48,8 +48,8 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       },
     });
 
-    if (res.url?.includes('/login')) {
-      throw new Error('Unable to download file: Login required');
+    if (res.url?.includes('/login') || res.status === 401) {
+      throw new Error('Unable to download file: Authorization required');
     }
 
     this.downloadUrl = res.url || this.url;
