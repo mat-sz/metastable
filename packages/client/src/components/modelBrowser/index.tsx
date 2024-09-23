@@ -2,7 +2,12 @@ import { CheckpointType, Model, ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsBoxFill, BsFolder, BsFolderFill } from 'react-icons/bs';
+import {
+  BsBoxFill,
+  BsExclamationTriangleFill,
+  BsFolder,
+  BsFolderFill,
+} from 'react-icons/bs';
 import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
 import { API } from '$api';
@@ -193,6 +198,14 @@ export const ModelBrowser: React.FC<Props> = observer(
                   {item.details?.checkpointType && (
                     <CardTag icon={<BsBoxFill />}>
                       {item.details?.checkpointType?.toUpperCase()}
+                    </CardTag>
+                  )}
+                  {item.details?.corrupt && (
+                    <CardTag
+                      variant="warning"
+                      icon={<BsExclamationTriangleFill />}
+                    >
+                      CORRUPT
                     </CardTag>
                   )}
                 </CardTags>

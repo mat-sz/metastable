@@ -104,8 +104,14 @@ class SimpleProjectValidator {
   validateModel(type: ModelType, model: ProjectModel) {
     if (!model.name) {
       this.errors.push(`No ${type} model selected.`);
-    } else if (!modelStore.find(type, model.name)) {
+      return;
+    }
+
+    const full = modelStore.find(type, model.name);
+    if (!full) {
       this.errors.push(`Selected ${type} does not exist.`);
+    } else if (full.details?.corrupt) {
+      this.warnings.push(`${type} model may be corrupt.`);
     }
   }
 }

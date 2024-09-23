@@ -74,7 +74,10 @@ export class ModelEntity extends FileEntity {
       try {
         this.details = await getModelDetails(this.path);
       } catch (e) {
-        console.warn(e);
+        console.warn(`Unable to get details from ${this.path} - ${e}`);
+        this.details = {
+          corrupt: true,
+        };
       }
     }
   }

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { useContextMenu } from 'use-context-menu';
@@ -80,14 +81,16 @@ export const CardTags: React.FC<React.PropsWithChildren> = ({ children }) => {
 
 interface CardTagProps {
   icon?: React.ReactNode;
+  variant?: 'default' | 'warning' | 'error';
 }
 
 export const CardTag: React.FC<React.PropsWithChildren<CardTagProps>> = ({
   icon,
   children,
+  variant = 'default',
 }) => {
   return (
-    <div className={styles.tag}>
+    <div className={clsx(styles.tag, styles[variant])}>
       {icon}
       {!!children && <span>{children}</span>}
     </div>

@@ -225,6 +225,7 @@
   align-items: center;
   padding: 2px 5px;
   margin-right: 5px;
+  border: 1px solid var(--grey-100);
   background: rgba(0, 0, 0, 0.7);
   border-radius: 5px;
 
@@ -236,6 +237,33 @@
   & > svg {
     min-width: 1rem;
     margin: 0;
+  }
+
+  &.error {
+    border: 1px solid var(--red-900);
+    background: var(--red-100);
+
+    svg {
+      color: var(--red-900);
+    }
+  }
+
+  &.warning {
+    border: 1px solid var(--yellow-900);
+    background: var(--yellow-100);
+
+    svg {
+      color: var(--yellow-900);
+    }
+  }
+
+  &.ok {
+    border: 1px solid var(--green-900);
+    background: var(--green-100);
+
+    svg {
+      color: var(--green-900);
+    }
   }
 }
 

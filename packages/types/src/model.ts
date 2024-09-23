@@ -43,6 +43,7 @@ export interface ModelMetadata {
 }
 
 export interface ModelDetails {
+  corrupt?: boolean;
   checkpointType?: CheckpointType;
   type?: ModelType;
 }
