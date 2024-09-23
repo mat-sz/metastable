@@ -18,64 +18,66 @@ async function getDict(modelPath: string) {
 }
 
 interface StatePattern {
-  key: string | string[];
+  matchLists: string[][];
   details: ModelDetails;
 }
 
 const PATTERNS: StatePattern[] = [
   {
-    key: 'lora_unet_double_blocks_12_img_mod_lin.lora_down.weight',
+    matchLists: [['lora_unet_double_blocks_12_img_mod_lin.lora_down.weight']],
     details: {
       checkpointType: CheckpointType.FLUX1,
       type: ModelType.LORA,
     },
   },
   {
-    key: 'encoder.mid.attn_1.v.weight',
+    matchLists: [['encoder.mid.attn_1.v.weight']],
     details: {
       checkpointType: CheckpointType.FLUX1,
       type: ModelType.VAE,
     },
   },
   {
-    key: 'double_blocks.18.txt_mod.lin.weight',
+    matchLists: [['double_blocks.18.txt_mod.lin.weight']],
     details: {
       checkpointType: CheckpointType.FLUX1,
       type: ModelType.UNET,
     },
   },
   {
-    key: 'add_embedding.linear_1.bias',
+    matchLists: [['add_embedding.linear_1.bias']],
     details: {
       checkpointType: CheckpointType.SDXL,
       type: ModelType.CONTROLNET,
     },
   },
   {
-    key: 'input_blocks.4.0.emb_layers.1.bias',
+    matchLists: [['input_blocks.4.0.emb_layers.1.bias']],
     details: {
       checkpointType: CheckpointType.SD1,
       type: ModelType.CONTROLNET,
     },
   },
   {
-    key: 'lora_unet_down_blocks_0_downsamplers_0_conv.alpha',
+    matchLists: [['lora_unet_down_blocks_0_downsamplers_0_conv.alpha']],
     details: {
       checkpointType: CheckpointType.SD2,
       type: ModelType.LORA,
     },
   },
   {
-    key: 'lora_te_text_model_encoder_layers_0_mlp_fc1.alpha',
+    matchLists: [['lora_te_text_model_encoder_layers_0_mlp_fc1.alpha']],
     details: {
       checkpointType: CheckpointType.SD1,
       type: ModelType.LORA,
     },
   },
   {
-    key: [
-      'lora_unet_input_blocks_8_1_transformer_blocks_9_ff_net_2.lora_up.weight',
-      'lora_te1_text_model_encoder_layers_0_mlp_fc1.alpha',
+    matchLists: [
+      [
+        'lora_unet_input_blocks_8_1_transformer_blocks_9_ff_net_2.lora_up.weight',
+      ],
+      ['lora_te1_text_model_encoder_layers_0_mlp_fc1.alpha'],
     ],
     details: {
       checkpointType: CheckpointType.SDXL,
@@ -83,42 +85,62 @@ const PATTERNS: StatePattern[] = [
     },
   },
   {
-    key: 'y_embedder.y_embedding',
+    matchLists: [['y_embedder.y_embedding']],
     details: {
       checkpointType: CheckpointType.PIXART,
       type: ModelType.CHECKPOINT,
     },
   },
   {
-    key: 'model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight',
+    matchLists: [
+      ['model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight'],
+    ],
     details: {
       checkpointType: CheckpointType.SVD,
       type: ModelType.CHECKPOINT,
     },
   },
   {
-    key: 'model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight',
+    matchLists: [
+      ['model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight'],
+    ],
     details: {
       checkpointType: CheckpointType.SD3,
       type: ModelType.CHECKPOINT,
     },
   },
   {
-    key: 'conditioner.embedders.1.model.transformer.resblocks.21.attn.out_proj.bias',
+    matchLists: [
+      [
+        'conditioner.embedders.1.model.transformer.resblocks.21.attn.out_proj.bias',
+      ],
+    ],
     details: {
       checkpointType: CheckpointType.SDXL,
       type: ModelType.CHECKPOINT,
     },
   },
   {
-    key: 'cond_stage_model.model.transformer.resblocks.14.attn.out_proj.weight',
+    matchLists: [
+      ['cond_stage_model.model.transformer.resblocks.14.attn.out_proj.weight'],
+    ],
     details: {
       checkpointType: CheckpointType.SD2,
       type: ModelType.CHECKPOINT,
     },
   },
   {
-    key: 'model.diffusion_model.output_blocks.9.1.transformer_blocks.0.norm3.weight',
+    matchLists: [
+      [
+        'model.diffusion_model.output_blocks.9.1.transformer_blocks.0.norm3.weight',
+        'model.diffusion_model.input_blocks.3.0.op.weight',
+        'model.diffusion_model.input_blocks.6.0.op.weight',
+        'model.diffusion_model.input_blocks.9.0.op.weight',
+        'model.diffusion_model.output_blocks.2.1.conv.weight',
+        'model.diffusion_model.output_blocks.5.2.conv.weight',
+        'model.diffusion_model.output_blocks.8.2.conv.weight',
+      ],
+    ],
     details: {
       checkpointType: CheckpointType.SD1,
       type: ModelType.CHECKPOINT,
@@ -136,18 +158,9 @@ export async function getModelDetails(
     const state = dict['state_dict'];
 
     for (const pattern of PATTERNS) {
-      if (typeof pattern.key === 'string') {
-        if (state[pattern.key]) {
-          details = { ...details, ...pattern.details };
-          break;
-        }
-      } else {
-        for (const key of pattern.key) {
-          if (state[key]) {
-            details = { ...details, ...pattern.details };
-            break;
-          }
-        }
+      if (pattern.matchLists.some(list => list.every(key => !!state[key]))) {
+        details = { ...details, ...pattern.details };
+        break;
       }
     }
   }

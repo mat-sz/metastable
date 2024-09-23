@@ -1,62 +1,30 @@
-import { constants } from 'buffer';
-import { createReadStream, ReadStream } from 'fs';
+import assert from 'assert';
+
+import { readPartial } from './utils.js';
+
+const MAX_HEADER_SIZE = 16 * 1024 * 1024;
 
 export async function readSafetensors(modelPath: string) {
-  const stream = createReadStream(modelPath);
-  return await getHeader(stream);
-}
+  const start = await readPartial(modelPath, 0, 9);
+  assert(start.readUint8(0x8) === 0x7b, "Header doesn't start with '{'.");
 
-const textDecoder = new TextDecoder();
-function getHeader(stream: ReadStream): Promise<any> {
-  let length: number | undefined = undefined;
-  let buffer: Buffer;
-  let offset = 0;
+  const length = Number(start.readBigUint64LE(0));
+  assert(length >= 8, 'Header too small.');
+  assert(length <= MAX_HEADER_SIZE, 'Header too large.');
 
-  return new Promise((resolve, reject) => {
-    let done = false;
+  const buffer = await readPartial(modelPath, 8, 8 + length - 1);
 
-    stream.on('data', (chunk: Buffer) => {
-      if (done) {
-        return;
-      }
+  try {
+    const data = buffer.toString('utf8');
+    const json = JSON.parse(data);
+    const metadata = json['__metadata__'];
+    delete json['__metadata__'];
 
-      if (!length) {
-        length = Number(chunk.readBigUint64LE(0));
-        if (length > constants.MAX_LENGTH) {
-          reject(new Error('Buffer limit exceeded'));
-          stream.close();
-          done = true;
-          return;
-        }
-
-        buffer = Buffer.alloc(length);
-        if (chunk.byteLength - 8 >= length) {
-          buffer.set(chunk.subarray(8, 8 + length), 0);
-          done = true;
-        } else {
-          buffer.set(chunk.subarray(8), 0);
-          offset += chunk.byteLength - 8;
-        }
-      } else if (offset + chunk.byteLength > length) {
-        done = true;
-        buffer.set(chunk.subarray(0, length - offset), offset);
-      } else {
-        buffer.set(chunk, offset);
-        offset += chunk.byteLength;
-      }
-
-      if (done) {
-        stream.close();
-        const data = textDecoder.decode(buffer);
-        const json = JSON.parse(data);
-        const metadata = json['__metadata__'];
-        delete json['__metadata__'];
-
-        resolve({
-          metadata,
-          state_dict: json,
-        });
-      }
-    });
-  });
+    return {
+      metadata,
+      state_dict: json,
+    };
+  } catch {
+    throw new Error('Unable to deserialize header.');
+  }
 }
