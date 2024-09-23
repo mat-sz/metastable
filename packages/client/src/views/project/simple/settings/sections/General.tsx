@@ -20,6 +20,7 @@ import {
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
+import { StyleSelect } from '../../common/StyleSelect';
 import { MaskEditor } from '../maskEditor';
 
 interface Props {
@@ -95,6 +96,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
       </VarCategory>
       {showPrompt && (
         <VarCategory label="Prompt" collapsible>
+          <StyleSelect />
           <VarString label="Positive" path="prompt.positive" multiline />
           <VarString label="Negative" path="prompt.negative" multiline />
         </VarCategory>

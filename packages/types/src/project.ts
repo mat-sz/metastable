@@ -5,6 +5,13 @@ export interface ProjectModel {
   path?: string;
 }
 
+export interface PromptStyle {
+  id: string;
+  name: string;
+  positive?: string;
+  negative?: string;
+}
+
 export interface ProjectSimpleSettings {
   version: number;
   checkpoint:
@@ -68,6 +75,9 @@ export interface ProjectSimpleSettings {
   prompt: {
     positive: string;
     negative: string;
+    style?: PromptStyle & {
+      source: 'system' | 'user' | 'model';
+    };
   };
   sampler: {
     seed: number;

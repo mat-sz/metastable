@@ -13,6 +13,7 @@ import PNG from 'meta-png';
 
 import { ProjectEntity } from '../../data/project.js';
 import { getNextNumber } from '../../helpers/fs.js';
+import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import type { ComfySession } from '../session.js';
@@ -273,10 +274,15 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       this.step('conditioning');
-      const conditioning = await checkpoint.conditioning(
-        settings.prompt.positive,
-        settings.prompt.negative,
-      );
+      const { style } = settings.prompt;
+      let { positive, negative } = settings.prompt;
+
+      if (style) {
+        positive = applyStyleToPrompt(positive, style.positive);
+        negative = applyStyleToPrompt(negative, style.negative);
+      }
+
+      const conditioning = await checkpoint.conditioning(positive, negative);
 
       const controlnets = settings.models.controlnet;
       if (controlnets?.length) {

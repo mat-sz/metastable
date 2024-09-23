@@ -9,6 +9,7 @@
   background: var(--grey-200);
   border-top: 1px solid var(--grey-400);
   overflow-y: auto;
+  position: relative;
 
   [varui-label] {
     margin: 1rem;
@@ -20,6 +21,13 @@
 
   .actions {
     border: none;
+  }
+
+  .style {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
   }
 }
 

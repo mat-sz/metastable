@@ -10,6 +10,7 @@ import { PromptLoad } from '$modals/promptLoad';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 import { useSimpleProject } from '../../context';
+import { StyleSelect } from '../common/StyleSelect';
 
 export const Prompt: React.FC = observer(() => {
   const project = useSimpleProject();
@@ -43,6 +44,7 @@ export const Prompt: React.FC = observer(() => {
       values={toJS(project.settings)}
     >
       <VarCategory label="Prompt">
+        <StyleSelect className={styles.style} />
         <VarString label="Positive" path="prompt.positive" multiline />
         <VarString label="Negative" path="prompt.negative" multiline />
       </VarCategory>
