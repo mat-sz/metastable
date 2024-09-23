@@ -1,3 +1,4 @@
+import { TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -52,20 +53,27 @@ export const Images: React.FC = observer(() => {
         {mode === 'task' && (
           <div className={styles.preview}>
             <div className={styles.progressPreview}>
-              <div>
-                <div>Image generation failed.</div>
-                {task!.log && <LogSimple log={task!.log} />}
+              {task?.state === TaskState.FAILED && (
                 <div>
-                  <Button
-                    onClick={() => {
-                      project.selectTask(undefined);
-                      mainStore.tasks.dismiss('project', task!.id);
-                    }}
-                  >
-                    Dismiss
-                  </Button>
+                  <div>Image generation failed.</div>
+                  {task.log && <LogSimple log={task.log} />}
+                  <div>
+                    <Button
+                      onClick={() => {
+                        project.selectTask(undefined);
+                        mainStore.tasks.dismiss('project', task.id);
+                      }}
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
+              {task?.state === TaskState.QUEUED && (
+                <div>
+                  <div>Image generation queued.</div>
+                </div>
+              )}
             </div>
           </div>
         )}
