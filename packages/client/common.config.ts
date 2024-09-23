@@ -18,6 +18,13 @@ export function getConfig(mode: string): any {
   const isProduction = mode.includes('production');
 
   return {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
+    },
     plugins: [react()],
     define,
     resolve: {
