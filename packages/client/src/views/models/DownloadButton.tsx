@@ -39,6 +39,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
         return {
           settings: file,
           state: 'not_queued',
+          size: file.size,
         };
       }
 
@@ -81,13 +82,17 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       return {
         settings: file,
         state: 'queued',
+        size: file.size,
       };
     });
     const allDownloaded = fileState.every(item => item.state === 'downloaded');
     const allQueued = fileState.every(
       item => item.state === 'queued' || item.state === 'downloaded',
     );
-    const remaining = fileState.filter(item => item.state === 'queued');
+    const toDownload = fileState.filter(item => item.state === 'not_queued');
+    const remaining = fileState.filter(
+      item => item.state === 'not_queued' || item.state === 'queued',
+    );
     const isWaiting = fileState.some(file =>
       mainStore.tasks.waiting.has(file.settings.name),
     );
@@ -142,19 +147,19 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       }
     }
 
-    const size = remaining.reduce((size, item) => size + (item.size || 0), 0);
+    const size = toDownload.reduce((size, item) => size + (item.size || 0), 0);
 
     return (
       <button
         onClick={() => {
-          for (const file of remaining) {
+          for (const file of toDownload) {
             mainStore.tasks.download(file.settings);
           }
         }}
       >
         <BsDownload />
         <span>
-          Download {remaining.length > 1 && `(${remaining.length} files)`}{' '}
+          Download {toDownload.length > 1 && `(${toDownload.length} files)`}{' '}
           {!!size && `(${filesize(size)})`}
         </span>
       </button>
