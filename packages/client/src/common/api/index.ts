@@ -14,10 +14,13 @@ import type { Router } from '@metastable/metastable';
 
 declare global {
   interface Window {
+    wsIsOpen: boolean;
     wsOnOpen?: () => void;
     wsOnClose?: () => void;
   }
 }
+
+window.wsIsOpen = false;
 
 const link = IS_ELECTRON
   ? ipcLink()
@@ -27,9 +30,11 @@ const link = IS_ELECTRON
         client: createWSClient({
           url: getUrl('/trpc', 'ws'),
           onOpen: () => {
+            window.wsIsOpen = true;
             window.wsOnOpen?.();
           },
           onClose: () => {
+            window.wsIsOpen = false;
             window.wsOnClose?.();
           },
         }),

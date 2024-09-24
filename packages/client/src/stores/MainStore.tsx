@@ -80,6 +80,7 @@ class MainStore {
       });
       this.connected = true;
     } else {
+      this.connected = window.wsIsOpen;
       window.wsOnOpen = () => {
         runInAction(() => {
           this.connected = true;
