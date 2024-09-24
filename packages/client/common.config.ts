@@ -21,7 +21,7 @@ export function getConfig(mode: string): any {
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler',
+          api: 'modern',
         },
       },
     },
