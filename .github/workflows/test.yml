@@ -8,6 +8,7 @@ on:
 
 jobs:
   test-linux:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +26,7 @@ jobs:
       - run: yarn test
 
   test-windows:
+    timeout-minutes: 15
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +45,7 @@ jobs:
       - run: yarn test
 
   test-macos:
+    timeout-minutes: 15
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
