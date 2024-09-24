@@ -6,11 +6,13 @@ import {
   ProjectModel,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
+  PromptStyleWithSource,
   Task,
   TaskState,
 } from '@metastable/types';
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
+import { PROMPT_STYLES } from '$/data/styles';
 import { API } from '$api';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
@@ -355,9 +357,33 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     return { errors: errors.filter(error => !!error) as string[], warnings };
   }
 
+  get availableStyles() {
+    const systemStyles: PromptStyleWithSource[] = PROMPT_STYLES.map(style => ({
+      ...style,
+      source: 'system',
+    }));
+    const userStyles: PromptStyleWithSource[] = (
+      mainStore.config.data?.styles || []
+    ).map(style => ({ ...style, source: 'user' }));
+    const allStyles = [...systemStyles, ...userStyles];
+
+    return allStyles.filter(
+      style =>
+        !style.architecture ||
+        style.architecture === 'any' ||
+        style.architecture === this.checkpointType,
+    );
+  }
+
   async request() {
     if (this.settings.client.randomizeSeed) {
       this.settings.sampler.seed = randomSeed();
+    }
+
+    const style = this.settings.prompt.style;
+    if (style) {
+      const saved = this.availableStyles.find(item => item.id === style.id);
+      this.settings.prompt.style = saved ? { ...saved } : undefined;
     }
 
     this.selectOutput(undefined);

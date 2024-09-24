@@ -2,6 +2,8 @@
 
 ## Features
 
+- Added prompt styles.
+- Added a tag for corrupt files inside of the model browser.
 - Added display of download errors in the download queue view.
 - Added a list of recommended resolutions per model type and aspect ratio.
 

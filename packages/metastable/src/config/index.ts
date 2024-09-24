@@ -21,6 +21,7 @@ const CONFIG_DEFAULTS: ConfigType = {
     autoUpdate: true,
     hideWelcome: false,
   },
+  styles: [],
 };
 
 export class Config {

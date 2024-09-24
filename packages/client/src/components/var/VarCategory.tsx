@@ -22,6 +22,8 @@ export interface IVarCategoryProps {
 
   defaultCollapsed?: boolean;
 
+  forceBorder?: boolean;
+
   children?: React.ReactNode;
 }
 
@@ -34,6 +36,7 @@ export const VarCategory = ({
   children,
   collapsible,
   defaultCollapsed = false,
+  forceBorder,
 }: IVarCategoryProps): JSX.Element => {
   const [isCollapsed, setCollapsed] = useState(defaultCollapsed);
 
@@ -42,7 +45,10 @@ export const VarCategory = ({
       varui-category=""
       className={clsx(
         styles.category,
-        { [styles.collapsible]: collapsible },
+        {
+          [styles.collapsible]: collapsible,
+          [styles.forceBorder]: forceBorder,
+        },
         className,
       )}
     >

@@ -32,7 +32,8 @@
     }
   }
 
-  &:not(:last-child) {
+  &:not(:last-child),
+  &.forceBorder {
     border-bottom: 1px solid var(--grey-400);
   }
 }

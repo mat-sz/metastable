@@ -1,17 +1,10 @@
 import { ImageFile } from './file.js';
+import { PromptStyleWithSource } from './instance.js';
 
 export interface ProjectModel {
   name?: string;
   path?: string;
 }
-
-export interface PromptStyle {
-  id: string;
-  name: string;
-  positive?: string;
-  negative?: string;
-}
-
 export interface ProjectSimpleSettings {
   version: number;
   checkpoint:
@@ -75,9 +68,7 @@ export interface ProjectSimpleSettings {
   prompt: {
     positive: string;
     negative: string;
-    style?: PromptStyle & {
-      source: 'system' | 'user' | 'model';
-    };
+    style?: PromptStyleWithSource;
   };
   sampler: {
     seed: number;

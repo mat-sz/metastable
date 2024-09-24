@@ -1,0 +1,14 @@
+.info {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.buttons {
+  display: flex;
+  align-items: stretch;
+  margin-top: 0.5rem;
+
+  & > * {
+    margin-right: 0.5rem;
+  }
+}

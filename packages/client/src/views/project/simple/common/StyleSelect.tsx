@@ -1,12 +1,8 @@
-import { ProjectSimpleSettings } from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { PROMPT_STYLES } from '$/data/styles';
 import { VarSelect } from '$components/var';
 import { useSimpleProject } from '../../context';
-
-type SettingsStyle = ProjectSimpleSettings['prompt']['style'];
 
 interface Props {
   className?: string;
@@ -15,13 +11,7 @@ interface Props {
 export const StyleSelect: React.FC<Props> = observer(({ className }) => {
   const project = useSimpleProject();
 
-  const styles: SettingsStyle[] = [
-    undefined,
-    ...PROMPT_STYLES.map(style => ({
-      ...style,
-      source: 'system' as any,
-    })),
-  ];
+  const styles = [undefined, ...project.availableStyles];
 
   const currentStyle = project.settings.prompt.style;
   const currentIndex = !currentStyle
