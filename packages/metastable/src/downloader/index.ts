@@ -52,6 +52,10 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
       throw new Error('Unable to download file: Authorization required');
     }
 
+    if (!res.ok) {
+      throw new Error(`Non-OK status code: ${res.status} - ${res.statusText}`);
+    }
+
     this.downloadUrl = res.url || this.url;
     if (this.downloadUrl !== this.url) {
       this.appendLog(`Found redirect: ${this.downloadUrl}`);
