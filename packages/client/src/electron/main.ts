@@ -4,8 +4,14 @@ import path from 'node:path';
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { TaskState } from '@metastable/types';
 import { app, BrowserWindow, Menu } from 'electron';
+import contextMenu from 'electron-context-menu';
 import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
+
+contextMenu({
+  showSearchWithGoogle: false,
+  showSaveImageAs: true,
+});
 
 setUseFileUrl(true);
 

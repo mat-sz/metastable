@@ -1,3 +1,9 @@
+# 0.0.5 (Upcoming)
+
+## Features
+
+- Added a context menu for text fields and images.
+
 # 0.0.4 (2024-09-24)
 
 ## Features
