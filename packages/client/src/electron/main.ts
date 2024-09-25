@@ -84,11 +84,16 @@ async function createWindow() {
   });
   await metastable.init();
 
-  const config = await metastable.config.get('app');
+  async function checkForUpdates() {
+    const config = await metastable.config.get('app');
 
-  if (config?.autoUpdate) {
-    autoUpdater.checkForUpdates();
+    if (config?.autoUpdate) {
+      autoUpdater.checkForUpdates();
+    }
   }
+
+  checkForUpdates();
+  setInterval(checkForUpdates, 15 * 60 * 1000);
 
   const win = new BrowserWindow({
     title: 'Metastable',
