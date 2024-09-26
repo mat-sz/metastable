@@ -4,15 +4,12 @@ import { BaseProject } from './base';
 import { SimpleProject } from './simple';
 import { TrainingProject } from './training';
 
-export function createProject(
-  data: Omit<APIProject, 'settings'>,
-  settings?: any,
-) {
+export function createProject(data: APIProject) {
   switch (data.type) {
     case 'training':
-      return new TrainingProject(data, settings);
+      return new TrainingProject(data);
     default:
-      return new SimpleProject(data, settings);
+      return new SimpleProject(data);
   }
 }
 

@@ -144,7 +144,8 @@ export interface ProjectInfo {
 export interface Project extends ProjectInfo {
   id: string;
   name: string;
-  settings: any;
+  settings?: any;
+  ui?: any;
   lastOutput?: ImageFile;
   outputCount?: number;
   size?: number;

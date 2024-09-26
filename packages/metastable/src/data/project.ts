@@ -19,6 +19,7 @@ export class ProjectEntity extends DirectoryEntity {
     path.join(this._path, 'project.json'),
   );
   settings = new Metadata(path.join(this._path, 'settings.json'));
+  ui = new Metadata<any>(path.join(this._path, 'ui.json'), {});
 
   input = new EntityRepository(path.join(this._path, 'input'), ImageEntity);
   output = new EntityRepository(path.join(this._path, 'output'), ImageEntity);
@@ -43,16 +44,12 @@ export class ProjectEntity extends DirectoryEntity {
     await mkdir(this.tempPath, { recursive: true });
   }
 
-  async json(withSettings: true): Promise<Project>;
-  async json(withSettings?: false): Promise<Omit<Project, 'settings'>>;
-  async json(
-    withSettings = false,
-  ): Promise<Project | Omit<Project, 'settings'>> {
+  async json(full = false): Promise<Project> {
     await this.load();
     const outputs = await this.output.all();
     const lastOutput = outputs[outputs.length - 1];
 
-    const json: Omit<Project, 'settings'> & { settings?: any } = {
+    const json: Project = {
       type: 'simple',
       ...this.metadata.json!,
       id: this.name,
@@ -62,8 +59,9 @@ export class ProjectEntity extends DirectoryEntity {
       size: await directorySize(this._path),
     };
 
-    if (withSettings) {
+    if (full) {
       json.settings = await this.settings.get();
+      json.ui = await this.ui.get();
     }
 
     return json;

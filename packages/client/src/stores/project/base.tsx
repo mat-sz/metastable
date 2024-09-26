@@ -1,6 +1,7 @@
 import { Project as APIProject, ImageFile, TaskState } from '@metastable/types';
 import {
   action,
+  autorun,
   computed,
   makeObservable,
   observable,
@@ -13,7 +14,7 @@ import { TemporaryProject } from '$modals/temporaryProject';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 
-export class BaseProject<T = any> {
+export class BaseProject<TSettings = any, TUI = any> {
   currentOutput: ImageFile | undefined = undefined;
   mode: string = 'images';
   id;
@@ -21,11 +22,12 @@ export class BaseProject<T = any> {
   type;
   temporary;
   outputs: ImageFile[] = [];
+  settings: TSettings;
+  ui: TUI;
 
-  constructor(
-    data: Omit<APIProject, 'settings'>,
-    public settings: T,
-  ) {
+  constructor(data: APIProject) {
+    this.settings = data.settings;
+    this.ui = data.ui;
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
@@ -41,8 +43,8 @@ export class BaseProject<T = any> {
       type: observable,
       temporary: observable,
       settings: observable,
+      ui: observable,
       save: action,
-      triggerAutosave: action,
       tasks: computed,
       firstTask: computed,
       queueCount: computed,
@@ -51,6 +53,18 @@ export class BaseProject<T = any> {
       progressMarquee: computed,
     });
     this.refresh();
+
+    autorun(() => {
+      if (this.ui) {
+        this.triggerAutosaveUI();
+      }
+    });
+
+    autorun(() => {
+      if (this.settings) {
+        this.triggerAutosave();
+      }
+    });
   }
 
   get tasks() {
@@ -124,6 +138,13 @@ export class BaseProject<T = any> {
     );
   }
 
+  async saveUI() {
+    await API.project.update.mutate({
+      projectId: this.id,
+      ui: toJS(this.ui),
+    });
+  }
+
   async save(name?: string, temporary?: boolean) {
     const id = this.id;
     const settings = toJS(this.settings);
@@ -157,5 +178,11 @@ export class BaseProject<T = any> {
   triggerAutosave() {
     clearTimeout(this._autosaveTimeout);
     this._autosaveTimeout = setTimeout(() => this.save(), 5000) as any;
+  }
+
+  private _autosaveUITimeout: number | undefined = undefined;
+  triggerAutosaveUI() {
+    clearTimeout(this._autosaveUITimeout);
+    this._autosaveUITimeout = setTimeout(() => this.saveUI(), 1000) as any;
   }
 }

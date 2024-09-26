@@ -318,13 +318,14 @@ export const router = t.router({
           name: z.string().optional(),
           type: z.string().optional(),
           settings: z.any().optional(),
+          ui: z.any().optional(),
           temporary: z.boolean().optional(),
         }),
       )
       .mutation(
         async ({
           ctx: { metastable },
-          input: { projectId, settings, name, ...metadata },
+          input: { projectId, settings, name, ui, ...metadata },
         }) => {
           const project = await metastable.project.getOrRename(projectId, name);
 
@@ -334,6 +335,10 @@ export const router = t.router({
 
           if (settings) {
             await project.settings.set(settings);
+          }
+
+          if (ui) {
+            await project.ui.set(ui);
           }
 
           return await project.json(true);

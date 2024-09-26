@@ -65,7 +65,7 @@ export class ProjectStore {
     const projectData = await API.project.get.query({
       projectId: id,
     });
-    return createProject(projectData, projectData.settings);
+    return createProject(projectData);
   }
 
   pushRecent(id: string) {
@@ -117,9 +117,10 @@ export class ProjectStore {
 
     try {
       const json = await API.project.create.mutate(project);
+      json.settings = settings;
 
       runInAction(() => {
-        this.projects.push(createProject(json, settings));
+        this.projects.push(createProject(json));
         this.select(json.id);
       });
 
@@ -145,12 +146,11 @@ export class ProjectStore {
         return;
       }
 
-      const settings = json.settings ?? defaultSettings();
-      if (settings.version !== 1) {
-        return;
+      if (json.settings?.version !== 1) {
+        json.settings = undefined;
       }
 
-      const project = createProject(json, settings);
+      const project = createProject(json);
       runInAction(() => {
         this.projects = [
           ...this.projects.filter(project => project.id !== id),

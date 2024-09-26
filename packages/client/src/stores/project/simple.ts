@@ -164,11 +164,9 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   stepTime: Record<string, number> | undefined = undefined;
   currentTask: Task<ProjectPromptTaskData> | undefined = undefined;
 
-  constructor(
-    data: Omit<APIProject, 'settings'>,
-    settings: ProjectSimpleSettings = defaultSettings(),
-  ) {
-    super(data, settings);
+  constructor(data: APIProject) {
+    data.settings ??= defaultSettings();
+    super(data);
     makeObservable(this, {
       editor: observable,
       preview: computed,
