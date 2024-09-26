@@ -65,9 +65,49 @@
     max-width: 100%;
   }
 
-  img {
+  .stepInfo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+
+    flex: 1;
+    text-align: center;
+
+    & > *:not(:first-child) {
+      margin-left: 0.5rem;
+    }
+  }
+
+  .layer {
+    position: relative;
+
+    .stepInfo {
+      z-index: 999;
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 5px;
+    }
+  }
+
+  .imageContainer {
     border-radius: 8px;
-    min-width: 500px;
+    width: 500px;
+    height: 500px;
+    background: var(--grey-200);
+    overflow: hidden;
+
+    img {
+      --blur: 3px;
+      width: calc(100% + 2 * var(--blur));
+      height: calc(100% + 2 * var(--blur));
+      object-fit: cover;
+      filter: blur(var(--blur));
+      margin: calc(-1 * var(--blur));
+    }
   }
 
   .progressBar {

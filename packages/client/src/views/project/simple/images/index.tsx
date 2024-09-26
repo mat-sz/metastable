@@ -5,7 +5,7 @@ import React from 'react';
 import { Button } from '$components/button';
 import { ImagePreview } from '$components/imagePreview';
 import { LogSimple } from '$components/log';
-import { ProgressBar } from '$components/progressBar';
+import { ProgressCircle } from '$components/progressCircle';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
@@ -13,9 +13,56 @@ import { useSimpleProject } from '../../context';
 import { ImageActions } from '../common/ImageActions';
 import { Settings } from '../settings';
 
-export const Images: React.FC = observer(() => {
+const STEP_MAP: Record<string, string> = {
+  checkpoint: 'Loading checkpoint...',
+  lora: 'Loading LoRAs...',
+  conditioning: 'Conditioning...',
+  controlnet: 'Loading ControlNets...',
+  ipadapter: 'Loading IPAdapter...',
+  input: 'Preparing input...',
+  sample: 'Sampling...',
+  upscale: 'Upscaling...',
+  save: 'Saving...',
+};
+
+const GenerationProgress = observer(() => {
   const project = useSimpleProject();
   const preview = project.preview;
+
+  if (!project.firstPrompt) {
+    return null;
+  }
+
+  const { step = '', stepValue, stepMax } = project.firstPrompt.data;
+
+  const stepName = STEP_MAP[step] ? STEP_MAP[step] : 'Loading...';
+  const stepProgress =
+    typeof stepMax === 'number' ? ` (${stepValue || 0}/${stepMax})` : '';
+  const stepInfo = `${stepName}${stepProgress}`;
+
+  return (
+    <div className={styles.preview}>
+      <div className={styles.progressPreview}>
+        <div className={styles.layer}>
+          <div className={styles.stepInfo}>
+            <ProgressCircle
+              value={project.progressValue || 0}
+              max={project.progressMax || 1}
+              hideText
+            />
+            <div>{stepInfo}</div>
+          </div>
+          <div className={styles.imageContainer}>
+            {preview ? <img src={preview} /> : undefined}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export const Images: React.FC = observer(() => {
+  const project = useSimpleProject();
 
   let mode: string | undefined = undefined;
   const task =
@@ -33,23 +80,7 @@ export const Images: React.FC = observer(() => {
   return (
     <div className={styles.main}>
       <div className={styles.center}>
-        {mode === 'progress' && (
-          <div className={styles.preview}>
-            <div className={styles.progressPreview}>
-              <div>
-                <div>{project.firstPrompt!.data.step}...</div>
-                <div className={styles.progressBar}>
-                  <ProgressBar
-                    value={project.progressValue}
-                    max={project.progressMax}
-                    marquee={project.progressMarquee}
-                  />
-                </div>
-                {preview ? <img src={preview} /> : undefined}
-              </div>
-            </div>
-          </div>
-        )}
+        {mode === 'progress' && <GenerationProgress />}
         {mode === 'task' && (
           <div className={styles.preview}>
             <div className={styles.progressPreview}>
