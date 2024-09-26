@@ -8,6 +8,7 @@ export interface CivitAIModelVersionFile {
   primary?: boolean;
   name: string;
   downloadUrl: string;
+  type?: 'Model' | 'Config' | string;
   metadata: {
     fp?: 'fp16' | 'fp32' | null;
     size?: 'full' | 'pruned' | null;

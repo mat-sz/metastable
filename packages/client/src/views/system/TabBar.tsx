@@ -9,7 +9,7 @@ import {
   BsGearFill,
   BsHouseFill,
   BsPlusLg,
-  BsX,
+  BsXLg,
 } from 'react-icons/bs';
 import { useContextMenu } from 'use-context-menu';
 
@@ -91,7 +91,7 @@ export const BaseTab = React.forwardRef<
               onClose();
             }}
           >
-            <BsX />
+            <BsXLg />
           </button>
         )}
         {contextMenu}

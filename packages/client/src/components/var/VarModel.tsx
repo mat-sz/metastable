@@ -1,7 +1,7 @@
 import { CheckpointType, Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { BsChevronRight } from 'react-icons/bs';
+import { BsChevronDown } from 'react-icons/bs';
 import { Popover } from 'react-tiny-popover';
 
 import { ModelBrowser } from '$components/modelBrowser';
@@ -85,18 +85,15 @@ export const VarModel = observer(
                   {model.image && <img src={model.image.thumbnailUrl} />}
                 </div>
                 <span className={styles.name}>{model.name}</span>
-                <div className={styles.chevron}>
-                  <BsChevronRight />
-                </div>
               </>
             ) : (
               <>
                 <span className={styles.name}>(none)</span>
-                <div className={styles.chevron}>
-                  <BsChevronRight />
-                </div>
               </>
             )}
+            <div className={styles.chevron}>
+              <BsChevronDown />
+            </div>
           </button>
         </Popover>
       </VarBase>

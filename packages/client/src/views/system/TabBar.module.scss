@@ -16,18 +16,18 @@
   }
 
   .tab {
-    padding-left: 1rem;
-    padding-top: 0.8rem;
-    padding-bottom: calc(0.8rem - 2px);
-    padding-right: 1rem;
+    padding: 1rem;
     display: inline-flex;
     align-items: center;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
     border-right: 1px solid var(--grey-400);
     position: relative;
     -webkit-app-region: no-drag;
     font-size: 0;
+
+    &:last-child {
+      border-right: none;
+    }
 
     span,
     svg {
@@ -61,11 +61,17 @@
 
     &.selected {
       background: var(--grey-300);
-      border-bottom-color: var(--accent-900);
     }
 
     &:hover {
-      border-bottom-color: var(--grey-800);
+      background: var(--grey-400);
+    }
+
+    &.selected,
+    &:hover {
+      button svg {
+        color: var(--grey-800);
+      }
     }
 
     button {
@@ -73,9 +79,14 @@
       padding: 0;
       line-height: 0;
       font-size: 1.2rem;
-      margin-left: 0.5rem;
-      margin-right: -0.5rem;
-      margin-top: 0.1rem;
+      margin-left: 0.75rem;
+      margin-right: -0.25rem;
+
+      svg {
+        color: var(--grey-600);
+        font-size: 0.9rem;
+        line-height: 1em;
+      }
     }
   }
 }
