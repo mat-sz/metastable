@@ -56,6 +56,8 @@
 
     .card {
       display: block;
+      border-radius: 5px;
+      overflow: hidden;
       aspect-ratio: 0.75;
 
       .name {
@@ -74,6 +76,11 @@
 
       .icon {
         font-size: 3rem;
+
+        & > div {
+          position: absolute;
+          inset: 0;
+        }
       }
 
       .image > * {
@@ -104,11 +111,21 @@
           rgba(0, 0, 0, 0.5) 90%,
           rgba(0, 0, 0, 0.75) 100%
         );
-        border-radius: 0 0 4px 4px;
       }
 
       .tag {
         margin-bottom: 5px;
+      }
+
+      .menuToggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 999;
+
+        &:hover {
+          background: none !important;
+        }
       }
     }
   }
@@ -153,7 +170,7 @@
   &.view_list {
     .card {
       display: grid;
-      grid-template-columns: 50px 1fr;
+      grid-template-columns: 50px 1fr 50px;
 
       .icon > div {
         display: flex;
@@ -187,7 +204,8 @@
 
   &.view_details {
     .card {
-      display: block;
+      display: grid;
+      grid-template-columns: 1fr 50px;
 
       .image,
       .icon {
@@ -268,13 +286,9 @@
 }
 
 .menuToggle {
-  position: absolute;
-  top: 0;
-  right: 0;
   background: none;
   padding: 0.25rem 0.5rem;
   font-size: 1.5rem;
-  z-index: 999;
 
   &:hover {
     background: none !important;
