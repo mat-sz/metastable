@@ -163,6 +163,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
   addOutputToEditor: Point | undefined = undefined;
   stepTime: Record<string, number> | undefined = undefined;
   currentTask: Task<ProjectPromptTaskData> | undefined = undefined;
+  lastOutputName: string | undefined = undefined;
 
   constructor(data: APIProject) {
     data.settings ??= defaultSettings();
@@ -182,6 +183,10 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       selectOutput: action,
       selectTask: action,
       checkpointType: computed,
+      lastOutputName: observable,
+      availableStyles: computed,
+      discard: action,
+      isLastOutput: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -373,6 +378,22 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     );
   }
 
+  get isLastOutput() {
+    return (
+      !!this.lastOutputName &&
+      this.currentOutput?.name === this.lastOutputName &&
+      !this.firstPrompt
+    );
+  }
+
+  async discard() {
+    if (this.isLastOutput) {
+      await this.deleteOutput(this.lastOutputName!);
+    }
+
+    await this.request();
+  }
+
   async request() {
     if (this.settings.client.randomizeSeed) {
       this.settings.sampler.seed = randomSeed();
@@ -512,6 +533,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     const outputs = task.data.outputs!;
     this.selectOutput(outputs[0]);
     this.outputs.push(...outputs);
+    this.lastOutputName = outputs[0].name;
 
     this.stepTime = task.data.stepTime;
 

@@ -91,13 +91,11 @@
   }
 
   .hint {
-    margin: 0 1rem;
+    margin-right: 1rem;
     font-size: 0.8rem;
   }
 
-  .buttons {
-    button {
-      margin-left: 1rem;
-    }
+  button:not(:last-child) {
+    margin-right: 1rem;
   }
 }

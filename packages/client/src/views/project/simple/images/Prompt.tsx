@@ -56,9 +56,15 @@ export const Prompt: React.FC = observer(() => {
           )}
         </div>
         <div>
-          <div className={styles.hint}>
-            Hint: You can use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> as well.
-          </div>
+          {project.isLastOutput && (
+            <Button
+              disabled={!isValid}
+              onClick={() => project.discard()}
+              variant="danger"
+            >
+              Discard
+            </Button>
+          )}
           <Button
             disabled={!isValid}
             onClick={() => project.request()}
