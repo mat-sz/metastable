@@ -3,7 +3,13 @@ import path from 'node:path';
 
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { TaskState } from '@metastable/types';
-import { app, BrowserWindow, Menu } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  shell,
+  WindowOpenHandlerResponse,
+} from 'electron';
 import contextMenu from 'electron-context-menu';
 import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
@@ -141,6 +147,15 @@ async function createWindow() {
   }
 
   win.setBackgroundColor('#11111a');
+
+  win.webContents.setWindowOpenHandler(details => {
+    if (details.url?.startsWith('http')) {
+      shell.openExternal(details.url);
+      return { action: 'deny' } as WindowOpenHandlerResponse;
+    }
+
+    return { action: 'allow' } as WindowOpenHandlerResponse;
+  });
 
   const PROGRESS_BAR_INDETERMINATE = os.platform() === 'win32' ? 2 : 0;
   let lastTaskId: string | undefined = undefined;

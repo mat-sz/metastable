@@ -37,14 +37,15 @@ export const downloadable: DownloadableModelGroup[] = [
           {
             type: ModelType.CHECKPOINT,
             name: 'sd_v1.5-pruned-emaonly.safetensors',
-            url: 'https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
+            url: 'https://huggingface.co/stable-diffusion-v1-5//stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
             size: 4265146304,
           },
         ],
         description:
           'The most commonly used checkpoint model. Most models on CivitAI are based on this.',
         recommended: true,
-        homepage: 'https://huggingface.co/runwayml/stable-diffusion-v1-5',
+        homepage:
+          'https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5',
         baseModel: 'SD 1.5',
       },
       {
@@ -134,24 +135,6 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0',
-        baseModel: 'SDXL 1.0',
-      },
-      {
-        name: 'SDXL 1.0 - Refiner',
-        source: 'huggingface',
-        type: ModelType.CHECKPOINT,
-        downloads: [
-          {
-            type: ModelType.CHECKPOINT,
-            name: 'sd_xl_refiner_1.0.safetensors',
-            url: 'https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors',
-            size: 6075981930,
-          },
-        ],
-        description:
-          'A model designed for improving the output from base SDXL.',
-        homepage:
-          'https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0',
         baseModel: 'SDXL 1.0',
       },
     ],
