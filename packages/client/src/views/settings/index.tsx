@@ -26,7 +26,12 @@ export const Settings: React.FC = observer(() => {
       onChange={value => config.set(value)}
       className={styles.settings}
     >
-      <TabView defaultTab="general" variant="large" direction="vertical">
+      <TabView
+        className={styles.view}
+        defaultTab="general"
+        variant="large"
+        direction="vertical"
+      >
         <Tabs>
           <Tab id="general" title="General" icon={<BsGear />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />

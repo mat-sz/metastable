@@ -60,12 +60,14 @@ export function List<T>({
           </Switch>
         )}
       </div>
-      <div
-        className={clsx(styles.list, styles[`view_${view || selectedView}`], {
-          [styles.small]: small,
-        })}
-      >
-        {displayItems.map(children)}
+      <div className={styles.listWrapper}>
+        <div
+          className={clsx(styles.list, styles[`view_${view || selectedView}`], {
+            [styles.small]: small,
+          })}
+        >
+          {displayItems.map(children)}
+        </div>
       </div>
     </div>
   );

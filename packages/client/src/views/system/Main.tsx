@@ -3,21 +3,24 @@ import React from 'react';
 import { useMediaQuery } from '$hooks/useMediaQuery';
 import { Status } from './common/Status';
 import styles from './Main.module.scss';
+import { TabBar } from './TabBar';
+import { TitleBar } from './TitleBar';
 
 interface Props {
-  hideStatus?: boolean;
+  isReady?: boolean;
 }
 
 export const Main: React.FC<React.PropsWithChildren<Props>> = ({
   children,
-  hideStatus,
+  isReady,
 }) => {
   const isDesktop = useMediaQuery('screen and (min-width: 960px)');
 
   return (
     <div className={styles.main}>
-      {children}
-      {isDesktop && !hideStatus && <Status />}
+      {isReady ? <TabBar /> : <TitleBar />}
+      <div className={styles.wrapper}>{children}</div>
+      {isDesktop && isReady && <Status />}
     </div>
   );
 };

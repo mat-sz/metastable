@@ -1,7 +1,14 @@
 .main {
   height: 100%;
-  max-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
 }
