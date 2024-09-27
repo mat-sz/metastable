@@ -188,68 +188,70 @@ export const FileList: React.FC<Props> = ({
   });
 
   return items.length ? (
-    <div className={styles.files} ref={listRef} {...dragProps()}>
+    <div className={styles.wrapper} ref={listRef} {...dragProps()}>
       <div className={styles.selectionBox} ref={selectionBoxRef} />
-      {items.map((item, index) => (
-        <a
-          className={clsx(styles.file, {
-            [styles.selected]: (dragSelectionPreview ?? selection)?.includes(
-              item.name,
-            ),
-          })}
-          href={item.image.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          key={item.name}
-          onPointerDown={e => {
-            e.stopPropagation();
-          }}
-          onClick={e => {
-            e.preventDefault();
-            e.stopPropagation();
+      <div className={styles.files}>
+        {items.map((item, index) => (
+          <a
+            className={clsx(styles.file, {
+              [styles.selected]: (dragSelectionPreview ?? selection)?.includes(
+                item.name,
+              ),
+            })}
+            href={item.image.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            key={item.name}
+            onPointerDown={e => {
+              e.stopPropagation();
+            }}
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
 
-            if (e.shiftKey) {
-              const last = lastClickedIdRef.current;
-              const lastIndex = items.findIndex(item => item.name === last);
-              if (lastIndex === -1) {
-                onSelect([item.name]);
-              } else {
-                const newSelection = items
-                  .slice(
-                    Math.min(lastIndex, index),
-                    Math.max(lastIndex, index) + 1,
-                  )
-                  .map(item => item.name);
-                if (e.ctrlKey) {
-                  onSelect(mergeSelection(selection, newSelection, 'add'));
+              if (e.shiftKey) {
+                const last = lastClickedIdRef.current;
+                const lastIndex = items.findIndex(item => item.name === last);
+                if (lastIndex === -1) {
+                  onSelect([item.name]);
                 } else {
-                  onSelect(newSelection);
+                  const newSelection = items
+                    .slice(
+                      Math.min(lastIndex, index),
+                      Math.max(lastIndex, index) + 1,
+                    )
+                    .map(item => item.name);
+                  if (e.ctrlKey) {
+                    onSelect(mergeSelection(selection, newSelection, 'add'));
+                  } else {
+                    onSelect(newSelection);
+                  }
                 }
+              } else if (e.ctrlKey) {
+                onSelect(mergeSelection(selection, [item.name], 'xor'));
+              } else {
+                onSelect([item.name]);
               }
-            } else if (e.ctrlKey) {
-              onSelect(mergeSelection(selection, [item.name], 'xor'));
-            } else {
-              onSelect([item.name]);
-            }
 
-            if (!e.shiftKey) {
-              lastClickedIdRef.current = item.name;
-            }
-          }}
-          onDoubleClick={() => {
-            onOpen([item.name]);
-          }}
-          data-id={item.name}
-        >
-          {item.image.thumbnailUrl ? (
-            <img src={item.image.thumbnailUrl} />
-          ) : (
-            <div className={styles.icon}>
-              <MdNoPhotography />
-            </div>
-          )}
-        </a>
-      ))}
+              if (!e.shiftKey) {
+                lastClickedIdRef.current = item.name;
+              }
+            }}
+            onDoubleClick={() => {
+              onOpen([item.name]);
+            }}
+            data-id={item.name}
+          >
+            {item.image.thumbnailUrl ? (
+              <img src={item.image.thumbnailUrl} />
+            ) : (
+              <div className={styles.icon}>
+                <MdNoPhotography />
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
     </div>
   ) : (
     <div className={styles.info}>This directory is empty.</div>

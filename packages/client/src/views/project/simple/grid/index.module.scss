@@ -1,22 +1,14 @@
 .grid {
   overflow-y: auto;
   margin-bottom: auto;
-  min-height: 0;
+  height: 100%;
   font-size: 0;
   padding: 1rem;
-  display: grid;
-  grid-gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  display: flex;
+  flex-direction: column;
 
-  a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    img {
-      border-radius: 5px;
-      width: 100%;
-    }
+  & > div {
+    flex: 1;
   }
 }
 

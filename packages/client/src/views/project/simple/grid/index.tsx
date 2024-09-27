@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
+import { BsTrash } from 'react-icons/bs';
 
+import { FileManager } from '$components/fileManager';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
@@ -18,26 +20,28 @@ export const Grid: React.FC = observer(() => {
   }
 
   return (
-    <>
-      <div className={styles.grid}>
-        {outputs.map((output, i) => (
-          <a
-            href={output.image.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            key={i}
-            onClick={e => {
-              if (e.button === 0) {
-                setOpen(true);
-                setCurrent(i);
-                e.preventDefault();
-              }
-            }}
-          >
-            <img src={output.image.thumbnailUrl} />
-          </a>
-        ))}
-      </div>
+    <div className={styles.grid}>
+      <FileManager
+        items={outputs}
+        onOpen={ids => {
+          setCurrent(outputs.findIndex(item => item.name === ids[0]) || 0);
+          setOpen(true);
+        }}
+        selectionActions={selection => (
+          <>
+            <button
+              onClick={async () => {
+                for (const item of selection) {
+                  await project.deleteOutput(item.name);
+                }
+              }}
+            >
+              <BsTrash />
+              <span>Delete</span>
+            </button>
+          </>
+        )}
+      />
       {open && (
         <Lightbox
           current={current}
@@ -49,6 +53,6 @@ export const Grid: React.FC = observer(() => {
           }}
         />
       )}
-    </>
+    </div>
   );
 });

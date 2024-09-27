@@ -6,10 +6,10 @@ import React, { useState } from 'react';
 import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 
 import { TRPC } from '$api';
+import { FileManager } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { Tagger } from '$modals/tagger';
 import { modalStore } from '$stores/ModalStore';
-import { FileManager } from './fileManager';
 import styles from './index.module.scss';
 import { InputEditor } from './InputEditor';
 import { UploadQueue, UploadQueueItem } from './UploadQueue';
