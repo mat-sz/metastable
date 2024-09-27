@@ -187,6 +187,7 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
       availableStyles: computed,
       discard: action,
       isLastOutput: computed,
+      queued: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -392,6 +393,30 @@ export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
     }
 
     await this.request();
+  }
+
+  get queued() {
+    return this.prompts.filter(
+      item =>
+        item.state !== TaskState.RUNNING && item.state !== TaskState.CANCELLING,
+    );
+  }
+
+  async clearQueue() {
+    await Promise.all(
+      this.queued.map(item =>
+        API.task.dismiss.mutate({ queueId: 'project', taskId: item.id }),
+      ),
+    );
+  }
+
+  async cancel() {
+    const task = this.firstPrompt;
+    if (!task) {
+      return;
+    }
+
+    await API.task.cancel.mutate({ queueId: 'project', taskId: task.id });
   }
 
   async request() {

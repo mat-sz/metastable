@@ -17,11 +17,7 @@ import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import type { ComfySession } from '../session.js';
-import { ComfyPreviewSettings } from '../types.js';
-
-function toBase64(url: string) {
-  return url.split(',')[1];
-}
+import { ComfyPreviewSettings, RPCBytes } from '../types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private embeddingsPath?: string;
@@ -29,6 +25,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     method: 'auto',
   };
   private storeMetadata = false;
+  private session?: ComfySession;
 
   constructor(
     private metastable: Metastable,
@@ -246,8 +243,28 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     }
   }
 
-  async execute() {
+  cancel() {
+    if (this.state === TaskState.RUNNING && this.session) {
+      this.session.destroy();
+    }
+
+    this.state = TaskState.CANCELLING;
+  }
+
+  async inputAsBytes(url: string): Promise<RPCBytes> {
+    if (url.startsWith('data:')) {
+      return {
+        $bytes: url.split(',')[1],
+      };
+    }
+
+    throw new Error('Unable to load input');
+  }
+
+  private async generate() {
     await this.metastable.comfy!.session(async ctx => {
+      this.session = ctx;
+
       ctx.on('progress', e => {
         this.progress = e.value / e.max;
         this.data = {
@@ -289,9 +306,9 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.step('controlnet');
         for (const controlnetSettings of controlnets) {
           if (controlnetSettings.enabled) {
-            const { image } = await ctx.loadImage({
-              $bytes: toBase64(controlnetSettings.image!),
-            });
+            const { image } = await ctx.loadImage(
+              await this.inputAsBytes(controlnetSettings.image!),
+            );
             const controlnet = await ctx.controlnet(controlnetSettings.path!);
             await controlnet.applyTo(
               conditioning,
@@ -307,9 +324,9 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.step('ipadapter');
         for (const ipadapterSettings of ipadapters) {
           if (ipadapterSettings.enabled) {
-            const { image } = await ctx.loadImage({
-              $bytes: toBase64(ipadapterSettings.image!),
-            });
+            const { image } = await ctx.loadImage(
+              await this.inputAsBytes(ipadapterSettings.image!),
+            );
             const ipadapter = await ctx.ipadapter(ipadapterSettings.path!);
             const clipVision = await ctx.clipVision(
               ipadapterSettings.clipVisionPath!,
@@ -340,17 +357,17 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           break;
         case 'image':
           {
-            const { image } = await ctx.loadImage({
-              $bytes: toBase64(settings.input.processedImage!),
-            });
+            const { image } = await ctx.loadImage(
+              await this.inputAsBytes(settings.input.processedImage!),
+            );
             latent = await checkpoint.encode(image);
           }
           break;
         case 'image_masked':
           {
-            const { image, mask } = await ctx.loadImage({
-              $bytes: toBase64(settings.input.processedImage!),
-            });
+            const { image, mask } = await ctx.loadImage(
+              await this.inputAsBytes(settings.input.processedImage!),
+            );
             latent = await checkpoint.encode(image, mask);
           }
           break;
@@ -417,6 +434,18 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         outputs,
       };
     });
+  }
+
+  async execute() {
+    try {
+      await this.generate();
+    } catch (e) {
+      if (this.state === TaskState.CANCELLING) {
+        return TaskState.CANCELLED;
+      }
+
+      throw e;
+    }
 
     return TaskState.SUCCESS;
   }

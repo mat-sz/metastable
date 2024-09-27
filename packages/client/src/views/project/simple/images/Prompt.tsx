@@ -65,6 +65,16 @@ export const Prompt: React.FC = observer(() => {
               Discard
             </Button>
           )}
+          {project.queued.length > 0 && (
+            <Button onClick={() => project.clearQueue()} variant="danger">
+              Clear queue
+            </Button>
+          )}
+          {!!project.firstPrompt && (
+            <Button onClick={() => project.cancel()} variant="danger">
+              Cancel
+            </Button>
+          )}
           <Button
             disabled={!isValid}
             onClick={() => project.request()}

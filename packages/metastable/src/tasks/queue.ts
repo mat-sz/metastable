@@ -28,6 +28,7 @@ export type BaseQueueEvents = QueueTaskEvents & {
 export interface BaseQueueSettings {
   startAutomatically?: boolean;
   dismissSuccessful?: boolean;
+  dismissCancelled?: boolean;
   stopOnFailure?: boolean;
 }
 
@@ -50,6 +51,7 @@ export class BaseQueue<T = any>
     this.settings = {
       stopOnFailure: false,
       dismissSuccessful: false,
+      dismissCancelled: false,
       startAutomatically: true,
       ...settings,
     };
@@ -111,6 +113,10 @@ export class BaseQueue<T = any>
           }
         } else {
           failed = true;
+        }
+
+        if (state === TaskState.CANCELLED && this.settings.dismissCancelled) {
+          this.dismiss(current.id);
         }
       } catch (e: any) {
         failed = true;

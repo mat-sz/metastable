@@ -2,6 +2,8 @@
 
 ## Features
 
+- Added "Cancel" and "Clear queue" buttons to projects.
+- Added a "Discard" button to quickly delete current output and try again.
 - Added a context menu for text fields and images.
 
 # 0.0.4 (2024-09-24)

@@ -6,6 +6,7 @@ import output
 import traceback
 
 import rpc_hook
+import comfy.model_management
 
 PRIMITIVES = (bool, str, int, float, type(None))
 
@@ -132,9 +133,10 @@ class RPC:
             method = request["method"]
             session_id = request["session"] if "session" in request else None
             session = None
-            
+
             if session_id is not None:
                 if method == "session:start":
+                    comfy.model_management.interrupt_current_processing(False)
                     self.sessions[session_id] = RPCSession()
 
                     return {
@@ -143,6 +145,7 @@ class RPC:
                         "result": session_id
                     }
                 elif method == "session:destroy":
+                    comfy.model_management.interrupt_current_processing(True)
                     del self.sessions[session_id]
 
                     return {

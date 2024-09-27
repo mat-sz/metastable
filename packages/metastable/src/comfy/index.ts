@@ -123,8 +123,8 @@ export class Comfy extends (EventEmitter as {
 
     const result = await callback(session);
 
+    await session.destroy();
     delete this.sessions[sessionId];
-    await this.invoke(sessionId, 'session:destroy');
 
     return result;
   }

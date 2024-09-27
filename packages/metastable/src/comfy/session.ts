@@ -160,4 +160,10 @@ export class ComfySession extends (EventEmitter as {
       caption_separator: captionSeparator,
     })) as Record<string, string>;
   }
+
+  async destroy() {
+    try {
+      await this.invoke('session:destroy');
+    } catch {}
+  }
 }
