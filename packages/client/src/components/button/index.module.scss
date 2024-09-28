@@ -34,12 +34,12 @@
   }
 
   &.danger {
-    background: var(--red-900);
-    border: 1px solid var(--red-800);
+    background: var(--red-700);
+    border: 1px solid var(--red-900);
     color: white;
 
     &:hover {
-      background: var(--red-800);
+      background: var(--red-900);
     }
   }
 

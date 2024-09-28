@@ -1,3 +1,9 @@
+# 0.0.6 (Upcoming)
+
+## Bug fixes
+
+- Improved progress display on smaller screens.
+
 # 0.0.5 (2024-09-28)
 
 ## Features
