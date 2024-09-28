@@ -6,9 +6,10 @@
 
   button {
     background: none;
+    border: none;
     font-size: 0;
-    height: 100%;
-    border-radius: 0;
+    margin: 0.1rem;
+    height: calc(100% - 0.2rem);
     padding: 0.2rem 0.9rem;
     -webkit-app-region: no-drag;
 
