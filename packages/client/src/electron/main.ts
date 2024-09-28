@@ -48,23 +48,38 @@ autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater.autoRunAppAfterInstall = true;
 
+const IS_WINDOWS = os.platform() === 'win32';
+const IS_MAC = os.platform() === 'darwin';
+
 function createMenu() {
   const menuTemplate: (
     | Electron.MenuItem
     | Electron.MenuItemConstructorOptions
   )[] = [
     {
-      label: app.name,
+      role: 'appMenu',
+    },
+    {
+      role: 'fileMenu',
+    },
+    {
+      role: 'editMenu',
+    },
+    {
+      role: 'viewMenu',
+    },
+    {
+      role: 'windowMenu',
+    },
+    {
+      label: 'Help',
       submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' },
+        {
+          label: 'Learn More',
+          click: async () => {
+            await shell.openExternal('https://metastable.studio');
+          },
+        },
       ],
     },
   ];
@@ -76,10 +91,7 @@ async function createWindow() {
   const dataRoot = path.join(app.getPath('userData'), 'data');
   const comfyMainPath = path.join(
     app.isPackaged
-      ? path.join(
-          path.dirname(app.getPath('exe')),
-          os.platform() === 'darwin' ? '..' : '.',
-        )
+      ? path.join(path.dirname(app.getPath('exe')), IS_MAC ? '..' : '.')
       : path.resolve('../metastable'),
     'python',
     'main.py',
@@ -132,7 +144,7 @@ async function createWindow() {
   win.setMenu(null);
 
   // macOS menu bar
-  if (os.platform() === 'darwin') {
+  if (IS_MAC) {
     app.applicationMenu = createMenu();
   }
 
@@ -157,7 +169,7 @@ async function createWindow() {
     return { action: 'allow' } as WindowOpenHandlerResponse;
   });
 
-  const PROGRESS_BAR_INDETERMINATE = os.platform() === 'win32' ? 2 : 0;
+  const PROGRESS_BAR_INDETERMINATE = IS_WINDOWS ? 2 : 0;
   let lastTaskId: string | undefined = undefined;
   metastable.tasks.on('update', e => {
     if (e.queueId === 'project') {

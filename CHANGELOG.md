@@ -10,6 +10,7 @@
 ## Bug fixes
 
 - Resolved issues with saving settings.
+- Fixed copy/paste/select keyboard shortcuts on MacOS.
 
 # 0.0.4 (2024-09-24)
 
