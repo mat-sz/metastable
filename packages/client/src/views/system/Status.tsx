@@ -12,7 +12,7 @@ import { Backend } from '$modals/backend';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import styles from './Status.module.scss';
-import { Utilization } from '../Utilization';
+import { Utilization } from './Utilization';
 
 interface Props {
   className?: string;

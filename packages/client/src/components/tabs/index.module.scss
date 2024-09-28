@@ -12,6 +12,7 @@
 .tab {
   display: flex;
   align-items: center;
+  transition: 0.2s ease-in-out all;
 
   button {
     background: none;
@@ -53,7 +54,7 @@
 
     & > .tabs {
       display: flex;
-      border-bottom: 1px solid var(--grey-600);
+      border-bottom: 1px solid var(--grey-300);
 
       & > .tab {
         background: var(--grey-300);
@@ -84,7 +85,6 @@
     & > .tabs {
       background: var(--grey-200);
       display: flex;
-      border-right: 1px solid var(--grey-400);
 
       @media screen and (min-width: 960px) {
         display: block;
@@ -101,7 +101,8 @@
         font-size: 0.7rem;
         font-weight: 600;
         cursor: pointer;
-        border-bottom: 1px solid var(--grey-400);
+        border-radius: 5px;
+        margin-bottom: 0.1rem;
 
         &.selected {
           background: var(--grey-300);
@@ -118,8 +119,12 @@
     flex: 1;
 
     & > .content {
-      background: none;
+      background: var(--grey-200);
+      border-radius: 5px;
       padding: 1rem;
+      margin-right: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
     }
 
     &.vertical {
@@ -128,9 +133,9 @@
       }
 
       & > .tabs {
-        background: var(--grey-200);
-        border-right: 1px solid var(--grey-400);
-        padding: 1rem;
+        background: none;
+        border-right: none;
+        padding: 0.5rem 1rem;
 
         & > .tab {
           text-transform: none;

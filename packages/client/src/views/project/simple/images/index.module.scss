@@ -7,9 +7,10 @@
 
 .prompt {
   background: var(--grey-200);
-  border-top: 1px solid var(--grey-400);
   overflow-y: auto;
   position: relative;
+  margin: 1rem 0;
+  border-radius: 5px;
 
   [varui-label] {
     margin: 1rem;
@@ -19,8 +20,39 @@
     padding: 0 1rem;
   }
 
+  [varui-category] {
+    border-bottom: none;
+
+    & > div:last-child {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      textarea {
+        min-height: 150px;
+      }
+    }
+  }
+
   .actions {
-    border: none;
+    background: var(--grey-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    padding-top: 0;
+
+    & > div {
+      display: flex;
+      align-items: center;
+    }
+
+    .hint {
+      margin-right: 1rem;
+      font-size: 0.8rem;
+    }
+
+    button:not(:last-child) {
+      margin-right: 1rem;
+    }
   }
 
   .style {
@@ -117,13 +149,14 @@
   }
 }
 
-.actions {
+.imageActions {
   background: var(--grey-200);
-  border-bottom: 1px solid var(--grey-400);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 5px;
 
   & > div {
     display: flex;

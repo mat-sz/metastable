@@ -43,14 +43,24 @@
 }
 
 .searchInput {
-  background: var(--grey-400);
-  border: none;
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
   color: var(--grey-900);
   padding: 0.6rem;
   border-radius: 5px;
+  transition: 0.2s ease-in-out all;
+
+  &:hover {
+    border-color: var(--grey-600);
+  }
+
+  &:focus-within {
+    border-color: var(--accent-900);
+  }
 
   input {
     background: none;
+    border: none;
     padding: 0;
     outline: none !important;
   }

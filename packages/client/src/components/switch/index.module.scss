@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   background: var(--grey-400);
+  border: 1px solid var(--grey-600);
   border-radius: 5px;
   overflow: hidden;
   padding: 0.25rem;
@@ -9,6 +10,7 @@
 
 .option {
   background: none;
+  border: none;
   border-radius: 5px;
   height: 100%;
   padding: 0.5rem 1rem;

@@ -2,6 +2,7 @@
 
 ## Features
 
+- Updated design language.
 - Replaced the output grid view with a more advanced file manager view.
 - Added "Cancel" and "Clear queue" buttons to projects.
 - Added a "Discard" button to quickly delete current output and try again.

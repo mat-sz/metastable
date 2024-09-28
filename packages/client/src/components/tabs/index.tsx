@@ -22,6 +22,7 @@ export const Tab: React.FC<React.PropsWithChildren<TabProps>> = ({
         [styles.selected]: context.selected === id,
       })}
       onClick={() => context.select(id)}
+      role="button"
       title={title}
     >
       {icon}

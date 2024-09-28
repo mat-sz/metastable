@@ -1,6 +1,8 @@
 .settings {
   position: relative;
-  border-left: 1px solid var(--grey-400);
+  margin: 1rem;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .var {
@@ -10,7 +12,7 @@
   overflow-y: auto;
 
   [varui-category] {
-    border-bottom: 1px solid var(--grey-400);
+    border-bottom: 1px solid var(--grey-300);
   }
 
   [varui-label] {

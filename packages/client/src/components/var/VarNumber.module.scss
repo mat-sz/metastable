@@ -10,12 +10,11 @@
 
   input {
     flex: 1;
-    border: none;
     -moz-appearance: textfield;
     height: 1.3rem;
     padding: 0 0.2rem;
     text-align: right;
-    border-radius: 0.25rem;
+    border-radius: 5px;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {

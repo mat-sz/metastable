@@ -43,10 +43,12 @@ export const Settings: React.FC = observer(() => {
           />
         </Tabs>
         <TabContent className={styles.content}>
-          <SettingsGeneral />
-          <SettingsDownloads />
-          <SettingsStyles />
-          <SettingsAbout />
+          <div className={styles.wrapper}>
+            <SettingsGeneral />
+            <SettingsDownloads />
+            <SettingsStyles />
+            <SettingsAbout />
+          </div>
         </TabContent>
       </TabView>
     </VarUI>

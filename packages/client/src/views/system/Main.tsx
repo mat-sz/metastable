@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { useMediaQuery } from '$hooks/useMediaQuery';
-import { Status } from './common/Status';
 import styles from './Main.module.scss';
+import { Status } from './Status';
 import { TabBar } from './TabBar';
 import { TitleBar } from './TitleBar';
 

@@ -7,6 +7,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 5px;
+  background: var(--grey-050);
 
   img {
     position: absolute;

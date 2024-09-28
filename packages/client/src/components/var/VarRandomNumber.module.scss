@@ -12,10 +12,9 @@
   margin-right: 0.5rem;
 
   input {
-    border: none;
     -moz-appearance: textfield;
-    text-align: right;
-    border-radius: 0.25rem;
+    text-align: left;
+    border-radius: 5px;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {

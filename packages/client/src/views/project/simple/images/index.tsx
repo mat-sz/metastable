@@ -110,7 +110,7 @@ export const Images: React.FC = observer(() => {
         )}
         {mode === 'image' && (
           <>
-            <div className={styles.actions}>
+            <div className={styles.imageActions}>
               <div>{project.currentOutput!.name}</div>
               <div className={styles.buttons}>
                 <ImageActions file={project.currentOutput!} />

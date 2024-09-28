@@ -1,22 +1,30 @@
 .search {
   display: flex;
   align-items: center;
-  background: var(--grey-400);
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
   border-radius: 5px;
   padding: 0 0.5rem;
+  transition: 0.2s ease-in-out all;
+
+  &:hover {
+    border: 1px solid var(--grey-600);
+  }
 
   &:focus-within {
-    background: var(--grey-600);
+    border: 1px solid var(--accent-900);
   }
 
   input {
     background: transparent;
     outline: none;
+    border: none;
     flex: 1;
   }
 
   button {
     background: none;
+    border: none;
     padding: 0;
 
     svg {

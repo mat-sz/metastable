@@ -17,8 +17,10 @@
 }
 
 :root {
+  --grey-050: #0a0a0f;
   --grey-100: #11111a;
   --grey-200: #17171f;
+  --grey-200-transparent: #17171fdd;
   --grey-300: #22222a;
   --grey-300-transparent: #22222add;
   --grey-400: #2b2b35;
@@ -157,11 +159,21 @@ input,
 textarea,
 select,
 option {
-  background: var(--grey-400);
-  border: none;
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
   color: var(--grey-900);
   padding: 0.6rem;
   border-radius: 5px;
+  outline: none !important;
+  transition: 0.2s ease-in-out all;
+
+  &:hover {
+    border-color: var(--grey-600);
+  }
+
+  &:focus {
+    border-color: var(--accent-900);
+  }
 }
 
 button {
@@ -173,8 +185,8 @@ button {
   padding: 0.6rem 1.2rem;
   font-size: 0.8rem;
   border-radius: 5px;
-  transition: 0.1s ease-in-out all;
-  border: none;
+  transition: 0.2s ease-in-out all;
+  border: 1px solid var(--grey-600);
   font-weight: 600;
   text-shadow: none;
 
