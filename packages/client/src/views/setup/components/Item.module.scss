@@ -6,6 +6,7 @@
   overflow: hidden;
   --progress-fg: var(--accent-900);
   --progress-bg: var(--grey-300);
+  border-radius: 5px;
 
   .header {
     display: flex;
