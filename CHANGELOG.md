@@ -7,6 +7,10 @@
 - Added a "Discard" button to quickly delete current output and try again.
 - Added a context menu for text fields and images.
 
+## Bug fixes
+
+- Resolved issues with saving settings.
+
 # 0.0.4 (2024-09-24)
 
 ## Features
