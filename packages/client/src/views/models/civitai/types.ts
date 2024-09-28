@@ -79,10 +79,10 @@ export interface CivitAIModel {
 export interface CivitAIResponse {
   items: CivitAIModel[];
   metadata: {
-    totalItems: number;
     currentPage: number;
     pageSize: number;
-    totalPages: number;
+    prevCursor: string;
+    nextCursor: string;
     nextPage: string;
     prevPage: string;
   };

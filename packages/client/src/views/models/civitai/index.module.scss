@@ -77,3 +77,13 @@
   min-height: 0;
   max-height: 100%;
 }
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    margin: 0.5rem;
+  }
+}

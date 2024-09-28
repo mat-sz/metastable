@@ -12,6 +12,7 @@
 
 - Resolved issues with saving settings.
 - Fixed copy/paste/select keyboard shortcuts on MacOS.
+- Fixed CivitAI page navigation.
 
 # 0.0.4 (2024-09-24)
 

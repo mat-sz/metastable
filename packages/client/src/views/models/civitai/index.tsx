@@ -8,7 +8,6 @@ import { IconButton } from '$components/iconButton';
 import { Label } from '$components/label';
 import { Card, CardTag, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
-import { Pagination } from '$components/pagination';
 import { Rating } from '$components/rating';
 import { Toggle } from '$components/toggle';
 import styles from './index.module.scss';
@@ -32,7 +31,7 @@ interface CivitAIArgs {
   nsfw: boolean;
   sort?: string;
   limit?: number;
-  page?: number;
+  cursor?: string;
   baseModels?: string;
 }
 
@@ -42,7 +41,7 @@ async function fetchCivitAI({
   nsfw,
   sort = 'Highest Rated',
   limit = 48,
-  page = 1,
+  cursor,
   baseModels,
 }: CivitAIArgs): Promise<CivitAIResponse> {
   const url = new URL('https://civitai.com/api/v1/models');
@@ -56,7 +55,9 @@ async function fetchCivitAI({
   url.searchParams.append('nsfw', `${nsfw}`);
   url.searchParams.append('sort', sort);
   url.searchParams.append('limit', `${limit}`);
-  url.searchParams.append('page', `${page}`);
+  if (cursor) {
+    url.searchParams.append('cursor', cursor);
+  }
 
   const res = await fetch(url);
   return await res.json();
@@ -98,10 +99,11 @@ const CivitAIBaseModels = [
 export const CivitAI: React.FC = observer(() => {
   const [query, setQuery] = useState('');
 
+  const [cursorHistory, setCursorHistory] = useState<string[]>([]);
   const [args, setArgs] = useState<CivitAIArgs>({
     query: '',
     type: 'Checkpoint',
-    page: 1,
+    cursor: undefined,
     nsfw: false,
   });
   const [item, setItem] = useState<CivitAIModel | undefined>();
@@ -110,7 +112,7 @@ export const CivitAI: React.FC = observer(() => {
       'fetchModels',
       args.query,
       args.type,
-      args.page,
+      args.cursor,
       args.nsfw,
       args.baseModels,
     ],
@@ -121,6 +123,27 @@ export const CivitAI: React.FC = observer(() => {
     return <Model model={item} onClose={() => setItem(undefined)} />;
   }
 
+  const goBack = () => {
+    if (!cursorHistory.length) {
+      return;
+    }
+
+    const previous = cursorHistory[cursorHistory.length - 2];
+    setCursorHistory(history => history.slice(0, -1));
+    setArgs(args => ({ ...args, cursor: previous }));
+  };
+
+  const updateArgs = (newArgs: Partial<CivitAIArgs>) => {
+    const cursor = newArgs.cursor;
+    if (cursor) {
+      setCursorHistory(history => [...history, cursor]);
+    } else {
+      setCursorHistory([]);
+    }
+
+    setArgs(args => ({ ...args, cursor: undefined, ...newArgs }));
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.search}>
@@ -129,7 +152,7 @@ export const CivitAI: React.FC = observer(() => {
           className={styles.searchInput}
           onSubmit={e => {
             e.preventDefault();
-            setArgs(args => ({ ...args, query }));
+            updateArgs({ query });
           }}
         >
           <input
@@ -145,7 +168,7 @@ export const CivitAI: React.FC = observer(() => {
         <Label label="Model type">
           <select
             value={args.type}
-            onChange={e => setArgs(args => ({ ...args, type: e.target.value }))}
+            onChange={e => updateArgs({ type: e.target.value })}
           >
             {Object.entries(CivitAICategories).map(([key, name]) => (
               <option key={key} value={key}>
@@ -158,10 +181,9 @@ export const CivitAI: React.FC = observer(() => {
           <select
             value={args.baseModels || ''}
             onChange={e =>
-              setArgs(args => ({
-                ...args,
+              updateArgs({
                 baseModels: e.target.value || undefined,
-              }))
+              })
             }
           >
             <option value="">Any</option>
@@ -175,7 +197,7 @@ export const CivitAI: React.FC = observer(() => {
         <Label label="Sort by">
           <select
             value={args.sort}
-            onChange={e => setArgs(args => ({ ...args, sort: e.target.value }))}
+            onChange={e => updateArgs({ sort: e.target.value })}
           >
             {CivitAISort.map(value => (
               <option key={value} value={value}>
@@ -187,7 +209,7 @@ export const CivitAI: React.FC = observer(() => {
         <Toggle
           label="NSFW"
           value={!!args.nsfw}
-          onChange={value => setArgs(args => ({ ...args, nsfw: value }))}
+          onChange={value => updateArgs({ nsfw: value })}
         />
       </div>
       <div className={styles.results}>
@@ -231,13 +253,20 @@ export const CivitAI: React.FC = observer(() => {
                 );
               }}
             </List>
-            <Pagination
-              current={data.metadata.currentPage}
-              max={data.metadata.totalPages}
-              onSelect={i => {
-                setArgs(args => ({ ...args, page: i }));
-              }}
-            />
+            <div className={styles.navigation}>
+              {!!cursorHistory.length && (
+                <button onClick={goBack}>Previous</button>
+              )}
+              {!!data.metadata.nextCursor && (
+                <button
+                  onClick={() => {
+                    updateArgs({ cursor: data.metadata.nextCursor });
+                  }}
+                >
+                  Next
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>
