@@ -27,33 +27,23 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   }, [close]);
 
   useEffect(() => {
-    const dialogEl = dialogRef.current;
-    if (!dialogEl) {
-      return;
-    }
-
-    dialogEl.showModal();
-    dialogEl.addEventListener('close', wrappedClose);
-
-    return () => {
-      dialogEl.removeEventListener('close', wrappedClose);
-    };
+    dialogRef.current?.showModal();
   }, [wrappedClose]);
 
   return (
     <dialog
       ref={dialogRef}
       className={styles.dialog}
-      onPointerUp={wrappedClose}
+      onPointerUp={() => {
+        wrappedClose();
+        pointerInsideRef.current = false;
+      }}
+      onClose={wrappedClose}
     >
       <div
         className={clsx(styles.modal, styles[`modal_${size}`])}
         onPointerDown={() => {
           pointerInsideRef.current = true;
-        }}
-        onPointerUp={e => {
-          pointerInsideRef.current = false;
-          e.stopPropagation();
         }}
       >
         <div className={styles.title}>
