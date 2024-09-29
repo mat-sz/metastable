@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { BsXLg } from 'react-icons/bs';
 
 import { useModal } from './context';
@@ -16,7 +16,15 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   size = 'big',
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const pointerInsideRef = useRef(false);
   const { close } = useModal();
+  const wrappedClose = useCallback(() => {
+    if (pointerInsideRef.current) {
+      return;
+    }
+
+    close();
+  }, [close]);
 
   useEffect(() => {
     const dialogEl = dialogRef.current;
@@ -25,18 +33,28 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
     }
 
     dialogEl.showModal();
-    dialogEl.addEventListener('close', close);
+    dialogEl.addEventListener('close', wrappedClose);
 
     return () => {
-      dialogEl.removeEventListener('close', close);
+      dialogEl.removeEventListener('close', wrappedClose);
     };
-  }, [close]);
+  }, [wrappedClose]);
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog} onClick={close}>
+    <dialog
+      ref={dialogRef}
+      className={styles.dialog}
+      onPointerUp={wrappedClose}
+    >
       <div
         className={clsx(styles.modal, styles[`modal_${size}`])}
-        onClick={e => e.stopPropagation()}
+        onPointerDown={() => {
+          pointerInsideRef.current = true;
+        }}
+        onPointerUp={e => {
+          pointerInsideRef.current = false;
+          e.stopPropagation();
+        }}
       >
         <div className={styles.title}>
           <span>{title}</span>
