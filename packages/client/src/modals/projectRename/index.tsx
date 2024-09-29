@@ -45,7 +45,7 @@ export const ProjectRename: React.FC<Props> = observer(
               }
             }}
           >
-            Update
+            Save
           </Button>
         </ModalActions>
       </Modal>

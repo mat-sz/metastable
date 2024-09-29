@@ -32,7 +32,7 @@ export const ProjectDelete: React.FC<Props> = ({ project }) => {
             close();
           }}
         >
-          Confirm
+          Delete
         </Button>
       </ModalActions>
     </Modal>

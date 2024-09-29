@@ -38,7 +38,7 @@ export const ProjectDuplicate: React.FC<Props> = observer(({ project }) => {
             project.duplicate(name);
           }}
         >
-          Update
+          Duplicate
         </Button>
       </ModalActions>
     </Modal>
