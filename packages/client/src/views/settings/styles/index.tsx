@@ -25,6 +25,7 @@ export const SettingsStyles: React.FC = observer(() => {
 
   return (
     <TabPanel id="styles">
+      <h2>Prompt styles</h2>
       <VarArray path="styles">
         {(_, i) => (
           <VarCategory

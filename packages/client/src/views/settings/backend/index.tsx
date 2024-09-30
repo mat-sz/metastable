@@ -7,6 +7,7 @@ import { VarCategory, VarString, VarSwitch } from '$components/var';
 export const SettingsBackend: React.FC = observer(() => {
   return (
     <TabPanel id="backend">
+      <h2>Backend</h2>
       <VarCategory label="Arguments">
         <VarSwitch
           label="VRAM usage"

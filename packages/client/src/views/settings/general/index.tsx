@@ -9,6 +9,7 @@ import styles from './index.module.scss';
 export const SettingsGeneral: React.FC = observer(() => {
   return (
     <TabPanel id="general">
+      <h2>General</h2>
       <VarCategory label="User interface">
         <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />
         {mainStore.notificationPermission !== 'denied' ? (

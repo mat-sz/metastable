@@ -1,5 +1,9 @@
 # 0.0.6 (Upcoming)
 
+## Features
+
+- Added a settings section for ComfyUI arguments.
+
 ## Bug fixes
 
 - Improved progress display on smaller screens.
