@@ -2,8 +2,8 @@ import {
   DownloadSettings,
   Requirement,
   SetupDetails,
-  SetupSettings,
   SetupStatus,
+  TorchMode,
 } from '@metastable/types';
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
 
@@ -68,7 +68,7 @@ export class SetupStore {
   }
 
   start() {
-    let torchMode: SetupSettings['torchMode'] = 'cpu';
+    let torchMode: TorchMode = 'cpu';
 
     const gpu = this.details?.graphics[this.gpuIndex];
     if (gpu) {

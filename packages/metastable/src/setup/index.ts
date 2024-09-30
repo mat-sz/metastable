@@ -109,17 +109,6 @@ export class Setup extends (EventEmitter as {
       bundleVersion: this._bundleVersion,
     });
 
-    const platform = os.platform();
-    if (this.settings.torchMode === 'directml') {
-      await this.metastable.config.set('comfy', {
-        args: ['--directml'],
-      });
-    } else if (platform === 'darwin' && os.arch() === 'arm64') {
-      await this.metastable.config.set('comfy', {
-        args: ['--force-fp16'],
-      });
-    }
-
     this.metastable.reload();
   }
 

@@ -1,4 +1,5 @@
 import { DownloadSettings } from './download.js';
+import { TorchMode } from './instance.js';
 
 export interface Requirement {
   name: string;
@@ -45,5 +46,5 @@ export interface SetupDetails {
 
 export interface SetupSettings {
   downloads: DownloadSettings[];
-  torchMode: 'cuda' | 'rocm' | 'directml' | 'cpu';
+  torchMode: TorchMode;
 }

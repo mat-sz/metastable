@@ -25,6 +25,7 @@ import { ModelRepository } from './data/model.js';
 import { ProjectEntity } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
+import { getBundleTorchMode } from './helpers/bundle.js';
 import { resolveConfigPath } from './helpers/fs.js';
 import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
@@ -260,11 +261,26 @@ export class Metastable extends (EventEmitter as {
       return;
     }
 
+    const args: string[] = [];
+    const torchMode = await getBundleTorchMode(config.python.pythonHome!);
+
+    if (this.settings.comfyArgs) {
+      args.push(...this.settings.comfyArgs);
+    }
+
+    if (torchMode === 'directml') {
+      args.push('--directml');
+    }
+
+    if (os.platform() === 'darwin' && os.arch() === 'arm64') {
+      args.push('--force-fp16');
+    }
+
     this.setStatus('starting');
     this.comfy = new Comfy(
       this.python,
       this.settings.comfyMainPath,
-      [...(config.comfy?.args || []), ...(this.settings.comfyArgs || [])],
+      args,
       config.comfy?.env,
     );
 

@@ -13,6 +13,8 @@ export type PromptStyleSource = 'system' | 'user' | 'model';
 
 export type PromptStyleWithSource = PromptStyle & { source: PromptStyleSource };
 
+export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu';
+
 export interface InstanceInfo {
   samplers: string[];
   schedulers: string[];
@@ -37,7 +39,6 @@ export interface ConfigType {
     bundleVersion?: string;
   };
   comfy?: {
-    args?: string[];
     env?: Record<string, string>;
   };
   civitai?: {
