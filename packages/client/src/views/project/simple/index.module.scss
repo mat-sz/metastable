@@ -38,6 +38,15 @@
     }
   }
 
+  .queue,
+  .recent:first-child {
+    padding-top: 0;
+  }
+
+  .modes {
+    padding-bottom: 0;
+  }
+
   .recent {
     .item {
       opacity: 0.75;

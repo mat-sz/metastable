@@ -10,6 +10,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.4);
@@ -21,18 +22,6 @@
   position: absolute;
   color: var(--grey-900);
   overflow: hidden;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Open Sans',
-    'Helvetica Neue',
-    sans-serif;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -59,12 +48,13 @@
   align-items: center;
   justify-content: space-between;
   background: var(--grey-200);
-  padding: 1rem;
+  margin-top: 1rem;
+  padding: 0 1rem;
   padding-bottom: 0;
 
   span {
     font-size: 1.2rem;
-    font-weight: 400;
+    font-weight: 600;
   }
 
   button {
@@ -84,15 +74,13 @@
 }
 
 .body {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  margin-top: 1rem;
+  padding: 0 1rem;
   min-height: 0;
 }
 
 .actions {
-  margin: -1rem;
+  margin: 0 -1rem;
   margin-top: 1rem;
   background: var(--grey-100);
   display: flex;

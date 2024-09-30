@@ -123,8 +123,6 @@
       border-radius: 5px;
       padding: 1rem;
       margin-right: 1rem;
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
     }
 
     &.vertical {
@@ -135,7 +133,7 @@
       & > .tabs {
         background: none;
         border-right: none;
-        padding: 0.5rem 1rem;
+        padding: 0 1rem;
 
         & > .tab {
           text-transform: none;

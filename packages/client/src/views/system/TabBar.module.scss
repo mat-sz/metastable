@@ -10,7 +10,7 @@
   }
 
   .tab {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
     display: inline-flex;
     align-items: center;
     cursor: pointer;
@@ -18,7 +18,7 @@
     -webkit-app-region: no-drag;
     font-size: 0;
     border-radius: 5px;
-    margin: 0.1rem;
+    margin: 0.25rem 0.125rem;
     transition: 0.2s ease-in-out all;
 
     &:last-child {
