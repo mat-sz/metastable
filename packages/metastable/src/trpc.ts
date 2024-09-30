@@ -27,7 +27,22 @@ export interface TRPCContext {
   autoUpdater?: AppUpdater;
 }
 
-export const t = initTRPC.context<TRPCContext>().create();
+const transformer = {
+  serialize(data: any) {
+    return JSON.stringify(data);
+  },
+  deserialize(data: any) {
+    if (typeof data === 'undefined') {
+      return undefined;
+    }
+
+    return JSON.parse(data);
+  },
+};
+
+export const t = initTRPC.context<TRPCContext>().create({
+  transformer,
+});
 
 const electronProcedure = t.procedure.use(opts => {
   const win = opts.ctx.win;

@@ -6,7 +6,6 @@ import {
   makeObservable,
   observable,
   runInAction,
-  toJS,
 } from 'mobx';
 
 import { API } from '$api';
@@ -141,17 +140,16 @@ export class BaseProject<TSettings = any, TUI = any> {
   async saveUI() {
     await API.project.update.mutate({
       projectId: this.id,
-      ui: toJS(this.ui),
+      ui: this.ui,
     });
   }
 
   async save(name?: string, temporary?: boolean) {
     const id = this.id;
-    const settings = toJS(this.settings);
 
     const json = await API.project.update.mutate({
       projectId: id,
-      settings,
+      settings: this.settings,
       name,
       temporary: temporary ?? (this.temporary && !name),
     });

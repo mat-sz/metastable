@@ -6,6 +6,7 @@ import {
   wsLink,
 } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
+import { toJS } from 'mobx';
 import { ipcLink } from 'trpc-electron/renderer';
 
 import { IS_ELECTRON } from '$utils/config';
@@ -22,8 +23,21 @@ declare global {
 
 window.wsIsOpen = false;
 
+const transformer = {
+  serialize(data: any) {
+    return JSON.stringify(toJS(data));
+  },
+  deserialize(data: any) {
+    if (typeof data === 'undefined') {
+      return undefined;
+    }
+
+    return JSON.parse(data);
+  },
+};
+
 const link = IS_ELECTRON
-  ? ipcLink()
+  ? ipcLink({ transformer })
   : splitLink({
       condition: op => op.type === 'subscription',
       true: wsLink({
@@ -38,8 +52,12 @@ const link = IS_ELECTRON
             window.wsOnClose?.();
           },
         }),
+        transformer,
       }),
-      false: httpLink({ url: getUrl('/trpc') }),
+      false: httpLink({
+        url: getUrl('/trpc'),
+        transformer,
+      }),
     });
 export const API = createTRPCClient<Router>({
   links: [link],

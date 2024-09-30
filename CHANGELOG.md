@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Improved progress display on smaller screens.
+- Fixed JSON serialization issues. (resolves problems with duplicating projects, etc.)
 
 # 0.0.5 (2024-09-28)
 

@@ -4,7 +4,7 @@ import {
   ProjectTaggingSettings,
   ProjectTrainingSettings,
 } from '@metastable/types';
-import { action, makeObservable, toJS } from 'mobx';
+import { action, makeObservable } from 'mobx';
 
 import { API } from '$api';
 import { BaseProject } from './base';
@@ -75,9 +75,11 @@ export class TrainingProject extends BaseProject<ProjectTrainingSettings> {
   }
 
   async request() {
-    const settings = toJS(this.settings);
     this.save();
     mainStore.trainingQueue.push({ id: this.id });
-    await API.project.training.start.mutate({ projectId: this.id, settings });
+    await API.project.training.start.mutate({
+      projectId: this.id,
+      settings: this.settings,
+    });
   }
 }

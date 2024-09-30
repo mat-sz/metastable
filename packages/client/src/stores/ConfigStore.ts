@@ -1,5 +1,5 @@
 import { ConfigType } from '@metastable/types';
-import { makeAutoObservable, runInAction, toJS } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
 
@@ -25,7 +25,7 @@ export class ConfigStore {
   }
 
   async save() {
-    const data = await API.instance.config.set.mutate(toJS(this.data));
+    const data = await API.instance.config.set.mutate(this.data);
     runInAction(() => {
       this.data = data;
     });
