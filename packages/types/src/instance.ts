@@ -30,6 +30,15 @@ export interface UpdateInfo {
   isUpToDate?: boolean;
 }
 
+export type ComfyVramMode =
+  | 'auto'
+  | 'cpu'
+  | 'novram'
+  | 'lowvram'
+  | 'normalvram'
+  | 'highvram'
+  | 'gpu-only';
+
 export interface ConfigType {
   python: {
     configured: boolean;
@@ -39,6 +48,8 @@ export interface ConfigType {
     bundleVersion?: string;
   };
   comfy?: {
+    vramMode?: ComfyVramMode;
+    extraArgs?: string;
     env?: Record<string, string>;
   };
   civitai?: {

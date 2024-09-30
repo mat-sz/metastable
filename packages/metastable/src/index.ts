@@ -27,6 +27,7 @@ import { DownloadModelTask } from './downloader/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
 import { resolveConfigPath } from './helpers/fs.js';
+import { parseArgString } from './helpers/shell.js';
 import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
@@ -262,21 +263,30 @@ export class Metastable extends (EventEmitter as {
     }
 
     const args: string[] = [];
+    const torchMode = await getBundleTorchMode(config.python.pythonHome!);
 
     if (this.settings.comfyArgs) {
       args.push(...this.settings.comfyArgs);
     }
 
-    if (config.python.pythonHome) {
-      const torchMode = await getBundleTorchMode(config.python.pythonHome);
-
-      if (torchMode === 'directml') {
-        args.push('--directml');
-      }
+    if (torchMode === 'directml') {
+      args.push('--directml');
     }
 
     if (os.platform() === 'darwin' && os.arch() === 'arm64') {
       args.push('--force-fp16');
+    }
+
+    if (config.comfy) {
+      const { vramMode = 'auto', extraArgs } = config.comfy;
+
+      if (vramMode !== 'auto') {
+        args.push(`--${vramMode}`);
+      }
+
+      if (extraArgs) {
+        args.push(...parseArgString(extraArgs));
+      }
     }
 
     this.setStatus('starting');
