@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import {
   VarAspectRatio,
   VarButton,
-  VarCategory,
   VarImage,
   VarImageMode,
   VarInputType,
@@ -20,6 +19,7 @@ import {
 import { mainStore } from '$stores/MainStore';
 import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
+import { SettingsCategory } from '../../common/SettingsCategory';
 import { StyleSelect } from '../../common/StyleSelect';
 import { MaskEditor } from '../maskEditor';
 
@@ -45,7 +45,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           }}
         />
       )}
-      <VarCategory label="Checkpoint" collapsible>
+      <SettingsCategory label="Checkpoint" sectionId="checkpoint">
         <VarSwitch
           label="Mode"
           path="checkpoint.mode"
@@ -93,15 +93,15 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             }}
           />
         )}
-      </VarCategory>
+      </SettingsCategory>
       {showPrompt && (
-        <VarCategory label="Prompt" collapsible>
+        <SettingsCategory label="Prompt" sectionId="prompt">
           <StyleSelect />
           <VarString label="Positive" path="prompt.positive" multiline />
           <VarString label="Negative" path="prompt.negative" multiline />
-        </VarCategory>
+        </SettingsCategory>
       )}
-      <VarCategory label="Input" collapsible>
+      <SettingsCategory label="Input" sectionId="input">
         <VarInputType
           label="Type"
           path="input.type"
@@ -140,8 +140,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             )}
           </>
         )}
-      </VarCategory>
-      <VarCategory label="Output" collapsible>
+      </SettingsCategory>
+      <SettingsCategory label="Output" sectionId="output">
         <VarAspectRatio
           label="Aspect ratio"
           widthPath="output.width"
@@ -177,8 +177,12 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           defaultValue={1}
           showInput
         />
-      </VarCategory>
-      <VarCategory label="Sampler" collapsible defaultCollapsed={true}>
+      </SettingsCategory>
+      <SettingsCategory
+        label="Sampler"
+        sectionId="sampler"
+        defaultCollapsed={true}
+      >
         <VarRandomNumber
           label="Seed"
           path="sampler.seed"
@@ -219,8 +223,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           }))}
         />
         <VarToggle label="Tiling" path="sampler.tiling" />
-      </VarCategory>
-      <VarCategory label="Other" collapsible defaultCollapsed={true}>
+      </SettingsCategory>
+      <SettingsCategory label="Other" sectionId="other" defaultCollapsed={true}>
         <VarSelect
           label="Format"
           path="output.format"
@@ -238,7 +242,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           step={1}
           defaultValue={0}
         />
-      </VarCategory>
+      </SettingsCategory>
     </>
   );
 });

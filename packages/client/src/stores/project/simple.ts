@@ -158,7 +158,14 @@ export function defaultSettings(): ProjectSimpleSettings {
   };
 }
 
-export class SimpleProject extends BaseProject<ProjectSimpleSettings> {
+interface ProjectSimpleUI {
+  collapsed?: Record<string, boolean>;
+}
+
+export class SimpleProject extends BaseProject<
+  ProjectSimpleSettings,
+  ProjectSimpleUI
+> {
   editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
   stepTime: Record<string, number> | undefined = undefined;

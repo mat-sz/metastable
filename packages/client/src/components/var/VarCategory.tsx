@@ -20,6 +20,10 @@ export interface IVarCategoryProps {
    */
   collapsible?: boolean;
 
+  collapsed?: boolean;
+
+  onToggleCollapsed?: () => void;
+
   defaultCollapsed?: boolean;
 
   forceBorder?: boolean;
@@ -37,8 +41,11 @@ export const VarCategory = ({
   collapsible,
   defaultCollapsed = false,
   forceBorder,
+  collapsed,
+  onToggleCollapsed,
 }: IVarCategoryProps): JSX.Element => {
   const [isCollapsed, setCollapsed] = useState(defaultCollapsed);
+  const collapsedState = collapsed ?? isCollapsed;
 
   return (
     <div
@@ -57,18 +64,22 @@ export const VarCategory = ({
         varui-category-title=""
         onClick={() => {
           if (collapsible) {
-            setCollapsed(isCollapsed => !isCollapsed);
+            if (onToggleCollapsed) {
+              onToggleCollapsed();
+            } else {
+              setCollapsed(isCollapsed => !isCollapsed);
+            }
           }
         }}
       >
         {label}
         {collapsible && (
           <span className={styles.collapse}>
-            {isCollapsed ? <BsChevronLeft /> : <BsChevronDown />}
+            {collapsedState ? <BsChevronLeft /> : <BsChevronDown />}
           </span>
         )}
       </div>
-      {(!collapsible || !isCollapsed) && <div>{children}</div>}
+      {(!collapsible || !collapsedState) && <div>{children}</div>}
     </div>
   );
 };

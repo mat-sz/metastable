@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added storage of project settings section state (if the section is collapsed or not).
 - Added a settings section for ComfyUI arguments.
 
 ## Bug fixes
