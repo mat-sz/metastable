@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom/client';
 
 import { TRPC, TRPCClient } from '$api';
 import { App } from './App.tsx';
+import './onError.ts';
 
 const queryClient = new QueryClient();
 
