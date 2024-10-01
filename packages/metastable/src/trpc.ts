@@ -83,6 +83,8 @@ export const router = t.router({
           type: z.nativeEnum(ModelType),
           name: z.string(),
           imageUrl: z.string().optional(),
+          configUrl: z.string().optional(),
+          configType: z.string().optional(),
           metadata: z.any().optional(),
         }),
       )

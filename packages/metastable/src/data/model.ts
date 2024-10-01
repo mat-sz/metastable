@@ -109,7 +109,12 @@ export class ModelEntity extends FileEntity {
     return undefined;
   }
 
-  async writeImage(data: Buffer | Uint8Array, extension: string) {
+  async writeConfig(data: Uint8Array | string, extension: string) {
+    const configName = `${removeFileExtension(this.name)}.${extension}`;
+    await writeFile(path.join(this.baseDir, configName), data);
+  }
+
+  async writeImage(data: Uint8Array, extension: string) {
     this.imageName = `${this.name}.${extension}`;
     const imagePath = this.imagePath!;
     await writeFile(imagePath, data);

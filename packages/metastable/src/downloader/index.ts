@@ -185,7 +185,12 @@ export class DownloadModelTask extends BaseDownloadTask {
     const state = await super.execute();
 
     if (state === TaskState.SUCCESS) {
-      const { imageUrl, metadata } = this.settings;
+      const {
+        imageUrl,
+        configUrl,
+        configType = 'yaml',
+        metadata,
+      } = this.settings;
 
       const model = new ModelEntity(this.savePath);
       await tryMkdir(path.join(path.dirname(this.savePath), '.metastable'));
@@ -214,6 +219,20 @@ export class DownloadModelTask extends BaseDownloadTask {
           if (ext) {
             await model.writeImage(new Uint8Array(data), ext);
           }
+        } catch {}
+      }
+
+      if (configUrl) {
+        try {
+          const res = await fetch(configUrl, {
+            headers: {
+              'User-Agent': USER_AGENT,
+              ...this.headers,
+            },
+          });
+
+          const data = await res.arrayBuffer();
+          await model.writeConfig(new Uint8Array(data), configType);
         } catch {}
       }
 

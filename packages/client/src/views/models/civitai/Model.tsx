@@ -24,6 +24,10 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
   const imageUrl = version.images[0]?.url;
   const type = CivitAITypeMap[model.type];
 
+  const configFile = version.files.find(file => file.type === 'Config');
+  const configUrl = configFile?.downloadUrl;
+  const configType = configFile?.name?.split('.')?.pop();
+
   return (
     <div className={styles.version}>
       <div className={styles.main}>
@@ -37,6 +41,8 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                   url: primaryFile.downloadUrl,
                   size: primaryFile.sizeKB * 1024,
                   imageUrl,
+                  configUrl,
+                  configType,
                   metadata: {
                     name: model.name,
                     nsfw: model.nsfw,
