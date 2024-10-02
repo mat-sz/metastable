@@ -409,6 +409,24 @@ export class SimpleProject extends BaseProject<
     );
   }
 
+  async dismissTask(taskId: string) {
+    const task = this.prompts.find(task => task.id === taskId);
+    if (!task) {
+      return;
+    }
+
+    switch (task.state) {
+      case TaskState.QUEUED:
+      case TaskState.FAILED:
+        await API.task.dismiss.mutate({ queueId: 'project', taskId: task.id });
+        return;
+      case TaskState.PREPARING:
+      case TaskState.RUNNING:
+        await API.task.cancel.mutate({ queueId: 'project', taskId: task.id });
+        return;
+    }
+  }
+
   async clearQueue() {
     await Promise.all(
       this.queued.map(item =>

@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added middle click to dismiss failed/queued tasks.
 - Added a confirmation dialog when deleting multiple output files.
 - Added support for loading YAML configuration files for checkpoints.
 - Added an error handler for unrecoverable errors.

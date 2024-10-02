@@ -55,6 +55,12 @@ export const SimpleProjectView: React.FC = observer(() => {
                       project.selectOutput(undefined);
                     }
                   }}
+                  onPointerUp={e => {
+                    if (e.pointerType === 'mouse' && e.button === 1) {
+                      e.stopPropagation();
+                      project.dismissTask(item.id);
+                    }
+                  }}
                 >
                   <div className={styles.status}>
                     {item.progress ? (
