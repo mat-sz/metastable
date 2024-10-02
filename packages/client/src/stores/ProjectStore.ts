@@ -10,7 +10,7 @@ import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
 
 const LS_RECENT = 'metastable_recent_projects';
-const MAX_RECENT_ITEMS = 6;
+const MAX_RECENT_ITEMS = 15;
 export class ProjectStore {
   projects: BaseProject[] = [];
   currentId: APIProject['id'] | undefined = undefined;
@@ -133,7 +133,7 @@ export class ProjectStore {
     }
   }
 
-  async open(id: APIProject['id']) {
+  async open(id: APIProject['id'], select = true) {
     if (this.loading) {
       return;
     }
@@ -156,7 +156,10 @@ export class ProjectStore {
           ...this.projects.filter(project => project.id !== id),
           project,
         ];
-        this.select(json.id);
+
+        if (select) {
+          this.select(json.id);
+        }
       });
 
       if (!json.temporary) {

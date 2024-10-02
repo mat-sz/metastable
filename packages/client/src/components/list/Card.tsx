@@ -11,6 +11,7 @@ interface CardProps {
   isVideo?: boolean;
   icon?: React.ReactNode;
   onClick?: () => void;
+  onMiddleClick?: () => void;
   color?: string;
   menu?: React.ReactNode;
 }
@@ -24,6 +25,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   onClick,
   color,
   menu,
+  onMiddleClick,
 }) => {
   const { contextMenu, onContextMenu } = useContextMenu(menu);
 
@@ -32,6 +34,12 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
       className={styles.card}
       onClick={onClick}
       onContextMenu={menu ? onContextMenu : undefined}
+      onPointerUp={e => {
+        if (e.pointerType === 'mouse' && e.button === 1) {
+          e.stopPropagation();
+          onMiddleClick?.();
+        }
+      }}
     >
       {imageUrl ? (
         <div className={styles.image}>

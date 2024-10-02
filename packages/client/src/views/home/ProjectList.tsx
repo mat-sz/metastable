@@ -46,6 +46,9 @@ export const ProjectList: React.FC<Props> = ({
             onClick={() => {
               mainStore.projects.open(item.id);
             }}
+            onMiddleClick={() => {
+              mainStore.projects.open(item.id, false);
+            }}
             menu={<ProjectMenu project={item} />}
           />
         )

@@ -144,7 +144,7 @@ export class BaseProject<TSettings = any, TUI = any> {
     });
   }
 
-  async save(name?: string, temporary?: boolean) {
+  async save(name?: string, temporary?: boolean, auto = false) {
     const id = this.id;
 
     const json = await API.project.update.mutate({
@@ -162,7 +162,7 @@ export class BaseProject<TSettings = any, TUI = any> {
           mainStore.projects.select(json.id);
         }
 
-        if (!json.temporary) {
+        if (!json.temporary && !auto) {
           mainStore.projects.removeRecent(id);
           mainStore.projects.pushRecent(json.id);
         }
@@ -175,7 +175,10 @@ export class BaseProject<TSettings = any, TUI = any> {
   private _autosaveTimeout: number | undefined = undefined;
   triggerAutosave() {
     clearTimeout(this._autosaveTimeout);
-    this._autosaveTimeout = setTimeout(() => this.save(), 5000) as any;
+    this._autosaveTimeout = setTimeout(
+      () => this.save(undefined, undefined, true),
+      5000,
+    ) as any;
   }
 
   private _autosaveUITimeout: number | undefined = undefined;
