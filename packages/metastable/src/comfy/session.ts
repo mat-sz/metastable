@@ -39,11 +39,17 @@ export class ComfySession extends (EventEmitter as {
     return this.comfy.invoke(this.id, method, params);
   }
 
-  async checkpoint(path: string, embeddingsPath?: string, clipLayer?: number) {
+  async checkpoint(
+    path: string,
+    embeddingsPath?: string,
+    clipLayer?: number,
+    configPath?: string,
+  ) {
     const data = await this.invoke('checkpoint:load', {
       path,
       embeddings_path: embeddingsPath,
       clip_layer: clipLayer,
+      config_path: configPath,
     });
     return new ComfyCheckpoint(this, data as any);
   }

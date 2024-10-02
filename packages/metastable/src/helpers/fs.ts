@@ -12,6 +12,23 @@ export const IMAGE_EXTENSIONS = [
   'avif',
 ];
 
+export const CONFIG_EXTENSIONS = ['yaml'];
+
+export async function testExtensions(
+  dirPath: string,
+  name: string,
+  extensions: string[],
+): Promise<string | undefined> {
+  for (const extension of extensions) {
+    const filename = `${name}.${extension}`;
+    if (await exists(path.join(dirPath, filename))) {
+      return filename;
+    }
+  }
+
+  return undefined;
+}
+
 export function isPathIn(parent: string, filePath: string) {
   const rel = path.relative(parent, filePath);
   return (

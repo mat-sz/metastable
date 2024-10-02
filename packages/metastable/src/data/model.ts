@@ -8,9 +8,12 @@ import chokidar from 'chokidar';
 
 import { FileEntity } from './common.js';
 import {
+  CONFIG_EXTENSIONS,
   exists,
   IMAGE_EXTENSIONS,
   removeFileExtension,
+  testExtensions,
+  tryUnlink,
   walk,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
@@ -31,6 +34,7 @@ const MODEL_EXTENSIONS = [
 export class ModelEntity extends FileEntity {
   type: ModelType | undefined = undefined;
   imageName: string | undefined = undefined;
+  configName: string | undefined = undefined;
   simpleName: string;
   modelBaseDir: string | undefined = undefined;
   details: ModelDetails | undefined = undefined;
@@ -51,14 +55,16 @@ export class ModelEntity extends FileEntity {
 
     await this.metadata.refresh();
 
-    for (const extension of IMAGE_EXTENSIONS) {
-      if (
-        await exists(path.join(this.metadataPath, `${this.name}.${extension}`))
-      ) {
-        this.imageName = `${this.name}.${extension}`;
-        break;
-      }
-    }
+    this.imageName = await testExtensions(
+      this.metadataPath,
+      this.name,
+      IMAGE_EXTENSIONS,
+    );
+    this.configName = await testExtensions(
+      this.baseDir,
+      this.name,
+      CONFIG_EXTENSIONS,
+    );
 
     const imagePath = this.imagePath;
     if (imagePath) {
@@ -80,6 +86,14 @@ export class ModelEntity extends FileEntity {
         };
       }
     }
+  }
+
+  get configPath() {
+    if (!this.configName) {
+      return undefined;
+    }
+
+    return path.join(this.baseDir, this.configName);
   }
 
   get imagePath() {
@@ -109,9 +123,16 @@ export class ModelEntity extends FileEntity {
     return undefined;
   }
 
+  async delete(): Promise<void> {
+    await super.delete();
+    await tryUnlink(this.configPath);
+    await tryUnlink(this.imagePath);
+    await tryUnlink(this.thumbnailPath);
+  }
+
   async writeConfig(data: Uint8Array | string, extension: string) {
-    const configName = `${removeFileExtension(this.name)}.${extension}`;
-    await writeFile(path.join(this.baseDir, configName), data);
+    this.configName = `${removeFileExtension(this.name)}.${extension}`;
+    await writeFile(this.configPath!, data);
   }
 
   async writeImage(data: Uint8Array, extension: string) {

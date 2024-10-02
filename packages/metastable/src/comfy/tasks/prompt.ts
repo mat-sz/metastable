@@ -26,6 +26,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   };
   private storeMetadata = false;
   private session?: ComfySession;
+  private checkpointConfigPath?: string;
 
   constructor(
     private metastable: Metastable,
@@ -47,6 +48,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     if (modelSettings.name && !modelSettings.path) {
       const model = await this.metastable.model.get(type, modelSettings.name);
       modelSettings.path = model.path;
+
+      if (type === ModelType.CHECKPOINT && model.configPath) {
+        this.checkpointConfigPath = model.configPath;
+      }
     }
   }
 
@@ -239,6 +244,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         data.path!,
         this.embeddingsPath,
         data.clipSkip ? -1 * data.clipSkip : undefined,
+        this.checkpointConfigPath,
       );
     }
   }
