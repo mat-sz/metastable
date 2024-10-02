@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added a confirmation dialog when deleting multiple output files.
 - Added support for loading YAML configuration files for checkpoints.
 - Added an error handler for unrecoverable errors.
 - Added storage of project settings section state (if the section is collapsed or not).

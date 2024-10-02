@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { BsTrash } from 'react-icons/bs';
 
 import { FileManager } from '$components/fileManager';
+import { ProjectFileDelete } from '$modals/projectFileDelete';
+import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
@@ -30,10 +32,17 @@ export const Grid: React.FC = observer(() => {
         selectionActions={selection => (
           <>
             <button
-              onClick={async () => {
-                for (const item of selection) {
-                  await project.deleteOutput(item.name);
-                }
+              onClick={() => {
+                modalStore.show(
+                  <ProjectFileDelete
+                    count={selection.length}
+                    onDelete={async () => {
+                      for (const item of selection) {
+                        await project.deleteOutput(item.name);
+                      }
+                    }}
+                  />,
+                );
               }}
             >
               <BsTrash />
