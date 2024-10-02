@@ -1,9 +1,22 @@
+.projectTabs {
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
 .tabs {
   display: flex;
   -webkit-app-region: drag;
   height: 3rem;
   min-height: 3rem;
   max-height: 3rem;
+  margin-bottom: 0.25rem;
 
   &.mac {
     padding-left: 86px;
@@ -21,6 +34,7 @@
     border-radius: 5px;
     margin: 0.25rem 0.125rem;
     transition: 0.2s ease-in-out all;
+    flex-shrink: 0;
 
     &:last-child {
       border-right: none;

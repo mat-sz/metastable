@@ -15,6 +15,7 @@ import { useContextMenu } from 'use-context-menu';
 
 import { ProgressBar } from '$components/progressBar';
 import { ProjectMenu } from '$components/projectMenu';
+import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import { IS_MAC } from '$utils/config';
@@ -190,6 +191,7 @@ export const TabBar: React.FC = observer(() => {
     }),
     [],
   );
+  const horizontalScroll = useHorizontalScroll();
 
   const downloads = mainStore.tasks.downloads;
   const remaining = downloads.filter(
@@ -211,7 +213,6 @@ export const TabBar: React.FC = observer(() => {
 
   return (
     <div
-      ref={drop}
       className={clsx(styles.tabs, { [styles.mac]: areTrafficLightsVisible })}
     >
       {!IS_MAC && <Logo />}
@@ -229,9 +230,14 @@ export const TabBar: React.FC = observer(() => {
       >
         <BsBoxFill />
       </ViewTab>
-      {mainStore.projects.projects.map(project => (
-        <ProjectTab key={project.id} project={project} />
-      ))}
+      <div
+        ref={ref => drop(horizontalScroll(ref))}
+        className={styles.projectTabs}
+      >
+        {mainStore.projects.projects.map(project => (
+          <ProjectTab key={project.id} project={project} />
+        ))}
+      </div>
       <BaseTab
         onClick={() => mainStore.projects.create(undefined, 'simple', true)}
       >

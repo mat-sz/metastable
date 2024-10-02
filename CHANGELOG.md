@@ -15,6 +15,7 @@
 
 - Improved progress display on smaller screens.
 - Fixed JSON serialization issues. (resolves problems with duplicating projects, etc.)
+- Fixed display of large amounts of horizontal tabs.
 
 # 0.0.5 (2024-09-28)
 

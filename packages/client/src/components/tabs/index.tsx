@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { useContext, useState } from 'react';
 
+import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import styles from './index.module.scss';
 
 interface TabProps {
@@ -31,14 +32,18 @@ export const Tab: React.FC<React.PropsWithChildren<TabProps>> = ({
   );
 };
 
+type TabsDirection = 'horizontal' | 'vertical';
+
 interface ITabsContext {
   selected: string | number;
   select(id: string | number): void;
+  direction: TabsDirection;
 }
 
 const TabsContext = React.createContext<ITabsContext>({
   selected: '',
   select: () => {},
+  direction: 'horizontal',
 });
 
 interface TabsProps {
@@ -49,14 +54,22 @@ export const Tabs: React.FC<React.PropsWithChildren<TabsProps>> = ({
   children,
   buttonStyle = 'normal',
 }) => {
+  const context = useContext(TabsContext);
+  const horizontalScroll = useHorizontalScroll();
+
   return (
-    <div className={clsx(styles.tabs, styles[buttonStyle])}>{children}</div>
+    <div
+      className={clsx(styles.tabs, styles[buttonStyle])}
+      ref={context.direction === 'horizontal' ? horizontalScroll : undefined}
+    >
+      {children}
+    </div>
   );
 };
 
 interface TabViewProps {
   defaultTab: string | number;
-  direction?: 'horizontal' | 'vertical';
+  direction?: TabsDirection;
   variant?: 'default' | 'large';
   className?: string;
 }
@@ -79,7 +92,7 @@ export const TabView: React.FC<React.PropsWithChildren<TabViewProps>> = ({
       )}
     >
       <TabsContext.Provider
-        value={{ selected: selectedTab, select: setSelectedTab }}
+        value={{ selected: selectedTab, select: setSelectedTab, direction }}
       >
         {children}
       </TabsContext.Provider>

@@ -55,6 +55,13 @@
     & > .tabs {
       display: flex;
       border-bottom: 1px solid var(--grey-300);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        width: 0;
+      }
 
       & > .tab {
         background: var(--grey-300);
@@ -63,6 +70,7 @@
         display: inline-flex;
         align-items: center;
         cursor: pointer;
+        flex-shrink: 0;
 
         &.selected {
           background: var(--grey-600);
