@@ -95,7 +95,9 @@ class MainStore {
 
     API.instance.onBackendStatus.subscribe(undefined, {
       onData: status => {
-        this.backendStatus = status;
+        runInAction(() => {
+          this.backendStatus = status;
+        });
 
         switch (status) {
           case 'ready':
