@@ -4,7 +4,13 @@ import { glueIsWebGLAvailable } from 'fxglue';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { Suspense } from 'react';
-import { BsGrid, BsHourglass, BsPencil, BsXCircleFill } from 'react-icons/bs';
+import {
+  BsArrowLeft,
+  BsGrid,
+  BsHourglass,
+  BsPencil,
+  BsXCircleFill,
+} from 'react-icons/bs';
 
 import { ProgressCircle } from '$components/progressCircle';
 import { Grid } from './grid';
@@ -34,12 +40,28 @@ export const SimpleProjectView: React.FC = observer(() => {
   return (
     <div className={styles.project}>
       <div className={styles.sidebar}>
+        {project.mode !== 'images' && (
+          <div className={styles.back}>
+            <div
+              className={styles.button}
+              role="button"
+              onClick={() =>
+                runInAction(() => {
+                  project.mode = 'images';
+                })
+              }
+              title="Back"
+            >
+              <BsArrowLeft />
+            </div>
+          </div>
+        )}
         <div className={styles.generated}>
           {!!project.prompts.length && (
             <ul className={styles.queue}>
               {project.prompts.map(item => (
                 <li
-                  className={clsx(styles.item, {
+                  className={clsx({
                     [styles.failed]: item.state === TaskState.FAILED,
                   })}
                   key={item.id}
@@ -61,6 +83,7 @@ export const SimpleProjectView: React.FC = observer(() => {
                       project.dismissTask(item.id);
                     }
                   }}
+                  role="button"
                 >
                   <div className={styles.status}>
                     {item.progress ? (
@@ -75,40 +98,44 @@ export const SimpleProjectView: React.FC = observer(() => {
               ))}
             </ul>
           )}
-          <ul className={styles.recent}>
-            {outputs.map(output => (
-              <li
-                className={clsx(styles.item, {
-                  [styles.active]:
-                    project.mode === 'images' &&
-                    output.image.url === project.currentOutput?.image.url,
-                })}
-                key={output.name}
-                style={{
-                  backgroundImage: `url(${CSS.escape(
-                    output.image.thumbnailUrl,
-                  )})`,
-                }}
-                onClick={() => {
-                  project.selectOutput(output);
-                }}
-              />
-            ))}
-            {!!remainingOutputs && (
-              <li
-                className={clsx(styles.item, {
-                  [styles.active]: project.mode === 'grid',
-                })}
-                onClick={() => {
-                  runInAction(() => {
-                    project.mode = 'grid';
-                  });
-                }}
-              >
-                <div className={styles.more}>+{remainingOutputs}</div>
-              </li>
-            )}
-          </ul>
+          {!!outputs.length && (
+            <ul className={styles.recent}>
+              {outputs.map(output => (
+                <li
+                  className={clsx({
+                    [styles.active]:
+                      project.mode === 'images' &&
+                      output.image.url === project.currentOutput?.image.url,
+                  })}
+                  key={output.name}
+                  style={{
+                    backgroundImage: `url(${CSS.escape(
+                      output.image.thumbnailUrl,
+                    )})`,
+                  }}
+                  onClick={() => {
+                    project.selectOutput(output);
+                  }}
+                  role="button"
+                />
+              ))}
+              {!!remainingOutputs && (
+                <li
+                  className={clsx({
+                    [styles.active]: project.mode === 'grid',
+                  })}
+                  onClick={() => {
+                    runInAction(() => {
+                      project.mode = 'grid';
+                    });
+                  }}
+                  role="button"
+                >
+                  <div className={styles.more}>+{remainingOutputs}</div>
+                </li>
+              )}
+            </ul>
+          )}
         </div>
         <div className={styles.actions}>
           <ul className={styles.modes}>
@@ -118,10 +145,11 @@ export const SimpleProjectView: React.FC = observer(() => {
                   project.mode = 'grid';
                 })
               }
-              className={clsx(styles.item, {
+              className={clsx({
                 [styles.active]: project.mode === 'grid',
               })}
               title="Grid"
+              role="button"
             >
               <BsGrid />
             </li>
@@ -132,10 +160,11 @@ export const SimpleProjectView: React.FC = observer(() => {
                     project.mode = 'editor';
                   })
                 }
-                className={clsx(styles.item, {
+                className={clsx({
                   [styles.active]: project.mode === 'editor',
                 })}
                 title="Editor"
+                role="button"
               >
                 <BsPencil />
               </li>

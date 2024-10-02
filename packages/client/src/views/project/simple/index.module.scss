@@ -10,6 +10,64 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  padding: 0 1rem;
+
+  .back {
+    padding-bottom: 1rem;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    &:not(:first-child) {
+      padding-top: 0.75rem;
+    }
+
+    &:not(:last-child) {
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--grey-400);
+    }
+  }
+
+  ul li,
+  .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    background: var(--grey-300);
+    position: relative;
+    background-size: cover;
+    cursor: pointer;
+    font-size: 0;
+    transition: 0.2s ease-in-out all;
+
+    .status {
+      font-size: 2rem;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 0.75rem;
+    }
+
+    svg {
+      font-size: 1.5rem;
+    }
+
+    &:hover,
+    &.active {
+      background-color: var(--grey-400);
+      color: var(--grey-900);
+    }
+
+    &.failed {
+      color: var(--red-900);
+    }
+  }
 
   .generated {
     flex: 1;
@@ -17,39 +75,18 @@
     overflow-y: auto;
     scrollbar-width: none;
 
-    .item {
-      transition: 0.2s ease-in-out opacity;
-    }
-
     &::-webkit-scrollbar {
       width: 0;
     }
   }
 
-  .queue,
-  .recent,
   .modes {
-    list-style-type: none;
-    padding: 1rem;
-    margin: 0;
-
-    .status {
-      font-size: 2rem;
-    }
-  }
-
-  .queue,
-  .recent:first-child {
-    padding-top: 0;
-  }
-
-  .modes {
-    padding-bottom: 0;
+    padding-top: 1rem;
   }
 
   .recent {
-    .item {
-      opacity: 0.75;
+    li {
+      opacity: 0.5;
 
       &:hover,
       &.active {
@@ -60,43 +97,5 @@
         font-size: 1rem;
       }
     }
-  }
-
-  .queue {
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--grey-400);
-  }
-}
-
-.item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 5px;
-  background: var(--grey-300);
-  position: relative;
-  background-size: cover;
-  cursor: pointer;
-  font-size: 0;
-  transition: 0.2s ease-in-out all;
-
-  &:not(:last-child) {
-    margin-bottom: 0.75rem;
-  }
-
-  svg {
-    font-size: 1.5rem;
-  }
-
-  &:hover,
-  &.active {
-    background-color: var(--grey-400);
-    color: var(--grey-900);
-  }
-
-  &.failed {
-    color: var(--red-900);
   }
 }
