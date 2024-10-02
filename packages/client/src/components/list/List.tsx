@@ -61,13 +61,21 @@ export function List<T>({
         )}
       </div>
       <div className={styles.listWrapper}>
-        <div
-          className={clsx(styles.list, styles[`view_${view || selectedView}`], {
-            [styles.small]: small,
-          })}
-        >
-          {displayItems.map(children)}
-        </div>
+        {displayItems.length ? (
+          <div
+            className={clsx(
+              styles.list,
+              styles[`view_${view || selectedView}`],
+              {
+                [styles.small]: small,
+              },
+            )}
+          >
+            {displayItems.map(children)}
+          </div>
+        ) : (
+          <div className={styles.empty}>No results.</div>
+        )}
       </div>
     </div>
   );

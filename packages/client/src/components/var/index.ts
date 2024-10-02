@@ -1,6 +1,7 @@
 export * from './VarUI';
 
 // Inputs
+export * from './VarAddModel';
 export * from './VarArray';
 export * from './VarAspectRatio';
 export * from './VarBase';

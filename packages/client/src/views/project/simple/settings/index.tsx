@@ -1,3 +1,4 @@
+import { ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -16,12 +17,10 @@ import { VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
-import { Controlnets } from './sections/Controlnets';
 import { General } from './sections/General';
-import { IPAdapters } from './sections/IPAdapters';
-import { LoRAs } from './sections/LoRAs';
 import { Upscale } from './sections/Upscale';
 import { useSimpleProject } from '../../context';
+import { ModelArray } from '../common/ModelArray';
 
 interface SettingsProps {
   showPrompt?: boolean;
@@ -93,13 +92,34 @@ export const Settings: React.FC<SettingsProps> = observer(
               <General showPrompt={showPrompt} />
             </TabPanel>
             <TabPanel id="loras">
-              <LoRAs />
+              <ModelArray
+                label="LoRA"
+                path="models.lora"
+                type={ModelType.LORA}
+                strengthMin={-5}
+                strengthMax={5}
+              />
             </TabPanel>
             <TabPanel id="controlnets">
-              <Controlnets />
+              <ModelArray
+                label="Controlnet"
+                path="models.controlnet"
+                type={ModelType.CONTROLNET}
+                hasImage
+                strengthMin={0}
+                strengthMax={2}
+              />
             </TabPanel>
             <TabPanel id="ipadapters">
-              <IPAdapters />
+              <ModelArray
+                label="IPAdapter"
+                path="models.ipadapter"
+                type={ModelType.IPADAPTER}
+                hasImage
+                hasClipVision
+                strengthMin={0}
+                strengthMax={1}
+              />
             </TabPanel>
             <TabPanel id="upscale">
               <Upscale />

@@ -6,6 +6,7 @@
 - Added an error handler for unrecoverable errors.
 - Added storage of project settings section state (if the section is collapsed or not).
 - Added a settings section for ComfyUI arguments.
+- Improved the process of adding models to a project.
 
 ## Bug fixes
 

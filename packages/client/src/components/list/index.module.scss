@@ -6,11 +6,6 @@
   flex: 1;
   user-select: none;
 
-  .empty {
-    font-size: 1rem;
-    text-align: center;
-  }
-
   .card {
     cursor: pointer;
     font-size: 1rem;
@@ -223,6 +218,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  flex: 1;
 }
 
 .options {
@@ -302,4 +298,16 @@
 .listWrapper {
   overflow-y: auto;
   border-radius: 5px;
+  flex: 1;
+
+  .empty {
+    font-size: 0.9rem;
+    padding: 1rem;
+    text-align: center;
+
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

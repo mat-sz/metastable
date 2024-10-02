@@ -1,0 +1,21 @@
+button.selection {
+  height: 2.5rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 12rem;
+    overflow: hidden;
+  }
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    overflow: hidden;
+    border-radius: 5px;
+  }
+}
