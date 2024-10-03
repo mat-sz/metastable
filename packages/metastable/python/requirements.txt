@@ -2,13 +2,13 @@ torch
 torchvision
 torchsde
 einops
-safetensors
+safetensors>=0.4.2
 pyyaml
 Pillow
 scipy
 tqdm
 psutil
-transformers
+transformers>=4.28.1
 segment_anything
 yapf
 addict
