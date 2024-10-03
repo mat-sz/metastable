@@ -1,3 +1,9 @@
+# 0.0.7 (Upcoming)
+
+## Bug fixes
+
+- Resolved issues with bundle detection (should fix performance issues on AMD GPUs on Windows).
+
 # 0.0.6 (2024-10-02)
 
 ## Features

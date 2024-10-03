@@ -18,7 +18,7 @@ export async function getBundleTorchMode(
         ) {
           return 'cuda';
         } else if (
-          await exists(path.join(packagesDir, 'torch_directml', '__init__.py'))
+          await exists(path.join(packagesDir, 'torch_directml', 'DirectML.dll'))
         ) {
           return 'directml';
         } else if (

@@ -268,8 +268,9 @@ export class Metastable extends (EventEmitter as {
       args.push(...this.settings.comfyArgs);
     }
 
-    if (config.python.pythonHome) {
-      const torchMode = await getBundleTorchMode(config.python.pythonHome);
+    const { pythonHome } = this.python;
+    if (pythonHome) {
+      const torchMode = await getBundleTorchMode(pythonHome);
 
       if (torchMode === 'directml') {
         args.push('--directml');
