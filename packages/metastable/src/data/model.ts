@@ -131,7 +131,7 @@ export class ModelEntity extends FileEntity {
   }
 
   async writeConfig(data: Uint8Array | string, extension: string) {
-    this.configName = `${removeFileExtension(this.name)}.${extension}`;
+    this.configName = `${this.name}.${extension}`;
     await writeFile(this.configPath!, data);
   }
 

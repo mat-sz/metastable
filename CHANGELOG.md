@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Resolved issues with bundle detection (should fix performance issues on AMD GPUs on Windows).
+- Fixed CivitAI config file downloads.
 
 # 0.0.6 (2024-10-02)
 
