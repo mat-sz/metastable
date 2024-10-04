@@ -7,6 +7,9 @@
   "scripts": {
     "build": "yarn workspaces foreach -Api --topological-dev run build",
     "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server --exclude metastable run build",
+    "env": "dotenvx run -f .env.local -f .env",
+    "electron:build": "yarn env -- yarn workspace @metastable/client run electron:build",
+    "electron:publish": "yarn env -- yarn workspace @metastable/client run electron:publish",
     "start": "yarn workspace @metastable/server run start",
     "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run dev",
     "lint": "yarn workspaces foreach -Api run lint",
@@ -27,6 +30,7 @@
   },
   "packageManager": "yarn@4.5.0",
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.14.2",
     "@eslint/compat": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.4.0",

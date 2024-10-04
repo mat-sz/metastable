@@ -14,7 +14,10 @@
     "lint": "run -T eslint src",
     "preview": "vite preview",
     "electron:start": "electron-vite dev",
-    "electron:build": "yarn build:deps && electron-vite build --mode production && electron-builder --config eb-config.cjs",
+    "electron:prebuild": "yarn build:deps && electron-vite build --mode production",
+    "electron:package": "electron-builder --config eb-config.cjs",
+    "electron:build": "yarn electron:prebuild && yarn electron:package",
+    "electron:publish": "yarn electron:prebuild && yarn electron:package --publish always",
     "analyze": "vite-bundle-visualizer"
   },
   "dependencies": {

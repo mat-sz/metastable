@@ -99,6 +99,10 @@ const config = {
       '!**/node_modules/@img/*-arm64/**/*',
     ],
   },
+
+  publish: {
+    provider: 'custom',
+  },
 };
 
 module.exports = config;

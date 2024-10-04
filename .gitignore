@@ -25,3 +25,5 @@ cache.json
 .DS_Store
 /data
 /temp
+
+*.local
