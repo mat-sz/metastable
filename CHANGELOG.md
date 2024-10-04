@@ -1,5 +1,9 @@
 # 0.0.7 (Upcoming)
 
+## Features
+
+- Added progress display in extraction task in the installer.
+
 ## Bug fixes
 
 - Resolved issues with bundle detection (should fix performance issues on AMD GPUs on Windows).

@@ -11,11 +11,22 @@ import { WrappedPromise } from '../../helpers/promise.js';
 import { BaseTask } from '../../tasks/task.js';
 
 export class ExtractTask extends BaseTask {
+  #offset = 0;
+  #size = 0;
+
   constructor(
     private partPaths: string[],
     private targetPath: string,
   ) {
     super('extract', undefined);
+  }
+
+  private lastProgress = Date.now();
+  private emitProgress() {
+    if (Date.now() - this.lastProgress > 500) {
+      this.lastProgress = Date.now();
+      this.progress = Math.min(1, this.#offset / (this.#size || 1));
+    }
   }
 
   async execute() {
@@ -67,6 +78,10 @@ export class ExtractTask extends BaseTask {
 
       const readStream = fs.createReadStream(part);
       readStream.pipe(decompressor, { end: !parts.length });
+      readStream.on('data', chunk => {
+        this.#offset += chunk.length;
+        this.emitProgress();
+      });
       readStream.on('end', () => {
         tryUnlink(part);
         next();
