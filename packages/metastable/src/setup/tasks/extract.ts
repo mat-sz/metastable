@@ -32,7 +32,7 @@ export class ExtractTask extends BaseTask {
   async execute() {
     this.#size = (await stat(this.targetPath)).size;
 
-    const { decompressStream } = await import('@metastable/cppzst');
+    const { createBrotliDecompress } = await import('zlib');
 
     this.appendLog('Removing old data...');
     try {
@@ -69,7 +69,9 @@ export class ExtractTask extends BaseTask {
       this.appendLog('Done.');
     });
 
-    const decompressor = decompressStream();
+    const decompressor = createBrotliDecompress({
+      chunkSize: 131072,
+    });
     decompressor.pipe(extract);
 
     const next = () => {

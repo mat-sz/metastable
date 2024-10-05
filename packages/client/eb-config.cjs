@@ -13,7 +13,6 @@ const globalIgnore = [
   '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}',
   '!**/{appveyor.yml,.travis.yml,circle.yml}',
   '!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}',
-  '!**/node_modules/@metastable/cppzst/bin/**/*.node',
 ];
 
 const globalFiles = ['dist', 'out', ...globalIgnore];

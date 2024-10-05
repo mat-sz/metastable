@@ -128,7 +128,7 @@ export class Setup extends (EventEmitter as {
     });
 
     const baseRelease = await getLatestReleaseInfo(
-      'metastable-studio/bundle-base',
+      'metastable-studio/bundle-torch',
     );
     this._bundleVersion = baseRelease.name;
 
