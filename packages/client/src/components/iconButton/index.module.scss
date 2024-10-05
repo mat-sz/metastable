@@ -9,6 +9,13 @@
   position: relative;
   border: none;
 
+  &.disabled,
+  &:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
   &:hover {
     color: var(--grey-900);
     background: none;

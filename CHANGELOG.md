@@ -2,8 +2,14 @@
 
 ## Features
 
+- Added Undo/Redo buttons to mask editor.
 - Window position and state is now restored on launch.
 - Added progress display in extraction task in the installer.
+
+## Improvements
+
+- Improved design consistency.
+- Reduced application size.
 
 ## Bug fixes
 

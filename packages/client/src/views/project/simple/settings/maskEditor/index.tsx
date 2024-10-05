@@ -2,11 +2,13 @@ import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
+  BsArrow90DegLeft,
+  BsArrow90DegRight,
   BsArrowRepeat,
   BsBrush,
   BsCircleFill,
   BsEraser,
-  BsSaveFill,
+  BsFloppy,
   BsSquareFill,
 } from 'react-icons/bs';
 
@@ -40,7 +42,10 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>();
   const maskCanvasRef = useRef<HTMLCanvasElement>();
+  const historyRef = useRef<string[]>([]);
 
+  const [historyLength, setHistoryLength] = useState<number>(0);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
   const [tool, setTool] = useState('add');
   const [loaded, setLoaded] = useState(false);
   const [brushSettings, setBrushSettings] = useState({
@@ -307,6 +312,14 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     }
   };
 
+  const replaceMask = async (url: string) => {
+    const canvas = maskCanvasRef.current!;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const mask = await loadImage(url);
+    ctx.drawImage(mask, 0, 0, mask.naturalWidth, mask.naturalHeight);
+  };
+
   return (
     <div className={styles.editor}>
       {!loaded && <div className={styles.loading}>Loading...</div>}
@@ -390,7 +403,14 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
             if (pointerActionRef.current === 'draw') {
               state[i].previous = state[i].current;
               state[i].current = Vector2.fromEvent(e);
+
               draw();
+
+              const newHistory = historyRef.current.slice(0, historyIndex + 1);
+              newHistory.push(maskCanvasRef.current!.toDataURL());
+              historyRef.current = newHistory;
+              setHistoryLength(newHistory.length);
+              setHistoryIndex(newHistory.length - 1);
             }
 
             state.splice(i, 1);
@@ -454,11 +474,43 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
           />
         </VarUI>
         <div className={styles.actions}>
+          <IconButton
+            onClick={() => {
+              if (historyIndex === 0) {
+                setHistoryIndex(-1);
+                reset();
+                return;
+              }
+
+              const newIndex = Math.max(0, historyIndex - 1);
+              setHistoryIndex(newIndex);
+              const url = historyRef.current[newIndex];
+              if (url) {
+                replaceMask(url);
+              }
+            }}
+            disabled={historyIndex < 0}
+          >
+            <BsArrow90DegLeft />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              const newIndex = Math.min(historyLength, historyIndex + 1);
+              setHistoryIndex(newIndex);
+              const url = historyRef.current[newIndex];
+              if (url) {
+                replaceMask(url);
+              }
+            }}
+            disabled={historyIndex >= historyLength - 1}
+          >
+            <BsArrow90DegRight />
+          </IconButton>
           <IconButton onClick={reset}>
             <BsArrowRepeat />
           </IconButton>
           <IconButton onClick={saveAndClose}>
-            <BsSaveFill />
+            <BsFloppy />
           </IconButton>
         </div>
       </div>

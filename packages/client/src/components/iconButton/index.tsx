@@ -11,6 +11,7 @@ export interface IconButtonProps
   href?: string;
   download?: string;
   round?: boolean;
+  disabled?: boolean;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -19,6 +20,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   href,
   download,
   round,
+  disabled,
   ...props
 }) => {
   if (href) {
@@ -26,7 +28,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       <a
         className={clsx(
           styles.iconButton,
-          { [styles.round]: round },
+          { [styles.round]: round, [styles.disabled]: disabled },
           className,
         )}
         href={href}
@@ -43,6 +45,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   return (
     <button
       className={clsx(styles.iconButton, { [styles.round]: round }, className)}
+      disabled={disabled}
       {...props}
     >
       {children}
