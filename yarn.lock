@@ -1271,7 +1271,7 @@ __metadata:
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
     clsx: "npm:^2.0.0"
-    electron: "npm:31.6.0"
+    electron: "npm:^32.1.2"
     electron-builder: "npm:25.0.0-alpha.8"
     electron-context-menu: "npm:^4.0.4"
     electron-settings: "npm:^4.0.4"
@@ -3943,16 +3943,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:31.6.0":
-  version: 31.6.0
-  resolution: "electron@npm:31.6.0"
+"electron@npm:^32.1.2":
+  version: 32.1.2
+  resolution: "electron@npm:32.1.2"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^20.9.0"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/8644c5a64d6687b9c26862303625872333a0b7c6ded192f21a86e6124f4c99801c58d412ed584740a2e78888ac9331601032894c3195e112d6e8dc4e4479c9b1
+  checksum: 10c0/9e453e046e024b1454fb212e977d622feba3b6d24ff922a360c06177ec8bcbe58e729e105260285e79c0a203dfcb42d3d795844030bba8681016ab50b7d4bb87
   languageName: node
   linkType: hard
 
