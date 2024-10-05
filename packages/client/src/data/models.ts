@@ -37,7 +37,7 @@ export const downloadable: DownloadableModelGroup[] = [
           {
             type: ModelType.CHECKPOINT,
             name: 'sd_v1.5-pruned-emaonly.safetensors',
-            url: 'https://huggingface.co/stable-diffusion-v1-5//stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
+            url: 'https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors',
             size: 4265146304,
           },
         ],

@@ -9,10 +9,5 @@ scipy
 tqdm
 psutil
 transformers>=4.28.1
-segment_anything
-yapf
-addict
-timm
 spandrel
 sentencepiece
-accelerate

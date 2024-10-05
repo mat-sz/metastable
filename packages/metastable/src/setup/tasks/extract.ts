@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { link, mkdir, symlink, writeFile } from 'fs/promises';
+import { link, mkdir, stat, symlink, writeFile } from 'fs/promises';
 import path from 'path';
 
 import { TaskState } from '@metastable/types';
@@ -30,6 +30,8 @@ export class ExtractTask extends BaseTask {
   }
 
   async execute() {
+    this.#size = (await stat(this.targetPath)).size;
+
     const { decompressStream } = await import('@metastable/cppzst');
 
     this.appendLog('Removing old data...');
