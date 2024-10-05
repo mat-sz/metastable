@@ -38,7 +38,7 @@ const config = {
   ],
   publish: {
     provider: 'generic',
-    url: 'https://api.metastable.studio/electron/update',
+    url: 'https://update.metastable.studio/desktop',
   },
 
   // Windows
