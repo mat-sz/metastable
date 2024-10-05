@@ -11,6 +11,7 @@ import {
   WindowOpenHandlerResponse,
 } from 'electron';
 import contextMenu from 'electron-context-menu';
+import settings from 'electron-settings';
 import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
 
@@ -47,6 +48,69 @@ app.on('web-contents-created', (_, wc) => {
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater.autoRunAppAfterInstall = true;
+
+const DEFAULT_WIDTH = 1200;
+const DEFAULT_HEIGHT = 800;
+
+interface WindowState {
+  x?: number;
+  y?: number;
+  width: number;
+  height: number;
+  isMaximized?: boolean;
+}
+
+const windowStateKeeper = async (windowName: string) => {
+  let window: BrowserWindow, windowState: WindowState;
+  const settingsKey = `windowState.${windowName}`;
+
+  const setBounds = async () => {
+    if (await settings.has(settingsKey)) {
+      windowState = (await settings.get(settingsKey)) as any;
+      return windowState;
+    }
+
+    windowState = {
+      x: undefined,
+      y: undefined,
+      width: DEFAULT_WIDTH,
+      height: DEFAULT_HEIGHT,
+    };
+
+    return windowState;
+  };
+
+  let saveTimeout: any = undefined;
+  const updateState = async () => {
+    const isMaximized = window.isMaximized();
+    if (!isMaximized) {
+      windowState = window.getBounds();
+    }
+    windowState.isMaximized = isMaximized;
+
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveState();
+    }, 100);
+  };
+
+  const saveState = async () => {
+    await settings.set(settingsKey, windowState as any);
+  };
+
+  const track = async (win: BrowserWindow) => {
+    window = win;
+    ['resize', 'move', 'close'].forEach(event => {
+      win.on(event as any, updateState);
+    });
+  };
+
+  return {
+    ...(await setBounds()),
+    track,
+    saveState,
+  };
+};
 
 const IS_WINDOWS = os.platform() === 'win32';
 const IS_MAC = os.platform() === 'darwin';
@@ -113,12 +177,16 @@ async function createWindow() {
   checkForUpdates();
   setInterval(checkForUpdates, 15 * 60 * 1000);
 
+  const mainWindowStateKeeper = await windowStateKeeper('main');
+
   const win = new BrowserWindow({
     title: 'Metastable',
     minWidth: 1200,
-    minHeight: 1000,
-    width: 1200,
-    height: 1000,
+    minHeight: 800,
+    x: mainWindowStateKeeper.x,
+    y: mainWindowStateKeeper.y,
+    width: mainWindowStateKeeper.width,
+    height: mainWindowStateKeeper.height,
     resizable: true,
     titleBarStyle: 'hidden',
     frame: false,
@@ -132,6 +200,12 @@ async function createWindow() {
       webSecurity: false,
     },
   });
+
+  if (mainWindowStateKeeper.isMaximized) {
+    win.maximize();
+  }
+
+  mainWindowStateKeeper.track(win);
 
   createIPCHandler({
     router,

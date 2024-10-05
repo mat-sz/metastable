@@ -1274,6 +1274,7 @@ __metadata:
     electron: "npm:31.6.0"
     electron-builder: "npm:25.0.0-alpha.8"
     electron-context-menu: "npm:^4.0.4"
+    electron-settings: "npm:^4.0.4"
     electron-updater: "npm:6.1.8"
     electron-vite: "npm:^2.3.0"
     eslint-plugin-react-hooks: "npm:^4.6.2"
@@ -3895,6 +3896,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-settings@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "electron-settings@npm:4.0.4"
+  dependencies:
+    lodash: "npm:^4.17.21"
+    mkdirp: "npm:^1.0.4"
+    write-file-atomic: "npm:^3.0.3"
+  peerDependencies:
+    electron: ">= 2"
+  checksum: 10c0/e66d47e04fa4d644ac85de810f8d0b88666954b6333bace9fb0f6484fbc200849e946d3a57cc294738797e6275c2602be7e48ddfcf0449a513781a06cfcabd22
+  languageName: node
+  linkType: hard
+
 "electron-to-chromium@npm:^1.5.4":
   version: 1.5.25
   resolution: "electron-to-chromium@npm:1.5.25"
@@ -6000,6 +6014,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-typedarray@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "is-typedarray@npm:1.0.0"
+  checksum: 10c0/4c096275ba041a17a13cca33ac21c16bc4fd2d7d7eb94525e7cd2c2f2c1a3ab956e37622290642501ff4310601e413b675cf399ad6db49855527d2163b3eeeec
+  languageName: node
+  linkType: hard
+
 "is-unicode-supported@npm:^0.1.0":
   version: 0.1.0
   resolution: "is-unicode-supported@npm:0.1.0"
@@ -6396,7 +6417,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.15":
+"lodash@npm:^4.17.15, lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c
@@ -9443,6 +9464,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typedarray-to-buffer@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "typedarray-to-buffer@npm:3.1.5"
+  dependencies:
+    is-typedarray: "npm:^1.0.0"
+  checksum: 10c0/4ac5b7a93d604edabf3ac58d3a2f7e07487e9f6e98195a080e81dbffdc4127817f470f219d794a843b87052cedef102b53ac9b539855380b8c2172054b7d5027
+  languageName: node
+  linkType: hard
+
 "typescript-eslint@npm:^8.4.0":
   version: 8.6.0
   resolution: "typescript-eslint@npm:8.6.0"
@@ -9957,6 +9987,18 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 10c0/56fece1a4018c6a6c8e28fbc88c87e0fbf4ea8fd64fc6c63b18f4acc4bd13e0ad2515189786dd2c30d3eec9663d70f4ecf699330002f8ccb547e4a18231fc9f0
+  languageName: node
+  linkType: hard
+
+"write-file-atomic@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "write-file-atomic@npm:3.0.3"
+  dependencies:
+    imurmurhash: "npm:^0.1.4"
+    is-typedarray: "npm:^1.0.0"
+    signal-exit: "npm:^3.0.2"
+    typedarray-to-buffer: "npm:^3.1.5"
+  checksum: 10c0/7fb67affd811c7a1221bed0c905c26e28f0041e138fb19ccf02db57a0ef93ea69220959af3906b920f9b0411d1914474cdd90b93a96e5cd9e8368d9777caac0e
   languageName: node
   linkType: hard
 
