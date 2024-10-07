@@ -30,7 +30,10 @@ export class ExtractTask extends BaseTask {
   }
 
   async execute() {
-    this.#size = (await stat(this.targetPath)).size;
+    this.#size = 0;
+    for (const part of this.partPaths) {
+      this.#size += (await stat(part)).size;
+    }
 
     const { createBrotliDecompress } = await import('zlib');
 
