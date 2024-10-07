@@ -75,9 +75,6 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     onClose(maskCanvasRef.current?.toDataURL());
   }, [onClose]);
 
-  useHotkeys('escape', saveAndClose);
-  useHotkeys('backspace', reset);
-
   useEffect(() => {
     brushStateRef.current = { tool, brushSettings };
   }, [brushSettings, tool]);
@@ -320,6 +317,35 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     ctx.drawImage(mask, 0, 0, mask.naturalWidth, mask.naturalHeight);
   };
 
+  const undo = () => {
+    if (historyIndex === 0) {
+      setHistoryIndex(-1);
+      reset();
+      return;
+    }
+
+    const newIndex = Math.max(0, historyIndex - 1);
+    setHistoryIndex(newIndex);
+    const url = historyRef.current[newIndex];
+    if (url) {
+      replaceMask(url);
+    }
+  };
+
+  const redo = () => {
+    const newIndex = Math.min(historyLength, historyIndex + 1);
+    setHistoryIndex(newIndex);
+    const url = historyRef.current[newIndex];
+    if (url) {
+      replaceMask(url);
+    }
+  };
+
+  useHotkeys('escape', saveAndClose);
+  useHotkeys('backspace', reset);
+  useHotkeys('ctrl+z', undo);
+  useHotkeys('ctrl+shift+z', redo);
+
   return (
     <div className={styles.editor}>
       {!loaded && <div className={styles.loading}>Loading...</div>}
@@ -474,34 +500,11 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
           />
         </VarUI>
         <div className={styles.actions}>
-          <IconButton
-            onClick={() => {
-              if (historyIndex === 0) {
-                setHistoryIndex(-1);
-                reset();
-                return;
-              }
-
-              const newIndex = Math.max(0, historyIndex - 1);
-              setHistoryIndex(newIndex);
-              const url = historyRef.current[newIndex];
-              if (url) {
-                replaceMask(url);
-              }
-            }}
-            disabled={historyIndex < 0}
-          >
+          <IconButton onClick={undo} disabled={historyIndex < 0}>
             <BsArrow90DegLeft />
           </IconButton>
           <IconButton
-            onClick={() => {
-              const newIndex = Math.min(historyLength, historyIndex + 1);
-              setHistoryIndex(newIndex);
-              const url = historyRef.current[newIndex];
-              if (url) {
-                replaceMask(url);
-              }
-            }}
+            onClick={redo}
             disabled={historyIndex >= historyLength - 1}
           >
             <BsArrow90DegRight />
