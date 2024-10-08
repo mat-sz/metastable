@@ -4,6 +4,7 @@
 
 - Added keyboard shortcuts:
   - `Ctrl+Z`/`Ctrl+Shift+Z` in mask editor now result in Undo/Redo respectively.
+  - `Alt+Enter` in project view now cancels the currently running prompt.
 - Added Undo/Redo buttons to mask editor.
 - Window position and state is now restored on launch.
 - Added progress display in extraction task in the installer.

@@ -34,6 +34,13 @@ export const Prompt: React.FC = observer(() => {
     },
     { enableOnFormTags: true },
   );
+  useHotkeys(
+    'alt+enter',
+    () => {
+      project.cancel();
+    },
+    { enableOnFormTags: true },
+  );
 
   return (
     <VarUI
