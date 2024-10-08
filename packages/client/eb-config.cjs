@@ -22,7 +22,7 @@ const config = {
   asar: true,
   disableSanityCheckAsar: true,
   electronLanguages: ['en', 'en-US', 'en_US'],
-  electronVersion: '30.0.1',
+  electronVersion: '32.1.2',
   nativeRebuilder: 'parallel',
   productName: 'Metastable',
   directories: {
@@ -35,10 +35,6 @@ const config = {
       filter: ['**/*', '!**/__pycache__'],
     },
   ],
-  publish: {
-    provider: 'generic',
-    url: 'https://update.metastable.studio/desktop',
-  },
 
   // Windows
   win: {
