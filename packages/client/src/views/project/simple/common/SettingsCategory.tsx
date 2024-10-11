@@ -39,10 +39,6 @@ export const SettingsCategory = observer(
     const collapsed = project.ui?.collapsed?.[sectionId] ?? defaultCollapsed;
     const onToggle = () => {
       runInAction(() => {
-        if (!project.ui) {
-          project.ui = {};
-        }
-
         if (!project.ui.collapsed) {
           project.ui.collapsed = {};
         }

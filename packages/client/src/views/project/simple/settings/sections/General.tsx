@@ -190,6 +190,16 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         sectionId="sampler"
         defaultCollapsed={true}
       >
+        <VarSwitch
+          label="Quality"
+          path="sampler.quality"
+          options={[
+            { key: 'low', label: 'Low' },
+            { key: 'medium', label: 'Medium' },
+            { key: 'high', label: 'High' },
+            { key: 'custom', label: 'Custom' },
+          ]}
+        />
         <VarRandomNumber
           label="Seed"
           path="sampler.seed"
@@ -204,31 +214,35 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           defaultValue={8}
           showInput
         />
-        <VarSlider
-          label="Steps"
-          path="sampler.steps"
-          min={1}
-          max={150}
-          step={1}
-          defaultValue={20}
-          showInput
-        />
-        <VarSelect
-          label="Sampler"
-          path="sampler.samplerName"
-          options={mainStore.info.samplers.map(name => ({
-            key: name,
-            label: name,
-          }))}
-        />
-        <VarSelect
-          label="Scheduler"
-          path="sampler.schedulerName"
-          options={mainStore.info.schedulers.map(name => ({
-            key: name,
-            label: name,
-          }))}
-        />
+        {project.settings.sampler.quality === 'custom' && (
+          <>
+            <VarSlider
+              label="Steps"
+              path="sampler.steps"
+              min={1}
+              max={150}
+              step={1}
+              defaultValue={20}
+              showInput
+            />
+            <VarSelect
+              label="Sampler"
+              path="sampler.samplerName"
+              options={mainStore.info.samplers.map(name => ({
+                key: name,
+                label: name,
+              }))}
+            />
+            <VarSelect
+              label="Scheduler"
+              path="sampler.schedulerName"
+              options={mainStore.info.schedulers.map(name => ({
+                key: name,
+                label: name,
+              }))}
+            />
+          </>
+        )}
         <VarToggle label="Tiling" path="sampler.tiling" />
       </SettingsCategory>
       <SettingsCategory label="Other" sectionId="other" defaultCollapsed={true}>

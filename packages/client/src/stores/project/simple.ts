@@ -15,6 +15,7 @@ import {
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { recommendedResolutions, Resolution } from '$/data/resolutions';
+import { qualitySamplerSettings } from '$/data/samplerSettings';
 import { PROMPT_STYLES } from '$/data/styles';
 import { API } from '$api';
 import { Editor } from '$editor';
@@ -149,11 +150,12 @@ export function defaultSettings(): ProjectSimpleSettings {
       negative: 'bad quality',
     },
     sampler: {
+      quality: 'medium',
       seed: randomSeed(),
-      steps: 20,
-      cfg: 8.0,
+      steps: 30,
+      cfg: 7.0,
       denoise: 1,
-      samplerName: 'dpm_2',
+      samplerName: 'dpmpp_2m_sde_gpu',
       schedulerName: 'karras',
       tiling: false,
       ...checkpoint?.metadata?.samplerSettings,
@@ -182,6 +184,7 @@ export class SimpleProject extends BaseProject<
     data.settings ??= defaultSettings();
     super(data);
 
+    this.settings.sampler.quality ??= 'custom';
     this.settings.output.sizeMode ??= 'custom';
     this.settings.output.orientation ??= detectOrientation(
       this.settings.output.width,
@@ -209,6 +212,7 @@ export class SimpleProject extends BaseProject<
       discard: action,
       isLastOutput: computed,
       queued: computed,
+      autoSizes: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -267,6 +271,11 @@ export class SimpleProject extends BaseProject<
         settings.output.width,
         settings.output.height,
       );
+    }
+
+    if (settings.sampler.quality !== 'custom') {
+      const samplerSettings = qualitySamplerSettings[settings.sampler.quality];
+      settings.sampler = { ...settings.sampler, ...samplerSettings };
     }
 
     this.settings = settings;

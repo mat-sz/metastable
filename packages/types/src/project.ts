@@ -74,6 +74,7 @@ export interface ProjectSimpleSettings {
     style?: PromptStyleWithSource;
   };
   sampler: {
+    quality: ProjectQuality;
     seed: number;
     steps: number;
     cfg: number;
@@ -173,5 +174,7 @@ export enum ProjectFileType {
   MASK = 'mask',
   OUTPUT = 'output',
 }
+
+export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';
 
 export type ProjectOrientation = 'square' | 'portrait' | 'landscape';
