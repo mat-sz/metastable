@@ -2,6 +2,7 @@ import { mkdir } from 'fs/promises';
 import path from 'path';
 
 import { Project, ProjectFileType } from '@metastable/types';
+import chokidar from 'chokidar';
 import { rimraf } from 'rimraf';
 
 import {
@@ -10,7 +11,7 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
-import { directorySize } from '../helpers/fs.js';
+import { directorySize, isPathIn } from '../helpers/fs.js';
 
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
@@ -35,6 +36,33 @@ export class ProjectEntity extends DirectoryEntity {
       );
     }
     this.files = files;
+  }
+
+  watch(onFilesChange: (type: ProjectFileType) => void) {
+    const timeout: Record<ProjectFileType, any> = {} as any;
+    const watcher = chokidar
+      .watch(this._path, {})
+      .on('all', (event: string, path: string) => {
+        if (!['add', 'change', 'unlink'].includes(event)) {
+          return;
+        }
+
+        let type: ProjectFileType | undefined = undefined;
+        for (const [key, files] of Object.entries(this.files)) {
+          if (isPathIn(files.path, path)) {
+            type = key as ProjectFileType;
+            break;
+          }
+        }
+
+        if (type) {
+          clearTimeout(timeout[type]);
+          timeout[type] = setTimeout(() => {
+            onFilesChange(type);
+          }, 250);
+        }
+      });
+    return watcher;
   }
 
   async load(): Promise<void> {

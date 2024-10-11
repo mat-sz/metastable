@@ -462,6 +462,24 @@ export const router = t.router({
             await project.files[type].delete(name);
           },
         ),
+      onChange: t.procedure
+        .input(
+          z.object({
+            projectId: z.string(),
+          }),
+        )
+        .subscription(async ({ ctx: { metastable }, input: { projectId } }) => {
+          const project = await metastable.project.get(projectId);
+
+          return observable<ProjectFileType>(emit => {
+            const watcher = project.watch(emit.next);
+
+            return () => {
+              watcher.unwatch(Object.keys(watcher.getWatched()));
+              watcher.close();
+            };
+          });
+        }),
     },
     training: {
       start: t.procedure

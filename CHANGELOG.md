@@ -2,6 +2,7 @@
 
 ## Improvements
 
+- Project files are now automatically refreshed.
 - Image thumbnails are now WEBP and support transparency.
 
 ## Bug fixes

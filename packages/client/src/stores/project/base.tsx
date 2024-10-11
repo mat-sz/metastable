@@ -29,6 +29,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   files: Record<ProjectFileType, ImageFile[]>;
   settings: TSettings;
   ui: TUI;
+  filesSubscription;
 
   constructor(data: APIProject) {
     this.settings = data.settings;
@@ -76,6 +77,15 @@ export class BaseProject<TSettings = any, TUI = any> {
         this.triggerAutosave();
       }
     });
+
+    this.filesSubscription = API.project.file.onChange.subscribe(
+      { projectId: this.id },
+      {
+        onData: type => {
+          this.refreshFiles(type);
+        },
+      },
+    );
   }
 
   get tasks() {
@@ -131,7 +141,12 @@ export class BaseProject<TSettings = any, TUI = any> {
     );
   }
 
+  async cleanup() {
+    this.filesSubscription.unsubscribe();
+  }
+
   async delete() {
+    this.cleanup();
     mainStore.projects.close(this.id);
     mainStore.projects.removeRecent(this.id);
     await API.project.delete.mutate({ projectId: this.id });
@@ -144,6 +159,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       return;
     }
 
+    this.cleanup();
     mainStore.projects.close(this.id);
   }
 
