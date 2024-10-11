@@ -1,4 +1,6 @@
+import { runInAction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { assign } from 'radash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '$components/button';
@@ -42,7 +44,7 @@ export const PromptLoad: React.FC<Props> = observer(
     useEffect(() => {
       setLoaded(false);
       if (loadedSettings) {
-        setSettings(JSON.parse(JSON.stringify(loadedSettings)));
+        setSettings(toJS(loadedSettings));
         setLoaded(true);
       } else if (file) {
         load(file);
@@ -139,14 +141,15 @@ export const PromptLoad: React.FC<Props> = observer(
               <Button
                 variant="primary"
                 onClick={() => {
-                  project.settings.prompt = {
-                    ...project.settings.prompt,
-                    ...settings?.prompt,
-                  };
-                  project.settings.sampler = {
-                    ...project.settings.sampler,
-                    ...settings?.sampler,
-                  };
+                  if (settings) {
+                    const newSettings = assign(
+                      toJS(project.settings),
+                      toJS(settings),
+                    ) as any;
+                    runInAction(() => {
+                      project.settings = newSettings;
+                    });
+                  }
                   close();
                 }}
               >
@@ -156,7 +159,7 @@ export const PromptLoad: React.FC<Props> = observer(
           ) : (
             <>
               <Button variant="primary" onClick={close}>
-                Cancel
+                Close
               </Button>
             </>
           )}

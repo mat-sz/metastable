@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added confirmation before project settings are restored from an image.
 - Added simplified sampling quality picker.
 - Added simplified output image resolution picker.
 - Added upload and management of input/mask files inside of projects.
