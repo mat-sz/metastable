@@ -50,10 +50,18 @@ export const Prompt: React.FC = observer(() => {
       }}
       values={toJS(project.settings)}
     >
-      <VarCategory label="Prompt">
-        <StyleSelect className={styles.style} />
-        <VarString label="Positive" path="prompt.positive" multiline />
-        <VarString label="Negative" path="prompt.negative" multiline />
+      <VarCategory
+        label={
+          <>
+            <span>Prompt</span>
+            <StyleSelect className={styles.style} />
+          </>
+        }
+      >
+        <div className={styles.inputs}>
+          <VarString label="Positive" path="prompt.positive" multiline />
+          <VarString label="Negative" path="prompt.negative" multiline />
+        </div>
       </VarCategory>
       <div className={styles.actions}>
         <div>

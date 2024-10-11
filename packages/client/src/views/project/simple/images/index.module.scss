@@ -13,23 +13,33 @@
   border-radius: 5px;
 
   [varui-label] {
-    margin: 1rem;
+    margin: 0;
+  }
+
+  .inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    textarea {
+      min-height: 150px;
+    }
+
+    [varui-label] {
+      margin: 1rem;
+
+      &:not(:last-child) {
+        margin-right: 0;
+      }
+    }
   }
 
   [varui-category-title] {
+    margin: 0;
     padding: 0 1rem;
   }
 
   [varui-category] {
     border-bottom: none;
-
-    & > div:last-child {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      textarea {
-        min-height: 150px;
-      }
-    }
   }
 
   .actions {
@@ -56,9 +66,6 @@
   }
 
   .style {
-    position: absolute;
-    top: 0;
-    right: 0;
     width: 200px;
   }
 }
