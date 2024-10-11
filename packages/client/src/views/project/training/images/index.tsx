@@ -1,31 +1,23 @@
 import { ImageFile, ProjectFileType } from '@metastable/types';
-import { Base64 } from 'js-base64';
 import { observer } from 'mobx-react-lite';
-import { nanoid } from 'nanoid';
 import React, { useState } from 'react';
 import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 
-import { TRPC } from '$api';
 import { FileManager } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
+import { UploadQueue } from '$components/uploadQueue';
 import { Tagger } from '$modals/tagger';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 import { InputEditor } from './InputEditor';
-import { UploadQueue, UploadQueueItem } from './UploadQueue';
 import { useTraningProject } from '../../context';
 import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
-  const allInputsQuery = TRPC.project.file.all.useQuery({
-    type: ProjectFileType.INPUT,
-    projectId: project.id,
-  });
-  const createInputMutation = TRPC.project.file.create.useMutation();
-  const deleteInputMutation = TRPC.project.file.delete.useMutation();
-  const [queue, setQueue] = useState<UploadQueueItem[]>([]);
   const [editing, setEditing] = useState<ImageFile>();
+  const type = ProjectFileType.INPUT;
+  const queue = project.uploadQueue[type];
 
   if (editing) {
     return (
@@ -33,55 +25,12 @@ export const Images: React.FC = observer(() => {
     );
   }
 
-  const inputs = allInputsQuery.data;
-  if (!inputs) {
-    return <div>Loading...</div>;
-  }
+  const inputs = project.files[type];
 
   return (
     <div className={styles.main}>
       <div className={styles.images}>
-        {!!queue.length && (
-          <UploadQueue
-            items={queue.map(item => ({
-              ...item,
-            }))}
-            onStart={async () => {
-              for (const item of queue) {
-                setQueue(queue =>
-                  queue.map(queueItem =>
-                    queueItem.id === item.id
-                      ? { ...queueItem, state: 'uploading' }
-                      : queueItem,
-                  ),
-                );
-                await createInputMutation.mutateAsync({
-                  type: ProjectFileType.INPUT,
-                  projectId: project.id,
-                  data: Base64.fromUint8Array(
-                    new Uint8Array(await item.file.arrayBuffer()),
-                  ),
-                  name: item.file.name,
-                });
-                URL.revokeObjectURL(item.url);
-                setQueue(queue =>
-                  queue.map(queueItem =>
-                    queueItem.id === item.id
-                      ? { ...queueItem, state: 'done' }
-                      : queueItem,
-                  ),
-                );
-              }
-              await allInputsQuery.refetch();
-            }}
-            onReset={() => {
-              setQueue([]);
-            }}
-            onRemove={id => {
-              setQueue(queue => queue.filter(item => item.id !== id));
-            }}
-          />
-        )}
+        <UploadQueue queue={queue} />
         <FileManager
           items={inputs}
           onOpen={ids => setEditing(inputs.find(item => item.name === ids[0]))}
@@ -91,20 +40,18 @@ export const Images: React.FC = observer(() => {
                 dropzone
                 paste
                 onFiles={files => {
-                  setQueue(queue => [
-                    ...files
-                      .map(file => ({
-                        id: nanoid(),
-                        file,
-                        url: URL.createObjectURL(file),
-                      }))
-                      .reverse(),
-                    ...queue,
-                  ]);
+                  if (queue.isRunning) {
+                    return;
+                  }
+
+                  for (const file of files) {
+                    queue.add(file);
+                  }
                 }}
+                accept="image/*"
               >
                 {state => (
-                  <button onClick={state.open}>
+                  <button onClick={state.open} disabled={queue.isRunning}>
                     <BsPlus />
                     <span>Add files</span>
                   </button>
@@ -130,13 +77,8 @@ export const Images: React.FC = observer(() => {
               <button
                 onClick={async () => {
                   for (const item of selection) {
-                    await deleteInputMutation.mutateAsync({
-                      type: ProjectFileType.INPUT,
-                      projectId: project.id,
-                      name: item.name,
-                    });
+                    await project.deleteFile(type, item.name);
                   }
-                  await allInputsQuery.refetch();
                 }}
               >
                 <BsTrash />
