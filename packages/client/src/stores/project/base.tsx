@@ -6,6 +6,7 @@ import {
   makeObservable,
   observable,
   runInAction,
+  toJS,
 } from 'mobx';
 
 import { API } from '$api';
@@ -26,7 +27,7 @@ export class BaseProject<TSettings = any, TUI = any> {
 
   constructor(data: APIProject) {
     this.settings = data.settings;
-    this.ui = data.ui;
+    this.ui = data.ui ?? {};
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
@@ -54,13 +55,13 @@ export class BaseProject<TSettings = any, TUI = any> {
     this.refresh();
 
     autorun(() => {
-      if (this.ui) {
+      if (toJS(this.ui)) {
         this.triggerAutosaveUI();
       }
     });
 
     autorun(() => {
-      if (this.settings) {
+      if (toJS(this.settings)) {
         this.triggerAutosave();
       }
     });

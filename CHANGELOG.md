@@ -1,3 +1,9 @@
+# 0.0.8 (Upcoming)
+
+## Bug fixes
+
+- UI state (e.g. section collapsed state) is now properly saved.
+
 # 0.0.7 (2024-10-08)
 
 ## Features
