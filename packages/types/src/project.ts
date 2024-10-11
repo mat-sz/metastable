@@ -150,7 +150,7 @@ export interface Project extends ProjectInfo {
   name: string;
   settings?: any;
   ui?: any;
-  lastOutput?: ImageFile;
+  lastOutput?: ProjectImageFile;
   outputCount?: number;
   size?: number;
   temporary?: boolean;
@@ -166,13 +166,17 @@ export interface ProjectPromptTaskData extends ProjectTaskData {
   stepValue?: number;
   stepMax?: number;
   stepTime?: Record<string, number>;
-  outputs?: ImageFile[];
+  outputs?: ProjectImageFile[];
 }
 
 export enum ProjectFileType {
   INPUT = 'input',
   MASK = 'mask',
   OUTPUT = 'output',
+}
+
+export interface ProjectImageFile extends ImageFile {
+  internalUrl: string;
 }
 
 export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';

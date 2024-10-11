@@ -1,9 +1,9 @@
 import {
   Project as APIProject,
   CheckpointType,
-  ImageFile,
   ModelType,
   ProjectFileType,
+  ProjectImageFile,
   ProjectModel,
   ProjectOrientation,
   ProjectPromptTaskData,
@@ -615,7 +615,7 @@ export class SimpleProject extends BaseProject<
     this.currentOutput = undefined;
   }
 
-  selectOutput(output?: ImageFile) {
+  selectOutput(output?: ProjectImageFile) {
     this.mode = 'images';
     this.currentOutput = output;
     this.currentTask = undefined;

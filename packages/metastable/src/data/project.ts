@@ -13,6 +13,25 @@ import {
 } from './common.js';
 import { directorySize, isPathIn } from '../helpers/fs.js';
 
+export class ProjectImageEntity extends ImageEntity {
+  type: ProjectFileType;
+
+  constructor(_path: string) {
+    super(_path);
+    this.type = path.basename(this.baseDir) as ProjectFileType;
+  }
+
+  async json(withMetadata = false) {
+    return {
+      name: this.name,
+      image: this.image,
+      path: this.path,
+      metadata: withMetadata ? await this.metadata.get() : undefined,
+      internalUrl: `metastable://current_project/${encodeURIComponent(this.type)}/${encodeURIComponent(this.name)}`,
+    };
+  }
+}
+
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
@@ -22,7 +41,7 @@ export class ProjectEntity extends DirectoryEntity {
   settings = new Metadata(path.join(this._path, 'settings.json'));
   ui = new Metadata<any>(path.join(this._path, 'ui.json'), {});
 
-  files: Record<ProjectFileType, EntityRepository<typeof ImageEntity>>;
+  files: Record<ProjectFileType, EntityRepository<typeof ProjectImageEntity>>;
   tempPath = path.join(this._path, 'temp');
 
   constructor(_path: string) {
@@ -32,7 +51,7 @@ export class ProjectEntity extends DirectoryEntity {
     for (const key of Object.values(ProjectFileType)) {
       files[key] = new EntityRepository(
         path.join(this._path, key),
-        ImageEntity,
+        ProjectImageEntity,
       );
     }
     this.files = files;

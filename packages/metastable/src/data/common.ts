@@ -283,7 +283,7 @@ export class EntityRepository<
     return this.baseDir;
   }
 
-  private getEntityPath(name: string) {
+  getEntityPath(name: string) {
     return path.join(this.baseDir, name);
   }
 

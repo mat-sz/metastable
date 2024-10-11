@@ -1,7 +1,7 @@
 import {
   Project as APIProject,
-  ImageFile,
   ProjectFileType,
+  ProjectImageFile,
   TaskState,
 } from '@metastable/types';
 import {
@@ -21,13 +21,13 @@ import { modalStore } from '$stores/ModalStore';
 import { UploadQueueStore } from './UploadQueueStore';
 
 export class BaseProject<TSettings = any, TUI = any> {
-  currentOutput: ImageFile | undefined = undefined;
+  currentOutput: ProjectImageFile | undefined = undefined;
   mode: string = 'images';
   id;
   name;
   type;
   temporary;
-  files: Record<ProjectFileType, ImageFile[]>;
+  files: Record<ProjectFileType, ProjectImageFile[]>;
   settings: TSettings;
   ui: TUI;
   filesSubscription;

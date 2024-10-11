@@ -1,10 +1,10 @@
-import { writeFile } from 'fs/promises';
+import fs from 'fs/promises';
 import path from 'path';
 
 import {
   CheckpointType,
-  ImageFile,
   ModelType,
+  ProjectImageFile,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
   TaskState,
@@ -16,6 +16,7 @@ import { getNextNumber } from '../../helpers/fs.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
+import { parseInternalUrl } from '../helpers.js';
 import type { ComfySession } from '../session.js';
 import { ComfyPreviewSettings, RPCBytes } from '../types.js';
 
@@ -257,10 +258,31 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     this.state = TaskState.CANCELLING;
   }
 
+  private async inputAsBuffer(url: string): Promise<Buffer> {
+    if (url.startsWith('data:')) {
+      return Buffer.from(url.split(',')[1], 'base64');
+    }
+
+    if (url.startsWith('metastable:')) {
+      const parsed = parseInternalUrl(url);
+      if (!parsed) {
+        throw new Error('Invalid internal file URL.');
+      }
+
+      const { type, name } = parsed;
+      const filePath = this.project.files[type].getEntityPath(name);
+      return await fs.readFile(filePath);
+    }
+
+    throw new Error('Unable to load input');
+  }
+
   async inputAsBytes(url: string): Promise<RPCBytes> {
+    const buffer = await this.inputAsBuffer(url);
+
     if (url.startsWith('data:')) {
       return {
-        $bytes: url.split(',')[1],
+        $bytes: buffer.toString('base64'),
       };
     }
 
@@ -405,7 +427,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.step('save');
       let counter = await getNextNumber(outputDir);
       const ext = settings.output?.format || 'png';
-      const outputs: ImageFile[] = [];
+      const outputs: ProjectImageFile[] = [];
       const cleanSettings = this.getCleanSettings();
 
       for (const image of images) {
@@ -428,7 +450,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           minimumIntegerDigits: 5,
           useGrouping: false,
         })}.${ext}`;
-        await writeFile(path.join(outputDir, filename), buffer);
+        await fs.writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.files.output.get(filename);
         await output.metadata.set(cleanSettings);
         outputs.push(await output.json());

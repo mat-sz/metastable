@@ -1,19 +1,5 @@
 import { ProjectFileType } from '@metastable/types';
 
-import { SERVER_HOST } from './config';
-
-export function getUrl(path: string, protocol = 'http') {
-  if (window.location.protocol === 'https:') {
-    if (protocol === 'http') {
-      protocol = 'https';
-    } else if (protocol === 'ws') {
-      protocol = 'wss';
-    }
-  }
-
-  return `${protocol}://${SERVER_HOST}${path}`;
-}
-
 interface InternalUrlInfo {
   type: ProjectFileType;
   name: string;
@@ -31,15 +17,15 @@ export function parseInternalUrl(
   // node.js parses hostnames for custom protocols, but browsers don't.
   const split = url.pathname.split('/');
   if (
-    split.length < 5 ||
-    split[2] !== 'current_project' ||
-    !Object.values(ProjectFileType).includes(split[3] as any)
+    split.length < 3 ||
+    url.hostname !== 'current_project' ||
+    !Object.values(ProjectFileType).includes(split[1] as any)
   ) {
     return undefined;
   }
 
   return {
-    type: split[3] as ProjectFileType,
-    name: split[4],
+    type: split[1] as ProjectFileType,
+    name: split[2],
   };
 }
