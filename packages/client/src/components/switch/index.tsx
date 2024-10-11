@@ -61,16 +61,20 @@ interface SwitchProps {
   className?: string;
   value: string;
   onChange: (value: string) => void;
+  variant?: 'default' | 'small';
 }
 
 export const Switch: React.FC<React.PropsWithChildren<SwitchProps>> = ({
   className,
   children,
+  variant = 'default',
   ...props
 }) => {
   return (
     <SwitchContext.Provider value={props}>
-      <div className={clsx(styles.switch, className)}>{children}</div>
+      <div className={clsx(styles.switch, styles[variant], className)}>
+        {children}
+      </div>
     </SwitchContext.Provider>
   );
 };

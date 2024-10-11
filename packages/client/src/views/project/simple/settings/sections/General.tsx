@@ -54,6 +54,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             { key: 'simple', label: 'Simple' },
             { key: 'advanced', label: 'Advanced' },
           ]}
+          inline
         />
         {project.settings.checkpoint.mode === 'advanced' ? (
           <>
@@ -225,7 +226,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         <VarToggle label="Tiling" path="sampler.tiling" />
       </SettingsCategory>
       <SettingsCategory label="Other" sectionId="other" defaultCollapsed={true}>
-        <VarSelect
+        <VarSwitch
           label="Format"
           path="output.format"
           defaultValue="png"
@@ -233,6 +234,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             { key: 'png', label: 'PNG' },
             { key: 'jpg', label: 'JPEG' },
           ]}
+          inline
         />
         <VarSlider
           label="CLIP skip last layers"

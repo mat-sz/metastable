@@ -47,6 +47,7 @@ export const VarSwitch = ({
   switchClassName,
   error,
   errorPath,
+  inline,
 }: IVarSwitchProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
@@ -68,11 +69,13 @@ export const VarSwitch = ({
       readOnly={readOnly}
       className={className}
       error={currentError}
+      inline={inline}
     >
       <Switch
         className={switchClassName}
         value={serializedCurrentValue}
         onChange={value => setCurrentValue(JSON.parse(value))}
+        variant={inline ? 'small' : 'default'}
       >
         {options.map(option => {
           const serializedValue = JSON.stringify(option.value ?? option.key);
