@@ -394,7 +394,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.preview,
       );
       let images = await checkpoint.decode(samples, isCircular);
-      const outputDir = this.project!.output.path;
+      const outputDir = this.project!.files.output.path;
 
       if (settings.upscale?.enabled) {
         this.step('upscale');
@@ -429,7 +429,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           useGrouping: false,
         })}.${ext}`;
         await writeFile(path.join(outputDir, filename), buffer);
-        const output = await this.project!.output.get(filename);
+        const output = await this.project!.files.output.get(filename);
         await output.metadata.set(cleanSettings);
         outputs.push(await output.json());
         counter++;

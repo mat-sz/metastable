@@ -3,6 +3,7 @@ import {
   CheckpointType,
   ImageFile,
   ModelType,
+  ProjectFileType,
   ProjectModel,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
@@ -208,15 +209,6 @@ export class SimpleProject extends BaseProject<
     });
   }
 
-  async deleteOutput(name: string) {
-    this.outputs = this.outputs.filter(output => output.name !== name);
-    if (this.currentOutput?.name === name) {
-      this.currentOutput = this.outputs[this.outputs.length - 1];
-    }
-
-    await API.project.output.delete.mutate({ name, projectId: this.id });
-  }
-
   async useInputImage(url: string) {
     const settings = this.settings;
     const res = await fetch(url);
@@ -396,7 +388,7 @@ export class SimpleProject extends BaseProject<
 
   async discard() {
     if (this.isLastOutput) {
-      await this.deleteOutput(this.lastOutputName!);
+      await this.deleteFile(ProjectFileType.OUTPUT, this.lastOutputName!);
     }
 
     await this.request();
@@ -582,7 +574,7 @@ export class SimpleProject extends BaseProject<
   onPromptDone(task: Task<ProjectPromptTaskData>) {
     const outputs = task.data.outputs!;
     this.selectOutput(outputs[0]);
-    this.outputs.push(...outputs);
+    this.files.output.push(...outputs);
     this.lastOutputName = outputs[0].name;
 
     this.stepTime = task.data.stepTime;

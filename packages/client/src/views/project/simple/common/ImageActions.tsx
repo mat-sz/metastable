@@ -1,4 +1,4 @@
-import { ImageFile } from '@metastable/types';
+import { ImageFile, ProjectFileType } from '@metastable/types';
 import React from 'react';
 import {
   BsArrowRightSquareFill,
@@ -24,7 +24,7 @@ export const ImageActions: React.FC<Props> = ({ file }) => {
       <IconButton
         title="Delete image"
         onClick={() => {
-          project.deleteOutput(file.name);
+          project.deleteFile(ProjectFileType.OUTPUT, file.name);
         }}
       >
         <BsTrashFill />
@@ -50,7 +50,8 @@ export const ImageActions: React.FC<Props> = ({ file }) => {
       <IconButton
         title="Load settings from current image"
         onClick={async () => {
-          const data = await API.project.output.get.query({
+          const data = await API.project.file.get.query({
+            type: ProjectFileType.OUTPUT,
             projectId: project.id,
             name: file.name,
           });

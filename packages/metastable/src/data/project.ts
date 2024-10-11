@@ -1,7 +1,7 @@
 import { mkdir } from 'fs/promises';
 import path from 'path';
 
-import { Project } from '@metastable/types';
+import { Project, ProjectFileType } from '@metastable/types';
 import { rimraf } from 'rimraf';
 
 import {
@@ -21,18 +21,28 @@ export class ProjectEntity extends DirectoryEntity {
   settings = new Metadata(path.join(this._path, 'settings.json'));
   ui = new Metadata<any>(path.join(this._path, 'ui.json'), {});
 
-  input = new EntityRepository(path.join(this._path, 'input'), ImageEntity);
-  output = new EntityRepository(path.join(this._path, 'output'), ImageEntity);
+  files: Record<ProjectFileType, EntityRepository<typeof ImageEntity>>;
   tempPath = path.join(this._path, 'temp');
 
   constructor(_path: string) {
     super(_path);
+
+    const files = {} as any;
+    for (const key of Object.values(ProjectFileType)) {
+      files[key] = new EntityRepository(
+        path.join(this._path, key),
+        ImageEntity,
+      );
+    }
+    this.files = files;
   }
 
   async load(): Promise<void> {
     await this.metadata.refresh();
-    await mkdir(this.input.path, { recursive: true });
-    await mkdir(this.output.path, { recursive: true });
+
+    for (const key of Object.values(ProjectFileType)) {
+      await mkdir(this.files[key].path, { recursive: true });
+    }
   }
 
   async cleanup() {
@@ -46,7 +56,7 @@ export class ProjectEntity extends DirectoryEntity {
 
   async json(full = false): Promise<Project> {
     await this.load();
-    const outputs = await this.output.all();
+    const outputs = await this.files.output.all();
     const lastOutput = outputs[outputs.length - 1];
 
     const json: Project = {

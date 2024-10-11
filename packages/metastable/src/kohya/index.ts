@@ -51,7 +51,7 @@ export class Kohya extends EventEmitter {
     const tempInputPath = path.join(project.tempPath, 'input');
     await fs.mkdir(tempInputPath, { recursive: true });
 
-    const inputs = await project.input.all();
+    const inputs = await project.files.input.all();
     for (const input of inputs) {
       const name = removeFileExtension(input.name);
       const inputData =
@@ -106,7 +106,7 @@ export class Kohya extends EventEmitter {
       train_batch_size: settings.limits.batchSize,
 
       // Data
-      output_dir: project.output.path,
+      output_dir: project.files.output.path,
       output_name: `${Date.now()}`,
 
       // Optimizer

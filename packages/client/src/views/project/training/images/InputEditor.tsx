@@ -1,4 +1,8 @@
-import { ImageFile, ProjectTrainingInputMetadata } from '@metastable/types';
+import {
+  ImageFile,
+  ProjectFileType,
+  ProjectTrainingInputMetadata,
+} from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { BsX } from 'react-icons/bs';
@@ -17,11 +21,12 @@ interface InputEditorProps {
 export const InputEditor: React.FC<InputEditorProps> = observer(
   ({ input, onClose }) => {
     const project = useTraningProject();
-    const metadataQuery = TRPC.project.input.get.useQuery({
+    const metadataQuery = TRPC.project.file.get.useQuery({
+      type: ProjectFileType.INPUT,
       projectId: project.id,
       name: input.name,
     });
-    const metadataMutation = TRPC.project.input.update.useMutation();
+    const metadataMutation = TRPC.project.file.update.useMutation();
     const [metadata, setMetadata] = useState<ProjectTrainingInputMetadata>({});
 
     useEffect(() => {
@@ -43,6 +48,7 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
             <IconButton
               onClick={async () => {
                 metadataMutation.mutate({
+                  type: ProjectFileType.INPUT,
                   projectId: project.id,
                   name: input.name,
                   metadata,

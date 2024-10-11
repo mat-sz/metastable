@@ -40,7 +40,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
       });
 
       const images = this.settings.inputs.map(input =>
-        path.join(this.project.input.path, input),
+        path.join(this.project.files.input.path, input),
       );
       const threshold = this.settings.threshold || 0.35;
       const result = await ctx.tag(
@@ -53,7 +53,9 @@ export class TagTask extends BaseTask<ProjectTaskData> {
 
       for (const [imagePath, caption] of Object.entries(result)) {
         try {
-          const input = await this.project.input.get(path.basename(imagePath));
+          const input = await this.project.files.input.get(
+            path.basename(imagePath),
+          );
           await input.metadata.update({ caption });
         } catch {}
       }

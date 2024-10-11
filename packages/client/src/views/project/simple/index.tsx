@@ -31,11 +31,9 @@ export const SimpleProjectView: React.FC = observer(() => {
     editor: <ImageEditor />,
   };
 
-  const outputs = [...project.outputs].reverse().slice(0, MAX_DISPLAY_OUTPUTS);
-  const remainingOutputs = Math.max(
-    project.outputs.length - MAX_DISPLAY_OUTPUTS,
-    0,
-  );
+  const allOutputs = project.files.output;
+  const outputs = [...allOutputs].reverse().slice(0, MAX_DISPLAY_OUTPUTS);
+  const remainingOutputs = Math.max(allOutputs.length - MAX_DISPLAY_OUTPUTS, 0);
 
   return (
     <div className={styles.project}>

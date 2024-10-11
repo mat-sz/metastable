@@ -1,4 +1,4 @@
-import { ImageFile } from '@metastable/types';
+import { ImageFile, ProjectFileType } from '@metastable/types';
 import { Base64 } from 'js-base64';
 import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
@@ -18,11 +18,12 @@ import { Settings } from '../settings';
 
 export const Images: React.FC = observer(() => {
   const project = useTraningProject();
-  const allInputsQuery = TRPC.project.input.all.useQuery({
+  const allInputsQuery = TRPC.project.file.all.useQuery({
+    type: ProjectFileType.INPUT,
     projectId: project.id,
   });
-  const createInputMutation = TRPC.project.input.create.useMutation();
-  const deleteInputMutation = TRPC.project.input.delete.useMutation();
+  const createInputMutation = TRPC.project.file.create.useMutation();
+  const deleteInputMutation = TRPC.project.file.delete.useMutation();
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
   const [editing, setEditing] = useState<ImageFile>();
 
@@ -55,6 +56,7 @@ export const Images: React.FC = observer(() => {
                   ),
                 );
                 await createInputMutation.mutateAsync({
+                  type: ProjectFileType.INPUT,
                   projectId: project.id,
                   data: Base64.fromUint8Array(
                     new Uint8Array(await item.file.arrayBuffer()),
@@ -129,6 +131,7 @@ export const Images: React.FC = observer(() => {
                 onClick={async () => {
                   for (const item of selection) {
                     await deleteInputMutation.mutateAsync({
+                      type: ProjectFileType.INPUT,
                       projectId: project.id,
                       name: item.name,
                     });

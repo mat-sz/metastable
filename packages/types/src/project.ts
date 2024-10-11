@@ -164,3 +164,9 @@ export interface ProjectPromptTaskData extends ProjectTaskData {
   stepTime?: Record<string, number>;
   outputs?: ImageFile[];
 }
+
+export enum ProjectFileType {
+  INPUT = 'input',
+  MASK = 'mask',
+  OUTPUT = 'output',
+}

@@ -1,3 +1,4 @@
+import { ProjectFileType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsTrash } from 'react-icons/bs';
@@ -15,7 +16,7 @@ export const Grid: React.FC = observer(() => {
   const [current, setCurrent] = useState(0);
   const [open, setOpen] = useState(false);
 
-  const outputs = project.outputs.slice().reverse();
+  const outputs = project.files.output.slice().reverse();
 
   if (!outputs.length) {
     return <div className={styles.info}>No project output images found.</div>;
@@ -38,7 +39,10 @@ export const Grid: React.FC = observer(() => {
                     count={selection.length}
                     onDelete={async () => {
                       for (const item of selection) {
-                        await project.deleteOutput(item.name);
+                        await project.deleteFile(
+                          ProjectFileType.OUTPUT,
+                          item.name,
+                        );
                       }
                     }}
                   />,

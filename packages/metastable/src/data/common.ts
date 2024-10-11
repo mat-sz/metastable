@@ -6,7 +6,6 @@ import { ImageInfo } from '@metastable/types';
 import { rimraf } from 'rimraf';
 
 import {
-  exists,
   getAvailableName,
   getMetadataDirectory,
   IMAGE_EXTENSIONS,

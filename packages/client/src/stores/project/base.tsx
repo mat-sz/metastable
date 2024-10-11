@@ -1,4 +1,9 @@
-import { Project as APIProject, ImageFile, TaskState } from '@metastable/types';
+import {
+  Project as APIProject,
+  ImageFile,
+  ProjectFileType,
+  TaskState,
+} from '@metastable/types';
 import {
   action,
   autorun,
@@ -21,7 +26,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   name;
   type;
   temporary;
-  outputs: ImageFile[] = [];
+  files: Record<ProjectFileType, ImageFile[]>;
   settings: TSettings;
   ui: TUI;
 
@@ -34,9 +39,15 @@ export class BaseProject<TSettings = any, TUI = any> {
     this.currentOutput = data.lastOutput;
     this.temporary = data.temporary ?? false;
 
+    const files = {} as any;
+    for (const key of Object.values(ProjectFileType)) {
+      files[key] = [];
+    }
+    this.files = files;
+
     makeObservable(this, {
       currentOutput: observable,
-      outputs: observable,
+      files: observable,
       mode: observable,
       id: observable,
       name: observable,
@@ -98,19 +109,26 @@ export class BaseProject<TSettings = any, TUI = any> {
     return !!this.firstTask && !this.firstTask.progress;
   }
 
-  async refresh() {
+  async refreshFiles(type: ProjectFileType) {
     try {
-      const outputs = await API.project.output.all.query({
+      const files = await API.project.file.all.query({
+        type: type,
         projectId: this.id,
       });
-      if (outputs) {
+      if (files) {
         runInAction(() => {
-          this.outputs = outputs;
+          this.files[type] = files;
         });
       }
     } catch {
       //
     }
+  }
+
+  async refresh() {
+    await Promise.all(
+      Object.values(ProjectFileType).map(type => this.refreshFiles(type)),
+    );
   }
 
   async delete() {
@@ -171,6 +189,20 @@ export class BaseProject<TSettings = any, TUI = any> {
         mainStore.projects.refresh();
       });
     }
+  }
+
+  async deleteFile(type: ProjectFileType, name: string) {
+    this.files[type] = this.files[type].filter(file => file.name !== name);
+
+    if (type === ProjectFileType.OUTPUT && this.currentOutput?.name === name) {
+      this.currentOutput = this.files.output[this.files.output.length - 1];
+    }
+
+    await API.project.file.delete.mutate({
+      type,
+      name,
+      projectId: this.id,
+    });
   }
 
   private _autosaveTimeout: number | undefined = undefined;

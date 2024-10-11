@@ -3,6 +3,7 @@ import {
   LogItem,
   Model,
   ModelType,
+  ProjectFileType,
   SetupStatus,
   TaskCreateEvent,
   TaskDeleteEvent,
@@ -378,47 +379,58 @@ export const router = t.router({
           return await metastable.prompt(projectId, settings);
         },
       ),
-    input: {
+    file: {
       all: t.procedure
-        .input(z.object({ projectId: z.string() }))
-        .query(async ({ ctx: { metastable }, input: { projectId } }) => {
+        .input(
+          z.object({
+            type: z.nativeEnum(ProjectFileType),
+            projectId: z.string(),
+          }),
+        )
+        .query(async ({ ctx: { metastable }, input: { type, projectId } }) => {
           const project = await metastable.project.get(projectId);
-          const inputs = await project.input.all();
-
-          return await Promise.all(inputs.map(input => input.json()));
+          const files = await project.files[type].all();
+          return await Promise.all(files.map(file => file.json()));
         }),
       get: t.procedure
         .input(
           z.object({
+            type: z.nativeEnum(ProjectFileType),
             projectId: z.string(),
             name: z.string(),
           }),
         )
-        .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
-          const project = await metastable.project.get(projectId);
-          const input = await project.input.get(name);
-          return await input.json(true);
-        }),
+        .query(
+          async ({ ctx: { metastable }, input: { type, projectId, name } }) => {
+            const project = await metastable.project.get(projectId);
+            const file = await project.files[type].get(name);
+            return await file.json(true);
+          },
+        ),
       create: t.procedure
         .input(
           z.object({
+            type: z.nativeEnum(ProjectFileType),
             projectId: z.string(),
             data: z.string(),
             name: z.string(),
           }),
         )
         .mutation(
-          async ({ ctx: { metastable }, input: { projectId, data, name } }) => {
+          async ({
+            ctx: { metastable },
+            input: { type, projectId, data, name },
+          }) => {
             const project = await metastable.project.get(projectId);
-            const input = await project.input.create(name);
-
-            await input.write(Base64.toUint8Array(data));
-            return await input.json(true);
+            const file = await project.files[type].create(name);
+            await file.write(Base64.toUint8Array(data));
+            return await file.json(true);
           },
         ),
       update: t.procedure
         .input(
           z.object({
+            type: z.nativeEnum(ProjectFileType),
             projectId: z.string(),
             name: z.string(),
             newName: z.string().optional(),
@@ -428,61 +440,26 @@ export const router = t.router({
         .mutation(
           async ({
             ctx: { metastable },
-            input: { projectId, name, newName, metadata },
+            input: { type, projectId, name, newName, metadata },
           }) => {
             const project = await metastable.project.get(projectId);
-            const input = await project.input.getOrRename(name, newName);
-
-            await input.metadata.update(metadata);
-            return await input.json(true);
+            const file = await project.files[type].getOrRename(name, newName);
+            await file.metadata.update(metadata);
+            return await file.json(true);
           },
         ),
       delete: t.procedure
         .input(
           z.object({
+            type: z.nativeEnum(ProjectFileType),
             projectId: z.string(),
             name: z.string(),
           }),
         )
         .mutation(
-          async ({ ctx: { metastable }, input: { projectId, name } }) => {
+          async ({ ctx: { metastable }, input: { type, projectId, name } }) => {
             const project = await metastable.project.get(projectId);
-            await project.input.delete(name);
-          },
-        ),
-    },
-    output: {
-      all: t.procedure
-        .input(z.object({ projectId: z.string() }))
-        .query(async ({ ctx: { metastable }, input: { projectId } }) => {
-          const project = await metastable.project.get(projectId);
-          const outputs = await project.output.all();
-
-          return await Promise.all(outputs.map(output => output.json()));
-        }),
-      get: t.procedure
-        .input(
-          z.object({
-            projectId: z.string(),
-            name: z.string(),
-          }),
-        )
-        .query(async ({ ctx: { metastable }, input: { projectId, name } }) => {
-          const project = await metastable.project.get(projectId);
-          const output = await project.output.get(name);
-          return await output.json(true);
-        }),
-      delete: t.procedure
-        .input(
-          z.object({
-            projectId: z.string(),
-            name: z.string(),
-          }),
-        )
-        .mutation(
-          async ({ ctx: { metastable }, input: { projectId, name } }) => {
-            const project = await metastable.project.get(projectId);
-            await project.output.delete(name);
+            await project.files[type].delete(name);
           },
         ),
     },
