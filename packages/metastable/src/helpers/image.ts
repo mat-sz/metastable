@@ -4,14 +4,14 @@ import sharp from 'sharp';
 
 import { exists, getMetadataDirectory, tryMkdir } from './fs.js';
 
-export function getThumbnailPath(filePath: string) {
+export function getThumbnailPath(filePath: string, ext = 'webp') {
   const name = path.basename(filePath);
   const dirName = getMetadataDirectory(filePath);
 
   const split = name.split('.');
   if (split.length > 1) {
     split.pop();
-    const thumbName = split.join('.') + '.thumb.jpg';
+    const thumbName = `${split.join('.')}.thumb.${ext}`;
     return path.join(dirName, thumbName);
   }
 
@@ -30,6 +30,9 @@ export async function generateThumbnail(filePath: string) {
       return;
     }
 
-    await sharp(filePath).resize(250, 250, { fit: 'inside' }).toFile(thumbPath);
+    await sharp(filePath)
+      .resize(250, 250, { fit: 'inside' })
+      .webp()
+      .toFile(thumbPath);
   }
 }

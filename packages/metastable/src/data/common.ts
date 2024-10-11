@@ -6,6 +6,7 @@ import { ImageInfo } from '@metastable/types';
 import { rimraf } from 'rimraf';
 
 import {
+  exists,
   getAvailableName,
   getMetadataDirectory,
   IMAGE_EXTENSIONS,
@@ -241,6 +242,9 @@ export class ImageEntity extends FileEntity {
     }
 
     await generateThumbnail(filePath);
+
+    const oldThumbnailPath = getThumbnailPath(filePath, 'jpg');
+    await tryUnlink(oldThumbnailPath);
 
     return await super.fromPath<T>(filePath);
   }

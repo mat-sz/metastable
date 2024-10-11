@@ -1,5 +1,9 @@
 # 0.0.8 (Upcoming)
 
+## Improvements
+
+- Image thumbnails are now WEBP and support transparency.
+
 ## Bug fixes
 
 - UI state (e.g. section collapsed state) is now properly saved.
