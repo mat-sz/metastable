@@ -1,14 +1,14 @@
 .files {
   font-size: 0;
-  padding: 5px;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  grid-gap: 10px;
+  grid-gap: 1rem;
   position: relative;
 
   .file {
     display: inline-block;
-    padding: 10px;
+    padding: 0.5rem;
     aspect-ratio: 1;
     width: 100%;
     height: auto;
@@ -32,6 +32,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  border-radius: 5px;
 }
 
 .selectionBox {

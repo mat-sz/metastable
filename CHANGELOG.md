@@ -1,5 +1,9 @@
 # 0.0.8 (Upcoming)
 
+## Features
+
+- Added management of input/mask files inside of projects.
+
 ## Improvements
 
 - Project files are now automatically refreshed.

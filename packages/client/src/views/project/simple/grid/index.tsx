@@ -1,71 +1,30 @@
 import { ProjectFileType } from '@metastable/types';
-import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
-import { BsTrash } from 'react-icons/bs';
+import React from 'react';
 
-import { FileManager } from '$components/fileManager';
-import { ProjectFileDelete } from '$modals/projectFileDelete';
-import { modalStore } from '$stores/ModalStore';
+import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
+import { TYPE_MAP } from '$utils/image';
+import { Files } from './Files';
 import styles from './index.module.scss';
-import { Lightbox } from './Lightbox';
-import { useSimpleProject } from '../../context';
-import { ImageActions } from '../common/ImageActions';
 
-export const Grid: React.FC = observer(() => {
-  const project = useSimpleProject();
-  const [current, setCurrent] = useState(0);
-  const [open, setOpen] = useState(false);
-
-  const outputs = project.files.output.slice().reverse();
-
-  if (!outputs.length) {
-    return <div className={styles.info}>No project output images found.</div>;
-  }
-
+export const Grid: React.FC = () => {
   return (
-    <div className={styles.grid}>
-      <FileManager
-        items={outputs}
-        onOpen={ids => {
-          setCurrent(outputs.findIndex(item => item.name === ids[0]) || 0);
-          setOpen(true);
-        }}
-        selectionActions={selection => (
-          <>
-            <button
-              onClick={() => {
-                modalStore.show(
-                  <ProjectFileDelete
-                    count={selection.length}
-                    onDelete={async () => {
-                      for (const item of selection) {
-                        await project.deleteFile(
-                          ProjectFileType.OUTPUT,
-                          item.name,
-                        );
-                      }
-                    }}
-                  />,
-                );
-              }}
-            >
-              <BsTrash />
-              <span>Delete</span>
-            </button>
-          </>
-        )}
-      />
-      {open && (
-        <Lightbox
-          current={current}
-          images={outputs}
-          onChange={setCurrent}
-          onClose={() => setOpen(false)}
-          actions={file => {
-            return <ImageActions file={file} />;
-          }}
-        />
-      )}
-    </div>
+    <TabView
+      defaultTab={ProjectFileType.OUTPUT}
+      direction="vertical"
+      className={styles.wrapper}
+    >
+      <Tabs>
+        {Object.values(ProjectFileType).map(type => (
+          <Tab id={type} title={TYPE_MAP[type]} key={type} />
+        ))}
+      </Tabs>
+      <TabContent>
+        {Object.values(ProjectFileType).map(type => (
+          <TabPanel key={type} id={type}>
+            <Files type={type} />
+          </TabPanel>
+        ))}
+      </TabContent>
+    </TabView>
   );
-});
+};

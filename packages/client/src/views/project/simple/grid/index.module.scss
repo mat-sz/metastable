@@ -1,3 +1,8 @@
+.wrapper {
+  background: var(--grey-200);
+  max-height: 100%;
+}
+
 .grid {
   overflow-y: auto;
   margin-bottom: auto;
@@ -5,10 +10,10 @@
   font-size: 0;
   display: flex;
   flex-direction: column;
+}
 
-  & > div {
-    flex: 1;
-  }
+.manager {
+  flex: 1;
 }
 
 .info {

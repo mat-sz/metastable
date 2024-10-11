@@ -1,3 +1,4 @@
+import { ProjectFileType } from '@metastable/types';
 import { glueIsSourceLoaded } from 'fxglue';
 
 export async function imageUrlToBase64(url: string): Promise<string> {
@@ -47,6 +48,12 @@ export const imageModeOptions = [
   { key: 'cover', label: 'Cover' },
   { key: 'contain', label: 'Contain' },
 ];
+
+export const TYPE_MAP: Record<ProjectFileType, string> = {
+  [ProjectFileType.INPUT]: 'Inputs',
+  [ProjectFileType.OUTPUT]: 'Outputs',
+  [ProjectFileType.MASK]: 'Masks',
+};
 
 export async function prepareImage(
   input: string,

@@ -1270,6 +1270,7 @@ __metadata:
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    attr-accept: "npm:^2.2.4"
     clsx: "npm:^2.0.0"
     electron: "npm:^32.1.2"
     electron-builder: "npm:25.0.0-alpha.8"
@@ -2773,6 +2774,13 @@ __metadata:
   version: 1.0.0
   resolution: "atomic-sleep@npm:1.0.0"
   checksum: 10c0/e329a6665512736a9bbb073e1761b4ec102f7926cce35037753146a9db9c8104f5044c1662e4a863576ce544fb8be27cd2be6bc8c1a40147d03f31eb1cfb6e8a
+  languageName: node
+  linkType: hard
+
+"attr-accept@npm:^2.2.4":
+  version: 2.2.4
+  resolution: "attr-accept@npm:2.2.4"
+  checksum: 10c0/602d88b40cb039f1159b86e389ca4f908c13dba513753f7c511e69499ba6216c153519f31a484bac9c9efa633f8f6a4ec25b4f777bd55198f8cb2514cef04618
   languageName: node
   linkType: hard
 
