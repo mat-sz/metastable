@@ -14,6 +14,7 @@ export * from './VarNumber';
 export * from './VarRandomNumber';
 export * from './VarScope';
 export * from './VarSelect';
+export * from './VarSize';
 export * from './VarSlider';
 export * from './VarString';
 export * from './VarSwitch';

@@ -24,15 +24,13 @@
   }
 
   .input {
+    display: flex;
+
     span {
       font-size: 0.8rem;
-      margin-left: 0.2rem;
+      margin-left: 0.5rem;
+      text-align: right;
     }
-  }
-
-  span {
-    width: 2.5rem;
-    text-align: right;
   }
 
   button {

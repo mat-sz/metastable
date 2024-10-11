@@ -1,4 +1,4 @@
-import { ProjectFileType } from '@metastable/types';
+import { ProjectFileType, ProjectOrientation } from '@metastable/types';
 import { glueIsSourceLoaded } from 'fxglue';
 
 export async function imageUrlToBase64(url: string): Promise<string> {
@@ -128,4 +128,15 @@ export async function prepareImage(
   }
 
   return canvas.toDataURL('image/png');
+}
+
+export function detectOrientation(
+  width: number,
+  height: number,
+): ProjectOrientation {
+  return height === width
+    ? 'square'
+    : height > width
+      ? 'portrait'
+      : 'landscape';
 }

@@ -30,6 +30,23 @@ export const Number = ({
 }: INumberProps): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const inputEl = inputRef.current;
+    if (!inputEl) {
+      return;
+    }
+
+    const onWheel = (e: Event) => {
+      e.stopPropagation();
+    };
+
+    inputEl.addEventListener('wheel', onWheel, { passive: false });
+
+    return () => {
+      inputEl.removeEventListener('wheel', onWheel, { passive: false } as any);
+    };
+  }, []);
+
   const setValue = useCallback(
     (value: number) => {
       if (inputRef.current) {

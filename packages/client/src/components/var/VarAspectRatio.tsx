@@ -1,19 +1,25 @@
+import { ProjectOrientation } from '@metastable/types';
 import { MdCropLandscape, MdCropPortrait, MdCropSquare } from 'react-icons/md';
 
+import { Resolution } from '$/data/resolutions';
 import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
 import { VarBase } from './VarBase';
 
 export interface IVarAspectRatioProps {
-  widthPath?: string;
-  heightPath?: string;
+  orientationPath: string;
+  widthPath: string;
+  heightPath: string;
   label?: string;
+  autoSizes?: Record<ProjectOrientation, Resolution>;
 }
 
 export const VarAspectRatio = ({
+  orientationPath,
   widthPath,
   heightPath,
   label,
+  autoSizes,
 }: IVarAspectRatioProps): JSX.Element => {
   const [width, setWidth] = useVarUIValue({
     path: widthPath,
@@ -23,11 +29,12 @@ export const VarAspectRatio = ({
     path: heightPath,
     fallbackValue: 512,
   });
+  const [orientation, setOrientation] = useVarUIValue<ProjectOrientation>({
+    path: orientationPath,
+    fallbackValue: 'square',
+  });
 
-  const orientation =
-    height === width ? 'square' : height > width ? 'portrait' : 'landscape';
-
-  const squareWidth = Math.min(width, height);
+  let squareWidth = Math.min(width, height);
 
   let portraitWidth = width;
   let portraitHeight = height;
@@ -35,22 +42,32 @@ export const VarAspectRatio = ({
   let landscapeWidth = width;
   let landscapeHeight = height;
 
-  switch (orientation) {
-    case 'square':
-      {
-        const other = Math.floor((squareWidth * 1.5) / 8) * 8;
-        portraitHeight = other;
-        landscapeWidth = other;
-      }
-      break;
-    case 'portrait':
-      landscapeWidth = height;
-      landscapeHeight = width;
-      break;
-    case 'landscape':
-      portraitWidth = height;
-      portraitHeight = width;
-      break;
+  if (autoSizes) {
+    squareWidth = autoSizes['square'][0];
+
+    portraitWidth = autoSizes['portrait'][0];
+    portraitHeight = autoSizes['portrait'][1];
+
+    landscapeWidth = autoSizes['landscape'][0];
+    landscapeHeight = autoSizes['landscape'][1];
+  } else {
+    switch (orientation) {
+      case 'square':
+        {
+          const other = Math.floor((squareWidth * 1.5) / 8) * 8;
+          portraitHeight = other;
+          landscapeWidth = other;
+        }
+        break;
+      case 'portrait':
+        landscapeWidth = height;
+        landscapeHeight = width;
+        break;
+      case 'landscape':
+        portraitWidth = height;
+        portraitHeight = width;
+        break;
+    }
   }
 
   return (
@@ -58,6 +75,8 @@ export const VarAspectRatio = ({
       <Switch
         value={orientation}
         onChange={value => {
+          setOrientation(value as ProjectOrientation);
+
           switch (value) {
             case 'square':
               setWidth(squareWidth);

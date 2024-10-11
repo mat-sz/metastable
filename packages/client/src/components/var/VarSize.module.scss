@@ -1,0 +1,33 @@
+.size {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .input {
+    width: 100px;
+    display: flex;
+    align-items: center;
+
+    input {
+      height: 1.3rem;
+      text-align: right;
+    }
+
+    span {
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+      text-align: right;
+    }
+  }
+
+  button {
+    flex: 0;
+    margin: 0 0.5rem;
+    padding: 0.25rem;
+    height: 1.3rem;
+
+    &.active {
+      background: var(--grey-500);
+    }
+  }
+}

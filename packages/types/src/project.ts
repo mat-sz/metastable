@@ -29,6 +29,9 @@ export interface ProjectSimpleSettings {
     processedImage?: string;
   };
   output: {
+    sizeMode: 'auto' | 'custom';
+    orientation: ProjectOrientation;
+    lockAspectRatio: boolean;
     width: number;
     height: number;
     batchSize: number;
@@ -170,3 +173,5 @@ export enum ProjectFileType {
   MASK = 'mask',
   OUTPUT = 'output',
 }
+
+export type ProjectOrientation = 'square' | 'portrait' | 'landscape';

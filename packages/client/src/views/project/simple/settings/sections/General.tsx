@@ -9,8 +9,10 @@ import {
   VarImageMode,
   VarInputType,
   VarModel,
+  VarNumber,
   VarRandomNumber,
   VarSelect,
+  VarSize,
   VarSlider,
   VarString,
   VarSwitch,
@@ -143,40 +145,44 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         )}
       </SettingsCategory>
       <SettingsCategory label="Output" sectionId="output">
+        <VarSwitch
+          label="Size"
+          path="output.sizeMode"
+          options={[
+            { key: 'auto', label: 'Automatic' },
+            { key: 'custom', label: 'Custom' },
+          ]}
+          inline
+        />
         <VarAspectRatio
           label="Aspect ratio"
+          orientationPath="output.orientation"
           widthPath="output.width"
           heightPath="output.height"
+          autoSizes={
+            project.settings.output.sizeMode === 'auto'
+              ? project.autoSizes
+              : undefined
+          }
         />
-        <ResolutionSelect />
-        <VarSlider
-          label="Width"
-          path="output.width"
-          min={64}
-          max={2048}
-          step={8}
-          defaultValue={512}
-          showInput
-          unit="px"
-        />
-        <VarSlider
-          label="Height"
-          path="output.height"
-          min={64}
-          max={2048}
-          step={8}
-          defaultValue={512}
-          showInput
-          unit="px"
-        />
-        <VarSlider
+        {project.settings.output.sizeMode === 'custom' && (
+          <>
+            <ResolutionSelect />
+            <VarSize
+              widthPath="output.width"
+              heightPath="output.height"
+              lockedPath="output.lockAspectRatio"
+            />
+          </>
+        )}
+        <VarNumber
           label="Batch size"
           path="output.batchSize"
           min={1}
           max={16}
           step={1}
           defaultValue={1}
-          showInput
+          inline
         />
       </SettingsCategory>
       <SettingsCategory

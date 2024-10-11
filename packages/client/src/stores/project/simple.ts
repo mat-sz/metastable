@@ -5,6 +5,7 @@ import {
   ModelType,
   ProjectFileType,
   ProjectModel,
+  ProjectOrientation,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
   PromptStyleWithSource,
@@ -13,6 +14,7 @@ import {
 } from '@metastable/types';
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
+import { recommendedResolutions, Resolution } from '$/data/resolutions';
 import { PROMPT_STYLES } from '$/data/styles';
 import { API } from '$api';
 import { Editor } from '$editor';
@@ -20,7 +22,7 @@ import { Point } from '$editor/types';
 import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
 import { filesize } from '$utils/file';
-import { base64ify, prepareImage } from '$utils/image';
+import { base64ify, detectOrientation, prepareImage } from '$utils/image';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
@@ -126,6 +128,9 @@ export function defaultSettings(): ProjectSimpleSettings {
     version: 1,
     input: { type: 'none' },
     output: {
+      sizeMode: 'auto',
+      orientation: 'square',
+      lockAspectRatio: false,
       width: 512,
       height: 512,
       batchSize: 1,
@@ -176,6 +181,14 @@ export class SimpleProject extends BaseProject<
   constructor(data: APIProject) {
     data.settings ??= defaultSettings();
     super(data);
+
+    this.settings.output.sizeMode ??= 'custom';
+    this.settings.output.orientation ??= detectOrientation(
+      this.settings.output.width,
+      this.settings.output.height,
+    );
+    this.settings.output.lockAspectRatio ??= false;
+
     makeObservable(this, {
       editor: observable,
       preview: computed,
@@ -242,7 +255,35 @@ export class SimpleProject extends BaseProject<
         ModelType.CHECKPOINT,
       );
     }
+
+    if (settings.output.sizeMode === 'auto') {
+      const recommended = this.autoSizes?.[settings.output.orientation];
+      if (recommended) {
+        settings.output.width = recommended[0];
+        settings.output.height = recommended[1];
+      }
+    } else {
+      settings.output.orientation ??= detectOrientation(
+        settings.output.width,
+        settings.output.height,
+      );
+    }
+
     this.settings = settings;
+  }
+
+  get autoSizes(): Record<ProjectOrientation, Resolution> | undefined {
+    const sizes: any = {};
+    const recommended = recommendedResolutions[this.checkpointType!];
+    if (recommended) {
+      for (const key of Object.keys(recommended)) {
+        sizes[key] = (recommended as any)[key][0];
+      }
+
+      return sizes;
+    }
+
+    return undefined;
   }
 
   get checkpointType(): CheckpointType | undefined {

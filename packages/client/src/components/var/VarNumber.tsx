@@ -59,6 +59,7 @@ export const VarNumber = ({
   error,
   errorPath,
   unit,
+  inline,
 }: IVarNumberProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
@@ -88,9 +89,11 @@ export const VarNumber = ({
       readOnly={readOnly}
       className={className}
       error={currentError}
+      inline={inline}
     >
       <div className={styles.number}>
         <Number
+          className={styles.input}
           round={round}
           min={min}
           max={max}

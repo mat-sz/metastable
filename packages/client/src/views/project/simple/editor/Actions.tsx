@@ -19,6 +19,7 @@ export const Actions: React.FC = () => {
             image: url,
           };
           project.settings.output = {
+            ...project.settings.output,
             width,
             height,
             batchSize: 1,
@@ -37,6 +38,8 @@ export const Actions: React.FC = () => {
             image: url,
           };
           project.settings.output = {
+            ...project.settings.output,
+            sizeMode: 'custom',
             width,
             height,
             batchSize: 1,
