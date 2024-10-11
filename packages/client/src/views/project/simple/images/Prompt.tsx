@@ -14,7 +14,7 @@ import { StyleSelect } from '../common/StyleSelect';
 
 export const Prompt: React.FC = observer(() => {
   const project = useSimpleProject();
-  const onOpen = useCallback(
+  const onFiles = useCallback(
     (files: File[]) => {
       if (files[0]) {
         modalStore.show(<PromptLoad project={project} file={files[0]} />);
@@ -22,7 +22,7 @@ export const Prompt: React.FC = observer(() => {
     },
     [project],
   );
-  const { open } = useFileInput(onOpen);
+  const { open } = useFileInput({ onFiles });
   const validationResult = project.validate();
   const isValid = !validationResult.errors.length;
   const sampleTime = project.stepTime?.sample;

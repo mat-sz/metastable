@@ -1,12 +1,20 @@
 import React from 'react';
 
+import { handleFilesEvent } from '$utils/file';
+
 interface FileInputState {
   open(): void;
 }
 
-export function useFileInput(
-  onFiles?: (files: File[]) => void,
-): FileInputState {
+interface FileInputOptions {
+  onFiles?: (files: File[]) => void;
+  accept?: string;
+}
+
+export function useFileInput({
+  onFiles,
+  accept,
+}: FileInputOptions): FileInputState {
   const [state, setState] = React.useState<FileInputState>({
     open: () => {},
   });
@@ -24,11 +32,11 @@ export function useFileInput(
     inputElement.style.width = '1px';
     inputElement.style.height = '1px';
     inputElement.multiple = true;
-    inputElement.accept = 'image/*';
-    inputElement.addEventListener('change', () => {
-      if (inputElement.files) {
-        onFiles([...inputElement.files]);
-      }
+    if (accept) {
+      inputElement.accept = accept;
+    }
+    inputElement.addEventListener('change', e => {
+      handleFilesEvent(e, onFiles, accept);
       inputElement.value = '';
     });
     document.body.append(inputElement);

@@ -13,6 +13,7 @@ interface Props {
   paste?: boolean;
   onFiles?: (files: File[]) => void;
   children?: (state: FilePickerState) => React.ReactNode;
+  accept?: string;
 }
 
 export const FilePicker: React.FC<Props> = ({
@@ -20,13 +21,14 @@ export const FilePicker: React.FC<Props> = ({
   paste = false,
   onFiles,
   children,
+  accept,
 }) => {
-  const inputState = useFileInput(onFiles);
-  usePaste(paste ? onFiles : undefined);
+  const inputState = useFileInput({ onFiles, accept });
+  usePaste(paste ? { onFiles, accept } : {});
 
   return (
     <>
-      {dropzone && <Dropzone onFiles={onFiles} />}
+      {dropzone && <Dropzone onFiles={onFiles} accept={accept} />}
       {children?.(inputState)}
     </>
   );

@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import { handleFilesEvent } from '$utils/file';
 import styles from './Dropzone.module.scss';
 import { Portal } from '../portal';
 
 interface Props {
   onFiles?: (files: File[]) => void;
+  accept?: string;
 }
 
-export const Dropzone: React.FC<Props> = ({ onFiles }) => {
+export const Dropzone: React.FC<Props> = ({ onFiles, accept }) => {
   const [isVisible, setVisible] = useState(false);
   const hideTimeoutRef = useRef<any>();
 
@@ -34,11 +36,7 @@ export const Dropzone: React.FC<Props> = ({ onFiles }) => {
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onFiles?.(
-      [...e.dataTransfer.items]
-        .map(item => item.getAsFile())
-        .filter(item => !!item) as File[],
-    );
+    handleFilesEvent(e, onFiles, accept);
     setVisible(false);
   };
 

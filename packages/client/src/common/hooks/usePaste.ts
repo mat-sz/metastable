@@ -1,25 +1,20 @@
 import React from 'react';
 
-export function usePaste(onFiles?: (files: File[]) => void) {
+import { handleFilesEvent } from '$utils/file';
+
+interface PasteOptions {
+  onFiles?: (files: File[]) => void;
+  accept?: string;
+}
+
+export function usePaste({ onFiles, accept }: PasteOptions) {
   React.useEffect(() => {
     if (!onFiles) {
       return;
     }
 
     const onPaste = (e: ClipboardEvent) => {
-      if (!e.clipboardData) {
-        return;
-      }
-
-      const files = [...e.clipboardData.items]
-        .map(item => item.getAsFile())
-        .filter(item => !!item) as File[];
-
-      if (files.length === 0) {
-        return;
-      }
-
-      onFiles(files);
+      handleFilesEvent(e, onFiles, accept);
     };
 
     document.addEventListener('paste', onPaste);
