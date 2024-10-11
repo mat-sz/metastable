@@ -13,10 +13,11 @@ import { IS_ELECTRON } from '$utils/config';
 import { useSimpleProject } from '../../context';
 
 interface Props {
+  type: ProjectFileType;
   file: ImageFile;
 }
 
-export const ImageActions: React.FC<Props> = ({ file }) => {
+export const ImageActions: React.FC<Props> = ({ type, file }) => {
   const project = useSimpleProject();
 
   return (
@@ -24,7 +25,7 @@ export const ImageActions: React.FC<Props> = ({ file }) => {
       <IconButton
         title="Delete image"
         onClick={() => {
-          project.deleteFile(ProjectFileType.OUTPUT, file.name);
+          project.deleteFile(type, file.name);
         }}
       >
         <BsTrashFill />
@@ -51,7 +52,7 @@ export const ImageActions: React.FC<Props> = ({ file }) => {
         title="Load settings from current image"
         onClick={async () => {
           const data = await API.project.file.get.query({
-            type: ProjectFileType.OUTPUT,
+            type,
             projectId: project.id,
             name: file.name,
           });

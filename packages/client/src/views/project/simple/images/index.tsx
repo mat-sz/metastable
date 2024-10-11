@@ -1,4 +1,4 @@
-import { TaskState } from '@metastable/types';
+import { ProjectFileType, TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -113,7 +113,10 @@ export const Images: React.FC = observer(() => {
             <div className={styles.imageActions}>
               <div>{project.currentOutput!.name}</div>
               <div className={styles.buttons}>
-                <ImageActions file={project.currentOutput!} />
+                <ImageActions
+                  file={project.currentOutput!}
+                  type={ProjectFileType.OUTPUT}
+                />
               </div>
             </div>
             <div className={styles.preview}>

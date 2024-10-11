@@ -21,7 +21,7 @@ export const Grid: React.FC = () => {
       <TabContent>
         {Object.values(ProjectFileType).map(type => (
           <TabPanel key={type} id={type}>
-            <Files type={type} />
+            <Files type={type} allowUpload={type !== ProjectFileType.OUTPUT} />
           </TabPanel>
         ))}
       </TabContent>

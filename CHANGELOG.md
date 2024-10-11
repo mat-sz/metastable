@@ -2,7 +2,7 @@
 
 ## Features
 
-- Added management of input/mask files inside of projects.
+- Added upload and management of input/mask files inside of projects.
 
 ## Improvements
 

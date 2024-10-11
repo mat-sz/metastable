@@ -18,6 +18,7 @@ import { API } from '$api';
 import { TemporaryProject } from '$modals/temporaryProject';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
+import { UploadQueueStore } from './UploadQueueStore';
 
 export class BaseProject<TSettings = any, TUI = any> {
   currentOutput: ImageFile | undefined = undefined;
@@ -30,6 +31,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   settings: TSettings;
   ui: TUI;
   filesSubscription;
+  uploadQueue: Record<ProjectFileType, UploadQueueStore>;
 
   constructor(data: APIProject) {
     this.settings = data.settings;
@@ -41,10 +43,13 @@ export class BaseProject<TSettings = any, TUI = any> {
     this.temporary = data.temporary ?? false;
 
     const files = {} as any;
+    const uploadQueue = {} as any;
     for (const key of Object.values(ProjectFileType)) {
       files[key] = [];
+      uploadQueue[key] = new UploadQueueStore(key, this.id);
     }
     this.files = files;
+    this.uploadQueue = uploadQueue;
 
     makeObservable(this, {
       currentOutput: observable,

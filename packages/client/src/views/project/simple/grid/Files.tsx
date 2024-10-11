@@ -1,9 +1,11 @@
 import { ProjectFileType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsTrash } from 'react-icons/bs';
+import { BsPlus, BsTrash } from 'react-icons/bs';
 
 import { FileManager } from '$components/fileManager';
+import { FilePicker } from '$components/filePicker';
+import { UploadQueue } from '$components/uploadQueue';
 import { ProjectFileDelete } from '$modals/projectFileDelete';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
@@ -13,9 +15,39 @@ import { ImageActions } from '../common/ImageActions';
 
 interface Props {
   type: ProjectFileType;
+  allowUpload?: boolean;
 }
 
-export const Files: React.FC<Props> = observer(({ type }) => {
+const FilesUpload: React.FC<Props> = observer(({ type }) => {
+  const project = useSimpleProject();
+  const queue = project.uploadQueue[type];
+
+  return (
+    <FilePicker
+      dropzone
+      paste
+      onFiles={files => {
+        if (queue.isRunning) {
+          return;
+        }
+
+        for (const file of files) {
+          queue.add(file);
+        }
+      }}
+      accept="image/*"
+    >
+      {state => (
+        <button onClick={state.open} disabled={queue.isRunning}>
+          <BsPlus />
+          <span>Add files</span>
+        </button>
+      )}
+    </FilePicker>
+  );
+});
+
+export const Files: React.FC<Props> = observer(({ type, allowUpload }) => {
   const [current, setCurrent] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -24,6 +56,7 @@ export const Files: React.FC<Props> = observer(({ type }) => {
 
   return (
     <div className={styles.grid}>
+      {allowUpload && <UploadQueue queue={project.uploadQueue[type]} />}
       <FileManager
         className={styles.manager}
         items={files}
@@ -52,6 +85,7 @@ export const Files: React.FC<Props> = observer(({ type }) => {
             </button>
           </>
         )}
+        actions={<>{allowUpload && <FilesUpload type={type} />}</>}
       />
       {open && (
         <Lightbox
@@ -60,7 +94,7 @@ export const Files: React.FC<Props> = observer(({ type }) => {
           onChange={setCurrent}
           onClose={() => setOpen(false)}
           actions={file => {
-            return <ImageActions file={file} />;
+            return <ImageActions file={file} type={type} />;
           }}
         />
       )}

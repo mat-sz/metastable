@@ -1,0 +1,69 @@
+.queue {
+  height: auto;
+  font-size: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  grid-gap: 0.5rem;
+  position: relative;
+  margin: 0.5rem 0;
+
+  .file {
+    display: inline-block;
+    padding: 0.5rem;
+    aspect-ratio: 1;
+    width: 100%;
+    height: auto;
+    position: relative;
+    background: var(--grey-300);
+    border-radius: 5px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    &.selected {
+      background: color-mix(in srgb, var(--accent-900) 50%, transparent);
+    }
+
+    button {
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
+      font-size: 0.7rem;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0.4rem;
+    }
+
+    .state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .selectionBox {
+    position: absolute;
+    border: 1px solid var(--accent-900);
+    background: color-mix(in srgb, var(--accent-900) 30%, transparent);
+    display: none;
+  }
+}
+
+.actions {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  background: var(--grey-300);
+  padding: 0.5rem;
+  border-radius: 5px;
+
+  button {
+    margin-left: 1rem;
+  }
+}
