@@ -3,13 +3,13 @@ import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 
 import { ImageInfo } from '@metastable/types';
-import { rimraf } from 'rimraf';
 
 import {
   exists,
   getAvailableName,
   getMetadataDirectory,
   IMAGE_EXTENSIONS,
+  rmdir,
   tryUnlink,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
@@ -165,7 +165,7 @@ export class DirectoryEntity extends BaseEntity {
   }
 
   async delete(): Promise<void> {
-    await rimraf(this.path);
+    await rmdir(this.path);
   }
 }
 

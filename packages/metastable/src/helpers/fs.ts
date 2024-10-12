@@ -265,3 +265,7 @@ export async function getNextFilename(dir: string, ext: string) {
     useGrouping: false,
   })}.${ext}`;
 }
+
+export async function rmdir(dir: string) {
+  await fs.rm(dir, { force: true, recursive: true });
+}

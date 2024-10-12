@@ -13,7 +13,6 @@ import {
   ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
-import { rimraf } from 'rimraf';
 import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
@@ -25,7 +24,7 @@ import { ProjectRepository } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
-import { resolveConfigPath } from './helpers/fs.js';
+import { resolveConfigPath, rmdir } from './helpers/fs.js';
 import { parseArgString } from './helpers/shell.js';
 import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
@@ -242,7 +241,7 @@ export class Metastable extends (EventEmitter as {
     this.python = undefined;
     if (pythonDir) {
       try {
-        await rimraf(pythonDir);
+        await rmdir(pythonDir);
       } catch {}
     }
   }

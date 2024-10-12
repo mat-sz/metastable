@@ -3,10 +3,9 @@ import { link, mkdir, stat, symlink, writeFile } from 'fs/promises';
 import path from 'path';
 
 import { TaskState } from '@metastable/types';
-import { rimraf } from 'rimraf';
 import tarStream from 'tar-stream';
 
-import { tryMkdir, tryUnlink } from '../../helpers/fs.js';
+import { rmdir, tryMkdir, tryUnlink } from '../../helpers/fs.js';
 import { WrappedPromise } from '../../helpers/promise.js';
 import { BaseTask } from '../../tasks/task.js';
 
@@ -39,7 +38,7 @@ export class ExtractTask extends BaseTask {
 
     this.appendLog('Removing old data...');
     try {
-      await rimraf(path.join(this.targetPath));
+      await rmdir(path.join(this.targetPath));
     } catch {}
 
     await tryMkdir(this.targetPath);

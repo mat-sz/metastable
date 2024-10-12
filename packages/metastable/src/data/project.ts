@@ -5,7 +5,6 @@ import path from 'path';
 import { Project, ProjectFileType } from '@metastable/types';
 import chokidar from 'chokidar';
 import { nanoid } from 'nanoid';
-import { rimraf } from 'rimraf';
 
 import {
   DirectoryEntity,
@@ -13,7 +12,12 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
-import { directorySize, getAvailableName, isPathIn } from '../helpers/fs.js';
+import {
+  directorySize,
+  getAvailableName,
+  isPathIn,
+  rmdir,
+} from '../helpers/fs.js';
 import { TypedEventEmitter } from '../types.js';
 
 export class ProjectImageEntity extends ImageEntity {
@@ -108,11 +112,11 @@ export class ProjectEntity extends DirectoryEntity {
   }
 
   async cleanup() {
-    await rimraf(this.tempPath);
+    await rmdir(this.tempPath);
   }
 
   async resetTemp() {
-    await rimraf(this.tempPath);
+    await rmdir(this.tempPath);
     await fs.mkdir(this.tempPath, { recursive: true });
   }
 
