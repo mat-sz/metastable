@@ -17,4 +17,5 @@ Out of ASCII printable characters, only the following are escaped:
 - `mrn:project:V1StGXR8_Z5jdHi6B-myT:file:input:00001.png?size=thumbnail`
 - `mrn:project:V1StGXR8_Z5jdHi6B-myT`
 - `mrn:model:checkpoint:sdxl/sd_xl_base_1.0.safetensors`
+- `mrn:model:checkpoint:sdxl/sd_xl_base_1.0.safetensors:cover`
 - `mrn:model:checkpoint:~extra_directory/sd_xl_base_1.0.safetensors`
