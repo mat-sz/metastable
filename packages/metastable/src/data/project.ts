@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 
+import { MRN } from '@metastable/common';
 import { Project, ProjectFileType } from '@metastable/types';
 import chokidar from 'chokidar';
 import { nanoid } from 'nanoid';
@@ -28,13 +29,23 @@ export class ProjectImageEntity extends ImageEntity {
     this.type = path.basename(this.baseDir) as ProjectFileType;
   }
 
+  static get mrnBaseSegments(): string[] {
+    return ['invalid'];
+  }
+
+  get mrn() {
+    return MRN.serialize({
+      segments: [...(this.constructor as any).mrnBaseSegments, this.name],
+    });
+  }
+
   async json(withMetadata = false) {
     return {
       name: this.name,
       image: this.image,
       path: this.path,
       metadata: withMetadata ? await this.metadata.get() : undefined,
-      internalUrl: `metastable://current_project/${encodeURIComponent(this.type)}/${encodeURIComponent(this.name)}`,
+      mrn: this.mrn,
     };
   }
 }
@@ -55,10 +66,16 @@ export class ProjectEntity extends DirectoryEntity {
     super(_path);
 
     const files = {} as any;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const project = this;
     for (const key of Object.values(ProjectFileType)) {
       files[key] = new EntityRepository(
         path.join(this._path, key),
-        ProjectImageEntity,
+        class ExtendedProjectImageEntity extends ProjectImageEntity {
+          static get mrnBaseSegments(): string[] {
+            return ['project', project.id, 'file', key];
+          }
+        },
       );
     }
     this.files = files;
@@ -189,7 +206,11 @@ export class ProjectRepository extends (EventEmitter as {
 
     const items = await fs.readdir(this.baseDir, { withFileTypes: true });
 
-    const promises = items.map(item => ProjectEntity.fromDirent(item));
+    const promises = items.map(async item => {
+      const project = await ProjectEntity.fromDirent(item);
+      await project.load();
+      return project;
+    });
 
     const projects = (await Promise.allSettled(promises))
       .filter(entity => entity.status === 'fulfilled')

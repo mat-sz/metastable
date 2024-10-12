@@ -19,7 +19,7 @@ import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
-import { bufferToRpcBytes, parseInternalUrl } from '../helpers.js';
+import { bufferToRpcBytes } from '../helpers.js';
 import type { ComfySession } from '../session.js';
 import { ComfyPreviewSettings, RPCBytes } from '../types.js';
 
@@ -266,15 +266,8 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       return Buffer.from(url.split(',')[1], 'base64');
     }
 
-    if (url.startsWith('metastable:')) {
-      const parsed = parseInternalUrl(url);
-      if (!parsed) {
-        throw new Error('Invalid internal file URL.');
-      }
-
-      const { type, name } = parsed;
-      const filePath = this.project.files[type].getEntityPath(name);
-      return await fs.readFile(filePath);
+    if (url.startsWith('mrn:')) {
+      return await fs.readFile(await this.metastable.resolve(url));
     }
 
     throw new Error('Unable to load input');

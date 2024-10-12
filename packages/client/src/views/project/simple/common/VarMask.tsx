@@ -34,13 +34,13 @@ export const VarMask = observer(
       error,
       errorPath,
     });
-    const [imageInternalUrl] = useVarUIValue<string | undefined>({
+    const [imageMrn] = useVarUIValue<string | undefined>({
       path: imagePath,
     });
     const [isOpen, setIsOpen] = useState(false);
 
     const project = useSimpleProject();
-    const imageUrl = project.getImageUrl(imageInternalUrl);
+    const imageUrl = project.getImageUrl(imageMrn);
     const maskUrl = project.getImageUrl(currentValue);
 
     return (

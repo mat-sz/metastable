@@ -71,7 +71,7 @@ export const ImageBrowser: React.FC<Props> = observer(
                 className={clsx(styles.file, {
                   [styles.mask]: type === ProjectFileType.MASK,
                 })}
-                onClick={() => onSelect(file.internalUrl)}
+                onClick={() => onSelect(file.mrn)}
               >
                 <img src={file.image.thumbnailUrl} />
               </div>

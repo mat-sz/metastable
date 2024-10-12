@@ -177,7 +177,7 @@ export enum ProjectFileType {
 export type ProjectImageMode = 'cover' | 'contain' | 'center' | 'stretch';
 
 export interface ProjectImageFile extends ImageFile {
-  internalUrl: string;
+  mrn: string;
 }
 
 export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';

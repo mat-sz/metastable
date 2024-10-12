@@ -35,7 +35,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
       <IconButton
         title="Use as input image"
         onClick={() => {
-          project.useInputImage(file.internalUrl);
+          project.useInputImage(file.mrn);
         }}
       >
         <BsArrowRightSquareFill />

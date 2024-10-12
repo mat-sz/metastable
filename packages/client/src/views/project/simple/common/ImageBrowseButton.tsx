@@ -7,7 +7,7 @@ import { Popover } from 'react-tiny-popover';
 import { ImageBrowser } from './ImageBrowser';
 
 interface Props {
-  onSelect: (internalUrl: string) => void;
+  onSelect: (mrn: string) => void;
   defaultType?: ProjectFileType;
   forceType?: ProjectFileType;
 }

@@ -31,7 +31,7 @@ import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
 import { EXTENSIONS, filesize } from '$utils/file';
 import { detectOrientation, fileToBase64 } from '$utils/image';
-import { isLocalUrl, parseInternalUrl } from '$utils/url';
+import { isLocalUrl } from '$utils/url';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
@@ -494,13 +494,10 @@ export class SimpleProject extends BaseProject<
   }
 
   getFile(url: string) {
-    const parsed = parseInternalUrl(url);
-    if (!parsed) {
-      return undefined;
-    }
-
-    const { type, name } = parsed;
-    return this.files[type].find(file => file.name === name);
+    const split = url.split(':');
+    return this.files[split[4] as ProjectFileType].find(
+      file => file.name === split[5],
+    );
   }
 
   getImageUrl(url?: string, mode: 'url' | 'thumbnailUrl' = 'url') {
@@ -522,7 +519,7 @@ export class SimpleProject extends BaseProject<
         ext,
       });
       URL.revokeObjectURL(url);
-      return file.internalUrl;
+      return file.mrn;
     }
 
     return url;

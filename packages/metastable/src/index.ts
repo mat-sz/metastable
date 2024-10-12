@@ -2,12 +2,14 @@ import EventEmitter from 'events';
 import os from 'os';
 import path from 'path';
 
+import { MRN } from '@metastable/common';
 import {
   BackendStatus,
   DownloadSettings,
   LogItem,
   ModelType,
   Project,
+  ProjectFileType,
   ProjectSimpleSettings,
   ProjectTaggingSettings,
   ProjectTrainingSettings,
@@ -378,6 +380,49 @@ export class Metastable extends (EventEmitter as {
     return this.tasks.queues.downloads.add(
       new DownloadModelTask(data, savePath, headers),
     );
+  }
+
+  async resolve(mrn: string) {
+    const parsed = MRN.parse(mrn);
+    const scope = parsed.segments[0];
+    switch (scope) {
+      case 'project':
+        {
+          const project = await this.project.get(parsed.segments[1]);
+          const subscope = parsed.segments[2];
+          switch (subscope) {
+            case 'file':
+              {
+                const type = parsed.segments[3] as ProjectFileType;
+                if (!Object.values(ProjectFileType).includes(type)) {
+                  throw new Error(`Invalid project file type - ${type}`);
+                }
+
+                const file = await project.files[type].get(parsed.segments[4]);
+                const size = parsed.query.get('size');
+                if (size) {
+                  switch (size) {
+                    case 'thumbnail':
+                      if (!file.thumbnailPath) {
+                        throw new Error('File does not exist.');
+                      }
+                      return file.thumbnailPath;
+                    default:
+                      throw new Error(`Invalid size option value: ${size}`);
+                  }
+                }
+
+                return file.path;
+              }
+              break;
+            default:
+              throw new Error(`Invalid project sub-scope: ${subscope}`);
+          }
+        }
+        break;
+      default:
+        throw new Error(`Invalid MRN scope: ${scope}`);
+    }
   }
 }
 

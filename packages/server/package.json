@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@fastify/http-proxy": "^9.4.0",
-    "@metastable/types": "*",
+    "@metastable/types": "workspace:^",
     "@types/http-errors": "^2.0.4",
     "@types/node": "^20.10.3",
     "@types/ws": "^8.5.10",
@@ -23,7 +23,7 @@
     "@fastify/multipart": "^8.2.0",
     "@fastify/static": "^7.0.4",
     "@fastify/websocket": "^10.0.1",
-    "@metastable/metastable": "*",
+    "@metastable/metastable": "workspace:^",
     "@trpc/server": "^11.0.0-rc.502",
     "fastify": "^4.27.0",
     "http-errors": "^2.0.0",

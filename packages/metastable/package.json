@@ -10,14 +10,15 @@
     "setup:amd": "yarn setup:amd:rocm",
     "rebuild": "electron-rebuild",
     "build": "tsc",
-    "lint": "run -T eslint src"
+    "lint": "run -T eslint src",
+    "test": "run -T vitest"
   },
   "peerDependencies": {
     "electron": "*",
     "electron-updater": "*"
   },
   "devDependencies": {
-    "@metastable/types": "*",
+    "@metastable/types": "workspace:^",
     "@types/event-stream": "^4.0.5",
     "@types/node": "^20.10.3",
     "@types/semver": "^7.5.8",
@@ -26,6 +27,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "@metastable/common": "workspace:^",
     "@metastable/model-info": "workspace:^",
     "@trpc/server": "^11.0.0-rc.502",
     "chokidar": "^3.5.3",
@@ -34,7 +36,6 @@
     "meta-png": "^1.0.6",
     "nanoid": "^5.0.4",
     "radash": "^12.1.0",
-    "rimraf": "^5.0.5",
     "semver": "^7.6.2",
     "sharp": "^0.33.2",
     "systeminformation": "^5.22.7",

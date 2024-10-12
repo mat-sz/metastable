@@ -21,7 +21,7 @@
     "analyze": "vite-bundle-visualizer"
   },
   "dependencies": {
-    "@metastable/metastable": "*",
+    "@metastable/metastable": "workspace:^",
     "attr-accept": "^2.2.4",
     "electron-context-menu": "^4.0.4",
     "electron-settings": "^4.0.4",
@@ -30,7 +30,7 @@
     "trpc-electron": "^0.1.1"
   },
   "devDependencies": {
-    "@metastable/types": "*",
+    "@metastable/types": "workspace:^",
     "@tanstack/react-query": "^5.56.2",
     "@trpc/client": "^11.0.0-rc.502",
     "@trpc/react-query": "^11.0.0-rc.502",
