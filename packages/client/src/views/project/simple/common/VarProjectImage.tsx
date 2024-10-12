@@ -5,6 +5,7 @@ import { BsUpload } from 'react-icons/bs';
 import { useVarUIValue } from '$components/var/common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from '$components/var/VarBase';
 import { ACCEPT_IMAGES } from '$utils/image';
+import { ImageBrowseButton } from './ImageBrowseButton';
 import styles from './VarProjectImage.module.scss';
 import { useSimpleProject } from '../../context';
 
@@ -51,7 +52,12 @@ export const VarProjectImage = observer(
 
     return (
       <VarBase
-        label={label}
+        label={
+          <div className={styles.header}>
+            <span>{label}</span>
+            <ImageBrowseButton onSelect={url => setCurrentValue(url)} />
+          </div>
+        }
         disabled={disabled}
         readOnly={readOnly}
         className={className}

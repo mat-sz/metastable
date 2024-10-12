@@ -55,4 +55,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+
+  button {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    flex: 0;
+  }
 }
