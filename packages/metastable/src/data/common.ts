@@ -6,6 +6,7 @@ import { ImageInfo } from '@metastable/types';
 import { rimraf } from 'rimraf';
 
 import {
+  exists,
   getAvailableName,
   getMetadataDirectory,
   IMAGE_EXTENSIONS,
@@ -315,6 +316,10 @@ export class EntityRepository<
     return (await Promise.all(promises)).filter(
       entity => !!entity,
     ) as TEntity[];
+  }
+
+  async exists(name: string): Promise<boolean> {
+    return await exists(this.getEntityPath(name));
   }
 
   async get(name: string): Promise<TEntity> {

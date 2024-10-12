@@ -14,6 +14,10 @@ export function getUrl(path: string, protocol = 'http') {
   return `${protocol}://${SERVER_HOST}${path}`;
 }
 
+export function isLocalUrl(url?: string) {
+  return !!(url?.startsWith('data:') || url?.startsWith('blob:'));
+}
+
 interface InternalUrlInfo {
   type: ProjectFileType;
   name: string;

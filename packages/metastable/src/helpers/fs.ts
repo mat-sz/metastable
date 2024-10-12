@@ -257,3 +257,11 @@ export async function getNextNumber(dirPath: string) {
     .filter(number => !!number);
   return Math.max(...numbers, 0) + 1;
 }
+
+export async function getNextFilename(dir: string, ext: string) {
+  const counter = await getNextNumber(dir);
+  return `${counter.toLocaleString('en-US', {
+    minimumIntegerDigits: 5,
+    useGrouping: false,
+  })}.${ext}`;
+}

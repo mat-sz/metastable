@@ -1,4 +1,4 @@
-import { ImageFile } from '@metastable/types';
+import { ProjectImageFile } from '@metastable/types';
 import React, { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import {
@@ -14,11 +14,11 @@ import { ImagePreview } from '$components/imagePreview';
 import styles from './Lightbox.module.scss';
 
 interface Props {
-  images: ImageFile[];
+  images: ProjectImageFile[];
   current?: number;
   onChange: (index: number) => void;
   onClose: () => void;
-  actions?: (file: ImageFile) => React.ReactNode;
+  actions?: (file: ProjectImageFile) => React.ReactNode;
 }
 
 export const Lightbox: React.FC<Props> = ({

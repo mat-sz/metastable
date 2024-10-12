@@ -5,18 +5,21 @@ import {
   CheckpointType,
   ModelType,
   ProjectImageFile,
+  ProjectImageMode,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
   TaskState,
 } from '@metastable/types';
 import PNG from 'meta-png';
+import sharp from 'sharp';
 
 import { ProjectEntity } from '../../data/project.js';
-import { getNextNumber } from '../../helpers/fs.js';
+import { getNextFilename } from '../../helpers/fs.js';
+import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
-import { parseInternalUrl } from '../helpers.js';
+import { bufferToRpcBytes, parseInternalUrl } from '../helpers.js';
 import type { ComfySession } from '../session.js';
 import { ComfyPreviewSettings, RPCBytes } from '../types.js';
 
@@ -86,8 +89,14 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   async init() {
     const settings = this.settings;
 
-    if (settings.input.type !== 'none' && !settings.input.processedImage) {
+    if (settings.input.type !== 'none' && !settings.input.image) {
       throw new Error("Image is required if input type is not 'none'.");
+    }
+
+    if (settings.input.type === 'image_masked' && !settings.input.mask) {
+      throw new Error(
+        "Mask image is required if input type is 'image_masked'.",
+      );
     }
 
     if (settings.checkpoint.mode === 'advanced') {
@@ -208,19 +217,13 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const array = (settings.models as any)[key] as {
         path?: string;
         clipVisionPath?: string;
-        image?: string;
       }[];
 
       for (const modelSettings of array) {
         delete modelSettings['path'];
         delete modelSettings['clipVisionPath'];
-        delete modelSettings['image'];
       }
     }
-
-    delete settings['input']['image'];
-    delete settings['input']['mask'];
-    delete settings['input']['processedImage'];
 
     return settings;
   }
@@ -277,16 +280,34 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     throw new Error('Unable to load input');
   }
 
-  async inputAsBytes(url: string): Promise<RPCBytes> {
+  private async prepareImage(
+    url: string,
+    mode?: ProjectImageMode,
+    maskUrl?: string,
+  ): Promise<RPCBytes> {
     const buffer = await this.inputAsBuffer(url);
+    const fit = SHARP_FIT_MAP[mode!] || 'stretch';
 
-    if (url.startsWith('data:')) {
-      return {
-        $bytes: buffer.toString('base64'),
-      };
+    const { width, height } = this.settings.output;
+    const image = sharp(buffer).resize({
+      width,
+      height,
+      fit,
+    });
+
+    if (maskUrl) {
+      const maskBuffer = await this.inputAsBuffer(maskUrl);
+      const maskImage = sharp(maskBuffer).resize({
+        width,
+        height,
+        fit,
+      });
+      image.composite([
+        { input: await maskImage.png().toBuffer(), blend: 'dest-out' },
+      ]);
     }
 
-    throw new Error('Unable to load input');
+    return bufferToRpcBytes(await image.png().toBuffer());
   }
 
   private async generate() {
@@ -335,7 +356,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         for (const controlnetSettings of controlnets) {
           if (controlnetSettings.enabled) {
             const { image } = await ctx.loadImage(
-              await this.inputAsBytes(controlnetSettings.image!),
+              await this.prepareImage(
+                controlnetSettings.image!,
+                controlnetSettings.imageMode,
+              ),
             );
             const controlnet = await ctx.controlnet(controlnetSettings.path!);
             await controlnet.applyTo(
@@ -353,7 +377,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         for (const ipadapterSettings of ipadapters) {
           if (ipadapterSettings.enabled) {
             const { image } = await ctx.loadImage(
-              await this.inputAsBytes(ipadapterSettings.image!),
+              await this.prepareImage(
+                ipadapterSettings.image!,
+                ipadapterSettings.imageMode,
+              ),
             );
             const ipadapter = await ctx.ipadapter(ipadapterSettings.path!);
             const clipVision = await ctx.clipVision(
@@ -386,7 +413,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         case 'image':
           {
             const { image } = await ctx.loadImage(
-              await this.inputAsBytes(settings.input.processedImage!),
+              await this.prepareImage(
+                settings.input.image!,
+                settings.input.imageMode,
+              ),
             );
             latent = await checkpoint.encode(image);
           }
@@ -394,7 +424,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         case 'image_masked':
           {
             const { image, mask } = await ctx.loadImage(
-              await this.inputAsBytes(settings.input.processedImage!),
+              await this.prepareImage(
+                settings.input.image!,
+                settings.input.imageMode,
+                settings.input.mask,
+              ),
             );
             latent = await checkpoint.encode(image, mask);
           }
@@ -425,7 +459,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       this.step('save');
-      let counter = await getNextNumber(outputDir);
       const ext = settings.output?.format || 'png';
       const outputs: ProjectImageFile[] = [];
       const cleanSettings = this.getCleanSettings();
@@ -446,15 +479,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           );
         }
 
-        const filename = `${counter.toLocaleString('en-US', {
-          minimumIntegerDigits: 5,
-          useGrouping: false,
-        })}.${ext}`;
+        const filename = await getNextFilename(outputDir, ext);
         await fs.writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.files.output.get(filename);
         await output.metadata.set(cleanSettings);
         outputs.push(await output.json());
-        counter++;
       }
 
       this.data = {

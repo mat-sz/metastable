@@ -20,6 +20,7 @@ import { Base64 } from 'js-base64';
 import { gte } from 'semver';
 import { z } from 'zod';
 
+import { getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
 
 export interface TRPCContext {
@@ -413,15 +414,20 @@ export const router = t.router({
             type: z.nativeEnum(ProjectFileType),
             projectId: z.string(),
             data: z.string(),
-            name: z.string(),
+            name: z.string().optional(),
+            ext: z.string(),
           }),
         )
         .mutation(
           async ({
             ctx: { metastable },
-            input: { type, projectId, data, name },
+            input: { type, projectId, data, name, ext },
           }) => {
             const project = await metastable.project.get(projectId);
+            if (!name) {
+              name = await getNextFilename(project.files[type].path, ext);
+            }
+
             const file = await project.files[type].create(name);
             await file.write(Base64.toUint8Array(data));
             return await file.json(true);

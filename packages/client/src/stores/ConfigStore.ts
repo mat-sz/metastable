@@ -31,7 +31,7 @@ export class ConfigStore {
     });
   }
 
-  async set(data: ConfigType) {
+  set(data: ConfigType) {
     this.data = data;
     this.triggerAutosave();
   }

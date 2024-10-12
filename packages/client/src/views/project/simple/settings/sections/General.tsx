@@ -1,11 +1,11 @@
 import { ModelType } from '@metastable/types';
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 
 import {
   VarAspectRatio,
   VarButton,
-  VarImage,
   VarImageMode,
   VarInputType,
   VarModel,
@@ -23,6 +23,7 @@ import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
 import { StyleSelect } from '../../common/StyleSelect';
+import { VarProjectImage } from '../../common/VarProjectImage';
 import { MaskEditor } from '../maskEditor';
 
 interface Props {
@@ -116,11 +117,13 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         />
         {project.settings.input.type !== 'none' && (
           <>
-            <VarImage
+            <VarProjectImage
               label="Image"
               path="input.image"
               onChange={() => {
-                project.settings.input.mask = undefined;
+                runInAction(() => {
+                  project.settings.input.mask = undefined;
+                });
               }}
             />
             <VarImageMode label="Image mode" path="input.imageMode" />
@@ -193,6 +196,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         <VarSwitch
           label="Quality"
           path="sampler.quality"
+          defaultValue="medium"
           options={[
             { key: 'low', label: 'Low' },
             { key: 'medium', label: 'Medium' },

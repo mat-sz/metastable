@@ -64,6 +64,7 @@ export class UploadQueueStore {
             new Uint8Array(await item.file.arrayBuffer()),
           ),
           name: item.file.name,
+          ext: item.file.name.split('.').pop()!,
         });
       } catch {
         this.update(item.id, { state: 'error' });

@@ -12,7 +12,14 @@ import {
   Task,
   TaskState,
 } from '@metastable/types';
-import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+  toJS,
+} from 'mobx';
 
 import { recommendedResolutions, Resolution } from '$/data/resolutions';
 import { qualitySamplerSettings } from '$/data/samplerSettings';
@@ -22,8 +29,9 @@ import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
-import { filesize } from '$utils/file';
-import { base64ify, detectOrientation, prepareImage } from '$utils/image';
+import { EXTENSIONS, filesize } from '$utils/file';
+import { detectOrientation, fileToBase64 } from '$utils/image';
+import { isLocalUrl, parseInternalUrl } from '$utils/url';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
@@ -213,6 +221,7 @@ export class SimpleProject extends BaseProject<
       isLastOutput: computed,
       queued: computed,
       autoSizes: computed,
+      beforeRequest: action,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -228,15 +237,13 @@ export class SimpleProject extends BaseProject<
 
   async useInputImage(url: string) {
     const settings = this.settings;
-    const res = await fetch(url);
-    const blob = await res.blob();
 
     if (settings.input.type === 'none') {
       settings.input.type = 'image';
     } else {
       settings.input.mask = undefined;
     }
-    settings.input.image = URL.createObjectURL(blob);
+    settings.input.image = url;
 
     this.setSettings(settings);
   }
@@ -486,7 +493,97 @@ export class SimpleProject extends BaseProject<
     await API.task.cancel.mutate({ queueId: 'project', taskId: task.id });
   }
 
-  async request() {
+  getFile(url: string) {
+    const parsed = parseInternalUrl(url);
+    if (!parsed) {
+      return undefined;
+    }
+
+    const { type, name } = parsed;
+    return this.files[type].find(file => file.name === name);
+  }
+
+  getImageUrl(url?: string, mode: 'url' | 'thumbnailUrl' = 'url') {
+    return url && !isLocalUrl(url) ? this.getFile(url)?.image[mode] : url;
+  }
+
+  private async handleImage(type: ProjectFileType, url: string) {
+    if (isLocalUrl(url)) {
+      const { data, mime } = await fileToBase64(url);
+      const ext = EXTENSIONS[mime];
+      if (!mime || !ext) {
+        throw new Error('Unable to upload file');
+      }
+
+      const file = await API.project.file.create.mutate({
+        projectId: this.id,
+        type,
+        data,
+        ext,
+      });
+      URL.revokeObjectURL(url);
+      return file.internalUrl;
+    }
+
+    return url;
+  }
+
+  private async handleImages() {
+    if (this.settings.input.image) {
+      const url = await this.handleImage(
+        ProjectFileType.INPUT,
+        this.settings.input.image,
+      );
+      runInAction(() => {
+        this.settings.input.image = url;
+      });
+    }
+
+    if (this.settings.input.mask) {
+      const url = await this.handleImage(
+        ProjectFileType.MASK,
+        this.settings.input.mask,
+      );
+      runInAction(() => {
+        this.settings.input.mask = url;
+      });
+    }
+
+    if (this.settings.models.controlnet) {
+      for (const controlnet of this.settings.models.controlnet) {
+        if (controlnet.image) {
+          const url = await this.handleImage(
+            ProjectFileType.INPUT,
+            controlnet.image,
+          );
+          runInAction(() => {
+            controlnet.image = url;
+          });
+        }
+      }
+    }
+
+    if (this.settings.models.ipadapter) {
+      for (const ipadapter of this.settings.models.ipadapter) {
+        if (ipadapter.image) {
+          const url = await this.handleImage(
+            ProjectFileType.INPUT,
+            ipadapter.image,
+          );
+          runInAction(() => {
+            ipadapter.image = url;
+          });
+        }
+      }
+    }
+  }
+
+  async save(name?: string, temporary?: boolean, auto = false) {
+    await this.handleImages();
+    await super.save(name, temporary, auto);
+  }
+
+  beforeRequest() {
     if (this.settings.client.randomizeSeed) {
       this.settings.sampler.seed = randomSeed();
     }
@@ -496,66 +593,18 @@ export class SimpleProject extends BaseProject<
       const saved = this.availableStyles.find(item => item.id === style.id);
       this.settings.prompt.style = saved ? { ...saved } : undefined;
     }
+  }
+
+  async request() {
+    await this.handleImages();
+    this.beforeRequest();
 
     this.selectOutput(undefined);
-
-    const settings = toJS(this.settings);
-    const width = settings.output.width;
-    const height = settings.output.height;
-
-    if (
-      settings.input.type === 'image' ||
-      settings.input.type === 'image_masked'
-    ) {
-      settings.input.processedImage = await prepareImage(
-        settings.input.image!,
-        width,
-        height,
-        settings.input.imageMode,
-        settings.input.type === 'image_masked'
-          ? settings.input.mask
-          : undefined,
-      );
-    }
-
-    if (settings.models.controlnet) {
-      for (const controlnet of settings.models.controlnet) {
-        if (!controlnet.image) {
-          continue;
-        }
-
-        controlnet.image = await base64ify(
-          await prepareImage(
-            controlnet.image,
-            width,
-            height,
-            controlnet.imageMode,
-          ),
-        );
-      }
-    }
-
-    if (settings.models.ipadapter) {
-      for (const ipadapter of settings.models.ipadapter) {
-        if (!ipadapter.image) {
-          continue;
-        }
-
-        ipadapter.image = await base64ify(
-          await prepareImage(
-            ipadapter.image!,
-            width,
-            height,
-            ipadapter.imageMode,
-          ),
-        );
-      }
-    }
-
     this.save();
+
     await API.project.prompt.mutate({
       projectId: this.id,
-      settings,
+      settings: this.settings,
     });
   }
 

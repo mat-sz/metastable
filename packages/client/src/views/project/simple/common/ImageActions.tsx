@@ -1,4 +1,4 @@
-import { ImageFile, ProjectFileType } from '@metastable/types';
+import { ProjectFileType, ProjectImageFile } from '@metastable/types';
 import React from 'react';
 import {
   BsArrowRightSquareFill,
@@ -16,7 +16,7 @@ import { useSimpleProject } from '../../context';
 
 interface Props {
   type: ProjectFileType;
-  file: ImageFile;
+  file: ProjectImageFile;
 }
 
 export const ImageActions: React.FC<Props> = ({ type, file }) => {
@@ -35,7 +35,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
       <IconButton
         title="Use as input image"
         onClick={() => {
-          project.useInputImage(file.image.url);
+          project.useInputImage(file.internalUrl);
         }}
       >
         <BsArrowRightSquareFill />

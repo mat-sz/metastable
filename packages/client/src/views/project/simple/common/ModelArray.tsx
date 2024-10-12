@@ -8,12 +8,12 @@ import {
   VarAddModel,
   VarArray,
   VarCategory,
-  VarImage,
   VarImageMode,
   VarModel,
   VarSlider,
   VarToggle,
 } from '$components/var';
+import { VarProjectImage } from './VarProjectImage';
 import { useSimpleProject } from '../../context';
 
 interface Props {
@@ -80,7 +80,7 @@ export const ModelArray: React.FC<Props> = observer(
               />
               {hasImage && (
                 <>
-                  <VarImage label="Image" path="image" />
+                  <VarProjectImage label="Image" path="image" />
                   <VarImageMode label="Image mode" path="imageMode" />
                 </>
               )}

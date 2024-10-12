@@ -24,9 +24,8 @@ export interface ProjectSimpleSettings {
   input: {
     type: 'none' | 'image' | 'image_masked';
     image?: string;
-    imageMode?: string;
+    imageMode?: ProjectImageMode;
     mask?: string;
-    processedImage?: string;
   };
   output: {
     sizeMode: 'auto' | 'custom';
@@ -51,7 +50,7 @@ export interface ProjectSimpleSettings {
       name?: string;
       path?: string;
       image?: string;
-      imageMode?: string;
+      imageMode?: ProjectImageMode;
       editor?: {
         name: string;
         data: any;
@@ -65,7 +64,7 @@ export interface ProjectSimpleSettings {
       clipVisionName?: string;
       clipVisionPath?: string;
       image?: string;
-      imageMode?: string;
+      imageMode?: ProjectImageMode;
     }[];
   };
   prompt: {
@@ -174,6 +173,8 @@ export enum ProjectFileType {
   MASK = 'mask',
   OUTPUT = 'output',
 }
+
+export type ProjectImageMode = 'cover' | 'contain' | 'center' | 'stretch';
 
 export interface ProjectImageFile extends ImageFile {
   internalUrl: string;

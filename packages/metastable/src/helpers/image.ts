@@ -1,6 +1,7 @@
 import path from 'path';
 
-import sharp from 'sharp';
+import { ProjectImageMode } from '@metastable/types';
+import sharp, { FitEnum } from 'sharp';
 
 import { exists, getMetadataDirectory, tryMkdir } from './fs.js';
 
@@ -36,3 +37,10 @@ export async function generateThumbnail(filePath: string) {
       .toFile(thumbPath);
   }
 }
+
+export const SHARP_FIT_MAP: Record<ProjectImageMode, keyof FitEnum> = {
+  cover: 'cover',
+  contain: 'contain',
+  center: 'inside',
+  stretch: 'fill',
+};

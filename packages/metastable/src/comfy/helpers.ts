@@ -1,5 +1,13 @@
 import { ProjectFileType } from '@metastable/types';
 
+import { RPCBytes } from './types.js';
+
+export function bufferToRpcBytes(buffer: Buffer): RPCBytes {
+  return {
+    $bytes: buffer.toString('base64'),
+  };
+}
+
 interface InternalUrlInfo {
   type: ProjectFileType;
   name: string;
