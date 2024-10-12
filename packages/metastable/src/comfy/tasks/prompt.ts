@@ -37,7 +37,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     private project: ProjectEntity,
     private settings: ProjectSimpleSettings,
   ) {
-    super('prompt', { projectId: project.name });
+    super('prompt', { projectId: project.id });
     this.created();
   }
 
@@ -184,7 +184,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
-    return { projectId: this.project.name };
+    return { projectId: this.project.id };
   }
 
   private stepStart: number | undefined;

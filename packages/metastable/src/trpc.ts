@@ -17,6 +17,7 @@ import { observable } from '@trpc/server/observable';
 import { type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
+import { nanoid } from 'nanoid';
 import { gte } from 'semver';
 import { z } from 'zod';
 
@@ -301,8 +302,13 @@ export const router = t.router({
   project: {
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
       const projects = await metastable.project.all();
-      const data = await Promise.all(projects.map(project => project.json()));
-      return data.filter(project => !project.temporary);
+      const data = await Promise.allSettled(
+        projects.map(project => project.json()),
+      );
+      return data
+        .filter(result => result.status === 'fulfilled')
+        .map(result => result.value)
+        .filter(project => !project.temporary);
     }),
     create: t.procedure
       .input(
@@ -319,7 +325,10 @@ export const router = t.router({
           input: { name, settings, ...metadata },
         }) => {
           const project = await metastable.project.create(name);
-          await project.metadata.set(metadata);
+          await project.metadata.set({
+            id: nanoid(),
+            ...metadata,
+          });
           await project.settings.set(settings);
           return await project.json(true);
         },
@@ -370,7 +379,7 @@ export const router = t.router({
         }),
       )
       .mutation(async ({ ctx: { metastable }, input: { projectId } }) => {
-        const project = await metastable.project.getOrRename(projectId);
+        const project = await metastable.project.get(projectId);
         await project.delete();
       }),
     prompt: t.procedure

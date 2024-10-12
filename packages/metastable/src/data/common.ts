@@ -111,7 +111,7 @@ export class BaseEntity {
     this: EntityClass<T>,
     dirent: Dirent,
   ): Promise<T> {
-    return this.fromPath(path.join(dirent.path, dirent.name));
+    return await this.fromPath(path.join(dirent.path, dirent.name));
   }
 
   static async fromPath<T extends BaseEntity>(
@@ -276,7 +276,7 @@ export class EntityRepository<
   TEntity extends BaseEntity = EntityType<TClass>,
 > {
   constructor(
-    private baseDir: string,
+    protected baseDir: string,
     private entityClass: TClass,
   ) {}
 
@@ -305,17 +305,11 @@ export class EntityRepository<
 
     const items = await fs.readdir(this.baseDir, { withFileTypes: true });
 
-    const promises = items.map(async item => {
-      try {
-        return await this.entityClass.fromDirent(item);
-      } catch {
-        return undefined;
-      }
-    });
+    const promises = items.map(item => this.entityClass.fromDirent(item));
 
-    return (await Promise.all(promises)).filter(
-      entity => !!entity,
-    ) as TEntity[];
+    return (await Promise.allSettled(promises))
+      .filter(result => result.status === 'fulfilled')
+      .map(result => result.value) as TEntity[];
   }
 
   async exists(name: string): Promise<boolean> {

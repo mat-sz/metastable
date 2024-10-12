@@ -45,7 +45,7 @@ export class Kohya extends EventEmitter {
   }
 
   async train(project: ProjectEntity, settings: ProjectTrainingSettings) {
-    this.stop(project.name);
+    this.stop(project.id);
     await project.resetTemp();
 
     const tempInputPath = path.join(project.tempPath, 'input');
@@ -156,7 +156,7 @@ export class Kohya extends EventEmitter {
     const proc = this.python.spawn([mainPath, ...args], this.env);
     this.emit('event', {
       event: 'training.start',
-      data: { projectId: project.name },
+      data: { projectId: project.id },
     });
 
     proc.stdin.setDefaultEncoding('utf-8');
@@ -172,29 +172,29 @@ export class Kohya extends EventEmitter {
 
         try {
           this.emit('event', {
-            projectId: project.name,
+            projectId: project.id,
             ...JSON.parse(item),
           });
         } catch {
-          this.log(project.name, 'stdout', item);
+          this.log(project.id, 'stdout', item);
         }
       }
     });
 
     proc.stderr.on('data', data => {
-      this.log(project.name, 'stderr', data);
+      this.log(project.id, 'stderr', data);
     });
 
     proc.on('close', () => {
       this.emit('event', {
         event: 'training.end',
-        data: { projectId: project.name },
+        data: { projectId: project.id },
       });
-      delete this.processes[project.name];
+      delete this.processes[project.id];
       project.cleanup().catch(() => {});
     });
 
-    this.processes[project.name] = proc;
+    this.processes[project.id] = proc;
   }
 
   private log(projectId: string, type: string, text: string) {

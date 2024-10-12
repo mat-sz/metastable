@@ -20,9 +20,8 @@ import { Comfy } from './comfy/index.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
 import { TagTask } from './comfy/tasks/tag.js';
 import { Config } from './config/index.js';
-import { EntityRepository } from './data/common.js';
 import { ModelRepository } from './data/model.js';
-import { ProjectEntity } from './data/project.js';
+import { ProjectRepository } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
@@ -71,10 +70,7 @@ export class Metastable extends (EventEmitter as {
     super();
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.config = new Config(path.join(dataRoot, 'config.json'));
-    this.project = new EntityRepository(
-      path.join(this.dataRoot, 'projects'),
-      ProjectEntity,
-    );
+    this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
 
     setTimeout(() => {

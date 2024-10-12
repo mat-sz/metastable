@@ -1,8 +1,10 @@
-import { mkdir } from 'fs/promises';
+import EventEmitter from 'events';
+import fs from 'fs/promises';
 import path from 'path';
 
 import { Project, ProjectFileType } from '@metastable/types';
 import chokidar from 'chokidar';
+import { nanoid } from 'nanoid';
 import { rimraf } from 'rimraf';
 
 import {
@@ -11,7 +13,8 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
-import { directorySize, isPathIn } from '../helpers/fs.js';
+import { directorySize, getAvailableName, isPathIn } from '../helpers/fs.js';
+import { TypedEventEmitter } from '../types.js';
 
 export class ProjectImageEntity extends ImageEntity {
   type: ProjectFileType;
@@ -35,7 +38,7 @@ export class ProjectImageEntity extends ImageEntity {
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
-  metadata = new Metadata<{ type?: string; temporary?: boolean }>(
+  metadata = new Metadata<{ id: string; type?: string; temporary?: boolean }>(
     path.join(this._path, 'project.json'),
   );
   settings = new Metadata(path.join(this._path, 'settings.json'));
@@ -55,6 +58,11 @@ export class ProjectEntity extends DirectoryEntity {
       );
     }
     this.files = files;
+  }
+
+  get id() {
+    // TODO: Figure out why we're having race conditions here.
+    return this.metadata.json?.id || '';
   }
 
   watch(onFilesChange: (type: ProjectFileType) => void) {
@@ -87,8 +95,15 @@ export class ProjectEntity extends DirectoryEntity {
   async load(): Promise<void> {
     await this.metadata.refresh();
 
+    if (!this.metadata.json?.id) {
+      await this.metadata.set({
+        ...this.metadata.json!,
+        id: nanoid(),
+      });
+    }
+
     for (const key of Object.values(ProjectFileType)) {
-      await mkdir(this.files[key].path, { recursive: true });
+      await fs.mkdir(this.files[key].path, { recursive: true });
     }
   }
 
@@ -98,7 +113,7 @@ export class ProjectEntity extends DirectoryEntity {
 
   async resetTemp() {
     await rimraf(this.tempPath);
-    await mkdir(this.tempPath, { recursive: true });
+    await fs.mkdir(this.tempPath, { recursive: true });
   }
 
   async json(full = false): Promise<Project> {
@@ -109,7 +124,6 @@ export class ProjectEntity extends DirectoryEntity {
     const json: Project = {
       type: 'simple',
       ...this.metadata.json!,
-      id: this.name,
       name: this.name,
       lastOutput: await lastOutput?.json(),
       outputCount: outputs.length,
@@ -122,5 +136,110 @@ export class ProjectEntity extends DirectoryEntity {
     }
 
     return json;
+  }
+}
+
+type ProjectRepositoryEvents = {
+  change: () => void;
+};
+export class ProjectRepository extends (EventEmitter as {
+  new (): TypedEventEmitter<ProjectRepositoryEvents>;
+}) {
+  private cache: ProjectEntity[] | undefined = undefined;
+
+  constructor(private baseDir: string) {
+    super();
+
+    let timeout: any = undefined;
+    chokidar.watch(baseDir, {}).on('all', (event: string) => {
+      if (!['add', 'change', 'unlink'].includes(event)) {
+        return;
+      }
+
+      this.cache = undefined;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        this.emit('change');
+      }, 250);
+    });
+  }
+
+  get path() {
+    return this.baseDir;
+  }
+
+  getEntityPath(name: string) {
+    return path.join(this.baseDir, name);
+  }
+
+  private async getAvailableEntityName(name: string) {
+    return await getAvailableName(this.baseDir, name, true);
+  }
+
+  private async getAvailableEntityPath(name: string) {
+    return this.getEntityPath(await this.getAvailableEntityName(name));
+  }
+
+  async refresh() {
+    await fs.mkdir(this.path, { recursive: true });
+
+    const items = await fs.readdir(this.baseDir, { withFileTypes: true });
+
+    const promises = items.map(item => ProjectEntity.fromDirent(item));
+
+    const projects = (await Promise.allSettled(promises))
+      .filter(entity => entity.status === 'fulfilled')
+      .map(result => result.value) as ProjectEntity[];
+    this.cache = projects;
+    return projects;
+  }
+
+  async all() {
+    if (!this.cache) {
+      return await this.refresh();
+    }
+
+    return this.cache;
+  }
+
+  async get(id: string) {
+    const all = await this.all();
+    const project = all.find(project => project.id === id);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    return project;
+  }
+
+  async create(name: string) {
+    await fs.mkdir(this.path, { recursive: true });
+
+    const project = (await ProjectEntity.create(
+      await this.getAvailableEntityPath(name),
+    )) as ProjectEntity;
+    this.cache = undefined;
+    return project;
+  }
+
+  async rename(id: string, newName: string) {
+    const project = await this.get(id);
+    newName = await this.getAvailableEntityName(newName);
+    await fs.rename(project.path, this.getEntityPath(newName));
+    this.cache = undefined;
+    return await this.get(id);
+  }
+
+  async getOrRename(id: string, newName?: string) {
+    if (newName) {
+      return await this.rename(id, newName);
+    }
+
+    return await this.get(id);
+  }
+
+  async delete(id: string): Promise<void> {
+    const entity = await this.get(id);
+    await entity.delete();
+    this.cache = undefined;
   }
 }

@@ -17,7 +17,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
     private project: ProjectEntity,
     private settings: ProjectTaggingSettings,
   ) {
-    super('tag', { projectId: project.name });
+    super('tag', { projectId: project.id });
     this.created();
   }
 
@@ -30,7 +30,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
       this.settings.tagger.path = model.path;
     }
 
-    return { projectId: this.project.name };
+    return { projectId: this.project.id };
   }
 
   async execute() {

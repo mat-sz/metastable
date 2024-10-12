@@ -229,9 +229,9 @@ export class ModelRepository extends (EventEmitter as {
       }
     }
 
-    const models = (await Promise.all(promises)).filter(
-      entity => !!entity,
-    ) as ModelEntity[];
+    const models = (await Promise.allSettled(promises))
+      .filter(result => result.status === 'fulfilled' && result.value)
+      .map(result => (result as any).value) as ModelEntity[];
     this.cache = models;
     return models;
   }

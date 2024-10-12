@@ -147,6 +147,8 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   async cleanup() {
+    clearTimeout(this._autosaveTimeout);
+    clearTimeout(this._autosaveUITimeout);
     this.filesSubscription.unsubscribe();
   }
 
