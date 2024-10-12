@@ -101,6 +101,17 @@ app.get('/static', (req, reply) => {
   }
 });
 
+app.get('/resolve', async (req, reply) => {
+  const mrn = (req.query as any)?.mrn;
+  if (mrn) {
+    const filePath = await metastable.resolve(mrn);
+    await reply.sendFile(path.basename(filePath), path.dirname(filePath));
+  } else {
+    await reply.status(404);
+    await reply.send('Not found');
+  }
+});
+
 app.listen({ host, port });
 
 console.log(`Server running on ${host}:${port}`);

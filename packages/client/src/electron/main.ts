@@ -1,5 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
 import { TaskState } from '@metastable/types';
@@ -7,6 +8,8 @@ import {
   app,
   BrowserWindow,
   Menu,
+  net,
+  protocol,
   shell,
   WindowOpenHandlerResponse,
 } from 'electron';
@@ -213,6 +216,20 @@ async function createWindow() {
     createContext: async () => {
       return { metastable, win, autoUpdater };
     },
+  });
+
+  protocol.handle('metastable+resolve', async request => {
+    const split = request.url.split('/');
+
+    try {
+      const resolved = await metastable.resolve(decodeURIComponent(split[2]));
+      return await net.fetch(pathToFileURL(resolved).toString());
+    } catch {
+      //
+    }
+
+    const res = new Response(null, { status: 404 });
+    return res;
   });
 
   win.setMenu(null);

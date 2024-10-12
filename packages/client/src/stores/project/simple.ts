@@ -493,17 +493,6 @@ export class SimpleProject extends BaseProject<
     await API.task.cancel.mutate({ queueId: 'project', taskId: task.id });
   }
 
-  getFile(url: string) {
-    const split = url.split(':');
-    return this.files[split[4] as ProjectFileType].find(
-      file => file.name === split[5],
-    );
-  }
-
-  getImageUrl(url?: string, mode: 'url' | 'thumbnailUrl' = 'url') {
-    return url && !isLocalUrl(url) ? this.getFile(url)?.image[mode] : url;
-  }
-
   private async handleImage(type: ProjectFileType, url: string) {
     if (isLocalUrl(url)) {
       const { data, mime } = await fileToBase64(url);
