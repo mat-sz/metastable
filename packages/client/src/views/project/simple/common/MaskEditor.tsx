@@ -18,7 +18,7 @@ import { linePoints } from '$editor/helpers';
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
 import { loadImage } from '$utils/image';
-import styles from './index.module.scss';
+import styles from './MaskEditor.module.scss';
 
 interface Props {
   imageSrc: string;

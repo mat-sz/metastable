@@ -1,11 +1,10 @@
 import { ModelType } from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
   VarAspectRatio,
-  VarButton,
   VarImageMode,
   VarInputType,
   VarModel,
@@ -23,8 +22,8 @@ import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
 import { StyleSelect } from '../../common/StyleSelect';
+import { VarMask } from '../../common/VarMask';
 import { VarProjectImage } from '../../common/VarProjectImage';
-import { MaskEditor } from '../maskEditor';
 
 interface Props {
   showPrompt?: boolean;
@@ -32,22 +31,9 @@ interface Props {
 
 export const General: React.FC<Props> = observer(({ showPrompt }) => {
   const project = useSimpleProject();
-  const [maskEditorOpen, setMaskEditorOpen] = useState(false);
 
   return (
     <>
-      {maskEditorOpen && !!project.settings.input.image && (
-        <MaskEditor
-          imageSrc={project.settings.input.image!}
-          maskSrc={project.settings.input.mask}
-          onClose={mask => {
-            setMaskEditorOpen(false);
-            if (mask) {
-              project.settings.input.mask = mask;
-            }
-          }}
-        />
-      )}
       <SettingsCategory label="Checkpoint" sectionId="checkpoint">
         <VarSwitch
           label="Mode"
@@ -128,10 +114,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             />
             <VarImageMode label="Image mode" path="input.imageMode" />
             {project.settings.input.type === 'image_masked' && (
-              <VarButton
-                buttonLabel="Edit mask"
-                onClick={() => setMaskEditorOpen(true)}
-              />
+              <VarMask label="Mask" path="input.mask" imagePath="input.image" />
             )}
             {project.settings.input.type === 'image' && (
               <VarSlider
