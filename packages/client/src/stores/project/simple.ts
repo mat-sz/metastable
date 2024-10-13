@@ -564,9 +564,9 @@ export class SimpleProject extends BaseProject<
     }
   }
 
-  async save(name?: string, temporary?: boolean, auto = false) {
+  async save(name?: string, draft?: boolean, auto = false) {
     await this.handleImages();
-    await super.save(name, temporary, auto);
+    await super.save(name, draft, auto);
   }
 
   beforeRequest() {

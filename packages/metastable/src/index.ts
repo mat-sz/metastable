@@ -145,7 +145,7 @@ export class Metastable extends (EventEmitter as {
     for (const project of projects) {
       try {
         const data = await project.metadata.get();
-        if (data.temporary) {
+        if (data.draft) {
           await project.delete();
         }
       } catch {}

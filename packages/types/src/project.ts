@@ -152,7 +152,7 @@ export interface Project extends ProjectInfo {
   lastOutput?: ProjectImageFile;
   outputCount?: number;
   size?: number;
-  temporary?: boolean;
+  draft?: boolean;
 }
 
 export interface ProjectTaskData {

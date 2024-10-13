@@ -158,7 +158,7 @@ class MainStore {
   }
 
   beforeUnload() {
-    if (this.projects.temporary.length) {
+    if (this.projects.draft.length) {
       modalStore.show(<UnsavedProjects />);
       return false;
     }

@@ -11,12 +11,12 @@ interface Props {
   project: BaseProject;
 }
 
-export const TemporaryProject: React.FC<Props> = observer(({ project }) => {
+export const ProjectDraft: React.FC<Props> = observer(({ project }) => {
   const { close } = useModal();
 
   return (
-    <Modal title="Temporary project" size="small">
-      <div>This project is temporary. Would you like to save it?</div>
+    <Modal title="Draft project" size="small">
+      <div>This project is a draft. Would you like to save it?</div>
       <ModalActions>
         <Button variant="secondary" onClick={() => close()}>
           Cancel

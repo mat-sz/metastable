@@ -23,8 +23,8 @@ export class ProjectStore {
     this.init();
   }
 
-  get temporary() {
-    return this.projects.filter(project => project.temporary);
+  get draft() {
+    return this.projects.filter(project => project.draft);
   }
 
   get current() {
@@ -96,7 +96,7 @@ export class ProjectStore {
   async create(
     name: string = 'Untitled',
     type = 'simple',
-    temporary = false,
+    draft = false,
     settings: any = defaultSettings(),
   ) {
     if (this.loading) {
@@ -112,7 +112,7 @@ export class ProjectStore {
       name,
       type,
       settings,
-      temporary,
+      draft,
     };
 
     try {
@@ -124,7 +124,7 @@ export class ProjectStore {
         this.select(json.id);
       });
 
-      if (!temporary) {
+      if (!draft) {
         this.pushRecent(json.id);
       }
       this.refresh();
@@ -162,7 +162,7 @@ export class ProjectStore {
         }
       });
 
-      if (!json.temporary) {
+      if (!json.draft) {
         this.pushRecent(json.id);
       }
       this.refresh();

@@ -308,7 +308,7 @@ export const router = t.router({
       return data
         .filter(result => result.status === 'fulfilled')
         .map(result => result.value)
-        .filter(project => !project.temporary);
+        .filter(project => !project.draft);
     }),
     create: t.procedure
       .input(
@@ -316,7 +316,7 @@ export const router = t.router({
           name: z.string(),
           type: z.string(),
           settings: z.any(),
-          temporary: z.boolean().optional(),
+          draft: z.boolean().optional(),
         }),
       )
       .mutation(
@@ -347,7 +347,7 @@ export const router = t.router({
           type: z.string().optional(),
           settings: z.any().optional(),
           ui: z.any().optional(),
-          temporary: z.boolean().optional(),
+          draft: z.boolean().optional(),
         }),
       )
       .mutation(

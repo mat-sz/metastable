@@ -15,7 +15,7 @@ import {
 } from 'mobx';
 
 import { API } from '$api';
-import { TemporaryProject } from '$modals/temporaryProject';
+import { ProjectDraft } from '$modals/projectDraft';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { UploadQueueStore } from './UploadQueueStore';
@@ -26,7 +26,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   id;
   name;
   type;
-  temporary;
+  draft;
   files: Record<ProjectFileType, ProjectImageFile[]>;
   settings: TSettings;
   ui: TUI;
@@ -40,7 +40,7 @@ export class BaseProject<TSettings = any, TUI = any> {
     this.name = data.name;
     this.type = data.type;
     this.currentOutput = data.lastOutput;
-    this.temporary = data.temporary ?? false;
+    this.draft = data.draft ?? false;
 
     const files = {} as any;
     const uploadQueue = {} as any;
@@ -58,7 +58,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       id: observable,
       name: observable,
       type: observable,
-      temporary: observable,
+      draft: observable,
       settings: observable,
       ui: observable,
       save: action,
@@ -161,8 +161,8 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   async close(force = false) {
-    if (!force && this.temporary) {
-      modalStore.show(<TemporaryProject project={this} />);
+    if (!force && this.draft) {
+      modalStore.show(<ProjectDraft project={this} />);
       return;
     }
 
@@ -174,7 +174,7 @@ export class BaseProject<TSettings = any, TUI = any> {
     await mainStore.projects.create(
       name ?? this.name,
       this.type,
-      this.temporary,
+      this.draft,
       this.settings,
     );
   }
@@ -186,14 +186,14 @@ export class BaseProject<TSettings = any, TUI = any> {
     });
   }
 
-  async save(name?: string, temporary?: boolean, auto = false) {
+  async save(name?: string, draft?: boolean, auto = false) {
     const id = this.id;
 
     const json = await API.project.update.mutate({
       projectId: id,
       settings: this.settings,
       name,
-      temporary: temporary ?? (this.temporary && !name),
+      draft: draft ?? (this.draft && !name),
     });
 
     if (json) {
@@ -204,7 +204,7 @@ export class BaseProject<TSettings = any, TUI = any> {
           mainStore.projects.select(json.id);
         }
 
-        if (!json.temporary && !auto) {
+        if (!json.draft && !auto) {
           mainStore.projects.removeRecent(id);
           mainStore.projects.pushRecent(json.id);
         }

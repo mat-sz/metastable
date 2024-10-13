@@ -53,7 +53,7 @@ export class ProjectImageEntity extends ImageEntity {
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
-  metadata = new Metadata<{ id: string; type?: string; temporary?: boolean }>(
+  metadata = new Metadata<{ id: string; type?: string; draft?: boolean }>(
     path.join(this._path, 'project.json'),
   );
   settings = new Metadata(path.join(this._path, 'settings.json'));
