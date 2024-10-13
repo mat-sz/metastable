@@ -5,6 +5,12 @@ import { readSafetensors } from './safetensors.js';
 
 export const PYTORCH_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth'];
 export const SAFETENSORS_EXTENSIONS = ['safetensors'];
+export const SUPPORTED_MODEL_TYPES = [
+  ModelType.CHECKPOINT,
+  ModelType.LORA,
+  ModelType.CONTROLNET,
+  ModelType.UNET,
+];
 
 async function getDict(modelPath: string) {
   const ext = modelPath.split('.').pop()!;

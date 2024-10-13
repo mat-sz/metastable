@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
-import { getModelDetails } from '@metastable/model-info';
+import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
 import { ImageInfo, Model, ModelDetails, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
@@ -71,12 +71,7 @@ export class ModelEntity extends FileEntity {
       await generateThumbnail(imagePath);
     }
 
-    if (
-      this.type === ModelType.CHECKPOINT ||
-      this.type === ModelType.LORA ||
-      this.type === ModelType.CONTROLNET ||
-      this.type === ModelType.UNET
-    ) {
+    if (!this.details && SUPPORTED_MODEL_TYPES.includes(this.type!)) {
       try {
         this.details = await getModelDetails(this.path);
       } catch (e) {
