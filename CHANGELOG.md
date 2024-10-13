@@ -1,7 +1,8 @@
-# 0.0.8 (Upcoming)
+# 0.0.8 (2024-10-13)
 
 ## Features
 
+- Added an easy way to select input images for img2img/inpainting.
 - Added confirmation before project settings are restored from an image.
 - Added simplified sampling quality picker.
 - Added simplified output image resolution picker.
@@ -9,12 +10,15 @@
 
 ## Improvements
 
+- Input images are now automatically saved and can be easily reused.
 - Project files are now automatically refreshed.
 - Image thumbnails are now WEBP and support transparency.
 
 ## Bug fixes
 
 - UI state (e.g. section collapsed state) is now properly saved.
+- Error display now doesn't overflow the screen for long errors.
+- Fixed issues with resetting the bundle.
 
 # 0.0.7 (2024-10-08)
 
