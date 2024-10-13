@@ -186,7 +186,7 @@ export class SetupStore {
 
     const gpu = this.details.graphics[this.gpuIndex];
 
-    const vendor = gpu?.vendor;
+    const vendor = gpu?.vendor || 'Unknown';
     const vram = gpu?.vram || 0;
     const humanVram = vram ? filesize(vram) : 'unknown';
 
