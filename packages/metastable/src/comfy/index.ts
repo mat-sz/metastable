@@ -194,6 +194,7 @@ export class Comfy extends (EventEmitter as {
 
   stop(force = false) {
     this.process?.kill(force ? 'SIGKILL' : 'SIGTERM');
+    this.process = undefined;
   }
 
   private log(type: string, text: string) {

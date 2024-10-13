@@ -189,7 +189,6 @@ export const router = t.router({
       return await metastable.restartComfy();
     }),
     resetBundle: t.procedure.mutation(async ({ ctx: { metastable } }) => {
-      metastable.stopComfy();
       await metastable.config.reset();
       await metastable.deleteBundle();
       metastable.setup.resetStatus();
