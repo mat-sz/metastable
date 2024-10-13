@@ -239,6 +239,7 @@ export class Metastable extends (EventEmitter as {
 
   async deleteBundle() {
     this.stopComfy();
+    this.setStatus('starting');
     const pythonDir = this.python?.pythonHome;
     this.python = undefined;
     if (pythonDir) {

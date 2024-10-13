@@ -33,6 +33,10 @@ export class Setup extends (EventEmitter as {
     super();
   }
 
+  resetStatus() {
+    this._checked = false;
+  }
+
   async status(): Promise<SetupStatus> {
     if (!this._checked) {
       const python = await this.metastable.config.get('python');

@@ -192,6 +192,7 @@ export const router = t.router({
       metastable.stopComfy();
       await metastable.config.reset();
       await metastable.deleteBundle();
+      metastable.setup.resetStatus();
       await metastable.setup.emitStatus();
     }),
     config: {
