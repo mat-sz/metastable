@@ -167,22 +167,31 @@ export class ProjectRepository extends (EventEmitter as {
   new (): TypedEventEmitter<ProjectRepositoryEvents>;
 }) {
   private cache: ProjectEntity[] | undefined = undefined;
+  private watcher: chokidar.FSWatcher | undefined = undefined;
 
   constructor(private baseDir: string) {
     super();
+  }
+
+  private initWatcher() {
+    if (this.watcher) {
+      return false;
+    }
 
     let timeout: any = undefined;
-    chokidar.watch(baseDir, {}).on('all', (event: string) => {
-      if (!['add', 'change', 'unlink'].includes(event)) {
-        return;
-      }
+    this.watcher = chokidar
+      .watch(this.baseDir, {})
+      .on('all', (event: string) => {
+        if (!['add', 'change', 'unlink'].includes(event)) {
+          return;
+        }
 
-      this.cache = undefined;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        this.emit('change');
-      }, 250);
-    });
+        this.cache = undefined;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          this.emit('change');
+        }, 250);
+      });
   }
 
   get path() {
@@ -216,6 +225,8 @@ export class ProjectRepository extends (EventEmitter as {
       .filter(entity => entity.status === 'fulfilled')
       .map(result => result.value) as ProjectEntity[];
     this.cache = projects;
+    this.initWatcher();
+
     return projects;
   }
 

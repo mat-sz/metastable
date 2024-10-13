@@ -177,6 +177,7 @@ export class ModelRepository extends (EventEmitter as {
 }) {
   private searchPaths: { [key in ModelType]?: string[] } = {};
   private cache: ModelEntity[] | undefined = undefined;
+  private watcher: chokidar.FSWatcher | undefined = undefined;
 
   constructor(private baseDir: string) {
     super();
@@ -184,19 +185,27 @@ export class ModelRepository extends (EventEmitter as {
     for (const type of Object.values(ModelType)) {
       this.searchPaths[type] = [path.join(baseDir, type)];
     }
+  }
+
+  private initWatcher() {
+    if (this.watcher) {
+      return;
+    }
 
     let timeout: any = undefined;
-    chokidar.watch(baseDir, {}).on('all', (event: string) => {
-      if (!['add', 'change', 'unlink'].includes(event)) {
-        return;
-      }
+    this.watcher = chokidar
+      .watch(this.baseDir, {})
+      .on('all', (event: string) => {
+        if (!['add', 'change', 'unlink'].includes(event)) {
+          return;
+        }
 
-      this.cache = undefined;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        this.emit('change');
-      }, 250);
-    });
+        this.cache = undefined;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          this.emit('change');
+        }, 250);
+      });
   }
 
   get path() {
@@ -228,6 +237,8 @@ export class ModelRepository extends (EventEmitter as {
         );
       }
     }
+
+    this.initWatcher();
 
     const models = (await Promise.allSettled(promises))
       .filter(result => result.status === 'fulfilled' && result.value)
