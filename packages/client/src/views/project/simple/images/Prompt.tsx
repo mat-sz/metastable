@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Button } from '$components/button';
-import { VarCategory, VarString, VarUI } from '$components/var';
+import { VarCategory, VarPrompt, VarUI } from '$components/var';
 import { useFileInput } from '$hooks/useFileInput';
 import { PromptLoad } from '$modals/promptLoad';
 import { modalStore } from '$stores/ModalStore';
@@ -59,8 +59,8 @@ export const Prompt: React.FC = observer(() => {
         }
       >
         <div className={styles.inputs}>
-          <VarString label="Positive" path="prompt.positive" multiline />
-          <VarString label="Negative" path="prompt.negative" multiline />
+          <VarPrompt label="Positive" path="prompt.positive" />
+          <VarPrompt label="Negative" path="prompt.negative" />
         </div>
       </VarCategory>
       <div className={styles.actions}>

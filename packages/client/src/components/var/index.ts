@@ -11,6 +11,7 @@ export * from './VarImage';
 export * from './VarImageMode';
 export * from './VarModel';
 export * from './VarNumber';
+export * from './VarPrompt';
 export * from './VarRandomNumber';
 export * from './VarScope';
 export * from './VarSelect';
