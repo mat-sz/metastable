@@ -1,4 +1,4 @@
-import { CheckpointType, Model, ModelType } from '@metastable/types';
+import { Architecture, Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
@@ -13,7 +13,7 @@ import styles from './VarModel.module.scss';
 
 interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;
-  checkpointType?: CheckpointType;
+  architecture?: Architecture;
   onSelect?: (modelData: Model) => void;
 }
 
@@ -30,7 +30,7 @@ export const VarModel = observer(
     modelType,
     onSelect,
     label = 'Model',
-    checkpointType,
+    architecture,
   }: IVarModelProps): JSX.Element => {
     const [currentValue, setCurrentValue, currentError] = useVarUIValue({
       path,
@@ -63,7 +63,7 @@ export const VarModel = observer(
               variant="small"
               defaultParts={model?.file.parts}
               type={modelType}
-              checkpointType={checkpointType}
+              architecture={architecture}
               onSelect={model => {
                 setCurrentValue(model.file.name);
                 onSelect?.(model);

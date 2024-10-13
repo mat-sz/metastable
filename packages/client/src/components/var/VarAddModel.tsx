@@ -1,4 +1,4 @@
-import { CheckpointType, Model, ModelType } from '@metastable/types';
+import { Architecture, Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { BsBox, BsPlusLg } from 'react-icons/bs';
@@ -12,7 +12,7 @@ import { VarBase } from './VarBase';
 interface IVarAddModelProps {
   label: string;
   modelType: ModelType;
-  checkpointType?: CheckpointType;
+  architecture?: Architecture;
   onSelect?: (modelData: Model) => void;
   disabled?: boolean;
   className?: string;
@@ -24,7 +24,7 @@ export const VarAddModel = observer(
     disabled,
     modelType,
     onSelect,
-    checkpointType,
+    architecture,
     className,
   }: IVarAddModelProps): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +55,7 @@ export const VarAddModel = observer(
             <ModelBrowser
               variant="small"
               type={modelType}
-              checkpointType={checkpointType}
+              architecture={architecture}
               onSelect={model => {
                 onSelect?.(model);
                 setIsOpen(false);

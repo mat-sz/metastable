@@ -1,4 +1,4 @@
-import { CheckpointType, Model, ModelType } from '@metastable/types';
+import { Architecture, Model, ModelType } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
@@ -29,7 +29,7 @@ interface Props {
   defaultParts?: string[];
   onSelect: (model: Model) => void;
   variant?: 'default' | 'small';
-  checkpointType?: CheckpointType;
+  architecture?: Architecture;
 }
 
 function listFiles(data: Model[], parts: string[], all = false) {
@@ -77,16 +77,14 @@ export const ModelBrowser: React.FC<Props> = observer(
     onSelect,
     defaultParts = [],
     variant = 'default',
-    checkpointType,
+    architecture,
   }) => {
     const [parts, setParts] = useState<string[]>(defaultParts);
     const [compatibleOnly, setCompatibleOnly] = useState(true);
 
     let data = modelStore.type(type) || [];
-    if (checkpointType && compatibleOnly) {
-      data = data.filter(
-        item => item.details?.checkpointType === checkpointType,
-      );
+    if (architecture && compatibleOnly) {
+      data = data.filter(item => item.details?.architecture === architecture);
     }
 
     const models = listFiles(data, parts, false);
@@ -107,7 +105,7 @@ export const ModelBrowser: React.FC<Props> = observer(
               <BsFolderFill />
             </IconButton>
           )}
-          {!!checkpointType && (
+          {!!architecture && (
             <div>
               <Toggle
                 label="Compatibility filter"
@@ -195,9 +193,9 @@ export const ModelBrowser: React.FC<Props> = observer(
                 }
               >
                 <CardTags>
-                  {item.details?.checkpointType && (
+                  {item.details?.architecture && (
                     <CardTag icon={<BsBoxFill />}>
-                      {item.details?.checkpointType?.toUpperCase()}
+                      {item.details?.architecture?.toUpperCase()}
                     </CardTag>
                   )}
                   {item.details?.corrupt && (

@@ -12,17 +12,17 @@ export const ResolutionSelect: React.FC = observer(() => {
   const [isOpen, setIsOpen] = useState(false);
 
   const project = useSimpleProject();
-  const checkpointType = project.checkpointType;
+  const architecture = project.architecture;
   const { height, width } = project.settings.output;
 
   const orientation =
     height === width ? 'square' : height > width ? 'portrait' : 'landscape';
 
-  if (!checkpointType) {
+  if (!architecture) {
     return null;
   }
 
-  const resolutions = recommendedResolutions[checkpointType]?.[orientation];
+  const resolutions = recommendedResolutions[architecture]?.[orientation];
   if (!resolutions?.length) {
     return null;
   }

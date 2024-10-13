@@ -1,4 +1,4 @@
-import { CheckpointType, ModelDetails, ModelType } from '@metastable/types';
+import { Architecture, ModelDetails, ModelType } from '@metastable/types';
 
 import { readPytorch } from './pytorch.js';
 import { readSafetensors } from './safetensors.js';
@@ -32,49 +32,49 @@ const PATTERNS: StatePattern[] = [
   {
     matchLists: [['lora_unet_double_blocks_12_img_mod_lin.lora_down.weight']],
     details: {
-      checkpointType: CheckpointType.FLUX1,
+      architecture: Architecture.FLUX1,
       type: ModelType.LORA,
     },
   },
   {
     matchLists: [['encoder.mid.attn_1.v.weight']],
     details: {
-      checkpointType: CheckpointType.FLUX1,
+      architecture: Architecture.FLUX1,
       type: ModelType.VAE,
     },
   },
   {
     matchLists: [['double_blocks.18.txt_mod.lin.weight']],
     details: {
-      checkpointType: CheckpointType.FLUX1,
+      architecture: Architecture.FLUX1,
       type: ModelType.UNET,
     },
   },
   {
     matchLists: [['add_embedding.linear_1.bias']],
     details: {
-      checkpointType: CheckpointType.SDXL,
+      architecture: Architecture.SDXL,
       type: ModelType.CONTROLNET,
     },
   },
   {
     matchLists: [['input_blocks.4.0.emb_layers.1.bias']],
     details: {
-      checkpointType: CheckpointType.SD1,
+      architecture: Architecture.SD1,
       type: ModelType.CONTROLNET,
     },
   },
   {
     matchLists: [['lora_unet_down_blocks_0_downsamplers_0_conv.alpha']],
     details: {
-      checkpointType: CheckpointType.SD2,
+      architecture: Architecture.SD2,
       type: ModelType.LORA,
     },
   },
   {
     matchLists: [['lora_te_text_model_encoder_layers_0_mlp_fc1.alpha']],
     details: {
-      checkpointType: CheckpointType.SD1,
+      architecture: Architecture.SD1,
       type: ModelType.LORA,
     },
   },
@@ -86,14 +86,14 @@ const PATTERNS: StatePattern[] = [
       ['lora_te1_text_model_encoder_layers_0_mlp_fc1.alpha'],
     ],
     details: {
-      checkpointType: CheckpointType.SDXL,
+      architecture: Architecture.SDXL,
       type: ModelType.LORA,
     },
   },
   {
     matchLists: [['y_embedder.y_embedding']],
     details: {
-      checkpointType: CheckpointType.PIXART,
+      architecture: Architecture.PIXART,
       type: ModelType.CHECKPOINT,
     },
   },
@@ -102,7 +102,7 @@ const PATTERNS: StatePattern[] = [
       ['model.diffusion_model.output_blocks.3.1.time_stack.0.norm2.weight'],
     ],
     details: {
-      checkpointType: CheckpointType.SVD,
+      architecture: Architecture.SVD,
       type: ModelType.CHECKPOINT,
     },
   },
@@ -111,7 +111,7 @@ const PATTERNS: StatePattern[] = [
       ['model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight'],
     ],
     details: {
-      checkpointType: CheckpointType.SD3,
+      architecture: Architecture.SD3,
       type: ModelType.CHECKPOINT,
     },
   },
@@ -122,7 +122,7 @@ const PATTERNS: StatePattern[] = [
       ],
     ],
     details: {
-      checkpointType: CheckpointType.SDXL,
+      architecture: Architecture.SDXL,
       type: ModelType.CHECKPOINT,
     },
   },
@@ -131,7 +131,7 @@ const PATTERNS: StatePattern[] = [
       ['cond_stage_model.model.transformer.resblocks.14.attn.out_proj.weight'],
     ],
     details: {
-      checkpointType: CheckpointType.SD2,
+      architecture: Architecture.SD2,
       type: ModelType.CHECKPOINT,
     },
   },
@@ -148,7 +148,7 @@ const PATTERNS: StatePattern[] = [
       ],
     ],
     details: {
-      checkpointType: CheckpointType.SD1,
+      architecture: Architecture.SD1,
       type: ModelType.CHECKPOINT,
     },
   },

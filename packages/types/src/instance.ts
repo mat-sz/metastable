@@ -1,12 +1,12 @@
 import { ComfyTorchInfo } from './comfy.js';
-import { CheckpointType } from './model.js';
+import { Architecture } from './model.js';
 
 export interface PromptStyle {
   id: string;
   name: string;
   positive?: string;
   negative?: string;
-  architecture?: CheckpointType | 'any';
+  architecture?: Architecture | 'any';
 }
 
 export type PromptStyleSource = 'system' | 'user' | 'model';

@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 
-import { CheckpointType } from '@metastable/types';
+import { Architecture } from '@metastable/types';
 
 import type { Comfy } from './index.js';
 import {
@@ -61,7 +61,7 @@ export class ComfySession extends (EventEmitter as {
     vaePath,
     embeddingsPath,
   }: {
-    type: CheckpointType;
+    type: Architecture;
     unetPath: string;
     clipPaths: string[];
     vaePath: string;

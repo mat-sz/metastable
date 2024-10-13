@@ -20,7 +20,7 @@ export enum ModelType {
   VAE_APPROX = 'vae_approx',
 }
 
-export enum CheckpointType {
+export enum Architecture {
   SD1 = 'sd1',
   SD2 = 'sd2',
   SD3 = 'sd3',
@@ -44,7 +44,7 @@ export interface ModelMetadata {
 
 export interface ModelDetails {
   corrupt?: boolean;
-  checkpointType?: CheckpointType;
+  architecture?: Architecture;
   type?: ModelType;
 }
 

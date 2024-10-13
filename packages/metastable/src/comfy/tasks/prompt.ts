@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import {
-  CheckpointType,
+  Architecture,
   ModelType,
   ProjectImageFile,
   ProjectImageMode,
@@ -237,7 +237,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       return await ctx.checkpointAdvanced({
-        type: CheckpointType.FLUX1,
+        type: Architecture.FLUX1,
         unetPath: data.unet.path!,
         clipPaths,
         vaePath: data.vae.path!,

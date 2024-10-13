@@ -1,6 +1,6 @@
 import {
   Project as APIProject,
-  CheckpointType,
+  Architecture,
   ModelType,
   ProjectFileType,
   ProjectImageFile,
@@ -214,7 +214,7 @@ export class SimpleProject extends BaseProject<
       currentTask: observable,
       selectOutput: action,
       selectTask: action,
-      checkpointType: computed,
+      architecture: computed,
       lastOutputName: observable,
       availableStyles: computed,
       discard: action,
@@ -290,7 +290,7 @@ export class SimpleProject extends BaseProject<
 
   get autoSizes(): Record<ProjectOrientation, Resolution> | undefined {
     const sizes: any = {};
-    const recommended = recommendedResolutions[this.checkpointType!];
+    const recommended = recommendedResolutions[this.architecture!];
     if (recommended) {
       for (const key of Object.keys(recommended)) {
         sizes[key] = (recommended as any)[key][0];
@@ -302,13 +302,13 @@ export class SimpleProject extends BaseProject<
     return undefined;
   }
 
-  get checkpointType(): CheckpointType | undefined {
+  get architecture(): Architecture | undefined {
     const data = this.settings.checkpoint;
     const model =
       data.mode === 'advanced'
         ? modelStore.find(ModelType.UNET, data.unet.name)
         : modelStore.find(ModelType.CHECKPOINT, data.name);
-    return model?.details?.checkpointType;
+    return model?.details?.architecture;
   }
 
   get prompts(): Task<ProjectPromptTaskData>[] {
@@ -431,7 +431,7 @@ export class SimpleProject extends BaseProject<
       style =>
         !style.architecture ||
         style.architecture === 'any' ||
-        style.architecture === this.checkpointType,
+        style.architecture === this.architecture,
     );
   }
 

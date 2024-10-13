@@ -61,7 +61,7 @@ export const ModelArray: React.FC<Props> = observer(
               <VarModel
                 path="name"
                 modelType={type}
-                checkpointType={project.checkpointType}
+                architecture={project.architecture}
               />
               {hasClipVision && (
                 <VarModel
@@ -90,7 +90,7 @@ export const ModelArray: React.FC<Props> = observer(
         <VarAddModel
           label={label}
           modelType={type}
-          checkpointType={project.checkpointType}
+          architecture={project.architecture}
           onSelect={model => {
             project.addModel(type, model.file.name);
           }}

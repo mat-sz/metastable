@@ -1,11 +1,11 @@
-import { CheckpointType, ProjectOrientation } from '@metastable/types';
+import { Architecture, ProjectOrientation } from '@metastable/types';
 
 export type Resolution = [width: number, height: number];
 
 export const recommendedResolutions: Partial<
-  Record<CheckpointType, Record<ProjectOrientation, Resolution[]>>
+  Record<Architecture, Record<ProjectOrientation, Resolution[]>>
 > = {
-  [CheckpointType.SD1]: {
+  [Architecture.SD1]: {
     square: [
       [512, 512],
       [768, 768],
@@ -21,17 +21,17 @@ export const recommendedResolutions: Partial<
       [512, 912],
     ],
   },
-  [CheckpointType.SD2]: {
+  [Architecture.SD2]: {
     square: [[768, 768]],
     landscape: [[1152, 768]],
     portrait: [[768, 1152]],
   },
-  [CheckpointType.SD3]: {
+  [Architecture.SD3]: {
     square: [[1024, 1024]],
     landscape: [[1152, 768]],
     portrait: [[768, 1152]],
   },
-  [CheckpointType.SDXL]: {
+  [Architecture.SDXL]: {
     square: [
       [1024, 1024],
       [768, 768],
@@ -47,7 +47,7 @@ export const recommendedResolutions: Partial<
       [768, 1360],
     ],
   },
-  [CheckpointType.FLUX1]: {
+  [Architecture.FLUX1]: {
     square: [
       [1024, 1024],
       [1536, 1536],

@@ -1,4 +1,4 @@
-import { CheckpointType, PromptStyle } from '@metastable/types';
+import { Architecture, PromptStyle } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
 import React from 'react';
@@ -16,7 +16,7 @@ import {
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
-const MAPPED_ARCHITECTURES = Object.entries(CheckpointType).map(
+const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
   ([label, value]) => ({ key: value, label, value }),
 );
 
