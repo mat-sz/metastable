@@ -1,6 +1,5 @@
 import { ProjectImageFile } from '@metastable/types';
 import React, { useCallback } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import {
   BsArrowLeft,
   BsArrowRight,
@@ -11,6 +10,7 @@ import {
 
 import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
+import { useHotkey } from '$hooks/useHotkey';
 import styles from './Lightbox.module.scss';
 
 interface Props {
@@ -40,9 +40,9 @@ export const Lightbox: React.FC<Props> = ({
     [onChange, current, images.length],
   );
 
-  useHotkeys('escape', onClose);
-  useHotkeys('left', previous);
-  useHotkeys('right', next);
+  useHotkey('gallery_close', onClose);
+  useHotkey('gallery_next', previous);
+  useHotkey('gallery_previous', next);
 
   return (
     <div className={styles.lightbox} onClick={onClose}>

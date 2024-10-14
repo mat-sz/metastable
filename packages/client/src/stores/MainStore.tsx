@@ -6,7 +6,9 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
+import { defaultHotkeys } from '$/data/hotkeys';
 import { API } from '$api';
+import { parseHotkey } from '$hooks/useHotkey';
 import { BackendError } from '$modals/backendError';
 import { UnsavedProjects } from '$modals/unsavedProjects';
 import { UpdateAvailable } from '$modals/updateAvailable';
@@ -155,6 +157,23 @@ class MainStore {
 
   get project() {
     return this.projects.current;
+  }
+
+  get hotkeys() {
+    const overrides = this.config.data?.app?.hotkeys;
+    const hotkeys = { ...defaultHotkeys };
+
+    if (overrides) {
+      for (const [key, value] of Object.entries(overrides)) {
+        if (value && key in hotkeys) {
+          hotkeys[key] = value;
+        }
+      }
+    }
+
+    return Object.fromEntries(
+      Object.entries(hotkeys).map(([id, keys]) => [id, parseHotkey(keys)]),
+    );
   }
 
   beforeUnload() {

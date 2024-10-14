@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import {
   BsArrow90DegLeft,
   BsArrow90DegRight,
@@ -17,6 +16,7 @@ import { VarSlider, VarSwitch, VarUI } from '$components/var';
 import { linePoints } from '$editor/helpers';
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
+import { useHotkey } from '$hooks/useHotkey';
 import { loadImage } from '$utils/image';
 import styles from './MaskEditor.module.scss';
 
@@ -341,10 +341,10 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     }
   };
 
-  useHotkeys('escape', saveAndClose);
-  useHotkeys('backspace', reset);
-  useHotkeys('ctrl+z', undo);
-  useHotkeys('ctrl+shift+z', redo);
+  useHotkey('maskEditor_saveAndClose', saveAndClose);
+  useHotkey('maskEditor_reset', reset);
+  useHotkey('global_undo', undo);
+  useHotkey('global_redo', redo);
 
   return (
     <div className={styles.editor}>

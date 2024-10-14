@@ -1,11 +1,11 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Button } from '$components/button';
 import { VarCategory, VarPrompt, VarUI } from '$components/var';
 import { useFileInput } from '$hooks/useFileInput';
+import { useHotkey } from '$hooks/useHotkey';
 import { PromptLoad } from '$modals/promptLoad';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
@@ -27,15 +27,15 @@ export const Prompt: React.FC = observer(() => {
   const isValid = !validationResult.errors.length;
   const sampleTime = project.stepTime?.sample;
 
-  useHotkeys(
-    'ctrl+enter',
+  useHotkey(
+    'prompt_submit',
     () => {
       project.request();
     },
     { enableOnFormTags: true },
   );
-  useHotkeys(
-    'alt+enter',
+  useHotkey(
+    'prompt_cancel',
     () => {
       project.cancel();
     },

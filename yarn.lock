@@ -1313,7 +1313,6 @@ __metadata:
     react-dnd: "npm:^16.0.1"
     react-dnd-html5-backend: "npm:^16.0.1"
     react-dom: "npm:^18.2.0"
-    react-hotkeys-hook: "npm:^4.4.4"
     react-icons: "npm:^4.11.0"
     react-tiny-popover: "npm:^8.0.4"
     react-use-pointer-drag: "npm:^0.1.2"
@@ -7649,16 +7648,6 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 10c0/a752496c1941f958f2e8ac56239172296fcddce1365ce45222d04a1947e0cc5547df3e8447f855a81d6d39f008d7c32eab43db3712077f09e3f67c4874973e85
-  languageName: node
-  linkType: hard
-
-"react-hotkeys-hook@npm:^4.4.4":
-  version: 4.5.1
-  resolution: "react-hotkeys-hook@npm:4.5.1"
-  peerDependencies:
-    react: ">=16.8.1"
-    react-dom: ">=16.8.1"
-  checksum: 10c0/d881d8b3dc94e63629467e9e370921d168fee23a683bd02cf52d9c51c488a0fd944d15bb43b5f2b1c99f2d04bac7f58ffb84b57f9c3f84b2f437ea81b439ec10
   languageName: node
   linkType: hard
 

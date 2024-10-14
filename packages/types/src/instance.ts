@@ -67,6 +67,7 @@ export interface ConfigType {
   app?: {
     autoUpdate?: boolean;
     hideWelcome?: boolean;
+    hotkeys?: Record<string, string>;
   };
   styles?: PromptStyle[];
 }
