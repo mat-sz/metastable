@@ -1,4 +1,11 @@
+let hasError = false;
+
 window.onerror = (_a, _b, _c, _d, error) => {
+  if (hasError) {
+    return;
+  }
+
+  hasError = true;
   const wrapperEl = document.createElement('div');
   wrapperEl.classList.add('onError');
 
