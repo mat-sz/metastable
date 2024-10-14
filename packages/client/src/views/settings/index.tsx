@@ -1,7 +1,13 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsDisplay, BsDownload, BsGear, BsPalette } from 'react-icons/bs';
+import {
+  BsDisplay,
+  BsDownload,
+  BsGear,
+  BsKeyboard,
+  BsPalette,
+} from 'react-icons/bs';
 
 import logo from '$/assets/logo.svg';
 import { Tab, TabContent, Tabs, TabView } from '$components/tabs';
@@ -11,6 +17,7 @@ import { SettingsAbout } from './about';
 import { SettingsBackend } from './backend';
 import { SettingsDownloads } from './downloads';
 import { SettingsGeneral } from './general';
+import { SettingsHotkeys } from './hotkeys';
 import styles from './index.module.scss';
 import { SettingsStyles } from './styles';
 
@@ -38,6 +45,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="backend" title="Backend" icon={<BsDisplay />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
+          <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab
             id="about"
             title={`About ${__APP_NAME__}`}
@@ -50,6 +58,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsBackend />
             <SettingsDownloads />
             <SettingsStyles />
+            <SettingsHotkeys />
             <SettingsAbout />
           </div>
         </TabContent>

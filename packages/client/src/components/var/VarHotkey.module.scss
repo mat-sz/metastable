@@ -1,0 +1,29 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--grey-200);
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+
+  .recording {
+    display: flex;
+    align-items: center;
+    color: var(--red-900);
+
+    svg {
+      margin-right: 0.25rem;
+    }
+  }
+
+  & > *:first-child {
+    flex: 1;
+  }
+
+  button {
+    padding: 0.25rem;
+    flex: 0;
+    font-size: 0.8rem;
+  }
+}

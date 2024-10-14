@@ -1,0 +1,36 @@
+.group {
+  margin: 1rem 0;
+  padding-bottom: 1rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--grey-400);
+  }
+
+  h3 {
+    margin-bottom: 1rem;
+  }
+
+  .hotkey {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    kbd:not(:last-child) {
+      margin-right: 0.25rem;
+    }
+
+    & > div:nth-child(1) {
+      flex: 1;
+    }
+
+    & > div:nth-child(2),
+    & > div:nth-child(3) {
+      width: 210px;
+      font-size: 0.9rem;
+
+      & > div {
+        margin: 0;
+      }
+    }
+  }
+}
