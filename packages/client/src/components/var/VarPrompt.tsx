@@ -1,13 +1,10 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { deleteText, getCurrentLineIndex, replaceText } from '$utils/input';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarPrompt.module.scss';
-
-function getLineIdx(element: HTMLTextAreaElement, charIdx: number) {
-  return element.value.substring(0, charIdx).split('\n').length - 1;
-}
 
 export const VarPrompt = ({
   label,
@@ -33,19 +30,7 @@ export const VarPrompt = ({
   const lines = currentValue.split('\n');
 
   const updateCurrentLine = useCallback(() => {
-    const el = textareaRef.current;
-    if (!el) {
-      setCurrentLine(undefined);
-      return;
-    }
-
-    const startLineIdx = getLineIdx(el, el.selectionStart);
-    const endLineIdx = getLineIdx(el, el.selectionEnd);
-    if (startLineIdx === endLineIdx) {
-      setCurrentLine(startLineIdx);
-    } else {
-      setCurrentLine(undefined);
-    }
+    setCurrentLine(getCurrentLineIndex(textareaRef.current));
   }, [setCurrentLine]);
 
   useEffect(() => {
@@ -55,6 +40,33 @@ export const VarPrompt = ({
       document.removeEventListener('selectionchange', updateCurrentLine);
     };
   }, [updateCurrentLine]);
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const el = e.currentTarget;
+    const textStart = el.selectionStart;
+    const textEnd = el.selectionEnd;
+
+    if (e.shiftKey && e.key === '(') {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const text = el.value.substring(textStart, textEnd);
+      replaceText(el, textStart, textEnd, `(${text})`);
+    }
+
+    if (e.key === 'Backspace') {
+      if (
+        textStart === textEnd &&
+        el.value[textStart - 1] === '(' &&
+        el.value[textStart] === ')'
+      ) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        deleteText(el, textStart - 1, textStart + 1);
+      }
+    }
+  };
 
   return (
     <VarBase
@@ -85,6 +97,7 @@ export const VarPrompt = ({
             onPointerMove={updateCurrentLine}
             onSelect={updateCurrentLine}
             spellCheck={false}
+            onKeyDown={onKeyDown}
           />
         </div>
       </div>
