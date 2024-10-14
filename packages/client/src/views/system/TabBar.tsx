@@ -18,7 +18,7 @@ import { ProjectMenu } from '$components/projectMenu';
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
-import { IS_MAC } from '$utils/config';
+import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
 import styles from './TabBar.module.scss';
@@ -209,13 +209,14 @@ export const TabBar: React.FC = observer(() => {
     0,
   );
 
-  const areTrafficLightsVisible = IS_MAC && !mainStore.isFullScreen;
+  const areTrafficLightsVisible =
+    IS_ELECTRON && IS_MAC && !mainStore.isFullScreen;
 
   return (
     <div
       className={clsx(styles.tabs, { [styles.mac]: areTrafficLightsVisible })}
     >
-      {!IS_MAC && <Logo />}
+      {!(IS_ELECTRON && IS_MAC) && <Logo />}
       <ViewTab viewId="home">
         <BsHouseFill />
       </ViewTab>
