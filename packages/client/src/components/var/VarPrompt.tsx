@@ -2,6 +2,11 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { deleteText, getCurrentLineIndex, replaceText } from '$utils/input';
+import {
+  findClosestTokenOrImportance,
+  parseImportance,
+  serializeImportance,
+} from '$utils/prompt';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarPrompt.module.scss';
@@ -45,6 +50,31 @@ export const VarPrompt = ({
     const el = e.currentTarget;
     const textStart = el.selectionStart;
     const textEnd = el.selectionEnd;
+
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const change = e.key === 'ArrowUp' ? 0.05 : -0.05;
+        const result = findClosestTokenOrImportance(
+          el.value,
+          textStart,
+          textEnd,
+        );
+        if (!result) {
+          return;
+        }
+
+        const parsed = parseImportance(result.text);
+        const replaceWith = serializeImportance(
+          parsed.text,
+          parsed.weight + change,
+        );
+
+        replaceText(el, result.start, result.end, replaceWith);
+      }
+    }
 
     if (e.shiftKey && e.key === '(') {
       e.stopPropagation();

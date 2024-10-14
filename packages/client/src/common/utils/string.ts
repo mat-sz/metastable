@@ -31,3 +31,45 @@ export function timestr(time?: number): string {
 
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
+
+export function getLineIndex(str: string, charIndex: number) {
+  return str.substring(0, charIndex).split('\n').length - 1;
+}
+
+export function uppercaseFirst(str: string) {
+  return str[0].toUpperCase() + str.substring(1);
+}
+
+export function indexOfWhitespace(
+  str: string,
+  start: number = 0,
+  end?: number,
+) {
+  const result = /[\s ]/.exec(str.substring(start, end));
+  if (!result) {
+    return -1;
+  }
+
+  return start + result.index;
+}
+
+export function lastIndexOfWhitespace(
+  str: string,
+  start: number = 0,
+  end?: number,
+) {
+  const sub = str.substring(start, end);
+  const regex = /[\s ]/g;
+
+  let result: RegExpExecArray | null = null;
+  let current;
+  while ((current = regex.exec(sub)) !== null) {
+    result = current;
+  }
+
+  if (!result) {
+    return -1;
+  }
+
+  return start + result.index;
+}
