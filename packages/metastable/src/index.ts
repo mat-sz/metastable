@@ -15,7 +15,6 @@ import {
   ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
-import si from 'systeminformation';
 
 import { Comfy } from './comfy/index.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
@@ -33,6 +32,7 @@ import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import * as cpu from './sysinfo/cpu.js';
 import * as disk from './sysinfo/disk.js';
+import { gpu, gpuUtilization } from './sysinfo/gpu.js';
 import * as ram from './sysinfo/ram.js';
 import { Tasks } from './tasks/index.js';
 import { TypedEventEmitter } from './types.js';
@@ -105,8 +105,8 @@ export class Metastable extends (EventEmitter as {
       ram.free(),
       disk.usage(this.dataRoot),
     ]);
-    const graphics = await si.graphics();
-    const gpu = graphics.controllers[0];
+
+    const gpu = await gpuUtilization();
     this.emit('utilization', {
       cpuUsage: load,
       hddTotal: usage.size,
@@ -153,24 +153,11 @@ export class Metastable extends (EventEmitter as {
   }
 
   async updateVram() {
-    const graphics = await si.graphics();
+    const controllers = await gpu();
     let vram = 0;
-    for (const gpu of graphics.controllers) {
-      if (gpu.vendor.toLowerCase().includes('apple')) {
-        vram = os.totalmem();
-        break;
-      }
-
-      let gpuVram = gpu.memoryTotal;
-      if (!gpuVram) {
-        if (gpu.vram) {
-          gpuVram = gpu.vram * 1024 * 1024;
-        } else {
-          gpuVram = 0;
-        }
-      }
-      if (gpuVram > vram) {
-        vram = gpuVram;
+    for (const gpu of controllers) {
+      if (gpu.vram > vram) {
+        vram = gpu.vram;
       }
     }
 

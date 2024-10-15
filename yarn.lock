@@ -1356,7 +1356,6 @@ __metadata:
     radash: "npm:^12.1.0"
     semver: "npm:^7.6.2"
     sharp: "npm:^0.33.2"
-    systeminformation: "npm:^5.22.7"
     tar-stream: "npm:^3.1.7"
     typescript: "npm:^5.3.2"
     which: "npm:^4.0.0"
@@ -8997,16 +8996,6 @@ __metadata:
     "@pkgr/core": "npm:^0.1.0"
     tslib: "npm:^2.6.2"
   checksum: 10c0/d8b89e1bf30ba3ffb469d8418c836ad9c0c062bf47028406b4d06548bc66af97155ea2303b96c93bf5c7c0f0d66153a6fbd6924c76521b434e6a9898982abc2e
-  languageName: node
-  linkType: hard
-
-"systeminformation@npm:^5.22.7":
-  version: 5.23.5
-  resolution: "systeminformation@npm:5.23.5"
-  bin:
-    systeminformation: lib/cli.js
-  checksum: 10c0/849283b2886c46ff5e79594e939c87202b5283b8aa16cd0d665c595781dba51913060728bae95b94837b78c3a515a0f00ab0a0471604990c5c778f555bd075ea
-  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
 

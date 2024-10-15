@@ -38,7 +38,6 @@
     "radash": "^12.1.0",
     "semver": "^7.6.2",
     "sharp": "^0.33.2",
-    "systeminformation": "^5.22.7",
     "tar-stream": "^3.1.7",
     "which": "^4.0.0",
     "zod": "^3.22.4"

@@ -1,0 +1,31 @@
+export interface GraphicsControllerData {
+  vendor?: string;
+  subVendor?: string;
+  vendorId?: string;
+  model?: string;
+  deviceId?: string;
+  bus?: string;
+  busAddress?: string;
+  vram: number;
+  vramDynamic: boolean;
+  external?: boolean;
+  cores?: number;
+  metalVersion?: string;
+  subDeviceId?: string;
+  driverVersion?: string;
+  name?: string;
+  pciBus?: string;
+  pciID?: string;
+  fanSpeed?: number;
+  memoryTotal?: number;
+  memoryUsed?: number;
+  memoryFree?: number;
+  utilizationGpu?: number;
+  utilizationMemory?: number;
+  temperatureGpu?: number;
+  temperatureMemory?: number;
+  powerDraw?: number;
+  powerLimit?: number;
+  clockCore?: number;
+  clockMemory?: number;
+}

@@ -1,15 +1,15 @@
-import { spawn } from 'child_process';
+import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 
 import { WrappedPromise } from '../helpers/promise.js';
 
 export function stdout(
   command: string,
   args?: string[],
-  env?: Record<string, string>,
+  options?: SpawnOptionsWithoutStdio,
 ) {
-  const proc = spawn(command, args, {
-    env,
-  });
+  const proc = spawn(command, args, options);
+  proc.stdout.setEncoding('utf8');
+  proc.stderr.setEncoding('utf8');
 
   const wrapped = new WrappedPromise<string>();
   wrapped.on('finish', () => {
@@ -47,4 +47,15 @@ export function stdout(
   }, 5000);
 
   return wrapped.promise;
+}
+
+export function shell(command: string) {
+  return stdout(command, undefined, {
+    shell: true,
+    windowsHide: true,
+    env: {
+      ...process.env,
+      LANG: 'en_US.UTF-8',
+    },
+  });
 }

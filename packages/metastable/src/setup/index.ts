@@ -3,7 +3,6 @@ import os from 'os';
 import path from 'path';
 
 import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
-import si from 'systeminformation';
 
 import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
@@ -11,6 +10,7 @@ import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
 import type { Metastable } from '../index.js';
 import * as disk from '../sysinfo/disk.js';
+import { gpu } from '../sysinfo/gpu.js';
 import { TypedEventEmitter } from '../types.js';
 
 export type SetupEvents = {
@@ -50,34 +50,16 @@ export class Setup extends (EventEmitter as {
   }
 
   async details(): Promise<SetupDetails> {
-    const graphics = await si.graphics();
+    const controllers = await gpu();
     const dataRoot = this.metastable.dataRoot;
     const usage = await disk.usage(dataRoot);
-    const memory = os.totalmem();
 
     return {
       os: await getOS(),
-      graphics: graphics.controllers.map(item => {
-        const normalized = item.vendor.toLowerCase();
-        let vendor = 'unknown';
-        if (normalized.includes('apple')) {
-          vendor = 'Apple';
-        } else if (
-          normalized.includes('advanced') ||
-          normalized.includes('amd')
-        ) {
-          vendor = 'AMD';
-        } else if (normalized.includes('nvidia')) {
-          vendor = 'NVIDIA';
-        }
-
+      graphics: controllers.map(item => {
         return {
-          vendor,
-          vram: item.vram
-            ? item.vram * 1024 * 1024
-            : vendor === 'Apple'
-              ? memory
-              : 0,
+          vendor: item.vendor || 'unknown',
+          vram: item.vram,
         };
       }),
       storage: {
