@@ -11,6 +11,48 @@ import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarPrompt.module.scss';
 
+interface HighlightToken {
+  text: string;
+  type: string;
+}
+
+function getTokens(str: string) {
+  const tokens: HighlightToken[] = [];
+  let text = '';
+  let type = 'text';
+
+  function next(newType: string) {
+    tokens.push({ text, type });
+    text = '';
+    type = newType;
+  }
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    switch (char) {
+      case '#':
+        next('comment');
+        break;
+      case '(':
+      case ')':
+        next('paren');
+        break;
+      default: {
+        if (char === '\n' && type === 'comment') {
+          next('text');
+        } else if (type === 'paren') {
+          next('text');
+        }
+      }
+    }
+
+    text += char;
+  }
+  tokens.push({ text, type });
+
+  return tokens;
+}
+
 export const VarPrompt = ({
   label,
   path,
@@ -98,6 +140,7 @@ export const VarPrompt = ({
     }
   };
 
+  const tokens = getTokens(currentValue);
   return (
     <VarBase
       label={label}
@@ -129,6 +172,13 @@ export const VarPrompt = ({
             spellCheck={false}
             onKeyDown={onKeyDown}
           />
+          <pre className={styles.highlighted}>
+            {tokens.map((token, i) => (
+              <span key={i} className={styles[token.type]}>
+                {token.text}
+              </span>
+            ))}
+          </pre>
         </div>
       </div>
     </VarBase>

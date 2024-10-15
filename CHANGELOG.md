@@ -1,3 +1,15 @@
+# 0.0.9 (Upcoming)
+
+## Features
+
+- Keyboard shortcuts are now customizable.
+- Prompt input has been updated to include new features:
+  - Added line numbers.
+  - Added the ability to use `Ctrl+Up/Down` to change the weight of certain parts of the prompt.
+  - Added the ability to wrap parts of the prompt with parentheses by pressing `(` (`Shift+9`) after selecting something.
+  - Added support for Python-style comments - any text after `#` is ignored until the end of line.
+  - Added syntax highlighting.
+
 # 0.0.8 (2024-10-13)
 
 ## Features
