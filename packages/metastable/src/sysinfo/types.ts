@@ -1,6 +1,5 @@
 export interface GraphicsControllerData {
   vendor?: string;
-  subVendor?: string;
   vendorId?: string;
   model?: string;
   deviceId?: string;

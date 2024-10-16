@@ -60,10 +60,6 @@ async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
             // already a controller found
             controllers.push(currentController);
             currentController = {
-              vendor: '',
-              model: '',
-              bus: '',
-              busAddress: '',
               vram: 0,
               vramDynamic: false,
             };
@@ -140,17 +136,6 @@ async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
                   .trim()
                   .split('(')[0]
                   .trim();
-              }
-            }
-            if (
-              currentController.model &&
-              subsystem.indexOf(currentController.model) !== -1
-            ) {
-              const subVendor = subsystem
-                .split(currentController.model)[0]
-                .trim();
-              if (subVendor) {
-                currentController.subVendor = subVendor;
               }
             }
           }
@@ -269,10 +254,19 @@ function parseLinesLinuxClinfo(
 }
 
 export async function gpuLinux() {
-  const stdout = await shell('lspci -vvv  2>/dev/null');
-  const lines = stdout.toString().split('\n');
-  let controllers = await parseLines(lines);
-  const nvidiaData = await nvidiaDevices();
+  let controllers: GraphicsControllerData[] = [];
+  let nvidiaData: GraphicsControllerData[] = [];
+
+  try {
+    nvidiaData = await nvidiaDevices();
+  } catch {}
+
+  try {
+    const stdout = await shell('lspci -vvv  2>/dev/null');
+    const lines = stdout.toString().split('\n');
+    controllers.push(...(await parseLines(lines)));
+  } catch {}
+
   controllers = controllers.map(controller => {
     const nvidiaController = nvidiaData.find(nvidiaController =>
       nvidiaController

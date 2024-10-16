@@ -10,6 +10,10 @@
   - Added support for Python-style comments - any text after `#` is ignored until the end of line.
   - Added syntax highlighting.
 
+# Bug fixes
+
+- Resolved issues with detection of enterprise GPUs.
+
 # 0.0.8 (2024-10-13)
 
 ## Features

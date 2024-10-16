@@ -81,6 +81,9 @@ The UI will be accessible at https://localhost:5001/
 
 #### Debian/Ubuntu
 
+- `apt install curl`
+- `curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh`
+- `bash nodesource_setup.sh`
 - `apt install git nodejs npm`
 - `npm install -g yarn`
 

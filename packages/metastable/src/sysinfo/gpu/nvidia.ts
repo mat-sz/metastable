@@ -3,6 +3,7 @@ import path from 'path';
 
 import { parseNumber } from '../../helpers/common.js';
 import { shell } from '../../helpers/spawn.js';
+import { GraphicsControllerData } from '../types.js';
 import * as util from '../util.js';
 
 const _platform = process.platform;
@@ -91,7 +92,6 @@ export async function nvidiaSmi<
 }
 
 const devicesColumns = [
-  'driver_version',
   'pci.sub_device_id',
   'name',
   'pci.bus_id',
@@ -118,13 +118,12 @@ function parseMemory(memory?: string | number | null) {
   return 0;
 }
 
-export async function nvidiaDevices() {
+export async function nvidiaDevices(): Promise<GraphicsControllerData[]> {
   const gpus = await nvidiaSmi(devicesColumns);
 
   return gpus.map(gpu => {
     const vram = parseMemory(gpu['memory.total']);
     return {
-      driverVersion: gpu['driver_version'],
       subDeviceId: gpu['pci.sub_device_id'],
       name: gpu['name'],
       pciBus: gpu['pci.bus_id'],
