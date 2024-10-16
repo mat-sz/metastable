@@ -1,5 +1,6 @@
 import { shell } from '../../helpers/spawn.js';
 import { GraphicsControllerData } from '../types.js';
+import { rocmDevices } from './amd.js';
 import { nvidiaDevices } from './nvidia.js';
 
 async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
@@ -255,10 +256,14 @@ function parseLinesLinuxClinfo(
 
 export async function gpuLinux() {
   let controllers: GraphicsControllerData[] = [];
-  let nvidiaData: GraphicsControllerData[] = [];
+  const smiData: GraphicsControllerData[] = [];
 
   try {
-    nvidiaData = await nvidiaDevices();
+    smiData.push(...(await nvidiaDevices()));
+  } catch {}
+
+  try {
+    smiData.push(...(await rocmDevices()));
   } catch {}
 
   try {
@@ -268,31 +273,30 @@ export async function gpuLinux() {
   } catch {}
 
   controllers = controllers.map(controller => {
-    const nvidiaController = nvidiaData.find(nvidiaController =>
-      nvidiaController
+    const smiController = smiData.find(smiController =>
+      smiController
         .pciBus!.toLowerCase()
         .endsWith(controller.busAddress!.toLowerCase()),
     );
 
     return {
       ...controller,
-      ...nvidiaController,
+      ...smiController,
     };
   });
 
   // Container GPUs won't be present in controllers.
-  for (const nvidiaController of nvidiaData) {
+  for (const smiController of smiData) {
     if (
       !controllers.find(controller =>
-        nvidiaController
+        smiController
           .pciBus!.toLowerCase()
           .endsWith(controller.busAddress!.toLowerCase()),
       )
     ) {
       controllers.push({
-        vendor: 'NVIDIA',
-        model: nvidiaController.name,
-        ...nvidiaController,
+        model: smiController.name,
+        ...smiController,
       });
     }
   }

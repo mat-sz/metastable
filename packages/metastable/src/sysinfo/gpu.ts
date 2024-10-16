@@ -1,9 +1,13 @@
 import os from 'os';
 
+import { rocmUtilization } from './gpu/amd.js';
 import { gpuLinux } from './gpu/linux.js';
 import { nvidiaUtilization } from './gpu/nvidia.js';
 import { gpuWindows } from './gpu/windows.js';
-import { GraphicsControllerData } from './types.js';
+import {
+  GraphicsControllerData,
+  GraphicsControllerUtilization,
+} from './types.js';
 
 export async function gpu(): Promise<GraphicsControllerData[]> {
   let controllers: GraphicsControllerData[] = [];
@@ -53,10 +57,17 @@ export async function gpu(): Promise<GraphicsControllerData[]> {
 }
 
 export async function gpuUtilization() {
+  const utilization: GraphicsControllerUtilization[] = [];
   try {
-    const utilization = await nvidiaUtilization();
+    utilization.push(...(await nvidiaUtilization()));
+  } catch {}
+  try {
+    utilization.push(...(await rocmUtilization()));
+  } catch {}
+
+  if (utilization.length) {
     return utilization[0];
-  } catch {
-    return undefined;
   }
+
+  return undefined;
 }

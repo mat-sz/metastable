@@ -8,23 +8,19 @@ export interface GraphicsControllerData {
   vram: number;
   vramDynamic: boolean;
   external?: boolean;
-  cores?: number;
-  metalVersion?: string;
   subDeviceId?: string;
-  driverVersion?: string;
   name?: string;
   pciBus?: string;
   pciID?: string;
-  fanSpeed?: number;
   memoryTotal?: number;
   memoryUsed?: number;
-  memoryFree?: number;
   utilizationGpu?: number;
-  utilizationMemory?: number;
   temperatureGpu?: number;
-  temperatureMemory?: number;
-  powerDraw?: number;
-  powerLimit?: number;
-  clockCore?: number;
-  clockMemory?: number;
+}
+
+export interface GraphicsControllerUtilization {
+  memoryTotal?: number;
+  memoryUsed?: number;
+  utilizationGpu?: number;
+  temperatureGpu?: number;
 }

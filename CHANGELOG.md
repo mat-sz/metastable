@@ -9,6 +9,7 @@
   - Added the ability to wrap parts of the prompt with parentheses by pressing `(` (`Shift+9`) after selecting something.
   - Added support for Python-style comments - any text after `#` is ignored until the end of line.
   - Added syntax highlighting.
+- Added support for fetching utilization data from AMD GPUs on Linux (via `rocm-smi`).
 
 # Bug fixes
 
