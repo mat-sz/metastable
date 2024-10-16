@@ -6,8 +6,6 @@ import { ProgressBar } from '$components/progressBar';
 import { filesize } from '$utils/file';
 import styles from './Utilization.module.scss';
 
-const MB = 1024 * 1024;
-
 export const Utilization: React.FC = () => {
   const [utilization, setUtilization] = useState<UtilizationData>({
     cpuUsage: 0,
@@ -71,8 +69,8 @@ export const Utilization: React.FC = () => {
                 %
               </span>
               <span>
-                {filesize(utilization.vramUsed * MB)}/
-                {filesize(utilization.vramTotal * MB)}
+                {filesize(utilization.vramUsed)}/
+                {filesize(utilization.vramTotal)}
               </span>
             </ProgressBar>
           </div>
