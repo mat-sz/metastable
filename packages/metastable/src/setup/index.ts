@@ -43,6 +43,8 @@ export class Setup extends (EventEmitter as {
 
       if (python?.configured || this.skipPythonSetup) {
         this._status = 'done';
+      } else {
+        this._status = 'required';
       }
     }
 
