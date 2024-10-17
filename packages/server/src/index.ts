@@ -115,3 +115,16 @@ app.get('/resolve', async (req, reply) => {
 app.listen({ host, port });
 
 console.log(`Server running on ${host}:${port}`);
+
+process.on('beforeExit', () => {
+  metastable.handleExit();
+});
+process.on('SIGINT', () => {
+  metastable.handleExit();
+});
+process.on('SIGUSR1', () => {
+  metastable.handleExit();
+});
+process.on('SIGUSR2', () => {
+  metastable.handleExit();
+});

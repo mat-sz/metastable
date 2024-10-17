@@ -186,7 +186,7 @@ export class ProjectRepository extends (EventEmitter as {
   }
 
   async cleanup() {
-    this.watcher?.close();
+    await this.watcher?.close();
     const projects = await this.refresh();
     for (const project of projects) {
       try {

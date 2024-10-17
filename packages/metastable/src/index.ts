@@ -77,19 +77,6 @@ export class Metastable extends (EventEmitter as {
     setTimeout(() => {
       this.refreshUtilization();
     }, 2000);
-
-    process.on('beforeExit', () => {
-      this.handleExit();
-    });
-    process.on('SIGINT', () => {
-      this.handleExit();
-    });
-    process.on('SIGUSR1', () => {
-      this.handleExit();
-    });
-    process.on('SIGUSR2', () => {
-      this.handleExit();
-    });
   }
 
   async refreshUtilization() {

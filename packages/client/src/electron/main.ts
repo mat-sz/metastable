@@ -169,6 +169,16 @@ async function createWindow() {
   });
   await metastable.init();
 
+  let flagQuit = false;
+  app.on('before-quit', async e => {
+    if (!flagQuit) {
+      flagQuit = true;
+      e.preventDefault();
+      await metastable.handleExit();
+      app.quit();
+    }
+  });
+
   async function checkForUpdates() {
     const config = await metastable.config.get('app');
 

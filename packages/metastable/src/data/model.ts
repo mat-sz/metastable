@@ -207,7 +207,7 @@ export class ModelRepository extends (EventEmitter as {
   }
 
   async cleanup() {
-    this.watcher?.close();
+    await this.watcher?.close();
   }
 
   get path() {
