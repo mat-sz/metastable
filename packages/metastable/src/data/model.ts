@@ -189,7 +189,10 @@ export class ModelRepository extends (EventEmitter as {
 
     let timeout: any = undefined;
     this.watcher = chokidar
-      .watch(this.baseDir, {})
+      .watch(this.baseDir, {
+        ignoreInitial: true,
+        ignorePermissionErrors: true,
+      })
       .on('all', (event: string) => {
         if (!['add', 'change', 'unlink'].includes(event)) {
           return;
@@ -201,6 +204,10 @@ export class ModelRepository extends (EventEmitter as {
           this.emit('change');
         }, 250);
       });
+  }
+
+  async cleanup() {
+    this.watcher?.close();
   }
 
   get path() {

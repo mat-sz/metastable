@@ -125,31 +125,19 @@ export class Metastable extends (EventEmitter as {
 
   async handleExit() {
     console.log('Cleaning up and exiting...');
-    await this.cleanup();
+    await this.model.cleanup();
+    await this.project.cleanup();
     console.log('Bye!');
     process.exit(0);
   }
 
   async init() {
     this.updateVram();
-    this.cleanup();
     await this.reload();
   }
 
   private resolvePath(value: string | undefined) {
     return resolveConfigPath(value, this.dataRoot);
-  }
-
-  async cleanup() {
-    const projects = await this.project.all();
-    for (const project of projects) {
-      try {
-        const data = await project.metadata.get();
-        if (data.draft) {
-          await project.delete();
-        }
-      } catch {}
-    }
   }
 
   async updateVram() {

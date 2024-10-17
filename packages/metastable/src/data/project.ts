@@ -13,12 +13,7 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
-import {
-  directorySize,
-  getAvailableName,
-  isPathIn,
-  rmdir,
-} from '../helpers/fs.js';
+import { directorySize, getAvailableName, rmdir } from '../helpers/fs.js';
 import { TypedEventEmitter } from '../types.js';
 
 export class ProjectImageEntity extends ImageEntity {
@@ -86,33 +81,6 @@ export class ProjectEntity extends DirectoryEntity {
     return this.metadata.json?.id || '';
   }
 
-  watch(onFilesChange: (type: ProjectFileType) => void) {
-    const timeout: Record<ProjectFileType, any> = {} as any;
-    const watcher = chokidar
-      .watch(this._path, {})
-      .on('all', (event: string, path: string) => {
-        if (!['add', 'change', 'unlink'].includes(event)) {
-          return;
-        }
-
-        let type: ProjectFileType | undefined = undefined;
-        for (const [key, files] of Object.entries(this.files)) {
-          if (isPathIn(files.path, path)) {
-            type = key as ProjectFileType;
-            break;
-          }
-        }
-
-        if (type) {
-          clearTimeout(timeout[type]);
-          timeout[type] = setTimeout(() => {
-            onFilesChange(type);
-          }, 250);
-        }
-      });
-    return watcher;
-  }
-
   async load(): Promise<void> {
     await this.metadata.refresh();
 
@@ -162,6 +130,7 @@ export class ProjectEntity extends DirectoryEntity {
 
 type ProjectRepositoryEvents = {
   change: () => void;
+  projectChange: (id: string, type: ProjectFileType) => void;
 };
 export class ProjectRepository extends (EventEmitter as {
   new (): TypedEventEmitter<ProjectRepositoryEvents>;
@@ -179,19 +148,54 @@ export class ProjectRepository extends (EventEmitter as {
     }
 
     let timeout: any = undefined;
+    const timeoutProject: Record<string, any> = {};
     this.watcher = chokidar
-      .watch(this.baseDir, {})
-      .on('all', (event: string) => {
-        if (!['add', 'change', 'unlink'].includes(event)) {
-          return;
+      .watch(this.baseDir, {
+        ignoreInitial: true,
+        ignorePermissionErrors: true,
+      })
+      .on('all', async (event: string, filePath: string) => {
+        if (['addDir', 'unlinkDir'].includes(event)) {
+          this.cache = undefined;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            this.emit('change');
+          }, 250);
         }
 
-        this.cache = undefined;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          this.emit('change');
-        }, 250);
+        if (['add', 'unlink'].includes(event)) {
+          try {
+            const relative = path.relative(this.baseDir, filePath);
+            const split = relative.split(path.sep);
+            const [name, type] = split;
+
+            if (name && type) {
+              const project = await this.getByName(name);
+              if (!project.id) {
+                return;
+              }
+
+              clearTimeout(timeoutProject[project.id]);
+              timeoutProject[project.id] = setTimeout(() => {
+                this.emit('projectChange', project.id, type as ProjectFileType);
+              }, 250);
+            }
+          } catch {}
+        }
       });
+  }
+
+  async cleanup() {
+    this.watcher?.close();
+    const projects = await this.refresh();
+    for (const project of projects) {
+      try {
+        const data = await project.metadata.get();
+        if (data.draft) {
+          await project.delete();
+        }
+      } catch {}
+    }
   }
 
   get path() {
@@ -245,6 +249,17 @@ export class ProjectRepository extends (EventEmitter as {
       throw new Error('Project not found');
     }
     return project;
+  }
+
+  async getByName(name: string) {
+    const project = this.cache?.find(project => project.name === name);
+    if (project) {
+      return project;
+    }
+
+    return (await ProjectEntity.fromPath(
+      this.getEntityPath(name),
+    )) as ProjectEntity;
   }
 
   async create(name: string) {

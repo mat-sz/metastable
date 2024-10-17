@@ -483,15 +483,17 @@ export const router = t.router({
             projectId: z.string(),
           }),
         )
-        .subscription(async ({ ctx: { metastable }, input: { projectId } }) => {
-          const project = await metastable.project.get(projectId);
-
+        .subscription(({ ctx: { metastable }, input: { projectId } }) => {
           return observable<ProjectFileType>(emit => {
-            const watcher = project.watch(emit.next);
+            const onChange = (id: string, type: ProjectFileType) => {
+              if (id === projectId) {
+                emit.next(type);
+              }
+            };
+            metastable.project.on('projectChange', onChange);
 
             return () => {
-              watcher.unwatch(Object.keys(watcher.getWatched()));
-              watcher.close();
+              metastable.project.off('projectChange', onChange);
             };
           });
         }),
