@@ -1,4 +1,4 @@
-# 0.0.9 (Upcoming)
+# 0.0.9 (2024-10-17)
 
 ## Features
 
@@ -18,6 +18,7 @@
 # Bug fixes
 
 - Resolved issues with detection of enterprise GPUs.
+- Resolved "App quit unexpectedly." on macOS.
 
 # 0.0.8 (2024-10-13)
 

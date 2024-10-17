@@ -46,6 +46,8 @@ export class Setup extends (EventEmitter as {
       } else {
         this._status = 'required';
       }
+
+      this._checked = true;
     }
 
     return this._status;
