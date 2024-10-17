@@ -7,7 +7,9 @@
   - Added line numbers.
   - Added the ability to use `Ctrl+Up/Down` to change the weight of certain parts of the prompt.
   - Added the ability to wrap parts of the prompt with parentheses by pressing `(` (`Shift+9`) after selecting something.
-  - Added support for Python-style comments - any text after `#` is ignored until the end of line.
+  - Added support for comments:
+    - Inline/multiline: `#- comment -#`
+    - Line (Python style): `# comment`
   - Added syntax highlighting.
 - Added support for fetching utilization data from AMD GPUs on Linux (via `rocm-smi`).
 

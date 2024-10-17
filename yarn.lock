@@ -1282,6 +1282,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/client@workspace:packages/client"
   dependencies:
+    "@metastable/common": "workspace:^"
     "@metastable/metastable": "workspace:^"
     "@metastable/types": "workspace:^"
     "@tanstack/react-query": "npm:^5.56.2"

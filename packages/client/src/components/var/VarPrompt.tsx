@@ -1,3 +1,4 @@
+import { lexPrompt, PromptTokenType } from '@metastable/common';
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -12,46 +13,34 @@ import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarPrompt.module.scss';
 
-interface HighlightToken {
-  text: string;
-  type: string;
-}
-
 function getTokens(str: string) {
-  const tokens: HighlightToken[] = [];
-  let text = '';
-  let type = 'text';
+  const tokens = lexPrompt(str);
+  return tokens.map(token => {
+    let className = undefined;
 
-  function next(newType: string) {
-    tokens.push({ text, type });
-    text = '';
-    type = newType;
-  }
-
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    switch (char) {
-      case '#':
-        next('comment');
+    switch (token.type) {
+      case PromptTokenType.COMMENT:
+        className = styles.comment;
         break;
-      case '(':
-      case ')':
-        next('paren');
+      case PromptTokenType.LPAREN:
+      case PromptTokenType.RPAREN:
+        className = styles.paren;
         break;
-      default: {
-        if (char === '\n' && type === 'comment') {
-          next('text');
-        } else if (type === 'paren') {
-          next('text');
-        }
-      }
+      case PromptTokenType.LBRACKET:
+      case PromptTokenType.RBRACKET:
+        className = styles.paren;
+        break;
+      case PromptTokenType.WEIGHT:
+      case PromptTokenType.PIPE:
+        className = styles.weight;
+        break;
     }
 
-    text += char;
-  }
-  tokens.push({ text, type });
-
-  return tokens;
+    return {
+      value: token.value,
+      className,
+    };
+  });
 }
 
 export const VarPrompt = ({
@@ -185,8 +174,8 @@ export const VarPrompt = ({
           />
           <pre className={styles.highlighted}>
             {tokens.map((token, i) => (
-              <span key={i} className={styles[token.type]}>
-                {token.text}
+              <span key={i} className={token.className}>
+                {token.value}
               </span>
             ))}
           </pre>

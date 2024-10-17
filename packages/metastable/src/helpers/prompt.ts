@@ -11,8 +11,3 @@ export function applyStyleToPrompt(
   const parts = [prompt.trim(), stylePrompt.trim()].filter(part => !!part);
   return parts.join(', ');
 }
-
-export function preprocessPrompt(prompt: string): string {
-  // Remove comments.
-  return prompt.replace(/#(.*?)$/gm, '');
-}

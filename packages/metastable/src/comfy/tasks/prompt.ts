@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import { preprocessPrompt } from '@metastable/common';
 import {
   Architecture,
   ModelType,
@@ -16,7 +17,7 @@ import sharp from 'sharp';
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
 import { SHARP_FIT_MAP } from '../../helpers/image.js';
-import { applyStyleToPrompt, preprocessPrompt } from '../../helpers/prompt.js';
+import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import { bufferToRpcBytes } from '../helpers.js';

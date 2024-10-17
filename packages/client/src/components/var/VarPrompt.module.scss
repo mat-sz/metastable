@@ -79,16 +79,16 @@
   }
 
   .highlighted {
-    .text {
-      color: var(--grey-900);
-    }
-
     .paren {
-      color: var(--yellow-900);
+      color: var(--accent-900);
     }
 
     .comment {
       color: var(--grey-800);
+    }
+
+    .weight {
+      color: var(--accent-900);
     }
   }
 }
