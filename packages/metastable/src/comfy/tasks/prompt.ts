@@ -432,6 +432,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           break;
       }
 
+      if (settings.input.type !== 'image') {
+        settings.sampler.denoise = 1;
+      }
+
       if (!latent) {
         return;
       }
