@@ -69,7 +69,7 @@ function isHotkeyModifier(key: string) {
 }
 
 const isHotkeyMatchingKeyboardEvent = (
-  e: KeyboardEvent,
+  e: KeyboardEvent | React.KeyboardEvent,
   hotkey: ParsedHotkey,
   ignoreModifiers = false,
 ): boolean => {
@@ -139,6 +139,21 @@ const isHotkeyMatchingKeyboardEvent = (
   return false;
 };
 
+export function matchHotkey(
+  e: KeyboardEvent | React.KeyboardEvent,
+  group?: string,
+) {
+  for (const [id, parsed] of Object.entries(mainStore.hotkeys)) {
+    if (group && !id.startsWith(`${group}_`)) {
+      continue;
+    }
+
+    if (isHotkeyMatchingKeyboardEvent(e, parsed)) {
+      return id.replace(`${group}_`, '');
+    }
+  }
+}
+
 export function parseHotkey(
   hotkey: string,
   combinationKey = '+',
@@ -192,13 +207,10 @@ document.addEventListener('keydown', e => {
 
   keys.forEach(hotkey => pressedKeys.add(hotkey.toLowerCase()));
 
-  for (const [id, parsed] of Object.entries(mainStore.hotkeys)) {
-    if (!listeners[id]?.size) {
-      continue;
-    }
-
-    if (!disableHotkeys && isHotkeyMatchingKeyboardEvent(e, parsed)) {
-      for (const listener of listeners[id]) {
+  if (!disableHotkeys) {
+    const hotkeyId = matchHotkey(e);
+    if (hotkeyId && listeners[hotkeyId]?.size) {
+      for (const listener of listeners[hotkeyId]) {
         if (!listener.enableOnFormTags && isOnFormTag(e)) {
           continue;
         }

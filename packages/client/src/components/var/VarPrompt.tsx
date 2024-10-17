@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { matchHotkey } from '$hooks/useHotkey';
 import { deleteText, getCurrentLineIndex, replaceText } from '$utils/input';
 import {
   findClosestTokenOrImportance,
@@ -93,37 +94,13 @@ export const VarPrompt = ({
     const textStart = el.selectionStart;
     const textEnd = el.selectionEnd;
 
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const change = e.key === 'ArrowUp' ? 0.05 : -0.05;
-        const result = findClosestTokenOrImportance(
-          el.value,
-          textStart,
-          textEnd,
-        );
-        if (!result) {
-          return;
-        }
-
-        const parsed = parseImportance(result.text);
-        const replaceWith = serializeImportance(
-          parsed.text,
-          parsed.weight + change,
-        );
-
-        replaceText(el, result.start, result.end, replaceWith);
-      }
-    }
-
-    if (e.shiftKey && e.key === '(') {
+    if (e.key === '(') {
       e.stopPropagation();
       e.preventDefault();
 
       const text = el.value.substring(textStart, textEnd);
       replaceText(el, textStart, textEnd, `(${text})`);
+      return;
     }
 
     if (e.key === 'Backspace') {
@@ -137,6 +114,40 @@ export const VarPrompt = ({
 
         deleteText(el, textStart - 1, textStart + 1);
       }
+      return;
+    }
+
+    const hotkeyId = matchHotkey(e, 'prompt');
+    if (!hotkeyId) {
+      return;
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    switch (hotkeyId) {
+      case 'weightIncrease':
+      case 'weightDecrease':
+        {
+          const change = hotkeyId === 'weightIncrease' ? 0.05 : -0.05;
+          const result = findClosestTokenOrImportance(
+            el.value,
+            textStart,
+            textEnd,
+          );
+          if (!result) {
+            break;
+          }
+
+          const parsed = parseImportance(result.text);
+          const replaceWith = serializeImportance(
+            parsed.text,
+            parsed.weight + change,
+          );
+
+          replaceText(el, result.start, result.end, replaceWith);
+        }
+        break;
     }
   };
 

@@ -33,6 +33,14 @@ export const hotkeyGroups: Record<string, HotkeyGroup> = {
         label: 'Cancel',
         defaultKeys: 'Alt+Enter',
       },
+      weightIncrease: {
+        label: 'Increase selected text weight',
+        defaultKeys: 'CmdOrCtrl+Up',
+      },
+      weightDecrease: {
+        label: 'Decrease selected text weight',
+        defaultKeys: 'CmdOrCtrl+Down',
+      },
     },
   },
   maskEditor: {
