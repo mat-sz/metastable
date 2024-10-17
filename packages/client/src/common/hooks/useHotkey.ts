@@ -6,7 +6,6 @@ import { IS_MAC } from '$utils/config';
 let disableHotkeys = false;
 const updateListeners = new Set<HotkeyListenerFn>();
 const keyUpListeners = new Set<HotkeyListenerFn>();
-const pressedKeys = new Set<string>();
 const reservedModifierKeywords = ['shift', 'alt', 'meta', 'mod', 'ctrl'];
 const mappedKeys: Record<string, string> = {
   esc: 'escape',
@@ -62,10 +61,6 @@ function mapKey(key?: string): string {
   }
 
   return key.trim().replace(/key|digit|numpad|arrow/, '');
-}
-
-function isHotkeyModifier(key: string) {
-  return reservedModifierKeywords.includes(key);
 }
 
 const isHotkeyMatchingKeyboardEvent = (
@@ -130,10 +125,6 @@ const isHotkeyMatchingKeyboardEvent = (
     (keys.includes(pressedKey) || keys.includes(keyCode))
   ) {
     return true;
-  } else if (keys) {
-    return keys.every(hotkey => pressedKeys.has(hotkey.trim().toLowerCase()));
-  } else if (!keys) {
-    return true;
   }
 
   return false;
@@ -187,6 +178,8 @@ function isOnFormTag({ target }: KeyboardEvent): boolean {
   return formTags.includes(targetTagName?.toLowerCase() as any);
 }
 
+let lastKey: string[] = [];
+
 document.addEventListener('keydown', e => {
   if (disableHotkeys) {
     e.preventDefault();
@@ -196,16 +189,21 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  const keys = [e.key, e.code].map(mapKey);
-
-  // https://stackoverflow.com/questions/11818637/why-does-javascript-drop-keyup-events-when-the-metakey-is-pressed-on-mac-browser
-  if (pressedKeys.has('meta')) {
-    pressedKeys.forEach(
-      key => !isHotkeyModifier(key) && pressedKeys.delete(key.toLowerCase()),
-    );
+  lastKey = [];
+  if (e.ctrlKey) {
+    lastKey.push('ctrl');
+  }
+  if (e.shiftKey) {
+    lastKey.push('shift');
+  }
+  if (e.metaKey) {
+    lastKey.push('meta');
+  }
+  if (e.altKey) {
+    lastKey.push('alt');
   }
 
-  keys.forEach(hotkey => pressedKeys.add(hotkey.toLowerCase()));
+  lastKey.push(e.code);
 
   if (!disableHotkeys) {
     const hotkeyId = matchHotkey(e);
@@ -228,15 +226,7 @@ document.addEventListener('keyup', e => {
     return;
   }
 
-  const keys = [e.key, e.code].map(mapKey);
   keyUpListeners.forEach(fn => fn());
-
-  // https://stackoverflow.com/questions/11818637/why-does-javascript-drop-keyup-events-when-the-metakey-is-pressed-on-mac-browser
-  if (keys.includes('meta')) {
-    pressedKeys.clear();
-  } else {
-    keys.forEach(hotkey => pressedKeys.delete(hotkey.toLowerCase()));
-  }
 
   updateListeners.forEach(fn => fn());
 });
@@ -267,35 +257,6 @@ export function useHotkey(
   }, dependencies);
 }
 
-export function usePressed() {
-  const [keys, setKeys] = useState('');
-
-  useEffect(() => {
-    const onUpdate = () => {
-      setKeys([...pressedKeys].join('+'));
-    };
-
-    onUpdate();
-    updateListeners.add(onUpdate);
-
-    return () => {
-      updateListeners.delete(onUpdate);
-    };
-  }, [setKeys]);
-
-  return keys;
-}
-
-export function useGlobalDisable(disabled: boolean) {
-  useEffect(() => {
-    disableHotkeys = disabled;
-
-    return () => {
-      disableHotkeys = false;
-    };
-  }, [disabled]);
-}
-
 export function useRecord(
   onRecorded: (keys: string) => void,
   deps?: DependencyList,
@@ -303,7 +264,7 @@ export function useRecord(
   const [isRecording, setIsRecording] = useState(false);
 
   const recordedCallback = useCallback(() => {
-    onRecorded([...pressedKeys].join('+'));
+    onRecorded([...lastKey].join('+'));
     stop();
   }, [deps]);
 
