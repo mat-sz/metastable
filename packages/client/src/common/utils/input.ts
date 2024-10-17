@@ -25,3 +25,12 @@ export function getCurrentLineIndex(el?: HTMLTextAreaElement | null) {
 
   return el.value.substring(0, el.selectionStart).split('\n').length - 1;
 }
+
+export function getLineStart(el: HTMLTextAreaElement, index: number) {
+  const lines = el.value.split('\n');
+
+  return Array(index)
+    .fill(0)
+    .map((_, i) => lines[i].length + 1)
+    .reduce((a, b) => a + b, 0);
+}

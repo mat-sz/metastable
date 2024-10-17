@@ -3,7 +3,12 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { matchHotkey } from '$hooks/useHotkey';
-import { deleteText, getCurrentLineIndex, replaceText } from '$utils/input';
+import {
+  deleteText,
+  getCurrentLineIndex,
+  getLineStart,
+  replaceText,
+} from '$utils/input';
 import {
   findClosestTokenOrImportance,
   parseImportance,
@@ -135,6 +140,33 @@ export const VarPrompt = ({
           );
 
           replaceText(el, result.start, result.end, replaceWith);
+        }
+        break;
+      case 'comment':
+        {
+          const lineIndex = getCurrentLineIndex(el);
+          if (lineIndex) {
+            const start = getLineStart(el, lineIndex);
+            let replaceLength = 0;
+            let replaceWith = '# ';
+
+            if (el.value[start] === '#') {
+              replaceWith = '';
+              replaceLength = el.value[start + 1] === ' ' ? 2 : 1;
+            }
+
+            replaceText(el, start, start + replaceLength, replaceWith);
+
+            const offset = -replaceLength || 2;
+            el.setSelectionRange(textStart + offset, textEnd + offset);
+          } else {
+            const text = el.value.substring(textStart, textEnd);
+            const isComment = text.startsWith('#-') && text.endsWith('-#');
+            const replaceWith = isComment
+              ? text.replace(/^#-\s?/, '').replace(/\s?-#$/, '')
+              : `#- ${text} -#`;
+            replaceText(el, textStart, textEnd, replaceWith);
+          }
         }
         break;
     }

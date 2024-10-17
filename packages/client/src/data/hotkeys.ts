@@ -41,6 +41,10 @@ export const hotkeyGroups: Record<string, HotkeyGroup> = {
         label: 'Decrease selected text weight',
         defaultKeys: 'CmdOrCtrl+Down',
       },
+      comment: {
+        label: 'Comment out selected text',
+        defaultKeys: 'CmdOrCtrl+/',
+      },
     },
   },
   maskEditor: {

@@ -5,8 +5,10 @@
 - Keyboard shortcuts are now customizable.
 - Prompt input has been updated to include new features:
   - Added line numbers.
-  - Added the ability to use `Ctrl+Up/Down` to change the weight of certain parts of the prompt.
-  - Added the ability to wrap parts of the prompt with parentheses by pressing `(` (`Shift+9`) after selecting something.
+  - Added keyboard shortcuts:
+    - `Ctrl+Up/Down` to change the weight of certain parts of the prompt.
+    - `Ctrl+/` to comment out parts of the prompt.
+    - `(` (`Shift+9`) to wrap parts of the prompt in parentheses after selecting something.
   - Added support for comments:
     - Inline/multiline: `#- comment -#`
     - Line (Python style): `# comment`
