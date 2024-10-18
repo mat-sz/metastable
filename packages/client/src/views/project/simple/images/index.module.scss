@@ -143,7 +143,7 @@
       --blur: 3px;
       width: calc(100% + 2 * var(--blur));
       height: calc(100% + 2 * var(--blur));
-      object-fit: cover;
+      object-fit: contain;
       filter: blur(var(--blur));
       margin: calc(-1 * var(--blur));
     }

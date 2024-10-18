@@ -4,6 +4,10 @@
 
 - Added an option to pad edges for inpainting.
 
+## Bug fixes
+
+- Resolved issues with non-square image generation previews.
+
 # 0.0.9 (2024-10-17)
 
 ## Features
