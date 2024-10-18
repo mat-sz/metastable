@@ -88,7 +88,7 @@ export const VarSlider = ({
   const sliderRef = useRef<HTMLDivElement>(null);
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
-    fallbackValue: value,
+    fallbackValue: value ?? defaultValue,
     onChange,
     error,
     errorPath,
