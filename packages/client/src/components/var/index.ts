@@ -3,7 +3,6 @@ export * from './VarUI';
 // Inputs
 export * from './VarAddModel';
 export * from './VarArray';
-export * from './VarAspectRatio';
 export * from './VarBase';
 export * from './VarButton';
 export * from './VarInputType';
@@ -11,6 +10,7 @@ export * from './VarImage';
 export * from './VarImageMode';
 export * from './VarModel';
 export * from './VarNumber';
+export * from './VarOrientation';
 export * from './VarPrompt';
 export * from './VarRandomNumber';
 export * from './VarScope';

@@ -6,7 +6,7 @@ import { Switch, SwitchOptionDetails } from '$components/switch';
 import { useVarUIValue } from './common/VarUIContext';
 import { VarBase } from './VarBase';
 
-export interface IVarAspectRatioProps {
+export interface IVarOrientationProps {
   orientationPath: string;
   widthPath: string;
   heightPath: string;
@@ -14,13 +14,13 @@ export interface IVarAspectRatioProps {
   autoSizes?: Record<ProjectOrientation, Resolution>;
 }
 
-export const VarAspectRatio = ({
+export const VarOrientation = ({
   orientationPath,
   widthPath,
   heightPath,
   label,
   autoSizes,
-}: IVarAspectRatioProps): JSX.Element => {
+}: IVarOrientationProps): JSX.Element => {
   const [width, setWidth] = useVarUIValue({
     path: widthPath,
     fallbackValue: 512,

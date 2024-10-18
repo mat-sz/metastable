@@ -4,11 +4,11 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import {
-  VarAspectRatio,
   VarImageMode,
   VarInputType,
   VarModel,
   VarNumber,
+  VarOrientation,
   VarRandomNumber,
   VarSelect,
   VarSize,
@@ -140,8 +140,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           ]}
           inline
         />
-        <VarAspectRatio
-          label="Aspect ratio"
+        <VarOrientation
+          label="Orientation"
           orientationPath="output.orientation"
           widthPath="output.width"
           heightPath="output.height"
