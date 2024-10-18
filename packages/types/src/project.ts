@@ -26,6 +26,7 @@ export interface ProjectSimpleSettings {
     image?: string;
     imageMode?: ProjectImageMode;
     mask?: string;
+    padEdges?: number;
   };
   output: {
     sizeMode: 'auto' | 'custom';

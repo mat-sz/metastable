@@ -114,7 +114,23 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             />
             <VarImageMode label="Image mode" path="input.imageMode" />
             {project.settings.input.type === 'image_masked' && (
-              <VarMask label="Mask" path="input.mask" imagePath="input.image" />
+              <>
+                <VarMask
+                  label="Mask"
+                  path="input.mask"
+                  imagePath="input.image"
+                />
+                <VarSlider
+                  label="Pad edges"
+                  path="input.padEdges"
+                  min={0}
+                  max={512}
+                  step={1}
+                  defaultValue={0}
+                  showInput
+                  unit="px"
+                />
+              </>
             )}
             {project.settings.input.type === 'image' && (
               <VarSlider

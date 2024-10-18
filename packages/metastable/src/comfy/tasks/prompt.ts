@@ -12,7 +12,7 @@ import {
   TaskState,
 } from '@metastable/types';
 import PNG from 'meta-png';
-import sharp from 'sharp';
+import sharp, { FitEnum } from 'sharp';
 
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
@@ -92,12 +92,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     if (settings.input.type !== 'none' && !settings.input.image) {
       throw new Error("Image is required if input type is not 'none'.");
-    }
-
-    if (settings.input.type === 'image_masked' && !settings.input.mask) {
-      throw new Error(
-        "Mask image is required if input type is 'image_masked'.",
-      );
     }
 
     if (settings.checkpoint.mode === 'advanced') {
@@ -181,6 +175,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     if (config.generation?.imageMetadata) {
       this.storeMetadata = true;
+    }
+
+    if (settings.input.type !== 'image_masked') {
+      settings.input.padEdges = undefined;
     }
 
     settings.sampler.tiling = !!settings.sampler.tiling;
@@ -274,28 +272,47 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     throw new Error('Unable to load input');
   }
 
-  private async prepareImage(
-    url: string,
-    mode?: ProjectImageMode,
-    maskUrl?: string,
-  ): Promise<RPCBytes> {
+  private async prepareImage(url: string, fit?: keyof FitEnum) {
     const buffer = await this.inputAsBuffer(url);
-    const fit = SHARP_FIT_MAP[mode!] || 'stretch';
+    const image = sharp(buffer);
 
+    const { padEdges } = this.settings.input;
     const { width, height } = this.settings.output;
-    const image = sharp(buffer).resize({
+    image.resize({
       width,
       height,
       fit,
     });
 
-    if (maskUrl) {
-      const maskBuffer = await this.inputAsBuffer(maskUrl);
-      const maskImage = sharp(maskBuffer).resize({
+    if (padEdges) {
+      image.extend({
+        top: padEdges,
+        bottom: padEdges,
+        left: padEdges,
+        right: padEdges,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      });
+
+      image.resize({
         width,
         height,
         fit,
       });
+    }
+
+    return image;
+  }
+
+  private async prepareInput(
+    url: string,
+    mode?: ProjectImageMode,
+    maskUrl?: string,
+  ): Promise<RPCBytes> {
+    const fit = SHARP_FIT_MAP[mode!] || 'stretch';
+    const image = await this.prepareImage(url, fit);
+
+    if (maskUrl) {
+      const maskImage = await this.prepareImage(url, fit);
       image.composite([
         { input: await maskImage.png().toBuffer(), blend: 'dest-out' },
       ]);
@@ -353,7 +370,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         for (const controlnetSettings of controlnets) {
           if (controlnetSettings.enabled) {
             const { image } = await ctx.loadImage(
-              await this.prepareImage(
+              await this.prepareInput(
                 controlnetSettings.image!,
                 controlnetSettings.imageMode,
               ),
@@ -374,7 +391,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         for (const ipadapterSettings of ipadapters) {
           if (ipadapterSettings.enabled) {
             const { image } = await ctx.loadImage(
-              await this.prepareImage(
+              await this.prepareInput(
                 ipadapterSettings.image!,
                 ipadapterSettings.imageMode,
               ),
@@ -410,7 +427,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         case 'image':
           {
             const { image } = await ctx.loadImage(
-              await this.prepareImage(
+              await this.prepareInput(
                 settings.input.image!,
                 settings.input.imageMode,
               ),
@@ -421,7 +438,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         case 'image_masked':
           {
             const { image, mask } = await ctx.loadImage(
-              await this.prepareImage(
+              await this.prepareInput(
                 settings.input.image!,
                 settings.input.imageMode,
                 settings.input.mask,

@@ -1,3 +1,9 @@
+# 0.0.10 (Upcoming)
+
+## Features
+
+- Added an option to pad edges for inpainting.
+
 # 0.0.9 (2024-10-17)
 
 ## Features
