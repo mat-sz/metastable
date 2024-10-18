@@ -194,7 +194,7 @@ export class FileEntity extends BaseEntity {
   }
 
   async delete(): Promise<void> {
-    await fs.unlink(this.path);
+    await tryUnlink(this.path);
     await this.metadata.delete();
   }
 
