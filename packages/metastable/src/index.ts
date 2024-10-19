@@ -23,6 +23,7 @@ import { Config } from './config/index.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectRepository } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
+import { ExtraFeatureManager } from './extra/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
 import { resolveConfigPath, rmdir } from './helpers/fs.js';
@@ -51,6 +52,7 @@ export class Metastable extends (EventEmitter as {
   comfy?: Comfy;
   setup = new Setup(this);
   tasks = new Tasks();
+  extra = new ExtraFeatureManager(this);
   kohya?: Kohya;
   project;
   model;
@@ -250,6 +252,13 @@ export class Metastable extends (EventEmitter as {
 
       if (extraArgs) {
         args.push(...parseArgString(extraArgs));
+      }
+    }
+
+    const features = await this.extra.all();
+    for (const feature of features) {
+      if (feature.enabled && feature.namespace) {
+        args.push('--namespace', feature.namespace);
       }
     }
 

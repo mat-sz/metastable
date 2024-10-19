@@ -4,6 +4,8 @@ import path from 'path';
 
 import which from 'which';
 
+import { stdout } from '../helpers/spawn.js';
+
 const PYTHON_COMMANDS = [
   'python3.11',
   'python3.10',
@@ -23,6 +25,19 @@ async function getPythonCommand() {
 
   return undefined;
 }
+
+const PYTHON_PACKAGES = `
+from importlib.metadata import version
+import json
+names = %NAMES
+output = {}
+for name in names:
+  try:
+    output[name] = version(name)
+  except:
+    output[name] = None
+print(json.dumps(output))
+`;
 
 export class PythonInstance {
   constructor(
@@ -63,6 +78,20 @@ export class PythonInstance {
     proc.stderr.setEncoding('utf-8');
 
     return proc;
+  }
+
+  private async stdout(args: string[]) {
+    return await stdout(this.path, ['-u', ...args], this.env);
+  }
+
+  private async runPython(code: string) {
+    return JSON.parse(await this.stdout(['-c', code]));
+  }
+
+  async packages(names: string[]): Promise<Record<string, string | null>> {
+    return await this.runPython(
+      PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
+    );
   }
 
   static async fromDirectory(dir: string, packagesDir?: string) {
