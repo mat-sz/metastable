@@ -9,7 +9,6 @@ import comfy.clip_vision
 import comfy.utils
 import comfy.model_management
 from .utils import custom, latent_preview
-from comfy.cli_args import LatentPreviewMethod
 from comfy.model_base import ModelType
 
 from rpc import RPC
@@ -110,7 +109,7 @@ class CheckpointNamespace:
         callback = None
         if preview is not None:
             taesd_decoder_path = None
-            if preview["method"] == LatentPreviewMethod.TAESD:
+            if preview["method"] == "taesd":
                 taesd_decoder_name = model.model.latent_format.taesd_decoder_name
                 if "taesd" in preview and taesd_decoder_name in preview["taesd"]:
                     taesd_decoder_path = preview["taesd"][taesd_decoder_name]

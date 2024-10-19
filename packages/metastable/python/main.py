@@ -1,9 +1,8 @@
 import sys
 import os
-
-import comfy.options
-comfy.options.enable_args_parsing()
-from comfy.cli_args import args
+import cli_args
+sys.modules['comfy.cli_args'] = cli_args
+args = cli_args.args
 
 import torch
 if not torch.cuda.is_available() and not args.directml and not torch.backends.mps.is_available():
@@ -32,7 +31,6 @@ if __name__ == "__main__":
 import comfy.utils
 
 import comfy.model_management
-import namespaces_base
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
@@ -73,7 +71,14 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     rpc = RPC()
-    namespaces_base.insert_all(rpc)
+    
+    namespaces = ['base']
+    if args.namespace:
+        namespaces.extend(args.namespace)
+
+    for namespace in namespaces:
+        namespace_module = __import__(f'namespaces_{namespace}')
+        namespace_module.insert_all(rpc)
 
     cuda_malloc_warning()
 
