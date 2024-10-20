@@ -43,7 +43,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
         path.join(this.project.files.input.path, input),
       );
       const threshold = this.settings.threshold || 0.35;
-      const result = await ctx.tag(
+      const result = await ctx.tag.run(
         this.settings.tagger.path!,
         images,
         threshold,

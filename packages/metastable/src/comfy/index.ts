@@ -8,7 +8,7 @@ import { BackendStatus, InstanceInfo, LogItem } from '@metastable/types';
 import es from 'event-stream';
 import { nanoid } from 'nanoid/non-secure';
 
-import { ComfySession } from './session.js';
+import { ComfySession } from './session/index.js';
 import type { PythonInstance } from '../python/index.js';
 import { TypedEventEmitter } from '../types.js';
 

@@ -1,4 +1,4 @@
-import type { ComfySession } from './session.js';
+import type { ComfySession } from './index.js';
 import type { ComfyPreviewSettings, RPCRef } from './types.js';
 
 export interface ComfyLatent {

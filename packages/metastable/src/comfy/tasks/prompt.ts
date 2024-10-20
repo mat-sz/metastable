@@ -20,9 +20,9 @@ import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
-import { bufferToRpcBytes } from '../helpers.js';
-import type { ComfySession } from '../session.js';
-import { ComfyPreviewSettings, RPCBytes } from '../types.js';
+import { bufferToRpcBytes } from '../session/helpers.js';
+import type { ComfySession } from '../session/index.js';
+import { ComfyPreviewSettings } from '../session/types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private embeddingsPath?: string;
@@ -235,7 +235,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         clipPaths.push(data.clip2.path);
       }
 
-      return await ctx.checkpointAdvanced({
+      return await ctx.checkpoint.advanced({
         type: Architecture.FLUX1,
         unetPath: data.unet.path!,
         clipPaths,
@@ -243,7 +243,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         embeddingsPath: this.embeddingsPath,
       });
     } else {
-      return await ctx.checkpoint(
+      return await ctx.checkpoint.load(
         data.path!,
         this.embeddingsPath,
         data.clipSkip ? -1 * data.clipSkip : undefined,
@@ -303,11 +303,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return image;
   }
 
-  private async prepareInput(
+  private async loadInput(
     url: string,
     mode?: ProjectImageMode,
     maskUrl?: string,
-  ): Promise<RPCBytes> {
+  ) {
     const fit = SHARP_FIT_MAP[mode!] || 'stretch';
     const image = await this.prepareImage(url, fit);
 
@@ -318,7 +318,9 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       ]);
     }
 
-    return bufferToRpcBytes(await image.png().toBuffer());
+    return await this.session!.image.load(
+      bufferToRpcBytes(await image.png().toBuffer()),
+    );
   }
 
   private async generate() {
@@ -344,7 +346,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.step('lora');
         for (const loraSettings of loras) {
           if (loraSettings.enabled) {
-            const lora = await ctx.lora(loraSettings.path!);
+            const lora = await ctx.lora.load(loraSettings.path!);
             await lora.applyTo(checkpoint, loraSettings.strength);
           }
         }
@@ -369,13 +371,13 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.step('controlnet');
         for (const controlnetSettings of controlnets) {
           if (controlnetSettings.enabled) {
-            const { image } = await ctx.loadImage(
-              await this.prepareInput(
-                controlnetSettings.image!,
-                controlnetSettings.imageMode,
-              ),
+            const { image } = await this.loadInput(
+              controlnetSettings.image!,
+              controlnetSettings.imageMode,
             );
-            const controlnet = await ctx.controlnet(controlnetSettings.path!);
+            const controlnet = await ctx.controlnet.load(
+              controlnetSettings.path!,
+            );
             await controlnet.applyTo(
               conditioning,
               image,
@@ -390,14 +392,12 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         this.step('ipadapter');
         for (const ipadapterSettings of ipadapters) {
           if (ipadapterSettings.enabled) {
-            const { image } = await ctx.loadImage(
-              await this.prepareInput(
-                ipadapterSettings.image!,
-                ipadapterSettings.imageMode,
-              ),
+            const { image } = await this.loadInput(
+              ipadapterSettings.image!,
+              ipadapterSettings.imageMode,
             );
-            const ipadapter = await ctx.ipadapter(ipadapterSettings.path!);
-            const clipVision = await ctx.clipVision(
+            const ipadapter = await ctx.ipadapter.load(ipadapterSettings.path!);
+            const clipVision = await ctx.clipVision.load(
               ipadapterSettings.clipVisionPath!,
             );
             await ipadapter.applyTo(
@@ -417,7 +417,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.step('input');
       switch (settings.input.type) {
         case 'none':
-          latent = await ctx.emptyLatent(
+          latent = await ctx.image.emptyLatent(
             settings.output.width,
             settings.output.height,
             settings.output.batchSize || 1,
@@ -426,23 +426,19 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           break;
         case 'image':
           {
-            const { image } = await ctx.loadImage(
-              await this.prepareInput(
-                settings.input.image!,
-                settings.input.imageMode,
-              ),
+            const { image } = await this.loadInput(
+              settings.input.image!,
+              settings.input.imageMode,
             );
             latent = await checkpoint.encode(image);
           }
           break;
         case 'image_masked':
           {
-            const { image, mask } = await ctx.loadImage(
-              await this.prepareInput(
-                settings.input.image!,
-                settings.input.imageMode,
-                settings.input.mask,
-              ),
+            const { image, mask } = await this.loadInput(
+              settings.input.image!,
+              settings.input.imageMode,
+              settings.input.mask,
             );
             latent = await checkpoint.encode(image, mask);
           }
@@ -472,7 +468,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       if (settings.upscale?.enabled) {
         this.step('upscale');
-        const upscaleModel = await ctx.upscaleModel(settings.upscale.path!);
+        const upscaleModel = await ctx.upscale.load(settings.upscale.path!);
         images = await upscaleModel.applyTo(images);
       }
 
@@ -482,7 +478,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const cleanSettings = this.getCleanSettings();
 
       for (const image of images) {
-        const bytes = await ctx.dumpImage(image, ext);
+        const bytes = await ctx.image.dump(image, ext);
         let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
 
         if (this.storeMetadata && ext === 'png') {
