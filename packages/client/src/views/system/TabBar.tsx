@@ -220,7 +220,10 @@ export const TabBar: React.FC = observer(() => {
       <ViewTab viewId="home">
         <BsHouseFill />
       </ViewTab>
-      <ViewTab viewId="settings">
+      <ViewTab
+        viewId="settings"
+        marquee={!!mainStore.tasks.queues.settings.length}
+      >
         <BsGearFill />
       </ViewTab>
       <ViewTab

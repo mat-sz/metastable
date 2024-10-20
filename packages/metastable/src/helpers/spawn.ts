@@ -2,12 +2,20 @@ import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 
 import { WrappedPromise } from '../helpers/promise.js';
 
+interface StdoutOptions extends SpawnOptionsWithoutStdio {
+  onLog?: (data: string) => void;
+  timeout?: number;
+}
+
 export function stdout(
   command: string,
   args?: string[],
-  options?: SpawnOptionsWithoutStdio,
+  options?: StdoutOptions,
 ) {
-  const proc = spawn(command, args, options);
+  const proc = spawn(command, args, {
+    timeout: 5000,
+    ...options,
+  });
   proc.stdout.setEncoding('utf8');
   proc.stderr.setEncoding('utf8');
 
@@ -22,12 +30,14 @@ export function stdout(
   proc.stdout.on('data', chunk => {
     output += chunk.toString();
     stdout += chunk.toString();
+    options?.onLog?.(chunk.toString());
   });
   proc.stderr.on('data', chunk => {
     output += chunk.toString();
+    options?.onLog?.(chunk.toString());
   });
 
-  proc.on('exit', code => {
+  proc.on('close', code => {
     if (code !== 0) {
       wrapped.reject(
         new Error(
@@ -41,10 +51,6 @@ export function stdout(
   proc.on('error', err => {
     wrapped.reject(err);
   });
-
-  setTimeout(() => {
-    wrapped.reject(new Error(`Process '${command}' timed out`));
-  }, 5000);
 
   return wrapped.promise;
 }

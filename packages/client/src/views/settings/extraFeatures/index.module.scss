@@ -1,0 +1,11 @@
+.feature {
+  padding: 1rem;
+  background: var(--grey-300);
+  border-radius: 5px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

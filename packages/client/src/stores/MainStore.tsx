@@ -29,6 +29,7 @@ class MainStore {
     schedulers: [],
     vram: 0,
     dataRoot: '/',
+    extraFeatures: [],
   };
   updateInfo: UpdateInfo = {
     canCheckForUpdate: false,
@@ -279,6 +280,17 @@ class MainStore {
   defaultModelName(type: ModelType) {
     const model = modelStore.defaultModel(type);
     return model?.file.name;
+  }
+
+  isExtraFeatureEnabled(featureId: string) {
+    const feature = this.info.extraFeatures.find(
+      feature => feature.id === featureId,
+    );
+    if (!feature) {
+      return false;
+    }
+
+    return feature.enabled;
   }
 
   get searchFn() {

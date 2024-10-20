@@ -80,8 +80,12 @@ export class PythonInstance {
     return proc;
   }
 
-  private async stdout(args: string[]) {
-    return await stdout(this.path, ['-u', ...args], this.env);
+  private async stdout(args: string[], onLog?: (data: string) => void) {
+    return await stdout(this.path, ['-u', ...args], {
+      env: { ...process.env, ...this.env },
+      onLog,
+      timeout: undefined,
+    });
   }
 
   private async runPython(code: string) {
@@ -92,6 +96,10 @@ export class PythonInstance {
     return await this.runPython(
       PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
     );
+  }
+
+  async pipInstall(packages: string[], onLog?: (data: string) => void) {
+    await this.stdout(['-m', 'pip', 'install', ...packages], onLog);
   }
 
   static async fromDirectory(dir: string, packagesDir?: string) {

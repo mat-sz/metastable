@@ -15,6 +15,7 @@ export class TaskStore {
     downloads: [],
     setup: [],
     project: [],
+    settings: [],
   };
 
   eventListeners: Record<string, Set<(...args: any) => void>> = {

@@ -21,6 +21,7 @@ export interface InstanceInfo {
   torch?: ComfyTorchInfo;
   vram: number;
   dataRoot: string;
+  extraFeatures: ExtraFeature[];
 }
 
 export interface UpdateInfo {
@@ -91,4 +92,14 @@ export interface LogItem {
   timestamp: number;
   type: string;
   text: string;
+}
+
+export interface ExtraFeature {
+  id: string;
+  name: string;
+  description?: string;
+  pythonPackages?: { name: string; extra?: string }[];
+  namespace?: string;
+  installed: boolean;
+  enabled: boolean;
 }

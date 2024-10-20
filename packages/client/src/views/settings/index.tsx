@@ -7,6 +7,7 @@ import {
   BsGear,
   BsKeyboard,
   BsPalette,
+  BsPatchPlus,
 } from 'react-icons/bs';
 
 import logo from '$/assets/logo.svg';
@@ -16,6 +17,7 @@ import { mainStore } from '$stores/MainStore';
 import { SettingsAbout } from './about';
 import { SettingsBackend } from './backend';
 import { SettingsDownloads } from './downloads';
+import { SettingsExtraFeatures } from './extraFeatures';
 import { SettingsGeneral } from './general';
 import { SettingsHotkeys } from './hotkeys';
 import styles from './index.module.scss';
@@ -47,6 +49,11 @@ export const Settings: React.FC = observer(() => {
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab
+            id="extraFeatures"
+            title="Extra features"
+            icon={<BsPatchPlus />}
+          />
+          <Tab
             id="about"
             title={`About ${__APP_NAME__}`}
             icon={<img src={logo} alt="Logo" />}
@@ -59,6 +66,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsDownloads />
             <SettingsStyles />
             <SettingsHotkeys />
+            <SettingsExtraFeatures />
             <SettingsAbout />
           </div>
         </TabContent>

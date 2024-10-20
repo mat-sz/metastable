@@ -1,12 +1,11 @@
-export interface ExtraFeature {
-  id: string;
-  name: string;
-  description?: string;
-  pythonPackages?: { name: string; extra?: string }[];
-  namespace?: string;
-}
+import { ExtraFeature } from '@metastable/types';
 
-export const EXTRA_FEATURES: ExtraFeature[] = [
+export type ExtraFeatureWithoutState = Omit<
+  ExtraFeature,
+  'installed' | 'enabled'
+>;
+
+export const EXTRA_FEATURES: ExtraFeatureWithoutState[] = [
   {
     id: 'pulid',
     name: 'PuLID',
@@ -16,6 +15,8 @@ export const EXTRA_FEATURES: ExtraFeature[] = [
       { name: 'onnxruntime' },
       { name: 'ftfy' },
       { name: 'timm' },
+      { name: 'xformers' },
+      { name: 'huggingface-hub' },
     ],
     namespace: 'pulid',
   },

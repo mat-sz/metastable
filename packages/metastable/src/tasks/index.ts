@@ -20,6 +20,10 @@ export class Tasks extends (EventEmitter as {
 }) {
   queues: Record<string, BaseQueue> = {
     downloads: new BaseQueue('downloads'),
+    settings: new BaseQueue('settings', {
+      dismissSuccessful: true,
+      dismissCancelled: true,
+    }),
     setup: new BaseQueue('setup', { stopOnFailure: true }),
     project: new BaseQueue('project', {
       dismissSuccessful: true,
