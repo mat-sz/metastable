@@ -4,6 +4,10 @@
 
 - Added an option to pad edges for inpainting.
 
+## Improvements
+
+- Moved backend status to settings.
+
 ## Bug fixes
 
 - Resolved issues with non-square image generation previews.

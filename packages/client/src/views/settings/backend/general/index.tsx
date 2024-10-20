@@ -1,9 +1,8 @@
-import { LogItem } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { BsArrowClockwise } from 'react-icons/bs';
 
-import { API, TRPC } from '$api';
+import { API } from '$api';
 import { Log } from '$components/log';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
@@ -11,23 +10,6 @@ import styles from './index.module.scss';
 
 export const General: React.FC = observer(() => {
   const torchInfo = mainStore.info.torch;
-  const [log, setLog] = useState<LogItem[]>([]);
-  const logRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const logEl = logRef.current;
-    if (!logEl) {
-      return;
-    }
-
-    logEl.scroll({ top: logEl.scrollHeight, left: 0, behavior: 'smooth' });
-  }, []);
-
-  TRPC.instance.onBackendLog.useSubscription(undefined, {
-    onData: items => {
-      setLog(current => [...current, ...items]);
-    },
-  });
 
   return (
     <>
@@ -71,7 +53,7 @@ export const General: React.FC = observer(() => {
           </tbody>
         </table>
       )}
-      <Log items={log} />
+      <Log items={mainStore.backendLog} className={styles.log} />
     </>
   );
 });

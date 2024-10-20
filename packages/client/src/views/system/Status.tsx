@@ -8,9 +8,7 @@ import {
   BsGpuCard,
 } from 'react-icons/bs';
 
-import { Backend } from '$modals/backend';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import styles from './Status.module.scss';
 import { Utilization } from './Utilization';
 
@@ -25,9 +23,8 @@ export const Status: React.FC<Props> = observer(({ className }) => {
   return (
     <div className={clsx(styles.status, className)}>
       <div className={styles.progress}>
-        <button
-          onClick={() => modalStore.show(<Backend />)}
-          className={clsx({
+        <div
+          className={clsx(styles.backendStatus, {
             [styles.error]: status === 'error',
             [styles.waiting]: status === 'starting' || status === 'connecting',
             [styles.ready]: status === 'ready',
@@ -39,7 +36,7 @@ export const Status: React.FC<Props> = observer(({ className }) => {
           )}
           {status === 'ready' && <BsFillCheckCircleFill />}
           <span>Status: {status}</span>
-        </button>
+        </div>
       </div>
       <div className={styles.info}>
         <button

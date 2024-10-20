@@ -9,9 +9,10 @@ import styles from './index.module.scss';
 
 interface Props {
   items: LogItem[];
+  className?: string;
 }
 
-export const Log: React.FC<Props> = ({ items }) => {
+export const Log: React.FC<Props> = ({ items, className }) => {
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,11 +21,11 @@ export const Log: React.FC<Props> = ({ items }) => {
       return;
     }
 
-    logEl.scroll({ top: logEl.scrollHeight, left: 0, behavior: 'smooth' });
+    logEl.scrollTo({ top: logEl.scrollHeight, behavior: 'smooth' });
   }, [items]);
 
   return (
-    <div className={styles.logWrapper}>
+    <div className={clsx(styles.logWrapper, className)}>
       <IconButton
         className={styles.copy}
         onClick={() => {
@@ -61,11 +62,23 @@ export const Log: React.FC<Props> = ({ items }) => {
 
 interface SimpleProps {
   log: string;
+  className?: string;
 }
 
-export const LogSimple: React.FC<SimpleProps> = ({ log }) => {
+export const LogSimple: React.FC<SimpleProps> = ({ log, className }) => {
+  const logRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const logEl = logRef.current;
+    if (!logEl) {
+      return;
+    }
+
+    logEl.scrollTo({ top: logEl.scrollHeight, behavior: 'smooth' });
+  }, [log]);
+
   return (
-    <div className={styles.logWrapper}>
+    <div className={clsx(styles.logWrapper, className)}>
       <IconButton
         className={styles.copy}
         onClick={() => {
@@ -74,7 +87,9 @@ export const LogSimple: React.FC<SimpleProps> = ({ log }) => {
       >
         <BsClipboard />
       </IconButton>
-      <div className={styles.log}>{log}</div>
+      <div className={styles.log} ref={logRef}>
+        {log}
+      </div>
     </div>
   );
 };

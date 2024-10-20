@@ -11,6 +11,17 @@
     justify-content: flex-start;
   }
 
+  .backendStatus {
+    padding: 0.2rem 0rem;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-left: 0.5rem;
+    }
+  }
+
   button {
     background: transparent;
     border: none;

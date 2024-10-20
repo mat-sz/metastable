@@ -1,6 +1,7 @@
 import {
   BackendStatus,
   InstanceInfo,
+  LogItem,
   ModelType,
   UpdateInfo,
 } from '@metastable/types';
@@ -35,6 +36,7 @@ class MainStore {
     canCheckForUpdate: false,
     isAutoUpdateAvailable: false,
   };
+  backendLog: LogItem[] = [];
 
   setup = new SetupStore();
 
@@ -110,6 +112,13 @@ class MainStore {
             modalStore.show(<BackendError />);
             break;
         }
+      },
+    });
+    API.instance.onBackendLog.subscribe(undefined, {
+      onData: items => {
+        runInAction(() => {
+          this.backendLog.push(...items);
+        });
       },
     });
     window.addEventListener('beforeunload', e => {

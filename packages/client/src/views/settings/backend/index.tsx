@@ -3,6 +3,8 @@ import React from 'react';
 
 import { TabPanel } from '$components/tabs';
 import { VarCategory, VarString, VarSwitch } from '$components/var';
+import { Compatibility } from './compatibility';
+import { General } from './general';
 
 export const SettingsBackend: React.FC = observer(() => {
   return (
@@ -28,6 +30,12 @@ export const SettingsBackend: React.FC = observer(() => {
           path="comfy.extraArgs"
           defaultValue=""
         />
+      </VarCategory>
+      <VarCategory label="Status">
+        <General />
+      </VarCategory>
+      <VarCategory label="Compatibility">
+        <Compatibility />
       </VarCategory>
     </TabPanel>
   );
