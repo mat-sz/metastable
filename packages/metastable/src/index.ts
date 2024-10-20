@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { mkdir } from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
@@ -57,6 +58,7 @@ export class Metastable extends (EventEmitter as {
   project;
   model;
   vram = 0;
+  internalPath;
 
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(25);
@@ -73,6 +75,7 @@ export class Metastable extends (EventEmitter as {
     super();
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
     this.config = new Config(path.join(dataRoot, 'config.json'));
+    this.internalPath = path.join(dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
 
@@ -121,6 +124,7 @@ export class Metastable extends (EventEmitter as {
   }
 
   async init() {
+    await mkdir(this.internalPath, { recursive: true });
     this.updateVram();
     await this.reload();
   }

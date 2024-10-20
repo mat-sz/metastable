@@ -4,6 +4,7 @@ import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
+  BsEmojiSmile,
   BsFullscreen,
   BsGearWideConnected,
   BsPlugFill,
@@ -21,6 +22,7 @@ import { General } from './sections/General';
 import { Upscale } from './sections/Upscale';
 import { useSimpleProject } from '../../context';
 import { ModelArray } from '../common/ModelArray';
+import { Pulid } from './sections/Pulid';
 
 interface SettingsProps {
   showPrompt?: boolean;
@@ -54,6 +56,10 @@ export const Settings: React.FC<SettingsProps> = observer(
           />
           <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
           <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
+          {!!(
+            mainStore.isExtraFeatureEnabled('pulid') ||
+            project.settings.pulid?.enabled
+          ) && <Tab id="pulid" title="PuLID" icon={<BsEmojiSmile />} />}
         </Tabs>
         <VarUI
           className={styles.var}
@@ -123,6 +129,9 @@ export const Settings: React.FC<SettingsProps> = observer(
             </TabPanel>
             <TabPanel id="upscale">
               <Upscale />
+            </TabPanel>
+            <TabPanel id="pulid">
+              <Pulid />
             </TabPanel>
           </div>
         </VarUI>

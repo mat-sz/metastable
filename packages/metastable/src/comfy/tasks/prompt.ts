@@ -183,6 +183,27 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
+    if (settings.pulid?.enabled) {
+      if (!settings.pulid.name || !settings.pulid.image) {
+        settings.pulid.enabled = false;
+      } else {
+        const isPulidEnabled = await this.metastable.extra.isEnabled('pulid');
+        if (!isPulidEnabled) {
+          throw new Error('PuLID feature is not enabled/installed.');
+        }
+
+        if (!settings.pulid.path) {
+          const model = await this.metastable.model.get(
+            ModelType.IPADAPTER,
+            settings.pulid.name!,
+          );
+          settings.pulid.path = model.path;
+        }
+
+        settings.pulid.strength ??= 1;
+      }
+    }
+
     return { projectId: this.project.id };
   }
 
@@ -272,6 +293,12 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     throw new Error('Unable to load input');
   }
 
+  private async loadInputRaw(url: string) {
+    const buffer = await this.inputAsBuffer(url);
+
+    return await this.session!.image.load(bufferToRpcBytes(buffer));
+  }
+
   private async prepareImage(url: string, fit?: keyof FitEnum) {
     const buffer = await this.inputAsBuffer(url);
     const image = sharp(buffer);
@@ -308,7 +335,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     mode?: ProjectImageMode,
     maskUrl?: string,
   ) {
-    const fit = SHARP_FIT_MAP[mode!] || 'stretch';
+    const fit = SHARP_FIT_MAP[mode!] || 'fill';
     const image = await this.prepareImage(url, fit);
 
     if (maskUrl) {
@@ -408,6 +435,23 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
             );
           }
         }
+      }
+
+      if (settings.pulid) {
+        this.step('pulid');
+        const pulid = await ctx.pulid.load(settings.pulid.path!);
+        const insightface = await ctx.pulid.loadInsightface(
+          path.join(this.metastable.internalPath),
+        );
+        const evaClip = await ctx.pulid.loadEvaClip();
+        const { image } = await this.loadInputRaw(settings.pulid.image!);
+        await pulid.applyTo(
+          checkpoint,
+          evaClip,
+          insightface,
+          image,
+          settings.pulid.strength,
+        );
       }
 
       const isCircular = !!settings.sampler.tiling;

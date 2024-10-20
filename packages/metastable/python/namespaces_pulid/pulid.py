@@ -3,12 +3,14 @@ from torch import nn
 import torchvision.transforms as T
 import torch.nn.functional as F
 import math
+import os
 import comfy.utils
 from insightface.app import FaceAnalysis
 from facexlib.parsing import init_parsing_model
 from facexlib.utils.face_restoration_helper import FaceRestoreHelper
 from comfy.ldm.modules.attention import optimized_attention
 from rpc import RPC
+from huggingface_hub import snapshot_download
 
 from .eva_clip.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 
@@ -195,18 +197,19 @@ class PulidNamespace:
             model = st_model
         
         # Also initialize the model, takes longer to load but then it doesn't have to be done every time you change parameters in the apply node
-        model = PulidModel(model)
+        return PulidModel(model)
 
     @RPC.autoref
     @RPC.method("load_insightface")
     def load_insightface(root):
+        snapshot_download('DIAMONIK7777/antelopev2', local_dir=os.path.join(root, 'models', 'antelopev2'))
         # "provider": (["CPU", "CUDA", "ROCM", "CoreML"], ),
         model = FaceAnalysis(name="antelopev2", root=root, providers=["CUDA" + 'ExecutionProvider',]) # alternative to buffalo_l
         model.prepare(ctx_id=0, det_size=(640, 640))
         return model
 
     @RPC.autoref
-    @RPC.method("load_insightface")
+    @RPC.method("load_eva_clip")
     def load_eva_clip():
         from .eva_clip.factory import create_model_and_transforms
 
@@ -224,7 +227,7 @@ class PulidNamespace:
     
     @RPC.autoref
     @RPC.method("apply")
-    def apply(model, pulid, eva_clip, face_analysis, image, projection="ortho_v2", weight=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0):
+    def apply(model, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
         work_model = model.clone()
         
         device = comfy.model_management.get_torch_device()
@@ -361,7 +364,7 @@ class PulidNamespace:
 
         patch_kwargs = {
             "pulid": pulid_model,
-            "weight": weight,
+            "weight": strength,
             "cond": cond,
             "uncond": uncond,
             "sigma_start": sigma_start,
@@ -389,4 +392,4 @@ class PulidNamespace:
             set_model_patch_replace(work_model, patch_kwargs, ("middle", 1, index))
             number += 1
 
-        return (work_model,)
+        return work_model

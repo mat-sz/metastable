@@ -10,6 +10,7 @@ import {
   ComfyIPAdapter,
   ComfyLatent,
   ComfyLORA,
+  ComfyPulid,
   ComfyUpscaleModel,
 } from './models.js';
 import {
@@ -185,6 +186,27 @@ class ComfySessionTag {
   }
 }
 
+class ComfySessionPulid {
+  constructor(private session: ComfySession) {}
+
+  async load(path: string) {
+    const data = (await this.session.invoke('pulid:load', {
+      path,
+    })) as RPCRef;
+    return new ComfyPulid(this.session, data);
+  }
+
+  async loadEvaClip() {
+    return (await this.session.invoke('pulid:load_eva_clip')) as RPCRef;
+  }
+
+  async loadInsightface(root: string) {
+    return (await this.session.invoke('pulid:load_insightface', {
+      root,
+    })) as RPCRef;
+  }
+}
+
 export class ComfySession extends (EventEmitter as {
   new (): TypedEventEmitter<ComfySessionEvents>;
 }) {
@@ -196,6 +218,7 @@ export class ComfySession extends (EventEmitter as {
   upscale = new ComfySessionUpscale(this);
   image = new ComfySessionImage(this);
   tag = new ComfySessionTag(this);
+  pulid = new ComfySessionPulid(this);
 
   constructor(
     private comfy: Comfy,

@@ -562,6 +562,16 @@ export class SimpleProject extends BaseProject<
         }
       }
     }
+
+    if (this.settings.pulid?.image) {
+      const url = await this.handleImage(
+        ProjectFileType.INPUT,
+        this.settings.pulid.image,
+      );
+      runInAction(() => {
+        this.settings.pulid!.image = url;
+      });
+    }
   }
 
   async save(name?: string, draft?: boolean, auto = false) {

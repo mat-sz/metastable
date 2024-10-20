@@ -23,6 +23,7 @@ const STEP_MAP: Record<string, string> = {
   sample: 'Sampling...',
   upscale: 'Upscaling...',
   save: 'Saving...',
+  pulid: 'Loading PuLID...',
 };
 
 const GenerationProgress = observer(() => {
