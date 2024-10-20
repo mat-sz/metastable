@@ -11,6 +11,7 @@ import {
   GraphicsControllerUtilization,
 } from '../types.js';
 import * as util from '../util.js';
+import { normalizeBusAddress } from './helpers.js';
 
 let _nvidiaSmiPath: string | undefined = undefined;
 let _nvidiaSmiRetry = true;
@@ -136,8 +137,9 @@ export async function nvidiaDevices(): Promise<GraphicsControllerData[]> {
     return {
       subDeviceId: gpu['pci.sub_device_id'],
       name: gpu['name'],
+      model: gpu['name'],
       vendor: 'NVIDIA',
-      pciBus: gpu['pci.bus_id'],
+      busAddress: normalizeBusAddress(gpu['pci.bus_id']),
       memoryTotal: vram,
       memoryUsed: parseMemory(gpu['memory.used']),
       utilizationGpu: parseNumber(gpu['utilization.gpu']),

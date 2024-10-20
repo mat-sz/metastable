@@ -1,15 +1,29 @@
 import { shell } from '../../helpers/spawn.js';
 import { GraphicsControllerData } from '../types.js';
 import { rocmDevices } from './amd.js';
+import { normalizeBusAddress } from './helpers.js';
 import { nvidiaDevices } from './nvidia.js';
 
 async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
-  const controllers = [];
+  const controllers: GraphicsControllerData[] = [];
   let currentController: GraphicsControllerData = {
     vram: 0,
     vramDynamic: false,
   };
   let isGraphicsController = false;
+
+  function maybePush() {
+    if (currentController.busAddress) {
+      currentController.busAddress = normalizeBusAddress(
+        currentController.busAddress,
+      );
+      controllers.push(currentController);
+      currentController = {
+        vram: 0,
+        vramDynamic: false,
+      };
+    }
+  }
   // PCI bus IDs
   let pciIDs: string[] = [];
   try {
@@ -51,20 +65,7 @@ async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
           if (_3dcontrollerpos !== -1 && vgapos === -1) {
             vgapos = _3dcontrollerpos;
           }
-          if (
-            currentController.vendor ||
-            currentController.model ||
-            currentController.bus ||
-            typeof currentController.vram !== 'undefined' ||
-            currentController.vramDynamic
-          ) {
-            // already a controller found
-            controllers.push(currentController);
-            currentController = {
-              vram: 0,
-              vramDynamic: false,
-            };
-          }
+          maybePush();
 
           const pciIDCandidate = line.split(' ')[0];
           if (/[\da-fA-F]{2}:[\da-fA-F]{2}\.[\da-fA-F]/.test(pciIDCandidate)) {
@@ -170,24 +171,12 @@ async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
     i++;
   });
 
-  if (
-    currentController.vendor ||
-    currentController.model ||
-    currentController.bus ||
-    currentController.busAddress ||
-    typeof currentController.vram !== 'undefined' ||
-    currentController.vramDynamic
-  ) {
-    // already a controller found
-    controllers.push(currentController);
-  }
+  maybePush();
   return controllers;
 }
 
-function parseLinesLinuxClinfo(
-  controllers: GraphicsControllerData[],
-  lines: string[],
-) {
+function parseLinesLinuxClinfo(lines: string[]) {
+  const controllers: GraphicsControllerData[] = [];
   const fieldPattern = /\[([^\]]+)\]\s+(\w+)\s+(.*)/;
   const devices = lines.reduce(
     (devices, line) => {
@@ -227,17 +216,11 @@ function parseLinesLinuxClinfo(
         }
       }
       if (busAddress) {
-        let controller = controllers.find(
-          controller => controller.busAddress === busAddress,
-        );
-        if (!controller) {
-          controller = {
-            busAddress,
-            vram: 0,
-            vramDynamic: false,
-          };
-          controllers.push(controller);
-        }
+        const controller: GraphicsControllerData = {
+          busAddress: normalizeBusAddress(busAddress),
+          vram: 0,
+          vramDynamic: false,
+        };
         controller.vendor = device['CL_DEVICE_VENDOR'];
         if (device['CL_DEVICE_BOARD_NAME_AMD']) {
           controller.model = device['CL_DEVICE_BOARD_NAME_AMD'];
@@ -248,6 +231,7 @@ function parseLinesLinuxClinfo(
         if (!isNaN(memory)) {
           controller.vram = memory;
         }
+        controllers.push(controller);
       }
     }
   }
@@ -256,14 +240,14 @@ function parseLinesLinuxClinfo(
 
 export async function gpuLinux() {
   let controllers: GraphicsControllerData[] = [];
-  const smiData: GraphicsControllerData[] = [];
+  const otherData: GraphicsControllerData[] = [];
 
   try {
-    smiData.push(...(await nvidiaDevices()));
+    otherData.push(...(await nvidiaDevices()));
   } catch {}
 
   try {
-    smiData.push(...(await rocmDevices()));
+    otherData.push(...(await rocmDevices()));
   } catch {}
 
   try {
@@ -272,11 +256,17 @@ export async function gpuLinux() {
     controllers.push(...(await parseLines(lines)));
   } catch {}
 
+  try {
+    const clinfoOut = await shell('clinfo --raw');
+    const lines = clinfoOut.toString().split('\n');
+    otherData.push(...parseLinesLinuxClinfo(lines));
+  } catch {}
+
   controllers = controllers.map(controller => {
-    const smiController = smiData.find(smiController =>
-      smiController
-        .pciBus!.toLowerCase()
-        .endsWith(controller.busAddress!.toLowerCase()),
+    const smiController = otherData.find(
+      smiController =>
+        controller.busAddress &&
+        controller.busAddress === smiController.busAddress,
     );
 
     return {
@@ -286,26 +276,19 @@ export async function gpuLinux() {
   });
 
   // Container GPUs won't be present in controllers.
-  for (const smiController of smiData) {
+  for (const smiController of otherData) {
     if (
-      !controllers.find(controller =>
-        smiController
-          .pciBus!.toLowerCase()
-          .endsWith(controller.busAddress!.toLowerCase()),
+      !controllers.find(
+        controller =>
+          controller.busAddress &&
+          controller.busAddress === smiController.busAddress,
       )
     ) {
       controllers.push({
-        model: smiController.name,
         ...smiController,
       });
     }
   }
-
-  try {
-    const clinfoOut = await shell('clinfo --raw');
-    const lines = clinfoOut.toString().split('\n');
-    controllers = parseLinesLinuxClinfo(controllers, lines);
-  } catch {}
 
   return controllers;
 }

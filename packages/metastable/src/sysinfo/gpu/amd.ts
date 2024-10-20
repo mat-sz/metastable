@@ -9,6 +9,7 @@ import {
   GraphicsControllerData,
   GraphicsControllerUtilization,
 } from '../types.js';
+import { normalizeBusAddress } from './helpers.js';
 
 let _rocmSmiPath: string | undefined = undefined;
 let _rocmSmiRetry = true;
@@ -137,8 +138,9 @@ export async function rocmDevices(): Promise<GraphicsControllerData[]> {
     return {
       subDeviceId: gpu['Device ID'],
       name: gpu['Card model'],
+      model: gpu['Card model'],
       vendor: gpu['Card vendor'],
-      pciBus: gpu['PCI Bus'],
+      busAddress: normalizeBusAddress(gpu['PCI Bus']),
       memoryTotal: vram,
       memoryUsed: vramUsed,
       utilizationGpu: parseNumber(gpu['GPU use (%)']),
