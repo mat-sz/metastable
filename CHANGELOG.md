@@ -7,6 +7,7 @@
 ## Bug fixes
 
 - Resolved issues with non-square image generation previews.
+- Fixed usage of TAESD decoder for previews.
 
 # 0.0.9 (2024-10-17)
 
