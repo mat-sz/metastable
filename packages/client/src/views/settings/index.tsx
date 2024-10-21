@@ -17,7 +17,7 @@ import { mainStore } from '$stores/MainStore';
 import { SettingsAbout } from './about';
 import { SettingsBackend } from './backend';
 import { SettingsDownloads } from './downloads';
-import { SettingsExtraFeatures } from './extraFeatures';
+import { SettingsFeatures } from './features';
 import { SettingsGeneral } from './general';
 import { SettingsHotkeys } from './hotkeys';
 import styles from './index.module.scss';
@@ -48,11 +48,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
-          <Tab
-            id="extraFeatures"
-            title="Extra features"
-            icon={<BsPatchPlus />}
-          />
+          <Tab id="features" title="Optional features" icon={<BsPatchPlus />} />
           <Tab
             id="about"
             title={`About ${__APP_NAME__}`}
@@ -66,7 +62,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsDownloads />
             <SettingsStyles />
             <SettingsHotkeys />
-            <SettingsExtraFeatures />
+            <SettingsFeatures />
             <SettingsAbout />
           </div>
         </TabContent>

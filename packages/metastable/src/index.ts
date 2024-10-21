@@ -24,7 +24,8 @@ import { Config } from './config/index.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectRepository } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
-import { ExtraFeatureManager } from './extra/index.js';
+import { FeaturePython } from './feature/base.js';
+import { FeatureManager } from './feature/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
 import { resolveConfigPath, rmdir } from './helpers/fs.js';
@@ -53,7 +54,7 @@ export class Metastable extends (EventEmitter as {
   comfy?: Comfy;
   setup = new Setup(this);
   tasks = new Tasks();
-  extra = new ExtraFeatureManager(this);
+  feature = new FeatureManager(this);
   kohya?: Kohya;
   project;
   model;
@@ -62,6 +63,8 @@ export class Metastable extends (EventEmitter as {
 
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(25);
+  enabledFeatures: string[] = [];
+  enabledNamespaceGroups: string[] = [];
 
   constructor(
     public readonly dataRoot: string,
@@ -217,6 +220,21 @@ export class Metastable extends (EventEmitter as {
     }
   }
 
+  async refreshFeatures() {
+    const features = this.feature.availableFeatures;
+    for (const feature of features) {
+      if (!(await feature.isEnabled())) {
+        continue;
+      }
+
+      this.enabledFeatures.push(feature.id);
+
+      if (feature instanceof FeaturePython && feature.pythonNamespaceGroup) {
+        this.enabledNamespaceGroups.push(feature.pythonNamespaceGroup);
+      }
+    }
+  }
+
   async restartComfy() {
     this.stopComfy();
 
@@ -259,11 +277,9 @@ export class Metastable extends (EventEmitter as {
       }
     }
 
-    const features = await this.extra.all();
-    for (const feature of features) {
-      if (feature.enabled && feature.namespace) {
-        args.push('--namespace', feature.namespace);
-      }
+    await this.refreshFeatures();
+    for (const group of this.enabledNamespaceGroups) {
+      args.push('--namespace', group);
     }
 
     this.setStatus('starting');

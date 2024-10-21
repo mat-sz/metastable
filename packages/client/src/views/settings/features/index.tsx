@@ -11,18 +11,18 @@ import { VarToggle } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
-export const SettingsExtraFeatures: React.FC = observer(() => {
+export const SettingsFeatures: React.FC = observer(() => {
   const bundleVersion = mainStore.config.data?.python.bundleVersion || '0.0.0';
   const available = semverGte(bundleVersion, '0.1.3');
-  const extraFeatures = available ? mainStore.info.extraFeatures : [];
+  const features = available ? mainStore.info.features : [];
 
   return (
-    <TabPanel id="extraFeatures">
-      <h2>Extra features</h2>
+    <TabPanel id="features">
+      <h2>Optional features</h2>
       {!available && (
         <Alert variant="warning">
           <div>
-            Extra features require a bundle version greater or equal to 0.1.3.
+            Adding features requires a bundle version greater or equal to 0.1.3.
           </div>
           <div>Current bundle version: {bundleVersion}</div>
           <div>
@@ -31,10 +31,11 @@ export const SettingsExtraFeatures: React.FC = observer(() => {
           </div>
         </Alert>
       )}
-      {extraFeatures.map(feature => {
+      {features.map(feature => {
         const task = mainStore.tasks.queues.settings.find(
           task =>
-            task.type === 'extra.install' && task.data.featureId === feature.id,
+            task.type === 'feature.install' &&
+            task.data.featureId === feature.id,
         );
         return (
           <div key={feature.id} className={styles.feature}>
@@ -51,7 +52,9 @@ export const SettingsExtraFeatures: React.FC = observer(() => {
               ) : (
                 <button
                   onClick={() =>
-                    API.instance.installExtra.mutate({ featureId: feature.id })
+                    API.instance.installFeature.mutate({
+                      featureId: feature.id,
+                    })
                   }
                 >
                   Install

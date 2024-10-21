@@ -157,7 +157,7 @@ export const router = t.router({
         ...info,
         vram,
         dataRoot: metastable.dataRoot,
-        extraFeatures: await metastable.extra.all(),
+        features: await metastable.feature.all(),
       };
     }),
     updateInfo: t.procedure.query(
@@ -186,10 +186,10 @@ export const router = t.router({
         } as UpdateInfo;
       },
     ),
-    installExtra: t.procedure
+    installFeature: t.procedure
       .input(z.object({ featureId: z.string() }))
       .mutation(async ({ ctx: { metastable }, input: { featureId } }) => {
-        metastable.extra.install(featureId);
+        metastable.feature.install(featureId);
       }),
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();

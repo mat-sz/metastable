@@ -187,7 +187,8 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       if (!settings.pulid.name || !settings.pulid.image) {
         settings.pulid.enabled = false;
       } else {
-        const isPulidEnabled = await this.metastable.extra.isEnabled('pulid');
+        const isPulidEnabled =
+          this.metastable.enabledFeatures.includes('pulid');
         if (!isPulidEnabled) {
           throw new Error('PuLID feature is not enabled/installed.');
         }

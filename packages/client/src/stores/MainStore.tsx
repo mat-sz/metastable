@@ -30,7 +30,7 @@ class MainStore {
     schedulers: [],
     vram: 0,
     dataRoot: '/',
-    extraFeatures: [],
+    features: [],
   };
   updateInfo: UpdateInfo = {
     canCheckForUpdate: false,
@@ -291,8 +291,8 @@ class MainStore {
     return model?.file.name;
   }
 
-  isExtraFeatureEnabled(featureId: string) {
-    const feature = this.info.extraFeatures.find(
+  isFeatureEnabled(featureId: string) {
+    const feature = this.info.features.find(
       feature => feature.id === featureId,
     );
     if (!feature) {

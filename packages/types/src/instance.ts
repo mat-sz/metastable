@@ -1,4 +1,5 @@
 import { ComfyTorchInfo } from './comfy.js';
+import { Feature } from './feature.js';
 import { Architecture } from './model.js';
 
 export interface PromptStyle {
@@ -21,7 +22,7 @@ export interface InstanceInfo {
   torch?: ComfyTorchInfo;
   vram: number;
   dataRoot: string;
-  extraFeatures: ExtraFeature[];
+  features: Feature[];
 }
 
 export interface UpdateInfo {
@@ -92,14 +93,4 @@ export interface LogItem {
   timestamp: number;
   type: string;
   text: string;
-}
-
-export interface ExtraFeature {
-  id: string;
-  name: string;
-  description?: string;
-  pythonPackages?: { name: string; extra?: string }[];
-  namespace?: string;
-  installed: boolean;
-  enabled: boolean;
 }

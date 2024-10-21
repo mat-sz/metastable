@@ -11,6 +11,7 @@
 ## Bug fixes
 
 - Resolved issues with non-square image generation previews.
+- Resolved issues with GPU detection on Linux.
 - Fixed usage of TAESD decoder for previews.
 
 # 0.0.9 (2024-10-17)

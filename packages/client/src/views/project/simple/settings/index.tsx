@@ -57,7 +57,7 @@ export const Settings: React.FC<SettingsProps> = observer(
           <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
           <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
           {!!(
-            mainStore.isExtraFeatureEnabled('pulid') ||
+            mainStore.isFeatureEnabled('pulid') ||
             project.settings.pulid?.enabled
           ) && <Tab id="pulid" title="PuLID" icon={<BsEmojiSmile />} />}
         </Tabs>
