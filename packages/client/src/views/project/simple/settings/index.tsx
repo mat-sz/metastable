@@ -1,4 +1,4 @@
-import { ModelType } from '@metastable/types';
+import { ModelType, ProjectType } from '@metastable/types';
 import clsx from 'clsx';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -17,12 +17,12 @@ import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
 import { VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
+import { SettingsField } from './Field';
 import styles from './index.module.scss';
 import { General } from './sections/General';
 import { Upscale } from './sections/Upscale';
 import { useSimpleProject } from '../../context';
 import { ModelArray } from '../common/ModelArray';
-import { Pulid } from './sections/Pulid';
 
 interface SettingsProps {
   showPrompt?: boolean;
@@ -39,6 +39,7 @@ export const Settings: React.FC<SettingsProps> = observer(
       validationResult.errors.length || validationResult.warnings.length
     );
     const memoryUsage = project.memoryUsage;
+    const sections = mainStore.projectFields[ProjectType.SIMPLE];
 
     return (
       <TabView
@@ -56,10 +57,14 @@ export const Settings: React.FC<SettingsProps> = observer(
           />
           <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
           <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
-          {!!(
-            mainStore.isFeatureEnabled('pulid') ||
-            project.settings.pulid?.enabled
-          ) && <Tab id="pulid" title="PuLID" icon={<BsEmojiSmile />} />}
+          {Object.entries(sections).map(([key, section]) => (
+            <Tab
+              id={key}
+              key={key}
+              title={section.label}
+              icon={<BsEmojiSmile />}
+            />
+          ))}
         </Tabs>
         <VarUI
           className={styles.var}
@@ -130,9 +135,11 @@ export const Settings: React.FC<SettingsProps> = observer(
             <TabPanel id="upscale">
               <Upscale />
             </TabPanel>
-            <TabPanel id="pulid">
-              <Pulid />
-            </TabPanel>
+            {Object.entries(sections).map(([key, section]) => (
+              <TabPanel id={key} key={key}>
+                <SettingsField id={key} field={section} isRoot />
+              </TabPanel>
+            ))}
           </div>
         </VarUI>
       </TabView>

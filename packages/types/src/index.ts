@@ -1,6 +1,7 @@
 export * from './comfy.js';
 export * from './download.js';
 export * from './feature.js';
+export * from './field.js';
 export * from './file.js';
 export * from './instance.js';
 export * from './model.js';

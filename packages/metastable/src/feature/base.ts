@@ -1,4 +1,4 @@
-import { Feature } from '@metastable/types';
+import { Feature, FeatureProjectFields } from '@metastable/types';
 
 import { Metastable } from '../index.js';
 
@@ -6,6 +6,7 @@ export interface FeatureInstance {
   readonly id: string;
   readonly name: string;
   readonly description: string | undefined;
+  readonly projectFields: FeatureProjectFields;
 
   install(onLog?: (data: string) => void): Promise<void>;
   isInstalled(): Promise<boolean>;
@@ -17,6 +18,7 @@ export class FeatureBase implements FeatureInstance {
   readonly id: string = '';
   readonly name: string = '';
   readonly description: string | undefined;
+  readonly projectFields: FeatureProjectFields;
 
   constructor(protected metastable: Metastable) {}
 
@@ -35,6 +37,7 @@ export class FeatureBase implements FeatureInstance {
       id: this.id,
       name: this.name,
       description: this.description,
+      projectFields: this.projectFields,
       enabled: await this.isEnabled(),
       installed: await this.isInstalled(),
     };

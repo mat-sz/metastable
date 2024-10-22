@@ -1,8 +1,10 @@
 import {
   BackendStatus,
+  Field,
   InstanceInfo,
   LogItem,
   ModelType,
+  ProjectType,
   UpdateInfo,
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -169,6 +171,27 @@ class MainStore {
     return this.projects.current;
   }
 
+  get projectFields() {
+    const result: Record<ProjectType, Record<string, Field>> = {} as any;
+
+    for (const projectType of Object.values(ProjectType)) {
+      result[projectType] = {};
+    }
+
+    for (const feature of this.info.features) {
+      for (const projectType of Object.values(ProjectType)) {
+        const fields = feature.projectFields?.[projectType];
+        if (fields) {
+          for (const [key, value] of Object.entries(fields)) {
+            result[projectType][key] = value;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   get hotkeys() {
     const overrides = this.config.data?.app?.hotkeys;
     const hotkeys = { ...defaultHotkeys };
@@ -282,6 +305,14 @@ class MainStore {
     return !!model;
   }
 
+  get enabledFeatures() {
+    const featureIds: string[] = [];
+    for (const feature of this.info.features) {
+      featureIds.push(feature.id);
+    }
+    return featureIds;
+  }
+
   openModelManager() {
     this.view = 'models';
   }
@@ -289,17 +320,6 @@ class MainStore {
   defaultModelName(type: ModelType) {
     const model = modelStore.defaultModel(type);
     return model?.file.name;
-  }
-
-  isFeatureEnabled(featureId: string) {
-    const feature = this.info.features.find(
-      feature => feature.id === featureId,
-    );
-    if (!feature) {
-      return false;
-    }
-
-    return feature.enabled;
   }
 
   get searchFn() {

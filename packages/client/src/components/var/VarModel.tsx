@@ -11,7 +11,7 @@ import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarModel.module.scss';
 
-interface IVarModelProps extends IVarBaseInputProps<string> {
+export interface IVarModelProps extends IVarBaseInputProps<string> {
   modelType: ModelType;
   architecture?: Architecture;
   onSelect?: (modelData: Model) => void;
