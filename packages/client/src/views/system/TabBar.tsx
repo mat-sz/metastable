@@ -1,4 +1,4 @@
-import { TaskState } from '@metastable/types';
+import { ProjectType, TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -243,7 +243,9 @@ export const TabBar: React.FC = observer(() => {
         ))}
       </div>
       <BaseTab
-        onClick={() => mainStore.projects.create(undefined, 'simple', true)}
+        onClick={() =>
+          mainStore.projects.create(undefined, ProjectType.SIMPLE, true)
+        }
       >
         <BsPlusLg />
       </BaseTab>

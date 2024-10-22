@@ -4,6 +4,7 @@ import {
   Model,
   ModelType,
   ProjectFileType,
+  ProjectType,
   SetupStatus,
   TaskCreateEvent,
   TaskDeleteEvent,
@@ -320,7 +321,7 @@ export const router = t.router({
       .input(
         z.object({
           name: z.string(),
-          type: z.string(),
+          type: z.nativeEnum(ProjectType),
           settings: z.any(),
           draft: z.boolean().optional(),
         }),
@@ -350,7 +351,7 @@ export const router = t.router({
         z.object({
           projectId: z.string(),
           name: z.string().optional(),
-          type: z.string().optional(),
+          type: z.nativeEnum(ProjectType).optional(),
           settings: z.any().optional(),
           ui: z.any().optional(),
           draft: z.boolean().optional(),

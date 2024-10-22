@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { MRN } from '@metastable/common';
-import { Project, ProjectFileType } from '@metastable/types';
+import { Project, ProjectFileType, ProjectType } from '@metastable/types';
 import chokidar from 'chokidar';
 import { nanoid } from 'nanoid';
 
@@ -48,7 +48,7 @@ export class ProjectImageEntity extends ImageEntity {
 export class ProjectEntity extends DirectoryEntity {
   static readonly isDirectory = true;
 
-  metadata = new Metadata<{ id: string; type?: string; draft?: boolean }>(
+  metadata = new Metadata<{ id: string; type?: ProjectType; draft?: boolean }>(
     path.join(this._path, 'project.json'),
   );
   settings = new Metadata(path.join(this._path, 'settings.json'));
@@ -111,7 +111,7 @@ export class ProjectEntity extends DirectoryEntity {
     const lastOutput = outputs[outputs.length - 1];
 
     const json: Project = {
-      type: 'simple',
+      type: ProjectType.SIMPLE,
       ...this.metadata.json!,
       name: this.name,
       lastOutput: await lastOutput?.json(),

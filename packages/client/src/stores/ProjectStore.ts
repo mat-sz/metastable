@@ -1,4 +1,4 @@
-import { Project as APIProject } from '@metastable/types';
+import { Project as APIProject, ProjectType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
@@ -95,7 +95,7 @@ export class ProjectStore {
 
   async create(
     name: string = 'Untitled',
-    type = 'simple',
+    type: ProjectType = ProjectType.SIMPLE,
     draft = false,
     settings: any = defaultSettings(),
   ) {

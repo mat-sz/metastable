@@ -1,3 +1,4 @@
+import { ProjectType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -15,8 +16,8 @@ export const Project: React.FC = observer(() => {
 
   return (
     <ProjectContext.Provider value={project}>
-      {project.type === 'simple' && <SimpleProjectView />}
-      {project.type === 'training' && <TrainingProjectView />}
+      {project.type === ProjectType.SIMPLE && <SimpleProjectView />}
+      {project.type === ProjectType.TRAINING && <TrainingProjectView />}
     </ProjectContext.Provider>
   );
 });

@@ -148,13 +148,15 @@ export interface ProjectTaggingSettings {
   };
 }
 
-export interface ProjectInfo {
-  type: string;
+export enum ProjectType {
+  SIMPLE = 'simple',
+  TRAINING = 'training',
 }
 
-export interface Project extends ProjectInfo {
+export interface Project {
   id: string;
   name: string;
+  type: ProjectType;
   settings?: any;
   ui?: any;
   lastOutput?: ProjectImageFile;
