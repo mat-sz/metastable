@@ -77,3 +77,25 @@ export type Field =
   | FieldImage
   | FieldCategory
   | FieldArray;
+
+type FieldCategoryPropertiesToType<TField extends FieldCategory> = {
+  [K in keyof TField['properties']]: FieldToType<TField['properties'][K]>;
+};
+
+type FieldCategoryToType<TField extends FieldCategory> =
+  TField['enabledKey'] extends string
+    ?
+        | (Record<TField['enabledKey'], true> &
+            FieldCategoryPropertiesToType<TField>)
+        | Record<TField['enabledKey'], false>
+    : FieldCategoryPropertiesToType<TField>;
+
+export type FieldToType<TField extends Field> = TField extends FieldNumber
+  ? number
+  : TField['type'] extends FieldType.IMAGE | FieldType.MODEL
+    ? string
+    : TField extends FieldArray
+      ? FieldToType<TField['items']>[]
+      : TField extends FieldCategory
+        ? FieldCategoryToType<TField>
+        : undefined;

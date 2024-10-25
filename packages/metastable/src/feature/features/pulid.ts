@@ -1,5 +1,6 @@
 import {
   FeatureProjectFields,
+  FieldToType,
   FieldType,
   ModelType,
   ProjectType,
@@ -36,6 +37,32 @@ class ComfyPulid {
   }
 }
 
+const pulidField = {
+  type: FieldType.CATEGORY,
+  label: 'PuLID',
+  enabledKey: 'enabled',
+  properties: {
+    name: {
+      type: FieldType.MODEL,
+      modelType: ModelType.IPADAPTER,
+      label: 'Model',
+    },
+    strength: {
+      type: FieldType.FLOAT,
+      label: 'Strength',
+      min: 0,
+      max: 1,
+      step: 0.01,
+      defaultValue: 1,
+    },
+    image: {
+      type: FieldType.IMAGE,
+      label: 'Image',
+    },
+  },
+} as const;
+
+type PulidFieldType = FieldToType<typeof pulidField>;
 export class FeaturePulid extends FeaturePython {
   readonly id = 'pulid';
   readonly name = 'pulid';
@@ -51,30 +78,7 @@ export class FeaturePulid extends FeaturePython {
   readonly pythonNamespaceGroup = 'pulid';
   readonly projectFields: FeatureProjectFields = {
     [ProjectType.SIMPLE]: {
-      pulid: {
-        type: FieldType.CATEGORY,
-        label: 'PuLID',
-        enabledKey: 'enabled',
-        properties: {
-          name: {
-            type: FieldType.MODEL,
-            modelType: ModelType.IPADAPTER,
-            label: 'Model',
-          },
-          strength: {
-            type: FieldType.FLOAT,
-            label: 'Strength',
-            min: 0,
-            max: 1,
-            step: 0.01,
-            defaultValue: 1,
-          },
-          image: {
-            type: FieldType.IMAGE,
-            label: 'Image',
-          },
-        },
-      },
+      pulid: pulidField,
     },
   };
 
@@ -97,18 +101,12 @@ export class FeaturePulid extends FeaturePython {
 
   async onAfterConditioning(task: PromptTask) {
     const { settings, checkpoint, session } = task;
-    const pulidSettings = (settings as any).pulid as {
-      enabled: boolean;
-      name?: string;
-      path?: string;
-      image?: string;
-      strength?: number;
-    };
+    const pulidSettings = (settings as any).pulid as PulidFieldType;
     if (!pulidSettings?.enabled || !session || !checkpoint) {
       return;
     }
 
-    const pulid = await this.load(session, pulidSettings.path!);
+    const pulid = await this.load(session, (pulidSettings as any).path!);
     const insightface = await this.loadInsightface(
       session,
       this.metastable.internalPath,
