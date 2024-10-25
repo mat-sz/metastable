@@ -5,7 +5,6 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   BsEmojiSmile,
-  BsFullscreen,
   BsGearWideConnected,
   BsPlugFill,
   BsRecordCircle,
@@ -20,7 +19,6 @@ import { filesize } from '$utils/file';
 import { SettingsField } from './Field';
 import styles from './index.module.scss';
 import { General } from './sections/General';
-import { Upscale } from './sections/Upscale';
 import { useSimpleProject } from '../../context';
 import { ModelArray } from '../common/ModelArray';
 
@@ -56,7 +54,6 @@ export const Settings: React.FC<SettingsProps> = observer(
             icon={<BsGearWideConnected />}
           />
           <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
-          <Tab id="upscale" title="Upscale" icon={<BsFullscreen />} />
           {Object.entries(sections).map(([key, section]) => (
             <Tab
               id={key}
@@ -131,9 +128,6 @@ export const Settings: React.FC<SettingsProps> = observer(
                 strengthMin={0}
                 strengthMax={1}
               />
-            </TabPanel>
-            <TabPanel id="upscale">
-              <Upscale />
             </TabPanel>
             {Object.entries(sections).map(([key, section]) => (
               <TabPanel id={key} key={key}>

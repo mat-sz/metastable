@@ -127,8 +127,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       true,
     );
 
-    await this.setModelPath(ModelType.UPSCALE_MODEL, settings.upscale);
-
     if (settings.models.ipadapter) {
       for (const modelSettings of settings.models.ipadapter) {
         if (

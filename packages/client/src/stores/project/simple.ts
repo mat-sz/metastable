@@ -377,13 +377,6 @@ export class SimpleProject extends BaseProject<
       }
     }
 
-    if (settings.upscale?.enabled && settings.upscale?.name) {
-      totalVram += modelStore.size(
-        ModelType.UPSCALE_MODEL,
-        settings.upscale.name,
-      );
-    }
-
     return totalVram;
   }
 
