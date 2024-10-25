@@ -1,14 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { preprocessPrompt } from '@metastable/common';
+import {
+  mapProjectFields,
+  preprocessPrompt,
+  recurseFields,
+} from '@metastable/common';
 import {
   Architecture,
+  Feature,
+  FieldType,
   ModelType,
   ProjectImageFile,
   ProjectImageMode,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
+  ProjectType,
   TaskState,
 } from '@metastable/types';
 import PNG from 'meta-png';
@@ -32,6 +39,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private storeMetadata = false;
   private session?: ComfySession;
   private checkpointConfigPath?: string;
+  private features: Feature[] = [];
 
   constructor(
     private metastable: Metastable,
@@ -88,6 +96,8 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   }
 
   async init() {
+    this.features = await this.metastable.feature.all();
+
     const settings = this.settings;
 
     if (settings.input.type !== 'none' && !settings.input.image) {
@@ -183,27 +193,32 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
-    if (settings.pulid?.enabled) {
-      if (!settings.pulid.name || !settings.pulid.image) {
-        settings.pulid.enabled = false;
-      } else {
-        const isPulidEnabled =
-          this.metastable.enabledFeatures.includes('pulid');
-        if (!isPulidEnabled) {
-          throw new Error('PuLID feature is not enabled/installed.');
-        }
+    const promises: Promise<void>[] = [];
+    const fields = mapProjectFields(this.features);
 
-        if (!settings.pulid.path) {
-          const model = await this.metastable.model.get(
-            ModelType.IPADAPTER,
-            settings.pulid.name!,
-          );
-          settings.pulid.path = model.path;
-        }
+    recurseFields(
+      settings,
+      fields[ProjectType.SIMPLE],
+      (parent, key, field) => {
+        if (field.type === FieldType.MODEL) {
+          const fn = async () => {
+            if (!parent?.[key]) {
+              throw new Error('Unable to find model.');
+            }
 
-        settings.pulid.strength ??= 1;
-      }
-    }
+            const model = await this.metastable.model.get(
+              field.modelType,
+              parent[key],
+            );
+            parent.path = model.path;
+          };
+
+          promises.push(fn());
+        }
+      },
+    );
+
+    await Promise.all(promises);
 
     return { projectId: this.project.id };
   }
