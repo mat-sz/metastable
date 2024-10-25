@@ -453,6 +453,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       for (const feature of this.features) {
+        if (!feature.enabled) {
+          continue;
+        }
+
         const instance = this.metastable.feature.features[feature.id];
         if (instance?.onAfterConditioning) {
           this.step(feature.id);

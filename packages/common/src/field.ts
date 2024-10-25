@@ -43,6 +43,10 @@ export function mapProjectFields(features: Feature[]) {
   }
 
   for (const feature of features) {
+    if (!feature.enabled) {
+      continue;
+    }
+
     for (const projectType of Object.values(ProjectType)) {
       const fields = feature.projectFields?.[projectType];
       if (fields) {
