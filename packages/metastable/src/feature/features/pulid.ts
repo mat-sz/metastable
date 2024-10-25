@@ -63,9 +63,10 @@ const pulidField = {
 } as const;
 
 type PulidFieldType = FieldToType<typeof pulidField>;
+
 export class FeaturePulid extends FeaturePython {
   readonly id = 'pulid';
-  readonly name = 'pulid';
+  readonly name = 'PuLID';
   readonly pythonPackages = [
     { name: 'facexlib' },
     { name: 'insightface' },

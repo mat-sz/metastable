@@ -83,7 +83,6 @@ export interface ProjectSimpleSettings {
     schedulerName: string;
     tiling?: boolean;
   };
-  upscale?: { enabled: boolean; name?: string; path?: string };
   client: {
     randomizeSeed: boolean;
   };

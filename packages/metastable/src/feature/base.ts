@@ -14,6 +14,7 @@ export interface FeatureInstance {
   isEnabled(): Promise<boolean>;
   info(): Promise<Feature>;
   onAfterConditioning?(task: PromptTask): Promise<void>;
+  onAfterSample?(task: PromptTask): Promise<void>;
 }
 
 export class FeatureBase implements FeatureInstance {

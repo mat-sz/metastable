@@ -154,17 +154,3 @@ export class ComfyIPAdapter {
 export class ComfyCLIPVision {
   constructor(public ref: RPCRef) {}
 }
-
-export class ComfyUpscaleModel {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(images: RPCRef[]) {
-    return (await this.session.invoke('upscale_model:apply', {
-      upscale_model: this.ref,
-      images: images,
-    })) as RPCRef[];
-  }
-}

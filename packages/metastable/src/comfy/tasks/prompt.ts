@@ -30,7 +30,7 @@ import { BaseTask } from '../../tasks/task.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
 import { ComfyCheckpoint } from '../session/models.js';
-import { ComfyPreviewSettings } from '../session/types.js';
+import { ComfyPreviewSettings, RPCRef } from '../session/types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private embeddingsPath?: string;
@@ -42,6 +42,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   public checkpoint?: ComfyCheckpoint;
   private checkpointConfigPath?: string;
   private features: Feature[] = [];
+  public images?: RPCRef[];
 
   constructor(
     private metastable: Metastable,
@@ -517,13 +518,19 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         },
         this.preview,
       );
-      let images = await checkpoint.decode(samples, isCircular);
+      this.images = await checkpoint.decode(samples, isCircular);
       const outputDir = this.project!.files.output.path;
 
-      if (settings.upscale?.enabled) {
-        this.step('upscale');
-        const upscaleModel = await ctx.upscale.load(settings.upscale.path!);
-        images = await upscaleModel.applyTo(images);
+      for (const feature of this.features) {
+        if (!feature.enabled) {
+          continue;
+        }
+
+        const instance = this.metastable.feature.features[feature.id];
+        if (instance?.onAfterSample) {
+          this.step(feature.id);
+          await instance.onAfterSample(this);
+        }
       }
 
       this.step('save');
@@ -531,7 +538,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const outputs: ProjectImageFile[] = [];
       const cleanSettings = this.getCleanSettings();
 
-      for (const image of images) {
+      for (const image of this.images) {
         const bytes = await ctx.image.dump(image, ext);
         let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
 

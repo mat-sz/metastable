@@ -10,7 +10,6 @@ import {
   ComfyIPAdapter,
   ComfyLatent,
   ComfyLORA,
-  ComfyUpscaleModel,
 } from './models.js';
 import {
   ComfySessionLogEvent,
@@ -118,17 +117,6 @@ class ComfySessionClipVision {
   }
 }
 
-class ComfySessionUpscale {
-  constructor(private session: ComfySession) {}
-
-  async load(path: string) {
-    const data = (await this.session.invoke('upscale_model:load', {
-      path,
-    })) as RPCRef;
-    return new ComfyUpscaleModel(this.session, data);
-  }
-}
-
 class ComfySessionImage {
   constructor(private session: ComfySession) {}
 
@@ -193,7 +181,6 @@ export class ComfySession extends (EventEmitter as {
   controlnet = new ComfySessionControlnet(this);
   clipVision = new ComfySessionClipVision(this);
   ipadapter = new ComfySessionIpadapter(this);
-  upscale = new ComfySessionUpscale(this);
   image = new ComfySessionImage(this);
   tag = new ComfySessionTag(this);
 
