@@ -168,28 +168,3 @@ export class ComfyUpscaleModel {
     })) as RPCRef[];
   }
 }
-
-export class ComfyPulid {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    checkpoint: ComfyCheckpoint,
-    evaClip: RPCRef,
-    faceAnalysis: RPCRef,
-    image: RPCRef,
-    strength: number,
-  ) {
-    const model = (await this.session.invoke('pulid:apply', {
-      model: checkpoint.data.model,
-      pulid: this.ref,
-      eva_clip: evaClip,
-      face_analysis: faceAnalysis,
-      image,
-      strength,
-    })) as RPCRef;
-    checkpoint.data.model = model;
-  }
-}

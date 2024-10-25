@@ -84,13 +84,6 @@ export interface ProjectSimpleSettings {
     tiling?: boolean;
   };
   upscale?: { enabled: boolean; name?: string; path?: string };
-  pulid?: {
-    enabled: boolean;
-    name?: string;
-    path?: string;
-    strength: number;
-    image?: string;
-  };
   client: {
     randomizeSeed: boolean;
   };

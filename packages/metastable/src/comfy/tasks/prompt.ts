@@ -29,6 +29,7 @@ import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
+import { ComfyCheckpoint } from '../session/models.js';
 import { ComfyPreviewSettings } from '../session/types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
@@ -37,14 +38,15 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     method: 'auto',
   };
   private storeMetadata = false;
-  private session?: ComfySession;
+  public session?: ComfySession;
+  public checkpoint?: ComfyCheckpoint;
   private checkpointConfigPath?: string;
   private features: Feature[] = [];
 
   constructor(
     private metastable: Metastable,
     private project: ProjectEntity,
-    private settings: ProjectSimpleSettings,
+    public settings: ProjectSimpleSettings,
   ) {
     super('prompt', { projectId: project.id });
     this.created();
@@ -264,7 +266,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return settings;
   }
 
-  async checkpoint(ctx: ComfySession) {
+  async getCheckpoint(ctx: ComfySession) {
     const data = this.settings.checkpoint;
     if (data.mode === 'advanced') {
       const clipPaths = [data.clip1.path!];
@@ -309,7 +311,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     throw new Error('Unable to load input');
   }
 
-  private async loadInputRaw(url: string) {
+  async loadInputRaw(url: string) {
     const buffer = await this.inputAsBuffer(url);
 
     return await this.session!.image.load(bufferToRpcBytes(buffer));
@@ -346,11 +348,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return image;
   }
 
-  private async loadInput(
-    url: string,
-    mode?: ProjectImageMode,
-    maskUrl?: string,
-  ) {
+  async loadInput(url: string, mode?: ProjectImageMode, maskUrl?: string) {
     const fit = SHARP_FIT_MAP[mode!] || 'fill';
     const image = await this.prepareImage(url, fit);
 
@@ -382,7 +380,8 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       this.step('checkpoint');
       const settings = this.settings;
-      const checkpoint = await this.checkpoint(ctx);
+      const checkpoint = await this.getCheckpoint(ctx);
+      this.checkpoint = checkpoint;
 
       const loras = settings.models.lora;
       if (loras?.length) {
@@ -453,21 +452,12 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         }
       }
 
-      if (settings.pulid) {
-        this.step('pulid');
-        const pulid = await ctx.pulid.load(settings.pulid.path!);
-        const insightface = await ctx.pulid.loadInsightface(
-          path.join(this.metastable.internalPath),
-        );
-        const evaClip = await ctx.pulid.loadEvaClip();
-        const { image } = await this.loadInputRaw(settings.pulid.image!);
-        await pulid.applyTo(
-          checkpoint,
-          evaClip,
-          insightface,
-          image,
-          settings.pulid.strength,
-        );
+      for (const feature of this.features) {
+        const instance = this.metastable.feature.features[feature.id];
+        if (instance?.onAfterConditioning) {
+          this.step(feature.id);
+          await instance.onAfterConditioning(this);
+        }
       }
 
       const isCircular = !!settings.sampler.tiling;

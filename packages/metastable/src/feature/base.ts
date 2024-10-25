@@ -1,5 +1,6 @@
 import { Feature, FeatureProjectFields } from '@metastable/types';
 
+import { PromptTask } from '../comfy/tasks/prompt.js';
 import { Metastable } from '../index.js';
 
 export interface FeatureInstance {
@@ -12,6 +13,7 @@ export interface FeatureInstance {
   isInstalled(): Promise<boolean>;
   isEnabled(): Promise<boolean>;
   info(): Promise<Feature>;
+  onAfterConditioning?(task: PromptTask): Promise<void>;
 }
 
 export class FeatureBase implements FeatureInstance {

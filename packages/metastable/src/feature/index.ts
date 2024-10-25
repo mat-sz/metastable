@@ -6,10 +6,14 @@ import { FeaturePulid } from './features/pulid.js';
 import { FeatureInstallTask } from './installTask.js';
 
 export class FeatureManager {
-  availableFeatures: FeatureInstance[] = [];
+  features: Record<string, FeatureInstance> = {
+    pulid: new FeaturePulid(this.metastable),
+  };
 
-  constructor(private metastable: Metastable) {
-    this.availableFeatures.push(new FeaturePulid(this.metastable));
+  constructor(private metastable: Metastable) {}
+
+  get availableFeatures() {
+    return Object.values(this.features);
   }
 
   async all(): Promise<Feature[]> {
