@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   BsEmojiSmile,
+  BsFullscreen,
   BsGearWideConnected,
   BsPlugFill,
   BsRecordCircle,
@@ -21,6 +22,11 @@ import styles from './index.module.scss';
 import { General } from './sections/General';
 import { useSimpleProject } from '../../context';
 import { ModelArray } from '../common/ModelArray';
+
+const FEATURE_ICONS: Record<string, JSX.Element> = {
+  upscale: <BsFullscreen />,
+  pulid: <BsEmojiSmile />,
+};
 
 interface SettingsProps {
   showPrompt?: boolean;
@@ -59,7 +65,7 @@ export const Settings: React.FC<SettingsProps> = observer(
               id={key}
               key={key}
               title={section.label}
-              icon={<BsEmojiSmile />}
+              icon={FEATURE_ICONS[key]}
             />
           ))}
         </Tabs>
