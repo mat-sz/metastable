@@ -1333,6 +1333,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metastable/common@workspace:packages/common"
   dependencies:
+    "@metastable/types": "workspace:^"
     "@types/node": "npm:^20.10.3"
     typescript: "npm:^5.3.2"
   languageName: unknown

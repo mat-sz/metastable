@@ -1,10 +1,9 @@
+import { mapProjectFields } from '@metastable/common';
 import {
   BackendStatus,
-  Field,
   InstanceInfo,
   LogItem,
   ModelType,
-  ProjectType,
   UpdateInfo,
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
@@ -172,24 +171,7 @@ class MainStore {
   }
 
   get projectFields() {
-    const result: Record<ProjectType, Record<string, Field>> = {} as any;
-
-    for (const projectType of Object.values(ProjectType)) {
-      result[projectType] = {};
-    }
-
-    for (const feature of this.info.features) {
-      for (const projectType of Object.values(ProjectType)) {
-        const fields = feature.projectFields?.[projectType];
-        if (fields) {
-          for (const [key, value] of Object.entries(fields)) {
-            result[projectType][key] = value;
-          }
-        }
-      }
-    }
-
-    return result;
+    return mapProjectFields(this.info.features);
   }
 
   get hotkeys() {

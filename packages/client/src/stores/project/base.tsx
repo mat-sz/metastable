@@ -68,6 +68,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       progressValue: computed,
       progressMax: computed,
       progressMarquee: computed,
+      extraFields: computed,
     });
     this.refresh();
 
@@ -91,6 +92,10 @@ export class BaseProject<TSettings = any, TUI = any> {
         },
       },
     );
+  }
+
+  get extraFields() {
+    return mainStore.projectFields[this.type];
   }
 
   get tasks() {

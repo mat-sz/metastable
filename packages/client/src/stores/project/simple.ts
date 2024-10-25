@@ -1,6 +1,8 @@
+import { FieldHandler, recurseFields } from '@metastable/common';
 import {
   Project as APIProject,
   Architecture,
+  FieldType,
   ModelType,
   ProjectFileType,
   ProjectImageFile,
@@ -493,7 +495,12 @@ export class SimpleProject extends BaseProject<
     await API.task.cancel.mutate({ queueId: 'project', taskId: task.id });
   }
 
-  private async handleImage(type: ProjectFileType, url: string) {
+  private async handleImage(type: ProjectFileType, parent: any, key: string) {
+    const url = parent?.[key];
+    if (!url) {
+      return;
+    }
+
     if (isLocalUrl(url)) {
       const { data, mime } = await fileToBase64(url);
       const ext = EXTENSIONS[mime];
@@ -507,71 +514,40 @@ export class SimpleProject extends BaseProject<
         data,
         ext,
       });
+      runInAction(() => {
+        parent[key] = file.mrn;
+      });
       URL.revokeObjectURL(url);
-      return file.mrn;
     }
+  }
 
-    return url;
+  private recurseFields(onField: FieldHandler) {
+    recurseFields(this.settings, this.extraFields, onField);
   }
 
   private async handleImages() {
-    if (this.settings.input.image) {
-      const url = await this.handleImage(
-        ProjectFileType.INPUT,
-        this.settings.input.image,
-      );
-      runInAction(() => {
-        this.settings.input.image = url;
-      });
-    }
-
-    if (this.settings.input.mask) {
-      const url = await this.handleImage(
-        ProjectFileType.MASK,
-        this.settings.input.mask,
-      );
-      runInAction(() => {
-        this.settings.input.mask = url;
-      });
-    }
+    await this.handleImage(ProjectFileType.INPUT, this.settings.input, 'image');
+    await this.handleImage(ProjectFileType.MASK, this.settings.input, 'mask');
 
     if (this.settings.models.controlnet) {
       for (const controlnet of this.settings.models.controlnet) {
-        if (controlnet.image) {
-          const url = await this.handleImage(
-            ProjectFileType.INPUT,
-            controlnet.image,
-          );
-          runInAction(() => {
-            controlnet.image = url;
-          });
-        }
+        await this.handleImage(ProjectFileType.INPUT, controlnet, 'image');
       }
     }
 
     if (this.settings.models.ipadapter) {
       for (const ipadapter of this.settings.models.ipadapter) {
-        if (ipadapter.image) {
-          const url = await this.handleImage(
-            ProjectFileType.INPUT,
-            ipadapter.image,
-          );
-          runInAction(() => {
-            ipadapter.image = url;
-          });
-        }
+        await this.handleImage(ProjectFileType.INPUT, ipadapter, 'image');
       }
     }
 
-    if (this.settings.pulid?.image) {
-      const url = await this.handleImage(
-        ProjectFileType.INPUT,
-        this.settings.pulid.image,
-      );
-      runInAction(() => {
-        this.settings.pulid!.image = url;
-      });
-    }
+    const promises: Promise<void>[] = [];
+    this.recurseFields((parent, key, field) => {
+      if (field.type === FieldType.IMAGE) {
+        promises.push(this.handleImage(ProjectFileType.INPUT, parent, key));
+      }
+    });
+    await Promise.all(promises);
   }
 
   async save(name?: string, draft?: boolean, auto = false) {
