@@ -116,13 +116,13 @@ export const VarPrompt = ({
       return;
     }
 
-    e.stopPropagation();
-    e.preventDefault();
-
     switch (hotkeyId) {
       case 'weightIncrease':
       case 'weightDecrease':
         {
+          e.stopPropagation();
+          e.preventDefault();
+
           const change = hotkeyId === 'weightIncrease' ? 0.05 : -0.05;
           const result = findClosestTokenOrImportance(
             el.value,
@@ -144,6 +144,9 @@ export const VarPrompt = ({
         break;
       case 'comment':
         {
+          e.stopPropagation();
+          e.preventDefault();
+
           const lineIndex = getCurrentLineIndex(el);
           if (lineIndex) {
             const start = getLineStart(el, lineIndex);

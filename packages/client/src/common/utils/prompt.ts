@@ -34,13 +34,15 @@ export function findClosestTokenOrImportance(
     }
   }
 
-  if (
+  const includesParentheses =
+    replaced[start] === '(' && replaced[end - 1] === ')';
+  const hasParenthesesAround =
     replaced[start - 1] === '(' &&
-    (replaced[end + 1] === ':' || replaced[end + 1] === ')')
-  ) {
+    (replaced[end] === ':' || replaced[end] === ')');
+  if (!includesParentheses && hasParenthesesAround) {
     const nextClosingParenIndex = replaced.indexOf(')', start);
     if (nextClosingParenIndex !== -1) {
-      start -= 1;
+      start--;
       end = nextClosingParenIndex + 1;
     }
   }
