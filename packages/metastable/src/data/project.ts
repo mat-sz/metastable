@@ -169,7 +169,11 @@ export class ProjectRepository extends (EventEmitter as {
             const split = relative.split(path.sep);
             const [name, type] = split;
 
-            if (name && type) {
+            if (
+              name &&
+              type &&
+              Object.values(ProjectFileType).includes(type as any)
+            ) {
               const project = await this.getByName(name);
               if (!project.id) {
                 return;

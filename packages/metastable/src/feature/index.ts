@@ -1,16 +1,11 @@
 import { Feature } from '@metastable/types';
 
 import { Metastable } from '../index.js';
-import { FeatureInstance } from './base.js';
-import { FeaturePulid } from './features/pulid.js';
-import { FeatureUpscale } from './features/upscale.js';
+import { getFeatureInstances } from './features/index.js';
 import { FeatureInstallTask } from './installTask.js';
 
 export class FeatureManager {
-  features: Record<string, FeatureInstance> = {
-    upscale: new FeatureUpscale(this.metastable),
-    pulid: new FeaturePulid(this.metastable),
-  };
+  features = getFeatureInstances(this.metastable);
 
   constructor(private metastable: Metastable) {}
 

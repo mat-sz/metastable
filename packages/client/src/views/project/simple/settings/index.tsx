@@ -24,6 +24,7 @@ import { useSimpleProject } from '../../context';
 import { ModelArray } from '../common/ModelArray';
 
 const FEATURE_ICONS: Record<string, JSX.Element> = {
+  lora: <BsRecordCircle />,
   upscale: <BsFullscreen />,
   pulid: <BsEmojiSmile />,
 };
@@ -54,7 +55,6 @@ export const Settings: React.FC<SettingsProps> = observer(
       >
         <Tabs buttonStyle="icon">
           <Tab id="general" title="General" icon={<BsWrench />} />
-          <Tab id="loras" title="LoRAs" icon={<BsRecordCircle />} />
           <Tab
             id="controlnets"
             title="Controlnets"
@@ -105,15 +105,6 @@ export const Settings: React.FC<SettingsProps> = observer(
           <div>
             <TabPanel id="general">
               <General showPrompt={showPrompt} />
-            </TabPanel>
-            <TabPanel id="loras">
-              <ModelArray
-                label="LoRA"
-                path="models.lora"
-                type={ModelType.LORA}
-                strengthMin={-5}
-                strengthMax={5}
-              />
             </TabPanel>
             <TabPanel id="controlnets">
               <ModelArray

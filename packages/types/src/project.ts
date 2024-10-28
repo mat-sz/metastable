@@ -39,12 +39,6 @@ export interface ProjectSimpleSettings {
     path?: string;
   };
   models: {
-    lora?: {
-      enabled: boolean;
-      strength: number;
-      name?: string;
-      path?: string;
-    }[];
     controlnet?: {
       enabled: boolean;
       strength: number;

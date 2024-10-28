@@ -58,17 +58,6 @@ class SimpleProjectValidator {
       this.validateModel(ModelType.CHECKPOINT, settings.checkpoint);
     }
 
-    const loras = settings.models.lora;
-    if (loras?.length) {
-      for (const lora of loras) {
-        if (!lora.enabled) {
-          continue;
-        }
-
-        this.validateModel(ModelType.LORA, lora);
-      }
-    }
-
     const controlnets = settings.models.controlnet;
     if (controlnets?.length) {
       for (const controlnet of controlnets) {
@@ -132,6 +121,41 @@ class SimpleProjectValidator {
   }
 }
 
+export function convertSettings(
+  settings: ProjectSimpleSettings,
+): ProjectSimpleSettings {
+  const newSettings: any = { ...settings };
+  if (!newSettings.featureData) {
+    newSettings.featureData = {};
+  }
+
+  if (newSettings.models?.lora) {
+    if (!newSettings.featureData.lora) {
+      newSettings.featureData.lora = newSettings.models.lora;
+    }
+
+    newSettings.models.lora = undefined;
+  }
+
+  if (newSettings.upscale) {
+    if (!newSettings.featureData.upscale) {
+      newSettings.featureData.upscale = newSettings.upscale;
+    }
+
+    newSettings.upscale = undefined;
+  }
+
+  if (newSettings.pulid) {
+    if (!newSettings.featureData.pulid) {
+      newSettings.featureData.pulid = newSettings.pulid;
+    }
+
+    newSettings.pulid = undefined;
+  }
+
+  return newSettings;
+}
+
 export function defaultSettings(): ProjectSimpleSettings {
   const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
 
@@ -152,7 +176,6 @@ export function defaultSettings(): ProjectSimpleSettings {
       name: checkpoint?.file.name,
     },
     models: {
-      lora: [],
       controlnet: [],
     },
     prompt: {
@@ -193,6 +216,7 @@ export class SimpleProject extends BaseProject<
 
   constructor(data: APIProject) {
     data.settings ??= defaultSettings();
+    data.settings = convertSettings(data.settings);
     super(data);
 
     this.settings.sampler.quality ??= 'custom';
@@ -208,7 +232,6 @@ export class SimpleProject extends BaseProject<
       preview: computed,
       request: action,
       addModel: action,
-      removeModel: action,
       setSettings: action,
       prompts: computed,
       firstPrompt: computed,
@@ -352,14 +375,6 @@ export class SimpleProject extends BaseProject<
         ModelType.CHECKPOINT,
         settings.checkpoint.name,
       );
-    }
-
-    if (settings.models.lora) {
-      for (const lora of settings.models.lora) {
-        if (lora.enabled && lora.name) {
-          totalVram += modelStore.size(ModelType.LORA, lora.name);
-        }
-      }
     }
 
     if (settings.models.controlnet) {
@@ -586,9 +601,6 @@ export class SimpleProject extends BaseProject<
     strength = 1,
   ) {
     const settings = { ...this.settings };
-    if (!settings.models[type]) {
-      settings.models[type] = [];
-    }
 
     switch (type) {
       case ModelType.CONTROLNET:
@@ -610,23 +622,8 @@ export class SimpleProject extends BaseProject<
           imageMode: 'cover',
         });
         break;
-      default:
-        this.settings.models[type]?.push({
-          enabled: true,
-          name,
-          strength,
-        });
     }
 
-    this.settings = settings;
-  }
-
-  removeModel(
-    type: ModelType.CONTROLNET | ModelType.IPADAPTER | ModelType.LORA,
-    index: number,
-  ) {
-    const settings = { ...this.settings };
-    settings.models[type]?.splice(index, 1);
     this.settings = settings;
   }
 

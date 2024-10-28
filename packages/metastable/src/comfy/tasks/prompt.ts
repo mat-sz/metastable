@@ -120,7 +120,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
 
-    await this.setModelPathArray(ModelType.LORA, settings.models.lora);
     await this.setModelPathArray(
       ModelType.CONTROLNET,
       settings.models.controlnet,
@@ -316,6 +315,22 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     return await this.session!.image.load(bufferToRpcBytes(buffer));
   }
 
+  private async callFeatureHandlers(
+    handler: 'onBeforeConditioning' | 'onAfterConditioning' | 'onAfterSample',
+  ) {
+    for (const feature of this.features) {
+      if (!feature.enabled) {
+        continue;
+      }
+
+      const instance = this.metastable.feature.features[feature.id];
+      if (instance?.[handler]) {
+        this.step(feature.id);
+        await instance[handler](this);
+      }
+    }
+  }
+
   private async prepareImage(url: string, fit?: keyof FitEnum) {
     const buffer = await this.inputAsBuffer(url);
     const image = sharp(buffer);
@@ -382,16 +397,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       const checkpoint = await this.getCheckpoint(ctx);
       this.checkpoint = checkpoint;
 
-      const loras = settings.models.lora;
-      if (loras?.length) {
-        this.step('lora');
-        for (const loraSettings of loras) {
-          if (loraSettings.enabled) {
-            const lora = await ctx.lora.load(loraSettings.path!);
-            await lora.applyTo(checkpoint, loraSettings.strength);
-          }
-        }
-      }
+      await this.callFeatureHandlers('onBeforeConditioning');
 
       this.step('conditioning');
       const { style } = settings.prompt;
@@ -451,17 +457,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         }
       }
 
-      for (const feature of this.features) {
-        if (!feature.enabled) {
-          continue;
-        }
-
-        const instance = this.metastable.feature.features[feature.id];
-        if (instance?.onAfterConditioning) {
-          this.step(feature.id);
-          await instance.onAfterConditioning(this);
-        }
-      }
+      await this.callFeatureHandlers('onAfterConditioning');
 
       const isCircular = !!settings.sampler.tiling;
 
@@ -519,17 +515,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.images = await checkpoint.decode(samples, isCircular);
       const outputDir = this.project!.files.output.path;
 
-      for (const feature of this.features) {
-        if (!feature.enabled) {
-          continue;
-        }
-
-        const instance = this.metastable.feature.features[feature.id];
-        if (instance?.onAfterSample) {
-          this.step(feature.id);
-          await instance.onAfterSample(this);
-        }
-      }
+      await this.callFeatureHandlers('onAfterSample');
 
       this.step('save');
       const ext = settings.output?.format || 'png';

@@ -13,6 +13,7 @@ export interface FeatureInstance {
   isInstalled(): Promise<boolean>;
   isEnabled(): Promise<boolean>;
   info(): Promise<Feature>;
+  onBeforeConditioning?(task: PromptTask): Promise<void>;
   onAfterConditioning?(task: PromptTask): Promise<void>;
   onAfterSample?(task: PromptTask): Promise<void>;
 }
@@ -49,7 +50,7 @@ export class FeatureBase implements FeatureInstance {
 
 export class FeaturePython extends FeatureBase {
   readonly pythonPackages: { name: string; extra?: string }[] = [];
-  readonly pythonNamespaceGroup: string | undefined;
+  readonly pythonNamespaceGroup: string | undefined = undefined;
 
   async isInstalled() {
     if (!(await super.isInstalled())) {
