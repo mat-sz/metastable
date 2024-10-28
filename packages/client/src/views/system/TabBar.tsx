@@ -1,6 +1,5 @@
 import { ProjectType, TaskState } from '@metastable/types';
 import clsx from 'clsx';
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
@@ -18,6 +17,7 @@ import { ProjectMenu } from '$components/projectMenu';
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
+import { uiStore, ViewName } from '$stores/UIStore';
 import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
@@ -132,7 +132,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
       <BaseTab
         ref={ref}
         isSelected={
-          mainStore.view === 'project' &&
+          uiStore.view === 'project' &&
           mainStore.projects.currentId === project.id
         }
         opacity={isDragging ? 0.5 : 1}
@@ -152,7 +152,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
 
 export const ViewTab: React.FC<
   React.PropsWithChildren<{
-    viewId: string;
+    viewId: ViewName;
     badge?: string | number;
     value?: number;
     max?: number;
@@ -161,16 +161,12 @@ export const ViewTab: React.FC<
 > = observer(({ viewId, badge, value, max, marquee, children }) => {
   return (
     <BaseTab
-      onClick={() =>
-        runInAction(() => {
-          mainStore.view = viewId;
-        })
-      }
+      onClick={() => uiStore.setView(viewId)}
       badge={badge}
       value={value}
       max={max}
       marquee={marquee}
-      isSelected={mainStore.view === viewId}
+      isSelected={uiStore.view === viewId}
     >
       {children}
     </BaseTab>
@@ -210,7 +206,7 @@ export const TabBar: React.FC = observer(() => {
   );
 
   const areTrafficLightsVisible =
-    IS_ELECTRON && IS_MAC && !mainStore.isFullScreen;
+    IS_ELECTRON && IS_MAC && !uiStore.isFullScreen;
 
   return (
     <div

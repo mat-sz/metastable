@@ -4,7 +4,7 @@ import { BsQuestion } from 'react-icons/bs';
 import { FaApple, FaLinux, FaWindows } from 'react-icons/fa';
 
 import { RequirementsTable } from '$components/requirementsTable';
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 import { Item } from '../components/Item';
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -14,8 +14,8 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 export const OSItem: React.FC = observer(() => {
-  const details = mainStore.setup.details!;
-  const item = mainStore.setup.os;
+  const details = setupStore.details!;
+  const item = setupStore.os;
 
   return (
     <Item

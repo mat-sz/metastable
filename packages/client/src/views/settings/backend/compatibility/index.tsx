@@ -2,10 +2,10 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { RequirementsTable } from '$components/requirementsTable';
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 
 export const Compatibility: React.FC = observer(() => {
-  const requirements = mainStore.setup.requirements;
+  const requirements = setupStore.requirements;
 
   return <RequirementsTable requirements={requirements} />;
 });

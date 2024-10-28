@@ -6,6 +6,7 @@ import { Popover } from 'react-tiny-popover';
 
 import { ModelBrowser } from '$components/modelBrowser';
 import { mainStore } from '$stores/MainStore';
+import { uiStore } from '$stores/UIStore';
 import styles from './VarAddModel.module.scss';
 import { VarBase } from './VarBase';
 
@@ -35,7 +36,7 @@ export const VarAddModel = observer(
         <VarBase disabled={disabled} className={className}>
           <button
             className={styles.selection}
-            onClick={() => mainStore.openModelManager()}
+            onClick={() => uiStore.setView('models')}
           >
             <BsBox />
             <span>Download models</span>

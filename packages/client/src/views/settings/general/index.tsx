@@ -3,7 +3,7 @@ import React from 'react';
 
 import { TabPanel } from '$components/tabs';
 import { VarCategory, VarToggle } from '$components/var';
-import { mainStore } from '$stores/MainStore';
+import { uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
 
 export const SettingsGeneral: React.FC = observer(() => {
@@ -12,13 +12,13 @@ export const SettingsGeneral: React.FC = observer(() => {
       <h2>General</h2>
       <VarCategory label="User interface">
         <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />
-        {mainStore.notificationPermission !== 'denied' ? (
+        {uiStore.notificationPermission !== 'denied' ? (
           <VarToggle
             path="ui.notifications"
             label="Enable notifications"
             onChange={value => {
               if (value) {
-                mainStore.checkNotificationPermission();
+                uiStore.checkNotificationPermission();
               }
             }}
           />

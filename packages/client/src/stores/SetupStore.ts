@@ -24,7 +24,7 @@ interface SetupItemState {
   storage?: number;
 }
 
-export class SetupStore {
+class SetupStore {
   status: SetupStatus = 'required';
   details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
@@ -311,4 +311,11 @@ export class SetupStore {
 
     return { total, breakdown };
   }
+
+  async resetBundle() {
+    this.status = 'required';
+    await API.instance.resetBundle.mutate();
+  }
 }
+
+export const setupStore = new SetupStore();

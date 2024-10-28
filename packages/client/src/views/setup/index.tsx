@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
+import { updateStore } from '$stores/UpdateStore';
 import { Checking } from './Checking';
 import { ConnectionError } from './ConnectionError';
 import { OutOfDate } from './OutOfDate';
@@ -9,15 +10,15 @@ import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 
 export const Setup: React.FC = observer(() => {
-  if (!mainStore.updateInfoReady) {
+  if (!updateStore.ready) {
     return <Checking />;
-  } else if (!mainStore.updateInfo.latestVersion) {
+  } else if (!updateStore.info.latestVersion) {
     return <ConnectionError />;
-  } else if (!mainStore.updateInfo.isUpToDate) {
+  } else if (!updateStore.info.isUpToDate) {
     return <OutOfDate />;
   }
 
-  if (mainStore.setup.status == 'in_progress') {
+  if (setupStore.status == 'in_progress') {
     return <Step2 />;
   } else {
     return <Step1 />;

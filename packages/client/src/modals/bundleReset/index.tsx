@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 
 export const BundleReset: React.FC = () => {
   const { close } = useModal();
@@ -26,7 +26,7 @@ export const BundleReset: React.FC = () => {
         <Button
           variant="danger"
           onClick={() => {
-            mainStore.resetBundle();
+            setupStore.resetBundle();
             close();
           }}
         >

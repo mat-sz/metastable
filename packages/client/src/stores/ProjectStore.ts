@@ -4,10 +4,10 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { API } from '$api';
 import { arrayMove } from '$utils/array';
 import { tryParse } from '$utils/json';
-import { mainStore } from './MainStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
+import { uiStore } from './UIStore';
 
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 15;
@@ -173,7 +173,7 @@ export class ProjectStore {
 
   select(id?: APIProject['id']) {
     this.currentId = id;
-    mainStore.view = id ? 'project' : 'home';
+    uiStore.setView(id ? 'project' : 'home');
   }
 
   move(fromId: APIProject['id'], toId?: APIProject['id']) {
@@ -189,7 +189,7 @@ export class ProjectStore {
 
     if (id === this.currentId) {
       const selectId = this.projects[0]?.id;
-      if (mainStore.view === 'project') {
+      if (uiStore.view === 'project') {
         this.select(selectId);
       } else {
         this.currentId = selectId;

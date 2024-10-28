@@ -8,7 +8,7 @@ import {
 } from 'react-icons/vsc';
 
 import { API } from '$api';
-import { mainStore } from '$stores/MainStore';
+import { uiStore } from '$stores/UIStore';
 import { IS_ELECTRON, IS_MAC } from '$utils/config';
 import styles from './Controls.module.scss';
 
@@ -22,7 +22,7 @@ export const Controls: React.FC = observer(() => {
       <button onClick={() => API.electron.window.minimize.mutate()}>
         <VscChromeMinimize />
       </button>
-      {mainStore.isMaximized ? (
+      {uiStore.isMaximized ? (
         <button onClick={() => API.electron.window.restore.mutate()}>
           <VscChromeRestore />
         </button>

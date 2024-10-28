@@ -5,7 +5,7 @@ import { BsBoxFill } from 'react-icons/bs';
 
 import { Checkbox } from '$components/checkbox';
 import { ModelList } from '$components/modelList';
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 import { DownloadableModel } from '../../../types/model';
 import { Item } from '../components/Item';
 
@@ -14,7 +14,7 @@ interface ModelCheckboxProps {
 }
 
 const ModelCheckbox: React.FC<ModelCheckboxProps> = observer(({ model }) => {
-  const value = !!mainStore.setup.downloads.find(
+  const value = !!setupStore.downloads.find(
     file => !!model.downloads.find(f => f.name === file.name),
   );
 
@@ -24,14 +24,14 @@ const ModelCheckbox: React.FC<ModelCheckboxProps> = observer(({ model }) => {
       onChange={value => {
         runInAction(() => {
           if (value) {
-            mainStore.setup.downloads = [
-              ...mainStore.setup.downloads.filter(
+            setupStore.downloads = [
+              ...setupStore.downloads.filter(
                 file => !model.downloads.find(f => f.name === file.name),
               ),
               ...model.downloads,
             ];
           } else {
-            mainStore.setup.downloads = mainStore.setup.downloads.filter(
+            setupStore.downloads = setupStore.downloads.filter(
               file => !model.downloads.find(f => f.name === file.name),
             );
           }
@@ -42,7 +42,7 @@ const ModelCheckbox: React.FC<ModelCheckboxProps> = observer(({ model }) => {
 });
 
 export const ModelsItem: React.FC = observer(() => {
-  const item = mainStore.setup.models;
+  const item = setupStore.models;
 
   return (
     <Item

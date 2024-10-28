@@ -5,6 +5,7 @@ import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 
 import { Loading } from '$components/loading';
 import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 import { filesize } from '$utils/file';
 import { timestr } from '$utils/string';
 import { Item } from './components/Item';
@@ -22,7 +23,7 @@ const TASK_TITLE: Record<string, string> = {
 };
 
 export const Step2: React.FC = observer(() => {
-  const details = mainStore.setup.details;
+  const details = setupStore.details;
   const tasks = mainStore.tasks.queues.setup || [];
 
   return (

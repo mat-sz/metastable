@@ -3,6 +3,8 @@ import React from 'react';
 
 import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
+import { uiStore } from '$stores/UIStore';
 import './index.scss';
 import { Home } from './views/home';
 import { ModelManager } from './views/models';
@@ -12,7 +14,7 @@ import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 
 const View: React.FC = observer(() => {
-  switch (mainStore.view) {
+  switch (uiStore.view) {
     case 'project':
       return <Project />;
     case 'settings':
@@ -29,7 +31,7 @@ export const App: React.FC = observer(() => {
     return <div className="app">Loading...</div>;
   }
 
-  if (mainStore.setup?.status !== 'done') {
+  if (setupStore?.status !== 'done') {
     return (
       <UIWrapper>
         <Main>

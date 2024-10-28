@@ -3,16 +3,16 @@ import React from 'react';
 import { BsHddFill } from 'react-icons/bs';
 
 import { AvailableStorage } from '$components/availableStorage';
-import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 import { filesize } from '$utils/file';
 import styles from './StorageItem.module.scss';
 import { Item } from '../components/Item';
 
 export const StorageItem: React.FC = observer(() => {
-  const item = mainStore.setup.storage;
+  const item = setupStore.storage;
 
-  const storage = mainStore.setup.details?.storage;
-  const predicted = mainStore.setup.predictedStorage;
+  const storage = setupStore.details?.storage;
+  const predicted = setupStore.predictedStorage;
   const entries = Object.entries(predicted.breakdown);
 
   return (

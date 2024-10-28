@@ -9,6 +9,7 @@ import { VarButton, VarCategory, VarToggle } from '$components/var';
 import { BundleReset } from '$modals/bundleReset';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
+import { updateStore } from '$stores/UpdateStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Social } from '../../common/Social';
@@ -43,25 +44,25 @@ export const SettingsAbout: React.FC = observer(() => {
           />
         )}
       </VarCategory>
-      {(mainStore.updateInfo.isAutoUpdateAvailable ||
-        mainStore.updateInfo.canCheckForUpdate) && (
+      {(updateStore.info.isAutoUpdateAvailable ||
+        updateStore.info.canCheckForUpdate) && (
         <VarCategory label="Updates">
-          {mainStore.updateInfo.isAutoUpdateAvailable && (
+          {updateStore.info.isAutoUpdateAvailable && (
             <VarToggle path="app.autoUpdate" label="Enable automatic updates" />
           )}
-          {mainStore.updateInfo.canCheckForUpdate && (
+          {updateStore.info.canCheckForUpdate && (
             <div className={styles.info}>
               <div>
-                {mainStore.updateInfoReady
-                  ? typeof mainStore.updateInfo.isUpToDate === 'undefined'
+                {updateStore.ready
+                  ? typeof updateStore.info.isUpToDate === 'undefined'
                     ? 'Unable to check for updates.'
-                    : mainStore.updateInfo.isUpToDate
+                    : updateStore.info.isUpToDate
                       ? 'Up to date.'
-                      : `New version available: ${mainStore.updateInfo.latestVersion}.`
+                      : `New version available: ${updateStore.info.latestVersion}.`
                   : 'Loading...'}
               </div>
               <div className={styles.buttons}>
-                <Button onClick={() => mainStore.checkForUpdates()}>
+                <Button onClick={() => updateStore.refresh()}>
                   Check for updates
                 </Button>
                 <Button href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md">
