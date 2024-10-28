@@ -170,18 +170,10 @@ export const Settings: React.FC = observer(() => {
         </VarCategory>
         <VarCategory label="Dataset settings">
           <VarArray path="dataset.activationTags">
-            {(_, i) => (
+            {({ remove }) => (
               <div className={styles.tag}>
                 <VarString label="Tag" path="" />
-                <IconButton
-                  title="Delete"
-                  onClick={() => {
-                    project.settings.dataset.activationTags =
-                      project.settings.dataset.activationTags.filter(
-                        (_, tagI) => tagI !== i,
-                      );
-                  }}
-                >
+                <IconButton title="Delete" onClick={remove}>
                   <BsX />
                 </IconButton>
               </div>
@@ -204,18 +196,10 @@ export const Settings: React.FC = observer(() => {
             options={optimizers.map(name => ({ key: name, label: name }))}
           />
           <VarArray path="optimizer.arguments">
-            {(_, i) => (
+            {({ remove }) => (
               <div className={styles.tag}>
                 <VarString label="Argument" path="" />
-                <IconButton
-                  title="Delete"
-                  onClick={() => {
-                    project.settings.optimizer.arguments =
-                      project.settings.optimizer.arguments?.filter(
-                        (_, argI) => argI !== i,
-                      );
-                  }}
-                >
+                <IconButton title="Delete" onClick={remove}>
                   <BsX />
                 </IconButton>
               </div>

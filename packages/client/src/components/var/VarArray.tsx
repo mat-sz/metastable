@@ -4,9 +4,21 @@ import { ReactNode } from 'react';
 import { useVarUIValue, VarUIContext } from './common/VarUIContext';
 import { IVarBaseInputProps } from './VarBase';
 
+interface VarArrayItemContext<T> {
+  element: T;
+  index: number;
+  array: T[];
+  remove(): void;
+}
+
+interface VarArrayFooterContext<T> {
+  append(item: T): void;
+}
+
 export interface IVarArrayProps<T = any>
   extends Omit<IVarBaseInputProps<T[]>, 'label' | 'children' | 'readOnly'> {
-  children?: ReactNode | ((element: T, index: number, array: T[]) => ReactNode);
+  children?: ReactNode | ((context: VarArrayItemContext<T>) => ReactNode);
+  footer?: ReactNode | ((context: VarArrayFooterContext<T>) => ReactNode);
 }
 
 /**
@@ -18,6 +30,7 @@ export const VarArray = ({
   onChange,
   className,
   children,
+  footer,
   error,
   errorPath,
 }: IVarArrayProps): JSX.Element => {
@@ -29,9 +42,11 @@ export const VarArray = ({
     errorPath,
   });
 
+  const currentArray = currentValue || [];
+
   return (
     <div className={className ?? ''}>
-      {currentValue?.map((element, index, array) => {
+      {currentArray.map((element, index, array) => {
         return (
           <VarUIContext.Provider
             value={{
@@ -39,7 +54,7 @@ export const VarArray = ({
               getValue: (path?: string) =>
                 typeof path === 'string' ? get(element, path) : undefined,
               setValue: (path: string, newValue: any) => {
-                const newArray = [...currentValue];
+                const newArray = [...currentArray];
                 newArray[index] =
                   path === '' ? newValue : set(clone(element), path, newValue);
                 setCurrentValue(newArray);
@@ -54,11 +69,28 @@ export const VarArray = ({
             key={index}
           >
             {typeof children === 'function'
-              ? children(element, index, array)
+              ? children({
+                  element,
+                  index,
+                  array,
+                  remove: () => {
+                    const newArray = [...currentArray];
+                    newArray.splice(index, 1);
+                    setCurrentValue(newArray);
+                  },
+                })
               : children}
           </VarUIContext.Provider>
         );
       })}
+      {typeof footer !== 'undefined' &&
+        (typeof footer === 'function'
+          ? footer({
+              append: item => {
+                setCurrentValue([...currentArray, item]);
+              },
+            })
+          : footer)}
     </div>
   );
 };

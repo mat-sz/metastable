@@ -8,14 +8,19 @@ export enum FieldType {
   IMAGE,
   CATEGORY,
   ARRAY,
+  SCOPE,
+  SECTION,
 }
 
 export interface FieldBase {
   type: FieldType;
+}
+
+export interface FieldWithLabel extends FieldBase {
   label: string;
 }
 
-export interface FieldWithValue<T> extends FieldBase {
+export interface FieldWithValue<T> extends FieldWithLabel {
   defaultValue?: T;
 }
 
@@ -54,9 +59,12 @@ export interface FieldImage extends FieldWithValue<string> {
   modeKey?: string;
 }
 
-export interface FieldCategory extends FieldBase {
-  type: FieldType.CATEGORY;
+export interface FieldWithProperties extends FieldBase {
   properties: Record<string, Field>;
+}
+
+export interface FieldCategory extends FieldWithLabel, FieldWithProperties {
+  type: FieldType.CATEGORY;
 
   /**
    * Will show a toggle to enable the item if not undefined.
@@ -64,9 +72,19 @@ export interface FieldCategory extends FieldBase {
   enabledKey?: string;
 }
 
-export interface FieldArray extends FieldBase {
+export interface FieldArray extends FieldWithLabel {
   type: FieldType.ARRAY;
-  items: Field;
+  itemType: Field;
+}
+
+export interface FieldScope extends FieldWithProperties {
+  type: FieldType.SCOPE;
+  properties: Record<string, Field>;
+}
+
+export interface FieldSection extends FieldWithLabel, FieldWithProperties {
+  type: FieldType.SECTION;
+  properties: Record<string, Field>;
 }
 
 export type Field =
@@ -76,26 +94,29 @@ export type Field =
   | FieldModel
   | FieldImage
   | FieldCategory
-  | FieldArray;
+  | FieldArray
+  | FieldScope
+  | FieldSection;
 
-type FieldCategoryPropertiesToType<TField extends FieldCategory> = {
+type FieldPropertiesToType<TField extends FieldWithProperties> = {
   [K in keyof TField['properties']]: FieldToType<TField['properties'][K]>;
 };
 
 type FieldCategoryToType<TField extends FieldCategory> =
   TField['enabledKey'] extends string
     ?
-        | (Record<TField['enabledKey'], true> &
-            FieldCategoryPropertiesToType<TField>)
+        | (Record<TField['enabledKey'], true> & FieldPropertiesToType<TField>)
         | Record<TField['enabledKey'], false>
-    : FieldCategoryPropertiesToType<TField>;
+    : FieldPropertiesToType<TField>;
 
 export type FieldToType<TField extends Field> = TField extends FieldNumber
   ? number
   : TField['type'] extends FieldType.IMAGE | FieldType.MODEL
     ? string
     : TField extends FieldArray
-      ? FieldToType<TField['items']>[]
+      ? FieldToType<TField['itemType']>[]
       : TField extends FieldCategory
         ? FieldCategoryToType<TField>
-        : undefined;
+        : TField extends FieldWithProperties
+          ? FieldPropertiesToType<TField>
+          : undefined;

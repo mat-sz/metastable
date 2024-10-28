@@ -1,6 +1,11 @@
-import { Field, FieldType } from '@metastable/types';
+import { Field, FieldModel, FieldType } from '@metastable/types';
+import { BsX } from 'react-icons/bs';
 
+import { IconButton } from '$components/iconButton';
 import {
+  VarAddModel,
+  VarArray,
+  VarButton,
   VarCategory,
   VarImageMode,
   VarNumber,
@@ -13,36 +18,107 @@ import { VarProjectImage } from '../common/VarProjectImage';
 import { VarProjectModel } from '../common/VarProjectModel';
 
 interface SettingsFieldProps {
-  id: string;
+  id?: string;
   isRoot?: boolean;
   field: Field;
+  labelSuffix?: React.ReactNode;
 }
 
 export const SettingsField: React.FC<SettingsFieldProps> = ({
   id,
   isRoot = false,
   field,
+  labelSuffix,
 }) => {
   switch (field.type) {
+    case FieldType.SECTION:
+    case FieldType.SCOPE: {
+      const scopeChildren = Object.entries(field.properties).map(
+        ([key, value]) => <SettingsField id={key} key={key} field={value} />,
+      );
+      return id ? (
+        <VarScope path={id}>{scopeChildren}</VarScope>
+      ) : (
+        scopeChildren
+      );
+    }
     case FieldType.CATEGORY: {
-      const children = (
-        <VarScope path={id}>
+      const scopeChildren = (
+        <>
           {!!field.enabledKey && <VarToggle label="Enable" path="enabled" />}
           {Object.entries(field.properties).map(([key, value]) => (
             <SettingsField id={key} key={key} field={value} />
           ))}
-        </VarScope>
+        </>
+      );
+      const label = (
+        <>
+          <span>{field.label}</span>
+          {labelSuffix}
+        </>
+      );
+      const children = id ? (
+        <VarScope path={id}>{scopeChildren}</VarScope>
+      ) : (
+        scopeChildren
       );
 
-      if (isRoot) {
+      if (id && isRoot) {
         return (
-          <SettingsCategory label={field.label} sectionId={id}>
+          <SettingsCategory label={label} sectionId={id}>
             {children}
           </SettingsCategory>
         );
       } else {
-        return <VarCategory label={field.label}>{children}</VarCategory>;
+        return <VarCategory label={label}>{children}</VarCategory>;
       }
+    }
+    case FieldType.ARRAY: {
+      const modelField =
+        field.itemType.type === FieldType.CATEGORY &&
+        field.itemType.properties['model']?.type === FieldType.MODEL
+          ? (field.itemType.properties['model'] as FieldModel)
+          : undefined;
+
+      return (
+        <>
+          <VarArray
+            path={id}
+            footer={({ append }) => (
+              <>
+                {modelField ? (
+                  <VarAddModel
+                    label="Add"
+                    modelType={modelField.modelType}
+                    // architecture={modelField.shouldFilterByArchitecture ? project}
+                    onSelect={model => {
+                      append({ model: model.file.name });
+                    }}
+                  />
+                ) : (
+                  <VarButton
+                    buttonLabel="Add"
+                    onClick={() => {
+                      append({});
+                    }}
+                  />
+                )}
+              </>
+            )}
+          >
+            {({ remove }) => (
+              <SettingsField
+                field={field.itemType}
+                labelSuffix={
+                  <IconButton title="Delete" onClick={remove}>
+                    <BsX />
+                  </IconButton>
+                }
+              />
+            )}
+          </VarArray>
+        </>
+      );
     }
     case FieldType.BOOLEAN:
       return (

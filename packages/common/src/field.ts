@@ -20,6 +20,22 @@ function recurseField(
         }
       }
       break;
+    case FieldType.SCOPE:
+    case FieldType.SECTION:
+      for (const [fieldKey, field] of Object.entries(current.properties)) {
+        recurseField(parent?.[key], fieldKey, field, onField);
+      }
+      break;
+    case FieldType.ARRAY:
+      {
+        const array = parent?.[key] as any[];
+        if (array && Array.isArray(array)) {
+          for (let i = 0; i < array.length; i++) {
+            recurseField(array, `${i}`, current.itemType, onField);
+          }
+        }
+      }
+      break;
     default:
       onField(parent, key, current);
   }

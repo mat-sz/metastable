@@ -41,17 +41,12 @@ export const ModelArray: React.FC<Props> = observer(
     return (
       <>
         <VarArray path={path}>
-          {(_, i) => (
+          {({ remove }) => (
             <VarCategory
               label={
                 <>
                   <span>{label}</span>
-                  <IconButton
-                    title="Delete"
-                    onClick={() => {
-                      project.removeModel(type, i);
-                    }}
-                  >
+                  <IconButton title="Delete" onClick={remove}>
                     <BsX />
                   </IconButton>
                 </>
