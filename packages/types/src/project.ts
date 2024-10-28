@@ -86,6 +86,7 @@ export interface ProjectSimpleSettings {
   client: {
     randomizeSeed: boolean;
   };
+  featureData?: any;
 }
 
 export interface ProjectTrainingInputMetadata {

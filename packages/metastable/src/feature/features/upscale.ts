@@ -60,7 +60,7 @@ export class FeatureUpscale extends FeaturePython {
 
   async onAfterSample(task: PromptTask) {
     const { settings, session, images } = task;
-    const upscaleSettings = (settings as any).upscale as UpscaleFieldType;
+    const upscaleSettings = settings.featureData?.upscale as UpscaleFieldType;
     if (!upscaleSettings?.enabled || !session || !images) {
       return;
     }

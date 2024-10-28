@@ -102,7 +102,7 @@ export class FeaturePulid extends FeaturePython {
 
   async onAfterConditioning(task: PromptTask) {
     const { settings, checkpoint, session } = task;
-    const pulidSettings = (settings as any).pulid as PulidFieldType;
+    const pulidSettings = settings.featureData?.pulid as PulidFieldType;
     if (!pulidSettings?.enabled || !session || !checkpoint) {
       return;
     }

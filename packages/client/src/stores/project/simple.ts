@@ -173,6 +173,7 @@ export function defaultSettings(): ProjectSimpleSettings {
     client: {
       randomizeSeed: true,
     },
+    featureData: {},
   };
 }
 
@@ -377,6 +378,12 @@ export class SimpleProject extends BaseProject<
       }
     }
 
+    this.recurseFields((parent, key, field) => {
+      if (field.type === FieldType.MODEL) {
+        totalVram += modelStore.size(field.modelType, parent[key]);
+      }
+    });
+
     return totalVram;
   }
 
@@ -515,7 +522,7 @@ export class SimpleProject extends BaseProject<
   }
 
   private recurseFields(onField: FieldHandler) {
-    recurseFields(this.settings, this.extraFields, onField);
+    recurseFields(this.settings.featureData, this.extraFields, onField);
   }
 
   private async handleImages() {

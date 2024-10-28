@@ -14,7 +14,7 @@ import {
 
 import { Alert } from '$components/alert';
 import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
-import { VarUI } from '$components/var';
+import { VarScope, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
 import { SettingsField } from './Field';
@@ -43,7 +43,8 @@ export const Settings: React.FC<SettingsProps> = observer(
       validationResult.errors.length || validationResult.warnings.length
     );
     const memoryUsage = project.memoryUsage;
-    const sections = mainStore.projectFields[ProjectType.SIMPLE];
+    const fields = mainStore.projectFields[ProjectType.SIMPLE];
+    const sections = Object.entries(fields);
 
     return (
       <TabView
@@ -60,11 +61,11 @@ export const Settings: React.FC<SettingsProps> = observer(
             icon={<BsGearWideConnected />}
           />
           <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
-          {Object.entries(sections).map(([key, section]) => (
+          {sections.map(([key, section]) => (
             <Tab
               id={key}
               key={key}
-              title={section.label}
+              title={(section as any).label}
               icon={FEATURE_ICONS[key]}
             />
           ))}
@@ -135,11 +136,13 @@ export const Settings: React.FC<SettingsProps> = observer(
                 strengthMax={1}
               />
             </TabPanel>
-            {Object.entries(sections).map(([key, section]) => (
-              <TabPanel id={key} key={key}>
-                <SettingsField id={key} field={section} isRoot />
-              </TabPanel>
-            ))}
+            <VarScope path="featureData">
+              {sections.map(([key, section]) => (
+                <TabPanel id={key} key={key}>
+                  <SettingsField id={key} field={section} isRoot />
+                </TabPanel>
+              ))}
+            </VarScope>
           </div>
         </VarUI>
       </TabView>

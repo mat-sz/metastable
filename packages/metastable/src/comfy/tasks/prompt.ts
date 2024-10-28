@@ -198,7 +198,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     const fields = mapProjectFields(this.features);
 
     recurseFields(
-      settings,
+      settings.featureData,
       fields[ProjectType.SIMPLE],
       (parent, key, field) => {
         if (field.type === FieldType.MODEL) {
