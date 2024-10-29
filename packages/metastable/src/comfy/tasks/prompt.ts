@@ -10,8 +10,8 @@ import {
   Architecture,
   Feature,
   FieldType,
+  ImageFile,
   ModelType,
-  ProjectImageFile,
   ProjectImageMode,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
@@ -519,7 +519,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       this.step('save');
       const ext = settings.output?.format || 'png';
-      const outputs: ProjectImageFile[] = [];
+      const outputs: ImageFile[] = [];
       const cleanSettings = this.getCleanSettings();
 
       for (const image of this.images) {

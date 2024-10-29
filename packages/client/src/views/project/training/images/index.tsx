@@ -3,11 +3,12 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 
-import { FileManager } from '$components/fileManager';
+import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
 import { Tagger } from '$modals/tagger';
 import { modalStore } from '$stores/ModalStore';
+import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 import { InputEditor } from './InputEditor';
 import { useTraningProject } from '../../context';
@@ -26,13 +27,18 @@ export const Images: React.FC = observer(() => {
   }
 
   const inputs = project.files[type];
+  const mappedFiles: FileManagerItem[] = inputs.map(file => ({
+    name: file.name,
+    url: resolveImage(file.mrn),
+    thumbnailUrl: resolveImage(file.mrn, 'thumbnail'),
+  }));
 
   return (
     <div className={styles.main}>
       <div className={styles.images}>
         <UploadQueue queue={queue} />
         <FileManager
-          items={inputs}
+          items={mappedFiles}
           onOpen={ids => setEditing(inputs.find(item => item.name === ids[0]))}
           actions={
             <>

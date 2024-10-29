@@ -1,4 +1,3 @@
-import { ImageFile } from '@metastable/types';
 import clsx from 'clsx';
 import React, { useRef, useState } from 'react';
 import { MdNoPhotography } from 'react-icons/md';
@@ -8,9 +7,10 @@ import { Rectangle } from '$editor/primitives/Rectangle';
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
 import styles from './FileList.module.scss';
+import { FileManagerItem } from './types';
 
 interface Props {
-  items: ImageFile[];
+  items: FileManagerItem[];
   selection?: string[];
   onSelect?: (itemIds: string[]) => void;
   onOpen?: (itemIds: string[]) => void;
@@ -198,7 +198,7 @@ export const FileList: React.FC<Props> = ({
                 item.name,
               ),
             })}
-            href={item.image.url}
+            href={item.url}
             target="_blank"
             rel="noopener noreferrer"
             key={item.name}
@@ -242,8 +242,8 @@ export const FileList: React.FC<Props> = ({
             }}
             data-id={item.name}
           >
-            {item.image.thumbnailUrl ? (
-              <img src={item.image.thumbnailUrl} />
+            {item.thumbnailUrl ? (
+              <img src={item.thumbnailUrl} />
             ) : (
               <div className={styles.icon}>
                 <MdNoPhotography />

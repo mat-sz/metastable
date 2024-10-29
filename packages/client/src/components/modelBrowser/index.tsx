@@ -22,6 +22,7 @@ import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
+import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 
 interface Props {
@@ -143,7 +144,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                 name={item.name}
                 key={item.file.name}
                 color={stringToColor(item.file.name)}
-                imageUrl={item.image?.thumbnailUrl}
+                imageUrl={resolveImage(item.coverMrn, 'thumbnail')}
                 onClick={() => {
                   onSelect(item);
                 }}

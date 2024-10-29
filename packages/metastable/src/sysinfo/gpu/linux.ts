@@ -251,7 +251,7 @@ export async function gpuLinux() {
   } catch {}
 
   try {
-    const stdout = await shell('lspci -vvv  2>/dev/null');
+    const stdout = await shell('lspci -vvv 2>/dev/null');
     const lines = stdout.toString().split('\n');
     controllers.push(...(await parseLines(lines)));
   } catch {}

@@ -3,11 +3,12 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsPlus, BsTrash } from 'react-icons/bs';
 
-import { FileManager } from '$components/fileManager';
+import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
 import { ProjectFileDelete } from '$modals/projectFileDelete';
 import { modalStore } from '$stores/ModalStore';
+import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 import { Lightbox } from './Lightbox';
 import { useSimpleProject } from '../../context';
@@ -53,13 +54,18 @@ export const Files: React.FC<Props> = observer(({ type, allowUpload }) => {
 
   const project = useSimpleProject();
   const files = project.files[type];
+  const mappedFiles: FileManagerItem[] = files.map(file => ({
+    name: file.name,
+    url: resolveImage(file.mrn),
+    thumbnailUrl: resolveImage(file.mrn, 'thumbnail'),
+  }));
 
   return (
     <div className={styles.grid}>
       {allowUpload && <UploadQueue queue={project.uploadQueue[type]} />}
       <FileManager
         className={styles.manager}
-        items={files}
+        items={mappedFiles}
         onOpen={ids => {
           setCurrent(files.findIndex(item => item.name === ids[0]) || 0);
           setOpen(true);

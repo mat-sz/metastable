@@ -1,15 +1,15 @@
-import { ImageFile } from '@metastable/types';
 import clsx from 'clsx';
 import React, { useState } from 'react';
 
 import { FileList } from './FileList';
 import styles from './index.module.scss';
+import { FileManagerItem } from './types';
 
 interface Props {
-  items: ImageFile[];
+  items: FileManagerItem[];
   onOpen?: (itemIds: string[]) => void;
   actions?: JSX.Element;
-  selectionActions?: (selection: ImageFile[]) => JSX.Element;
+  selectionActions?: (selection: FileManagerItem[]) => JSX.Element;
   className?: string;
 }
 
@@ -32,7 +32,7 @@ export const FileManager: React.FC<Props> = ({
             {selectionActions?.(
               selection
                 .map(name => items.find(item => item.name === name))
-                .filter(item => !!item) as ImageFile[],
+                .filter(item => !!item) as FileManagerItem[],
             )}
           </>
         )}
@@ -50,3 +50,5 @@ export const FileManager: React.FC<Props> = ({
     </div>
   );
 };
+
+export type { FileManagerItem };

@@ -146,7 +146,7 @@ export interface Project {
   type: ProjectType;
   settings?: any;
   ui?: any;
-  lastOutput?: ProjectImageFile;
+  lastOutput?: ImageFile;
   outputCount?: number;
   size?: number;
   draft?: boolean;
@@ -162,7 +162,7 @@ export interface ProjectPromptTaskData extends ProjectTaskData {
   stepValue?: number;
   stepMax?: number;
   stepTime?: Record<string, number>;
-  outputs?: ProjectImageFile[];
+  outputs?: ImageFile[];
 }
 
 export enum ProjectFileType {
@@ -172,10 +172,6 @@ export enum ProjectFileType {
 }
 
 export type ProjectImageMode = 'cover' | 'contain' | 'center' | 'stretch';
-
-export interface ProjectImageFile extends ImageFile {
-  mrn: string;
-}
 
 export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';
 

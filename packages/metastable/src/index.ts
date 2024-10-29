@@ -10,7 +10,6 @@ import {
   LogItem,
   ModelType,
   Project,
-  ProjectFileType,
   ProjectSimpleSettings,
   ProjectTaggingSettings,
   ProjectTrainingSettings,
@@ -374,49 +373,35 @@ export class Metastable extends (EventEmitter as {
     );
   }
 
+  private mrnCache: Record<string, string> = {};
+
   async resolve(mrn: string) {
+    if (this.mrnCache[mrn]) {
+      return this.mrnCache[mrn];
+    }
+
     const parsed = MRN.parse(mrn);
     const scope = parsed.segments[0];
+    let resolved: string | undefined = undefined;
+
     switch (scope) {
       case 'project':
-        {
-          const project = await this.project.get(parsed.segments[1]);
-          const subscope = parsed.segments[2];
-          switch (subscope) {
-            case 'file':
-              {
-                const type = parsed.segments[3] as ProjectFileType;
-                if (!Object.values(ProjectFileType).includes(type)) {
-                  throw new Error(`Invalid project file type - ${type}`);
-                }
-
-                const file = await project.files[type].get(parsed.segments[4]);
-                const size = parsed.query.get('size');
-                if (size) {
-                  switch (size) {
-                    case 'thumbnail':
-                      if (!file.thumbnailPath) {
-                        throw new Error('File does not exist.');
-                      }
-                      return file.thumbnailPath;
-                    default:
-                      throw new Error(`Invalid size option value: ${size}`);
-                  }
-                }
-
-                return file.path;
-              }
-              break;
-            default:
-              throw new Error(`Invalid project sub-scope: ${subscope}`);
-          }
-        }
+        resolved = await this.project.resolve(parsed);
+        break;
+      case 'model':
+        resolved = await this.model.resolve(parsed);
         break;
       default:
         throw new Error(`Invalid MRN scope: ${scope}`);
     }
+
+    if (!resolved) {
+      throw new Error(`File not found: ${mrn}`);
+    }
+
+    this.mrnCache[mrn] = resolved;
+    return resolved;
   }
 }
 
 export * from './trpc.js';
-export { setUseFileUrl } from './helpers/url.js';

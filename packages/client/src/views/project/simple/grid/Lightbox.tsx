@@ -1,4 +1,4 @@
-import { ProjectImageFile } from '@metastable/types';
+import { ImageFile } from '@metastable/types';
 import React, { useCallback } from 'react';
 import {
   BsArrowLeft,
@@ -11,14 +11,15 @@ import {
 import { IconButton } from '$components/iconButton';
 import { ImagePreview } from '$components/imagePreview';
 import { useHotkey } from '$hooks/useHotkey';
+import { resolveImage } from '$utils/url';
 import styles from './Lightbox.module.scss';
 
 interface Props {
-  images: ProjectImageFile[];
+  images: ImageFile[];
   current?: number;
   onChange: (index: number) => void;
   onClose: () => void;
-  actions?: (file: ProjectImageFile) => React.ReactNode;
+  actions?: (file: ImageFile) => React.ReactNode;
 }
 
 export const Lightbox: React.FC<Props> = ({
@@ -44,6 +45,8 @@ export const Lightbox: React.FC<Props> = ({
   useHotkey('gallery_next', previous);
   useHotkey('gallery_previous', next);
 
+  const currentUrl = resolveImage(currentFile.mrn);
+
   return (
     <div className={styles.lightbox} onClick={onClose}>
       <div className={styles.header} onClick={e => e.stopPropagation()}>
@@ -53,10 +56,10 @@ export const Lightbox: React.FC<Props> = ({
         <div>{filename}</div>
         <div>
           {actions && currentFile ? actions(currentFile) : undefined}
-          <IconButton href={currentFile.image.url} download={filename}>
+          <IconButton href={currentUrl} download={filename}>
             <BsDownload />
           </IconButton>
-          <IconButton href={currentFile.image.url}>
+          <IconButton href={currentUrl}>
             <BsArrowUpRightSquare />
           </IconButton>
           <IconButton onClick={onClose}>
@@ -73,7 +76,7 @@ export const Lightbox: React.FC<Props> = ({
         >
           <BsArrowLeft />
         </button>
-        <ImagePreview url={currentFile.image.url} />
+        <ImagePreview url={currentUrl} />
         <button
           onClick={e => {
             e.stopPropagation();
@@ -91,7 +94,7 @@ export const Lightbox: React.FC<Props> = ({
 
           return (
             <img
-              src={file.image.thumbnailUrl}
+              src={resolveImage(file.mrn, 'thumbnail')}
               key={i}
               onClick={() => onChange(i)}
               className={i === current ? styles.active : undefined}

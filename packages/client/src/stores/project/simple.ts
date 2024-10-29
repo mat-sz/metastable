@@ -3,9 +3,9 @@ import {
   Project as APIProject,
   Architecture,
   FieldType,
+  ImageFile,
   ModelType,
   ProjectFileType,
-  ProjectImageFile,
   ProjectModel,
   ProjectOrientation,
   ProjectPromptTaskData,
@@ -33,7 +33,7 @@ import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
 import { EXTENSIONS, filesize } from '$utils/file';
 import { detectOrientation, fileToBase64 } from '$utils/image';
-import { isLocalUrl } from '$utils/url';
+import { isLocalUrl, resolveImage } from '$utils/url';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
 
@@ -633,7 +633,7 @@ export class SimpleProject extends BaseProject<
     this.currentOutput = undefined;
   }
 
-  selectOutput(output?: ProjectImageFile) {
+  selectOutput(output?: ImageFile) {
     this.mode = 'images';
     this.currentOutput = output;
     this.currentTask = undefined;
@@ -648,7 +648,7 @@ export class SimpleProject extends BaseProject<
     this.stepTime = task.data.stepTime;
 
     if (this.addOutputToEditor) {
-      this.editor?.addImage(outputs[0].image.url, {
+      this.editor?.addImage(resolveImage(outputs[0].mrn), {
         name: `Output (${outputs[0].name})`,
         offset: toJS(this.addOutputToEditor),
       });

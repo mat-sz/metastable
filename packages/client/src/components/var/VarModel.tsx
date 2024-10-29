@@ -7,6 +7,7 @@ import { Popover } from 'react-tiny-popover';
 import { ModelBrowser } from '$components/modelBrowser';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
+import { resolveImage } from '$utils/url';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarModel.module.scss';
@@ -82,7 +83,9 @@ export const VarModel = observer(
                   style={{ backgroundColor: stringToColor(currentValue) }}
                   className={styles.icon}
                 >
-                  {model.image && <img src={model.image.thumbnailUrl} />}
+                  {model.coverMrn && (
+                    <img src={resolveImage(model.coverMrn, 'thumbnail')} />
+                  )}
                 </div>
                 <span className={styles.name}>{model.name}</span>
               </>

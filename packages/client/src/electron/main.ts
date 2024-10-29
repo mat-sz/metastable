@@ -2,7 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { Metastable, router, setUseFileUrl } from '@metastable/metastable';
+import { Metastable, router } from '@metastable/metastable';
 import { TaskState } from '@metastable/types';
 import {
   app,
@@ -22,8 +22,6 @@ contextMenu({
   showSearchWithGoogle: false,
   showSaveImageAs: true,
 });
-
-setUseFileUrl(true);
 
 process.env.DIST = path.join(import.meta.dirname, '../dist');
 process.env.PUBLIC = app.isPackaged

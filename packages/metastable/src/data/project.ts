@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MRN } from '@metastable/common';
+import { MRN, MRNDataParsed } from '@metastable/common';
 import { Project, ProjectFileType, ProjectType } from '@metastable/types';
 import chokidar from 'chokidar';
 import { nanoid } from 'nanoid';
@@ -37,7 +37,6 @@ export class ProjectImageEntity extends ImageEntity {
   async json(withMetadata = false) {
     return {
       name: this.name,
-      image: this.image,
       path: this.path,
       metadata: withMetadata ? await this.metadata.get() : undefined,
       mrn: this.mrn,
@@ -296,5 +295,31 @@ export class ProjectRepository extends (EventEmitter as {
     const entity = await this.get(id);
     await entity.delete();
     this.cache = undefined;
+  }
+
+  async resolve(parsed: MRNDataParsed) {
+    const project = await this.get(parsed.segments[1]);
+    const subscope = parsed.segments[2];
+    switch (subscope) {
+      case 'file': {
+        const type = parsed.segments[3] as ProjectFileType;
+        if (!Object.values(ProjectFileType).includes(type)) {
+          throw new Error(`Invalid project file type - ${type}`);
+        }
+
+        const file = await project.files[type].get(parsed.segments[4]);
+        const size = parsed.query.get('size') || 'full';
+        switch (size) {
+          case 'full':
+            return file.path;
+          case 'thumbnail':
+            return file.thumbnailPath;
+          default:
+            throw new Error(`Invalid size option value: ${size}`);
+        }
+      }
+      default:
+        throw new Error(`Invalid project sub-scope: ${subscope}`);
+    }
   }
 }

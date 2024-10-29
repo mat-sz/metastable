@@ -1,5 +1,5 @@
 export interface FileManagerItem {
-  id: string;
-  fileUrl: string;
+  name: string;
+  url: string;
   thumbnailUrl?: string;
 }

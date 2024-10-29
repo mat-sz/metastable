@@ -1,4 +1,4 @@
-import { ProjectFileType, ProjectImageFile } from '@metastable/types';
+import { ImageFile, ProjectFileType } from '@metastable/types';
 import React from 'react';
 import {
   BsArrowRightSquareFill,
@@ -16,7 +16,7 @@ import { useSimpleProject } from '../../context';
 
 interface Props {
   type: ProjectFileType;
-  file: ProjectImageFile;
+  file: ImageFile;
 }
 
 export const ImageActions: React.FC<Props> = ({ type, file }) => {

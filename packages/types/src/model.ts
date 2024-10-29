@@ -1,4 +1,3 @@
-import { ImageInfo } from './file.js';
 import { ProjectSimpleSettings } from './project.js';
 
 export enum ModelType {
@@ -50,6 +49,8 @@ export interface ModelDetails {
 
 export interface Model {
   id: string;
+  mrn: string;
+  coverMrn?: string;
   name: string;
   type: ModelType;
   file: {
@@ -59,6 +60,5 @@ export interface Model {
     size: number;
   };
   metadata?: ModelMetadata;
-  image?: ImageInfo;
   details?: ModelDetails;
 }

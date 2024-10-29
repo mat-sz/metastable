@@ -10,6 +10,7 @@ import { BsX } from 'react-icons/bs';
 import { TRPC } from '$api';
 import { IconButton } from '$components/iconButton';
 import { ImageCrop } from '$components/imageCrop';
+import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 import { useTraningProject } from '../../context';
 
@@ -62,7 +63,7 @@ export const InputEditor: React.FC<InputEditorProps> = observer(
         </div>
         <div className={styles.crop}>
           <ImageCrop
-            src={input.image.url}
+            src={resolveImage(input.mrn)}
             defaultArea={(metadataQuery.data.metadata as any).crop}
             onChange={area => {
               setMetadata(metadata => ({ ...metadata, crop: area }));

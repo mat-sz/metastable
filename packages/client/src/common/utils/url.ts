@@ -24,14 +24,17 @@ export function resolveMrn(mrn: string) {
   return getUrl(`/resolve?mrn=${encodeURIComponent(mrn)}`);
 }
 
-export function resolveImage(url?: string, size?: 'thumbnail') {
-  if (!url) {
-    return undefined;
+export function resolveImage<T extends string | undefined>(
+  url?: T,
+  size?: 'thumbnail',
+): T {
+  if (typeof url === 'undefined') {
+    return undefined as T;
   }
 
   if (isLocalUrl(url)) {
     return url;
   }
 
-  return resolveMrn(`${url}${size ? `?size=${size}` : undefined}`);
+  return resolveMrn(`${url}${size ? `?size=${size}` : ''}`) as T;
 }

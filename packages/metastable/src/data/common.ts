@@ -2,8 +2,6 @@ import { Dirent } from 'fs';
 import fs, { mkdir } from 'fs/promises';
 import path from 'path';
 
-import { ImageInfo } from '@metastable/types';
-
 import {
   exists,
   getAvailableName,
@@ -13,7 +11,6 @@ import {
   tryUnlink,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
-import { getStaticUrl } from '../helpers/url.js';
 
 export type EntityClass<T extends BaseEntity> = {
   new (...args: any[]): T;
@@ -219,13 +216,6 @@ export class ImageEntity extends FileEntity {
     return getThumbnailPath(this.path);
   }
 
-  get image(): ImageInfo {
-    return {
-      url: getStaticUrl(this.path),
-      thumbnailUrl: getStaticUrl(this.thumbnailPath!),
-    };
-  }
-
   static async fromPath<T extends BaseEntity>(
     this: EntityClass<T>,
     filePath: string,
@@ -262,7 +252,7 @@ export class ImageEntity extends FileEntity {
   async json(withMetadata = false) {
     return {
       name: this.name,
-      image: this.image,
+      mrn: 'mrn:invalid',
       path: this.path,
       metadata: withMetadata ? await this.metadata.get() : undefined,
     };

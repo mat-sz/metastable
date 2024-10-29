@@ -18,7 +18,7 @@ const MRN_IDENTIFIER = 'mrn';
 const MRN_SEGMENT_SEPARATOR = ':';
 const MRN_QUERY_SEPARATOR = '?';
 
-function parse(mrn: string) {
+function parse(mrn: string): MRNDataParsed {
   if (!mrn.startsWith(`${MRN_IDENTIFIER}${MRN_SEGMENT_SEPARATOR}`)) {
     throw new Error('Invalid MRN: doesn\'t begin with "mrn:"');
   }
@@ -36,13 +36,7 @@ function parse(mrn: string) {
   };
 }
 
-function serialize({
-  segments,
-  query,
-}: {
-  segments: string[];
-  query?: URLSearchParams | string | Record<string, string | string[]>;
-}) {
+function serialize({ segments, query }: MRNData) {
   let mrn = [MRN_IDENTIFIER, ...segments]
     .map(segment => encodeSegment(segment))
     .join(MRN_SEGMENT_SEPARATOR);
@@ -50,6 +44,15 @@ function serialize({
     mrn += `?${new URLSearchParams(query).toString()}`;
   }
   return mrn;
+}
+
+export interface MRNData {
+  segments: string[];
+  query?: URLSearchParams | string | Record<string, string | string[]>;
+}
+
+export interface MRNDataParsed extends MRNData {
+  query: URLSearchParams;
 }
 
 export const MRN = {

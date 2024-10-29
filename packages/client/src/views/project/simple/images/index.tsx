@@ -7,6 +7,7 @@ import { ImagePreview } from '$components/imagePreview';
 import { LogSimple } from '$components/log';
 import { ProgressCircle } from '$components/progressCircle';
 import { mainStore } from '$stores/MainStore';
+import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
@@ -121,7 +122,7 @@ export const Images: React.FC = observer(() => {
               </div>
             </div>
             <div className={styles.preview}>
-              <ImagePreview url={project.currentOutput!.image.url} />
+              <ImagePreview url={resolveImage(project.currentOutput!.mrn)} />
             </div>
           </>
         )}

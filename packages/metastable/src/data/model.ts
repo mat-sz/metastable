@@ -2,8 +2,9 @@ import EventEmitter from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
+import { MRN, MRNDataParsed } from '@metastable/common';
 import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
-import { ImageInfo, Model, ModelDetails, ModelType } from '@metastable/types';
+import { Model, ModelDetails, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
 import { FileEntity } from './common.js';
@@ -17,7 +18,6 @@ import {
   walk,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
-import { getStaticUrl } from '../helpers/url.js';
 import { TypedEventEmitter } from '../types.js';
 
 const MODEL_EXTENSIONS = [
@@ -37,6 +37,7 @@ export class ModelEntity extends FileEntity {
   configName: string | undefined = undefined;
   simpleName: string;
   modelBaseDir: string | undefined = undefined;
+  mrnBaseSegments: string[] = [];
   details: ModelDetails | undefined = undefined;
 
   constructor(_path: string) {
@@ -107,17 +108,6 @@ export class ModelEntity extends FileEntity {
     return getThumbnailPath(this.imagePath);
   }
 
-  get image(): ImageInfo | undefined {
-    if (this.imageName) {
-      return {
-        url: getStaticUrl(this.imagePath!),
-        thumbnailUrl: getStaticUrl(this.thumbnailPath!),
-      };
-    }
-
-    return undefined;
-  }
-
   async delete(): Promise<void> {
     await super.delete();
     await tryUnlink(this.configPath);
@@ -137,6 +127,22 @@ export class ModelEntity extends FileEntity {
     await generateThumbnail(imagePath);
   }
 
+  get mrn() {
+    return MRN.serialize({
+      segments: [...this.mrnBaseSegments, this.name],
+    });
+  }
+
+  get coverMrn() {
+    if (this.imageName) {
+      return MRN.serialize({
+        segments: [...this.mrnBaseSegments, this.name, 'cover'],
+      });
+    }
+
+    return undefined;
+  }
+
   async json() {
     await this.load();
     const parts = this.modelBaseDir
@@ -146,6 +152,8 @@ export class ModelEntity extends FileEntity {
 
     const json: Model = {
       type: this.type!,
+      mrn: this.mrn,
+      coverMrn: this.coverMrn,
       id: this.name,
       name: (this.metadata.json as any)?.name || removeFileExtension(this.name),
       metadata: this.metadata.json,
@@ -155,7 +163,6 @@ export class ModelEntity extends FileEntity {
         path: this.path,
         size: (await stat(this.path)).size,
       },
-      image: this.image,
       details: this.details,
     };
 
@@ -221,7 +228,7 @@ export class ModelRepository extends (EventEmitter as {
   async refresh() {
     const promises: Promise<ModelEntity | undefined>[] = [];
 
-    for (const [type, paths] of Object.entries(this.searchPaths)) {
+    for (const [modelType, paths] of Object.entries(this.searchPaths)) {
       for (const dirPath of paths) {
         await mkdir(dirPath, { recursive: true });
         const items = await walk(dirPath);
@@ -229,8 +236,9 @@ export class ModelRepository extends (EventEmitter as {
           ...items.map(async item => {
             try {
               const model = await ModelEntity.fromDirent<ModelEntity>(item);
-              model.type = type as ModelType;
+              model.type = modelType as ModelType;
               model.modelBaseDir = dirPath;
+              model.mrnBaseSegments = ['model', modelType];
               return model;
             } catch {
               return undefined;
@@ -290,5 +298,39 @@ export class ModelRepository extends (EventEmitter as {
   async delete(type: ModelType, name: string): Promise<void> {
     const entity = await this.get(type, name);
     await entity.delete();
+  }
+
+  async resolve(parsed: MRNDataParsed) {
+    const modelType = parsed.segments[1] as ModelType;
+    const name = parsed.segments[2];
+    const option = parsed.segments[3] || 'model';
+
+    if (!Object.values(ModelType).includes(modelType)) {
+      throw new Error(`Invalid model type: ${modelType}`);
+    }
+
+    if (!name) {
+      throw new Error(`Empty model name`);
+    }
+
+    const model = await this.get(modelType, name);
+
+    switch (option) {
+      case 'model':
+        return model.path;
+      case 'cover': {
+        const size = parsed.query.get('size') || 'full';
+        switch (size) {
+          case 'thumbnail':
+            return model.thumbnailPath;
+          case 'full':
+            return model.imagePath;
+          default:
+            throw new Error(`Invalid size option value: ${size}`);
+        }
+      }
+      default:
+        throw new Error(`Invalid option value: ${option}`);
+    }
   }
 }

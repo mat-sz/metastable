@@ -9,6 +9,7 @@ import { Breadcrumbs } from '$components/breadcrumbs';
 import { IconButton } from '$components/iconButton';
 import { IS_ELECTRON } from '$utils/config';
 import { TYPE_MAP } from '$utils/image';
+import { resolveImage } from '$utils/url';
 import styles from './ImageBrowser.module.scss';
 import { useSimpleProject } from '../../context';
 
@@ -73,7 +74,7 @@ export const ImageBrowser: React.FC<Props> = observer(
                 })}
                 onClick={() => onSelect(file.mrn)}
               >
-                <img src={file.image.thumbnailUrl} />
+                <img src={resolveImage(file.mrn, 'thumbnail')} />
               </div>
             ))}
           </div>
