@@ -4,6 +4,9 @@ import comfy
 import output
 from io import BytesIO
 import base64
+from PIL import Image
+
+PREVIEW_SIZE = (512, 512)
 
 def reset_progress():
     def hook(value, total, preview_image):
@@ -18,8 +21,9 @@ def hook_progress(request_id, session_id=None):
 
         if preview_image is not None:
             buffered = BytesIO()
-            preview_image.save(buffered, format="PNG")
-            preview = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode('utf-8')
+            preview_image.thumbnail(PREVIEW_SIZE, Image.Resampling.LANCZOS)
+            preview_image.save(buffered, format="jpeg", quality=70)
+            preview = "data:image/jpeg;base64," + base64.b64encode(buffered.getvalue()).decode('utf-8')
 
         output.write_event("rpc.progress", { "requestId": request_id, "sessionId": session_id, "value": value, "max": total, "preview": preview })
         

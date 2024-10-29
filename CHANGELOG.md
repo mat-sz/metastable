@@ -7,11 +7,13 @@
 ## Improvements
 
 - Moved backend status to settings.
+- Reduced memory usage during image generation.
 
 ## Bug fixes
 
 - Resolved issues with non-square image generation previews.
 - Resolved issues with GPU detection on Linux.
+- Resolved issues with out-of-memory crashes.
 - Fixed usage of TAESD decoder for previews.
 
 # 0.0.9 (2024-10-17)
