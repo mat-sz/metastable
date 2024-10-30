@@ -32,8 +32,8 @@ export class Metadata<T> {
     return this._json;
   }
 
-  async get(): Promise<T> {
-    if (this._json) {
+  async get(force = false): Promise<T> {
+    if (!force && this._json) {
       return this._json;
     }
 
@@ -67,11 +67,6 @@ export class Metadata<T> {
   async update(data: Partial<T>) {
     const current = await this.get();
     await this.set({ ...current, ...data });
-  }
-
-  async refresh() {
-    this._json = undefined;
-    await this.get();
   }
 
   async delete() {
@@ -138,7 +133,7 @@ export class DirectoryEntity extends BaseEntity {
   }
 
   async load(): Promise<void> {
-    await this.metadata.refresh();
+    await this.metadata.get(true);
   }
 
   static async fromDirent<T extends BaseEntity>(
@@ -183,7 +178,7 @@ export class FileEntity extends BaseEntity {
   }
 
   async load(): Promise<void> {
-    await this.metadata.refresh();
+    await this.metadata.get(true);
   }
 
   async json(): Promise<{ name: string; metadata?: any }> {

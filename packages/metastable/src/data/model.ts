@@ -54,7 +54,7 @@ export class ModelEntity extends FileEntity {
       throw new Error('Not a valid model file.');
     }
 
-    await this.metadata.refresh();
+    await this.metadata.get(true);
 
     this.imageName = await testExtensions(
       this.metadataPath,

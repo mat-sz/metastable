@@ -76,12 +76,11 @@ export class ProjectEntity extends DirectoryEntity {
   }
 
   get id() {
-    // TODO: Figure out why we're having race conditions here.
     return this.metadata.json?.id || '';
   }
 
   async load(): Promise<void> {
-    await this.metadata.refresh();
+    await this.metadata.get(true);
 
     if (!this.metadata.json?.id) {
       await this.metadata.set({

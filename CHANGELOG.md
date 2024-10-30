@@ -15,6 +15,7 @@
 - Resolved issues with GPU detection on Linux.
 - Resolved issues with out-of-memory crashes.
 - Fixed usage of TAESD decoder for previews.
+- Fixed problems with project metadata sometimes not loading correctly.
 
 # 0.0.9 (2024-10-17)
 
