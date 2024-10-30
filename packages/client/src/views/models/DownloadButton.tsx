@@ -22,7 +22,7 @@ interface DownloadFileState {
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
   ({ files }) => {
     const fileState: DownloadFileState[] = files.map(file => {
-      const model = modelStore.find(file.type, file.name);
+      const model = modelStore.findByName(file.type, file.name);
       if (model) {
         return {
           settings: file,

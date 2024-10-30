@@ -1,25 +1,20 @@
 import { ImageFile } from './file.js';
 import { PromptStyleWithSource } from './instance.js';
 
-export interface ProjectModel {
-  name?: string;
-  path?: string;
-}
 export interface ProjectSimpleSettings {
   version: number;
   checkpoint:
     | {
         mode: 'simple';
-        name?: string;
-        path?: string;
+        model?: string;
         clipSkip?: number;
       }
     | {
         mode: 'advanced';
-        unet: ProjectModel;
-        clip1: ProjectModel;
-        clip2?: ProjectModel;
-        vae: ProjectModel;
+        unet?: string;
+        clip1?: string;
+        clip2?: string;
+        vae?: string;
       };
   input: {
     type: 'none' | 'image' | 'image_masked';
@@ -42,8 +37,7 @@ export interface ProjectSimpleSettings {
     controlnet?: {
       enabled: boolean;
       strength: number;
-      name?: string;
-      path?: string;
+      model?: string;
       image?: string;
       imageMode?: ProjectImageMode;
       editor?: {
@@ -54,10 +48,8 @@ export interface ProjectSimpleSettings {
     ipadapter?: {
       enabled: boolean;
       strength: number;
-      name?: string;
-      path?: string;
-      clipVisionName?: string;
-      clipVisionPath?: string;
+      model?: string;
+      clipVision?: string;
       image?: string;
       imageMode?: ProjectImageMode;
     }[];

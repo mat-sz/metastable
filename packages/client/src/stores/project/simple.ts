@@ -6,7 +6,6 @@ import {
   ImageFile,
   ModelType,
   ProjectFileType,
-  ProjectModel,
   ProjectOrientation,
   ProjectPromptTaskData,
   ProjectSimpleSettings,
@@ -47,15 +46,15 @@ class SimpleProjectValidator {
       this.validateModel(ModelType.CLIP, settings.checkpoint.clip1);
       this.validateModel(ModelType.VAE, settings.checkpoint.vae);
 
-      if (settings.checkpoint.clip2?.name) {
+      if (settings.checkpoint.clip2) {
         this.validateModel(ModelType.CLIP, settings.checkpoint.clip2);
 
-        if (settings.checkpoint.clip1.name === settings.checkpoint.clip2.name) {
+        if (settings.checkpoint.clip1 === settings.checkpoint.clip2) {
           this.errors.push('CLIP1 must be a different model from CLIP2.');
         }
       }
     } else {
-      this.validateModel(ModelType.CHECKPOINT, settings.checkpoint);
+      this.validateModel(ModelType.CHECKPOINT, settings.checkpoint.model);
     }
 
     const controlnets = settings.models.controlnet;
@@ -65,7 +64,7 @@ class SimpleProjectValidator {
           continue;
         }
 
-        this.validateModel(ModelType.CONTROLNET, controlnet);
+        this.validateModel(ModelType.CONTROLNET, controlnet.model);
 
         if (!controlnet.image) {
           this.errors.push('No image input for ControlNet selected.');
@@ -80,15 +79,12 @@ class SimpleProjectValidator {
           continue;
         }
 
-        this.validateModel(ModelType.IPADAPTER, ipadapter);
+        this.validateModel(ModelType.IPADAPTER, ipadapter.model);
 
-        if (!ipadapter.clipVisionName) {
+        if (!ipadapter.clipVision) {
           this.errors.push('No CLIP Vision model for IPAdapter selected.');
         } else {
-          const model = modelStore.find(
-            ModelType.CLIP_VISION,
-            ipadapter.clipVisionName,
-          );
+          const model = modelStore.find(ipadapter.clipVision);
           if (!model) {
             this.errors.push('Selected CLIP Vision model does not exist.');
           }
@@ -106,17 +102,67 @@ class SimpleProjectValidator {
     }
   }
 
-  validateModel(type: ModelType, model: ProjectModel) {
-    if (!model.name) {
+  validateModel(type: ModelType, mrn?: string) {
+    if (!mrn) {
       this.errors.push(`No ${type} model selected.`);
       return;
     }
 
-    const full = modelStore.find(type, model.name);
+    const full = modelStore.find(mrn);
     if (!full) {
       this.errors.push(`Selected ${type} does not exist.`);
     } else if (full.details?.corrupt) {
       this.warnings.push(`${type} model may be corrupt.`);
+    } else if (full.type !== type) {
+      this.errors.push(
+        `Model of type ${full.type} selected for field of type ${type}.`,
+      );
+    }
+  }
+}
+
+function convertModelItem(type: ModelType, item?: any) {
+  if (!item) {
+    return;
+  }
+
+  if (!item.model && item.name) {
+    const model = modelStore.findByName(type, item.name);
+    item.model = model?.mrn;
+  }
+  item.name = undefined;
+
+  if (!item.clipVision && item.clipVisionName) {
+    const model = modelStore.findByName(
+      ModelType.CLIP_VISION,
+      item.clipVisionName,
+    );
+    item.clipVision = model?.mrn;
+    item.clipVisionName = undefined;
+  }
+}
+
+function convertModelArray(type: ModelType, array?: any[]) {
+  if (!array) {
+    return;
+  }
+
+  for (const item of array) {
+    convertModelItem(type, item);
+  }
+}
+
+function convertModelKey(type: ModelType, object: any, key: string) {
+  if (!object?.[key]) {
+    return;
+  }
+
+  if (typeof object[key] !== 'string') {
+    if (typeof object[key].name === 'string') {
+      const model = modelStore.findByName(type, object[key].name);
+      object[key] = model?.mrn;
+    } else {
+      object[key] = undefined;
     }
   }
 }
@@ -124,10 +170,28 @@ class SimpleProjectValidator {
 export function convertSettings(
   settings: ProjectSimpleSettings,
 ): ProjectSimpleSettings {
-  const newSettings: any = { ...settings };
+  const newSettings: any = toJS(settings);
   if (!newSettings.featureData) {
     newSettings.featureData = {};
   }
+
+  if (newSettings.checkpoint.mode === 'advanced') {
+    convertModelKey(ModelType.UNET, newSettings.checkpoint, 'unet');
+    convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip1');
+    convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip2');
+    convertModelKey(ModelType.VAE, newSettings.checkpoint, 'vae');
+  } else {
+    convertModelItem(ModelType.CHECKPOINT, newSettings.checkpoint);
+  }
+
+  convertModelArray(ModelType.LORA, newSettings.featureData.lora);
+  convertModelItem(ModelType.IPADAPTER, newSettings.featureData.pulid);
+
+  convertModelArray(ModelType.LORA, newSettings.models?.lora);
+  convertModelArray(ModelType.CONTROLNET, newSettings.models?.controlnet);
+  convertModelArray(ModelType.IPADAPTER, newSettings.models?.ipadapter);
+
+  convertModelItem(ModelType.UPSCALE_MODEL, newSettings.upscale);
 
   if (newSettings.models?.lora) {
     if (!newSettings.featureData.lora) {
@@ -173,7 +237,7 @@ export function defaultSettings(): ProjectSimpleSettings {
     },
     checkpoint: {
       mode: 'simple',
-      name: checkpoint?.file.name,
+      model: checkpoint?.mrn,
     },
     models: {
       controlnet: [],
@@ -280,15 +344,9 @@ export class SimpleProject extends BaseProject<
     settings.output.batchSize ||= 1;
 
     if (settings.checkpoint.mode === 'advanced') {
-      settings.checkpoint.unet ??= {};
-      settings.checkpoint.clip1 ??= {};
-      settings.checkpoint.vae ??= {};
-
-      settings.checkpoint.unet.name ||= mainStore.defaultModelName(
-        ModelType.UNET,
-      );
+      settings.checkpoint.unet ||= mainStore.defaultModelMrn(ModelType.UNET);
     } else {
-      settings.checkpoint.name ||= mainStore.defaultModelName(
+      settings.checkpoint.model ||= mainStore.defaultModelMrn(
         ModelType.CHECKPOINT,
       );
     }
@@ -332,8 +390,8 @@ export class SimpleProject extends BaseProject<
     const data = this.settings.checkpoint;
     const model =
       data.mode === 'advanced'
-        ? modelStore.find(ModelType.UNET, data.unet.name)
-        : modelStore.find(ModelType.CHECKPOINT, data.name);
+        ? modelStore.find(data.unet)
+        : modelStore.find(data.model);
     return model?.details?.architecture;
   }
 
@@ -357,45 +415,32 @@ export class SimpleProject extends BaseProject<
     let totalVram = 0;
 
     if (settings.checkpoint.mode === 'advanced') {
-      totalVram += modelStore.size(
-        ModelType.UNET,
-        settings.checkpoint.unet.name,
-      );
-      totalVram += modelStore.size(
-        ModelType.CLIP,
-        settings.checkpoint.clip1.name,
-      );
-      totalVram += modelStore.size(
-        ModelType.CLIP,
-        settings.checkpoint.clip2?.name,
-      );
-      totalVram += modelStore.size(ModelType.VAE, settings.checkpoint.vae.name);
+      totalVram += modelStore.size(settings.checkpoint.unet);
+      totalVram += modelStore.size(settings.checkpoint.clip1);
+      totalVram += modelStore.size(settings.checkpoint.clip2);
+      totalVram += modelStore.size(settings.checkpoint.vae);
     } else {
-      totalVram += modelStore.size(
-        ModelType.CHECKPOINT,
-        settings.checkpoint.name,
-      );
+      totalVram += modelStore.size(settings.checkpoint.model);
     }
 
     if (settings.models.controlnet) {
       for (const controlnet of settings.models.controlnet) {
-        if (controlnet.enabled && controlnet.name) {
-          totalVram += modelStore.size(ModelType.CONTROLNET, controlnet.name);
+        if (controlnet.enabled) {
+          totalVram += modelStore.size(controlnet.model);
         }
       }
     }
 
     if (settings.models.ipadapter) {
       for (const ipadapter of settings.models.ipadapter) {
-        if (ipadapter.enabled && ipadapter.name) {
-          totalVram += modelStore.size(ModelType.IPADAPTER, ipadapter.name);
-        }
+        totalVram += modelStore.size(ipadapter.model);
+        totalVram += modelStore.size(ipadapter.clipVision);
       }
     }
 
     this.recurseFields((parent, key, field) => {
       if (field.type === FieldType.MODEL) {
-        totalVram += modelStore.size(field.modelType, parent[key]);
+        totalVram += modelStore.size(parent[key]);
       }
     });
 
@@ -597,7 +642,7 @@ export class SimpleProject extends BaseProject<
 
   addModel(
     type: ModelType.CONTROLNET | ModelType.IPADAPTER | ModelType.LORA,
-    name: string,
+    mrn: string,
     strength = 1,
   ) {
     const settings = { ...this.settings };
@@ -606,7 +651,7 @@ export class SimpleProject extends BaseProject<
       case ModelType.CONTROLNET:
         this.settings.models[type]?.push({
           enabled: true,
-          name,
+          model: mrn,
           strength,
           image: '',
           imageMode: 'cover',
@@ -615,8 +660,7 @@ export class SimpleProject extends BaseProject<
       case ModelType.IPADAPTER:
         this.settings.models[type]?.push({
           enabled: true,
-          name,
-          clipVisionName: '',
+          model: mrn,
           strength,
           image: '',
           imageMode: 'cover',

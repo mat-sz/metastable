@@ -1,3 +1,4 @@
+import { MRN } from '@metastable/common';
 import { Model, ModelType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
@@ -35,11 +36,7 @@ class ModelStore {
       .map(entry => entry[0]) as ModelType[];
   }
 
-  has(type: ModelType, name: string) {
-    return !!this.find(type, name);
-  }
-
-  find(type: ModelType, name?: string) {
+  findByName(type: ModelType, name?: string) {
     if (!name) {
       return undefined;
     }
@@ -47,12 +44,38 @@ class ModelStore {
     return this.models[type]?.find(({ file }) => file.name === name);
   }
 
-  size(type: ModelType, name?: string) {
-    if (!name) {
+  hasByName(type: ModelType, name: string) {
+    return !!this.findByName(type, name);
+  }
+
+  find(mrn?: string) {
+    if (!mrn) {
+      return undefined;
+    }
+
+    const parsed = MRN.parse(mrn);
+    if (parsed.segments[0] !== 'model') {
+      return undefined;
+    }
+
+    const type = parsed.segments[1] as ModelType;
+    if (!Object.values(ModelType).includes(type)) {
+      return undefined;
+    }
+
+    return this.models[type]?.find(model => model.mrn === mrn);
+  }
+
+  has(mrn?: string) {
+    return !!this.find(mrn);
+  }
+
+  size(mrn?: string) {
+    if (!mrn) {
       return 0;
     }
 
-    const model = this.find(type, name);
+    const model = this.find(mrn);
     return model?.file.size ?? 0;
   }
 

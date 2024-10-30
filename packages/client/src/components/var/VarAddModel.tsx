@@ -29,7 +29,7 @@ export const VarAddModel = observer(
     className,
   }: IVarAddModelProps): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
-    const defaultModel = mainStore.defaultModelName(modelType);
+    const defaultModel = mainStore.defaultModelMrn(modelType);
 
     if (!defaultModel) {
       return (

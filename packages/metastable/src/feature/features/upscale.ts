@@ -30,7 +30,7 @@ const upscaleField = {
   label: 'Upscale',
   enabledKey: 'enabled',
   properties: {
-    name: {
+    model: {
       type: FieldType.MODEL,
       modelType: ModelType.UPSCALE_MODEL,
       label: 'Model',
@@ -51,9 +51,9 @@ export class FeatureUpscale extends FeaturePython {
     },
   };
 
-  private async load(session: ComfySession, path: string) {
+  private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('upscale_model:load', {
-      path,
+      path: await this.metastable.resolve(mrn),
     })) as RPCRef;
     return new ComfyUpscaleModel(session, data);
   }
@@ -65,10 +65,7 @@ export class FeatureUpscale extends FeaturePython {
       return;
     }
 
-    const upscaleModel = await this.load(
-      session,
-      (upscaleSettings as any).path!,
-    );
+    const upscaleModel = await this.load(session, upscaleSettings.model);
     task.images = await upscaleModel.applyTo(images);
   }
 }

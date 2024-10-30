@@ -224,6 +224,11 @@ class MainStore {
     return featureIds;
   }
 
+  defaultModelMrn(type: ModelType) {
+    const model = modelStore.defaultModel(type);
+    return model?.mrn;
+  }
+
   defaultModelName(type: ModelType) {
     const model = modelStore.defaultModel(type);
     return model?.file.name;

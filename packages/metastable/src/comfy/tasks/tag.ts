@@ -23,7 +23,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
 
   async init() {
     if (!this.settings.tagger.path) {
-      const model = await this.metastable.model.get(
+      const model = await this.metastable.model.getByName(
         ModelType.TAGGER,
         this.settings.tagger.name,
       );

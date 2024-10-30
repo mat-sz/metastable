@@ -42,7 +42,7 @@ const pulidField = {
   label: 'PuLID',
   enabledKey: 'enabled',
   properties: {
-    name: {
+    model: {
       type: FieldType.MODEL,
       modelType: ModelType.IPADAPTER,
       label: 'Model',
@@ -83,9 +83,9 @@ export class FeaturePulid extends FeaturePython {
     },
   };
 
-  private async load(session: ComfySession, path: string) {
+  private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('pulid:load', {
-      path,
+      path: await this.metastable.resolve(mrn),
     })) as RPCRef;
     return new ComfyPulid(session, data);
   }
@@ -107,7 +107,7 @@ export class FeaturePulid extends FeaturePython {
       return;
     }
 
-    const pulid = await this.load(session, (pulidSettings as any).path!);
+    const pulid = await this.load(session, pulidSettings.model);
     const insightface = await this.loadInsightface(
       session,
       this.metastable.internalPath,

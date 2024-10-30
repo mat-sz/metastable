@@ -31,6 +31,26 @@ const MODEL_EXTENSIONS = [
   'sft',
 ];
 
+function parsedMrnToModelInfo(parsed: MRNDataParsed) {
+  const type = parsed.segments[1] as ModelType;
+  const name = parsed.segments[2];
+
+  if (!Object.values(ModelType).includes(type)) {
+    throw new Error(`Invalid model type: ${type}`);
+  }
+
+  if (!name) {
+    throw new Error(`Empty model name`);
+  }
+
+  return { type, name };
+}
+
+function mrnToModelInfo(mrn: string) {
+  const parsed = MRN.parse(mrn);
+  return parsedMrnToModelInfo(parsed);
+}
+
 export class ModelEntity extends FileEntity {
   type: ModelType | undefined = undefined;
   imageName: string | undefined = undefined;
@@ -270,7 +290,7 @@ export class ModelRepository extends (EventEmitter as {
     return models.filter(model => model.type === type);
   }
 
-  async get(type: ModelType, name: string): Promise<ModelEntity> {
+  async getByName(type: ModelType, name: string): Promise<ModelEntity> {
     const basename = path.basename(name.replace(/[\\/]/g, path.sep));
     const cache = await this.all();
 
@@ -286,6 +306,11 @@ export class ModelRepository extends (EventEmitter as {
     return model;
   }
 
+  async get(mrn: string): Promise<ModelEntity> {
+    const { type, name } = mrnToModelInfo(mrn);
+    return await this.getByName(type, name);
+  }
+
   async getEmbeddingsPath(): Promise<string | undefined> {
     const embeddingsDir = path.join(this.baseDir, ModelType.EMBEDDING);
     if (await exists(embeddingsDir)) {
@@ -295,25 +320,15 @@ export class ModelRepository extends (EventEmitter as {
     return undefined;
   }
 
-  async delete(type: ModelType, name: string): Promise<void> {
-    const entity = await this.get(type, name);
+  async delete(mrn: string): Promise<void> {
+    const entity = await this.get(mrn);
     await entity.delete();
   }
 
   async resolve(parsed: MRNDataParsed) {
-    const modelType = parsed.segments[1] as ModelType;
-    const name = parsed.segments[2];
+    const { type, name } = parsedMrnToModelInfo(parsed);
     const option = parsed.segments[3] || 'model';
-
-    if (!Object.values(ModelType).includes(modelType)) {
-      throw new Error(`Invalid model type: ${modelType}`);
-    }
-
-    if (!name) {
-      throw new Error(`Empty model name`);
-    }
-
-    const model = await this.get(modelType, name);
+    const model = await this.getByName(type, name);
 
     switch (option) {
       case 'model':

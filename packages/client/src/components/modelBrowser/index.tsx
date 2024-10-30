@@ -100,7 +100,7 @@ export const ModelBrowser: React.FC<Props> = observer(
             <IconButton
               title="Reveal in explorer"
               onClick={() => {
-                API.electron.shell.showItemInFolder.mutate(models[0].file.path);
+                API.electron.shell.showItemInFolder.mutate(models[0].mrn);
               }}
             >
               <BsFolderFill />
@@ -142,8 +142,8 @@ export const ModelBrowser: React.FC<Props> = observer(
             ) : (
               <Card
                 name={item.name}
-                key={item.file.name}
-                color={stringToColor(item.file.name)}
+                key={item.mrn}
+                color={stringToColor(item.mrn)}
                 imageUrl={resolveImage(item.coverMrn, 'thumbnail')}
                 onClick={() => {
                   onSelect(item);
@@ -166,12 +166,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                       )}
                       <ContextMenuItem
                         onSelect={() => {
-                          modalStore.show(
-                            <ModelEdit
-                              name={item.file.name}
-                              type={item.type}
-                            />,
-                          );
+                          modalStore.show(<ModelEdit mrn={item.mrn} />);
                         }}
                       >
                         Edit
@@ -179,12 +174,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                       <ContextMenuDivider />
                       <ContextMenuItem
                         onSelect={() => {
-                          modalStore.show(
-                            <ModelDelete
-                              name={item.file.name}
-                              type={item.type}
-                            />,
-                          );
+                          modalStore.show(<ModelDelete mrn={item.mrn} />);
                         }}
                       >
                         Delete

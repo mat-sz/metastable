@@ -1,4 +1,4 @@
-import { Model, ModelType } from '@metastable/types';
+import { Model } from '@metastable/types';
 import React, { useEffect, useState } from 'react';
 
 import { TRPC } from '$api';
@@ -7,17 +7,15 @@ import { Modal, ModalActions, useModal } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
 
 interface Props {
-  type: ModelType;
-  name: string;
+  mrn: string;
 }
 
-export const ModelEdit: React.FC<Props> = ({ type, name }) => {
+export const ModelEdit: React.FC<Props> = ({ mrn }) => {
   const { close } = useModal();
   const [metadata, setMetadata] = useState<Model['metadata']>();
 
   const metadataQuery = TRPC.model.get.useQuery({
-    type,
-    name,
+    mrn,
   });
   const metadataMutation = TRPC.model.update.useMutation();
 
@@ -56,7 +54,7 @@ export const ModelEdit: React.FC<Props> = ({ type, name }) => {
         <Button
           variant="primary"
           onClick={() => {
-            metadataMutation.mutate({ name, type, metadata });
+            metadataMutation.mutate({ mrn, metadata });
             close();
           }}
         >

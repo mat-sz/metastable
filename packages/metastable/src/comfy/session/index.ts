@@ -9,7 +9,6 @@ import {
   ComfyControlnet,
   ComfyIPAdapter,
   ComfyLatent,
-  ComfyLORA,
 } from './models.js';
 import {
   ComfySessionLogEvent,
@@ -70,17 +69,6 @@ class ComfySessionCheckpoint {
       vae,
       latent_type: 'sd',
     } as any);
-  }
-}
-
-class ComfySessionLora {
-  constructor(private session: ComfySession) {}
-
-  async load(path: string) {
-    const data = (await this.session.invoke('lora:load', {
-      path,
-    })) as RPCRef;
-    return new ComfyLORA(this.session, data);
   }
 }
 
@@ -177,7 +165,6 @@ export class ComfySession extends (EventEmitter as {
   new (): TypedEventEmitter<ComfySessionEvents>;
 }) {
   checkpoint = new ComfySessionCheckpoint(this);
-  lora = new ComfySessionLora(this);
   controlnet = new ComfySessionControlnet(this);
   clipVision = new ComfySessionClipVision(this);
   ipadapter = new ComfySessionIpadapter(this);

@@ -14,7 +14,7 @@ export function defaultSettings(): ProjectTrainingSettings {
   return {
     mode: 'lora',
     base: {
-      name: mainStore.defaultModelName(ModelType.CHECKPOINT),
+      name: mainStore.defaultModelMrn(ModelType.CHECKPOINT),
       sdxl: false,
     },
     resolution: { width: 512, height: 512 },

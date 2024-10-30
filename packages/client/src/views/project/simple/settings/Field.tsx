@@ -92,7 +92,7 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
                     modelType={modelField.modelType}
                     // architecture={modelField.shouldFilterByArchitecture ? project}
                     onSelect={model => {
-                      append({ model: model.file.name });
+                      append({ model: model.mrn });
                     }}
                   />
                 ) : (

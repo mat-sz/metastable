@@ -242,35 +242,31 @@ export const router = t.router({
       return map;
     }),
     get: t.procedure
-      .input(z.object({ type: z.nativeEnum(ModelType), name: z.string() }))
-      .query(async ({ ctx: { metastable }, input: { type, name } }) => {
-        const model = await metastable.model.get(type, name);
+      .input(z.object({ mrn: z.string() }))
+      .query(async ({ ctx: { metastable }, input: { mrn } }) => {
+        const model = await metastable.model.get(mrn);
         return await model.json();
       }),
     update: t.procedure
       .input(
         z.object({
-          type: z.nativeEnum(ModelType),
-          name: z.string(),
+          mrn: z.string(),
           metadata: z.any(),
         }),
       )
-      .mutation(
-        async ({ ctx: { metastable }, input: { type, name, metadata } }) => {
-          const model = await metastable.model.get(type, name);
-          await model.metadata.update(metadata);
-          return await model.json();
-        },
-      ),
+      .mutation(async ({ ctx: { metastable }, input: { mrn, metadata } }) => {
+        const model = await metastable.model.get(mrn);
+        await model.metadata.update(metadata);
+        return await model.json();
+      }),
     delete: t.procedure
       .input(
         z.object({
-          type: z.nativeEnum(ModelType),
-          name: z.string(),
+          mrn: z.string(),
         }),
       )
-      .mutation(async ({ ctx: { metastable }, input: { type, name } }) => {
-        await metastable.model.delete(type, name);
+      .mutation(async ({ ctx: { metastable }, input: { mrn } }) => {
+        await metastable.model.delete(mrn);
       }),
   },
   setup: {
@@ -656,14 +652,20 @@ export const router = t.router({
     shell: {
       showItemInFolder: electronProcedure
         .input(z.string())
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx: { metastable } }) => {
           const { shell } = await import('electron');
+          if (input.startsWith('mrn:')) {
+            input = await metastable.resolve(input);
+          }
           shell.showItemInFolder(input);
         }),
       openPath: electronProcedure
         .input(z.string())
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx: { metastable } }) => {
           const { shell } = await import('electron');
+          if (input.startsWith('mrn:')) {
+            input = await metastable.resolve(input);
+          }
           shell.openPath(input);
         }),
     },

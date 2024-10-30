@@ -48,29 +48,29 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         {project.settings.checkpoint.mode === 'advanced' ? (
           <>
             <VarModel
-              path="checkpoint.unet.name"
+              path="checkpoint.unet"
               modelType={ModelType.UNET}
               label="UNET"
             />
             <VarModel
-              path="checkpoint.clip1.name"
+              path="checkpoint.clip1"
               modelType={ModelType.CLIP}
               label="CLIP 1"
             />
             <VarModel
-              path="checkpoint.clip2.name"
+              path="checkpoint.clip2"
               modelType={ModelType.CLIP}
               label="CLIP 2"
             />
             <VarModel
-              path="checkpoint.vae.name"
+              path="checkpoint.vae"
               modelType={ModelType.VAE}
               label="VAE"
             />
           </>
         ) : (
           <VarModel
-            path="checkpoint.name"
+            path="checkpoint.model"
             modelType={ModelType.CHECKPOINT}
             onSelect={model => {
               const samplerSettings = model.metadata?.samplerSettings;

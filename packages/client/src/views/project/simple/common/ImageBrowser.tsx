@@ -42,7 +42,7 @@ export const ImageBrowser: React.FC<Props> = observer(
               <IconButton
                 title="Reveal in explorer"
                 onClick={() => {
-                  API.electron.shell.showItemInFolder.mutate(images[0].path);
+                  API.electron.shell.showItemInFolder.mutate(images[0].mrn);
                 }}
               >
                 <BsFolderFill />

@@ -44,7 +44,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
         <IconButton
           title="Reveal in explorer"
           onClick={() => {
-            API.electron.shell.showItemInFolder.mutate(file.path);
+            API.electron.shell.showItemInFolder.mutate(file.mrn);
           }}
         >
           <BsFolderFill />

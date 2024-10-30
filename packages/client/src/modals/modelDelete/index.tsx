@@ -1,24 +1,24 @@
-import { ModelType } from '@metastable/types';
 import React from 'react';
 
 import { TRPC } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
+import { modelStore } from '$stores/ModelStore';
 
 interface Props {
-  type: ModelType;
-  name: string;
+  mrn: string;
 }
 
-export const ModelDelete: React.FC<Props> = ({ type, name }) => {
+export const ModelDelete: React.FC<Props> = ({ mrn }) => {
   const { close } = useModal();
 
   const deleteMutation = TRPC.model.delete.useMutation();
+  const model = modelStore.find(mrn);
 
   return (
     <Modal title="Delete model" size="small">
       <div>
-        Are you sure you want to delete <span>{name}</span>?
+        Are you sure you want to delete <span>{model?.name}</span>?
       </div>
       <ModalActions>
         <Button
@@ -32,7 +32,7 @@ export const ModelDelete: React.FC<Props> = ({ type, name }) => {
         <Button
           variant="danger"
           onClick={() => {
-            deleteMutation.mutate({ name, type });
+            deleteMutation.mutate({ mrn });
             close();
           }}
         >

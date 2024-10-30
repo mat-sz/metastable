@@ -3,6 +3,7 @@ import path from 'path';
 
 import {
   mapProjectFields,
+  MRN,
   preprocessPrompt,
   recurseFields,
 } from '@metastable/common';
@@ -53,49 +54,41 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     this.created();
   }
 
-  private async setModelPath(
+  private async validateModel(
     type: ModelType,
-    modelSettings?: { name?: string; path?: string },
+    required: boolean,
+    mrn?: string,
   ) {
-    if (!modelSettings) {
-      return;
-    }
-
-    if (modelSettings.name && !modelSettings.path) {
-      const model = await this.metastable.model.get(type, modelSettings.name);
-      modelSettings.path = model.path;
-
-      if (type === ModelType.CHECKPOINT && model.configPath) {
-        this.checkpointConfigPath = model.configPath;
+    if (!mrn) {
+      if (required) {
+        throw new Error(`Missing ${type} model.`);
+      } else {
+        return;
       }
     }
+
+    const parsed = MRN.parse(mrn);
+    if (parsed.segments[0] !== 'model') {
+      throw new Error(`Invalid MRN for model type ${type}: ${mrn}`);
+    }
+
+    await this.metastable.resolve(mrn);
   }
 
-  private async setModelPathArray(
-    type: ModelType,
-    array:
-      | { enabled: boolean; name?: string; path?: string; image?: string }[]
-      | undefined,
-    validateImage = false,
-  ) {
+  private async validateModelArray(type: ModelType, array?: any[]) {
     if (!array) {
       return;
     }
 
-    await Promise.all(
-      array.map(async modelSettings => {
-        if (!modelSettings.enabled) {
-          return;
+    for (const model of array) {
+      if (model.enabled) {
+        try {
+          await this.validateModel(type, true, model.model);
+        } catch {
+          model.enabled = false;
         }
-
-        if (validateImage && !modelSettings.image) {
-          modelSettings.enabled = false;
-          return;
-        }
-
-        await this.setModelPath(type, modelSettings);
-      }),
-    );
+      }
+    }
   }
 
   async init() {
@@ -108,22 +101,27 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     }
 
     if (settings.checkpoint.mode === 'advanced') {
-      await this.setModelPath(ModelType.UNET, settings.checkpoint.unet);
-      await this.setModelPath(ModelType.CLIP, settings.checkpoint.clip1);
-      if (settings.checkpoint.clip2?.name) {
-        await this.setModelPath(ModelType.CLIP, settings.checkpoint.clip2);
-      }
-      await this.setModelPath(ModelType.VAE, settings.checkpoint.vae);
+      await this.validateModel(ModelType.UNET, true, settings.checkpoint.unet);
+      await this.validateModel(ModelType.CLIP, true, settings.checkpoint.clip1);
+      await this.validateModel(
+        ModelType.CLIP,
+        false,
+        settings.checkpoint.clip2,
+      );
+      await this.validateModel(ModelType.VAE, true, settings.checkpoint.vae);
     } else {
-      await this.setModelPath(ModelType.CHECKPOINT, settings.checkpoint);
+      await this.validateModel(
+        ModelType.CHECKPOINT,
+        true,
+        settings.checkpoint.model,
+      );
     }
 
     this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
 
-    await this.setModelPathArray(
+    await this.validateModelArray(
       ModelType.CONTROLNET,
       settings.models.controlnet,
-      true,
     );
 
     if (settings.models.ipadapter) {
@@ -131,28 +129,23 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         if (
           !modelSettings.enabled ||
           !modelSettings.image ||
-          !modelSettings.name ||
-          !modelSettings.clipVisionName
+          !modelSettings.model ||
+          !modelSettings.clipVision
         ) {
           modelSettings.enabled = false;
           continue;
         }
 
-        if (!modelSettings.path) {
-          const model = await this.metastable.model.get(
-            ModelType.IPADAPTER,
-            modelSettings.name,
-          );
-          modelSettings.path = model.path;
-        }
-
-        if (!modelSettings.clipVisionPath) {
-          const model = await this.metastable.model.get(
-            ModelType.CLIP_VISION,
-            modelSettings.clipVisionName,
-          );
-          modelSettings.clipVisionPath = model.path;
-        }
+        await this.validateModel(
+          ModelType.IPADAPTER,
+          true,
+          modelSettings.model,
+        );
+        await this.validateModel(
+          ModelType.CLIP_VISION,
+          true,
+          modelSettings.clipVision,
+        );
       }
     }
 
@@ -160,11 +153,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     if (config.generation?.preview) {
       try {
-        const decoderModel = await this.metastable.model.get(
+        const decoderModel = await this.metastable.model.getByName(
           ModelType.VAE_APPROX,
           'taesd_decoder',
         );
-        const decoderXlModel = await this.metastable.model.get(
+        const decoderXlModel = await this.metastable.model.getByName(
           ModelType.VAE_APPROX,
           'taesdxl_decoder',
         );
@@ -202,15 +195,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       (parent, key, field) => {
         if (field.type === FieldType.MODEL) {
           const fn = async () => {
-            if (!parent?.[key]) {
-              throw new Error('Unable to find model.');
+            try {
+              await this.validateModel(field.modelType, true, parent?.[key]);
+            } catch {
+              parent.enabled = false;
             }
-
-            const model = await this.metastable.model.get(
-              field.modelType,
-              parent[key],
-            );
-            parent.path = model.path;
           };
 
           promises.push(fn());
@@ -244,44 +233,24 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     };
   }
 
-  private getCleanSettings() {
-    const settings: ProjectSimpleSettings = JSON.parse(
-      JSON.stringify(this.settings),
-    );
-
-    for (const key of Object.keys(settings.models)) {
-      const array = (settings.models as any)[key] as {
-        path?: string;
-        clipVisionPath?: string;
-      }[];
-
-      for (const modelSettings of array) {
-        delete modelSettings['path'];
-        delete modelSettings['clipVisionPath'];
-      }
-    }
-
-    return settings;
-  }
-
   async getCheckpoint(ctx: ComfySession) {
     const data = this.settings.checkpoint;
     if (data.mode === 'advanced') {
-      const clipPaths = [data.clip1.path!];
-      if (data.clip2?.path) {
-        clipPaths.push(data.clip2.path);
+      const clipPaths = [await this.metastable.resolve(data.clip1!)];
+      if (data.clip2) {
+        clipPaths.push(await this.metastable.resolve(data.clip2));
       }
 
       return await ctx.checkpoint.advanced({
         type: Architecture.FLUX1,
-        unetPath: data.unet.path!,
+        unetPath: await this.metastable.resolve(data.unet!),
         clipPaths,
-        vaePath: data.vae.path!,
+        vaePath: await this.metastable.resolve(data.vae!),
         embeddingsPath: this.embeddingsPath,
       });
     } else {
       return await ctx.checkpoint.load(
-        data.path!,
+        await this.metastable.resolve(data.model!),
         this.embeddingsPath,
         data.clipSkip ? -1 * data.clipSkip : undefined,
         this.checkpointConfigPath,
@@ -423,7 +392,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
               controlnetSettings.imageMode,
             );
             const controlnet = await ctx.controlnet.load(
-              controlnetSettings.path!,
+              await this.metastable.resolve(controlnetSettings.model!),
             );
             await controlnet.applyTo(
               conditioning,
@@ -443,9 +412,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
               ipadapterSettings.image!,
               ipadapterSettings.imageMode,
             );
-            const ipadapter = await ctx.ipadapter.load(ipadapterSettings.path!);
+            const ipadapter = await ctx.ipadapter.load(
+              await this.metastable.resolve(ipadapterSettings.model!),
+            );
             const clipVision = await ctx.clipVision.load(
-              ipadapterSettings.clipVisionPath!,
+              await this.metastable.resolve(ipadapterSettings.clipVision!),
             );
             await ipadapter.applyTo(
               checkpoint,
@@ -520,7 +491,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       this.step('save');
       const ext = settings.output?.format || 'png';
       const outputs: ImageFile[] = [];
-      const cleanSettings = this.getCleanSettings();
 
       for (const image of this.images) {
         const bytes = await ctx.image.dump(image, ext);
@@ -534,14 +504,14 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
           buffer = PNG.addMetadata(
             buffer,
             'metastable',
-            JSON.stringify(cleanSettings),
+            JSON.stringify(settings),
           );
         }
 
         const filename = await getNextFilename(outputDir, ext);
         await fs.writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.files.output.get(filename);
-        await output.metadata.set(cleanSettings);
+        await output.metadata.set(settings);
         outputs.push(await output.json());
       }
 

@@ -42,9 +42,7 @@ export const VarModel = observer(
     });
     const [isOpen, setIsOpen] = useState(false);
 
-    const model = currentValue
-      ? modelStore.find(modelType, currentValue)
-      : undefined;
+    const model = currentValue ? modelStore.find(currentValue) : undefined;
 
     return (
       <VarBase
@@ -66,7 +64,7 @@ export const VarModel = observer(
               type={modelType}
               architecture={architecture}
               onSelect={model => {
-                setCurrentValue(model.file.name);
+                setCurrentValue(model.mrn);
                 onSelect?.(model);
                 setIsOpen(false);
               }}

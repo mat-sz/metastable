@@ -54,15 +54,12 @@ export const ModelArray: React.FC<Props> = observer(
             >
               <VarToggle label="Enable" path="enabled" />
               <VarModel
-                path="name"
+                path="model"
                 modelType={type}
                 architecture={project.architecture}
               />
               {hasClipVision && (
-                <VarModel
-                  path="clipVisionName"
-                  modelType={ModelType.CLIP_VISION}
-                />
+                <VarModel path="clipVision" modelType={ModelType.CLIP_VISION} />
               )}
               <VarSlider
                 label="Strength"
@@ -87,7 +84,7 @@ export const ModelArray: React.FC<Props> = observer(
           modelType={type}
           architecture={project.architecture}
           onSelect={model => {
-            project.addModel(type, model.file.name);
+            project.addModel(type, model.mrn);
           }}
         />
       </>

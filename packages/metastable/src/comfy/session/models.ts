@@ -110,24 +110,6 @@ export class ComfyControlnet {
   }
 }
 
-export class ComfyLORA {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(checkpoint: ComfyCheckpoint, strength: number) {
-    const { model, clip } = (await this.session.invoke('lora:apply', {
-      lora: this.ref,
-      model: checkpoint.data.model,
-      clip: checkpoint.data.clip,
-      strength,
-    })) as { model: RPCRef; clip: RPCRef };
-    checkpoint.data.model = model;
-    checkpoint.data.clip = clip;
-  }
-}
-
 export class ComfyIPAdapter {
   constructor(
     private session: ComfySession,
