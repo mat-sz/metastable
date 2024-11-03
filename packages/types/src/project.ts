@@ -33,27 +33,6 @@ export interface ProjectSimpleSettings {
     format?: string;
     path?: string;
   };
-  models: {
-    controlnet?: {
-      enabled: boolean;
-      strength: number;
-      model?: string;
-      image?: string;
-      imageMode?: ProjectImageMode;
-      editor?: {
-        name: string;
-        data: any;
-      };
-    }[];
-    ipadapter?: {
-      enabled: boolean;
-      strength: number;
-      model?: string;
-      clipVision?: string;
-      image?: string;
-      imageMode?: ProjectImageMode;
-    }[];
-  };
   prompt: {
     positive: string;
     negative: string;

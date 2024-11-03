@@ -1,4 +1,10 @@
-import { Feature, Field, FieldType, ProjectType } from '@metastable/types';
+import {
+  Feature,
+  Field,
+  FieldProperties,
+  FieldType,
+  ProjectType,
+} from '@metastable/types';
 
 export type FieldHandler = (parent: any, key: string, field: Field) => void;
 
@@ -43,7 +49,7 @@ function recurseField(
 
 export function recurseFields(
   object: any,
-  fields: Record<string, Field>,
+  fields: FieldProperties,
   onField: FieldHandler,
 ) {
   for (const [key, field] of Object.entries(fields)) {
@@ -52,7 +58,7 @@ export function recurseFields(
 }
 
 export function mapProjectFields(features: Feature[]) {
-  const result: Record<ProjectType, Record<string, Field>> = {} as any;
+  const result: Record<ProjectType, FieldProperties> = {} as any;
 
   for (const projectType of Object.values(ProjectType)) {
     result[projectType] = {};
@@ -74,4 +80,13 @@ export function mapProjectFields(features: Feature[]) {
   }
 
   return result;
+}
+
+export function setDefaultValues(object: any, fields: FieldProperties) {
+  recurseFields(object, fields, (parent, key, field) => {
+    const defaultValue = (field as any).defaultValue;
+    if (defaultValue) {
+      parent[key] ??= defaultValue;
+    }
+  });
 }

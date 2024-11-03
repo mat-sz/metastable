@@ -1,4 +1,4 @@
-import { runInAction, toJS } from 'mobx';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { assign } from 'radash';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -146,9 +146,7 @@ export const PromptLoad: React.FC<Props> = observer(
                       toJS(project.settings),
                       toJS(settings),
                     ) as any;
-                    runInAction(() => {
-                      project.settings = newSettings;
-                    });
+                    project.setSettings(newSettings);
                   }
                   close();
                 }}

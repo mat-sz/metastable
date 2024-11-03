@@ -1,5 +1,7 @@
 import { ModelType } from './model.js';
 
+export type FieldProperties = Record<string, Field>;
+
 export enum FieldType {
   BOOLEAN,
   FLOAT,
@@ -60,7 +62,7 @@ export interface FieldImage extends FieldWithValue<string> {
 }
 
 export interface FieldWithProperties extends FieldBase {
-  properties: Record<string, Field>;
+  properties: FieldProperties;
 }
 
 export interface FieldCategory extends FieldWithLabel, FieldWithProperties {
@@ -79,12 +81,12 @@ export interface FieldArray extends FieldWithLabel {
 
 export interface FieldScope extends FieldWithProperties {
   type: FieldType.SCOPE;
-  properties: Record<string, Field>;
+  properties: FieldProperties;
 }
 
 export interface FieldSection extends FieldWithLabel, FieldWithProperties {
   type: FieldType.SECTION;
-  properties: Record<string, Field>;
+  properties: FieldProperties;
 }
 
 export type Field =

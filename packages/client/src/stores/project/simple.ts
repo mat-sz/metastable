@@ -199,9 +199,6 @@ export function defaultSettings(): ProjectSimpleSettings {
       mode: 'simple',
       model: checkpoint?.mrn,
     },
-    models: {
-      controlnet: [],
-    },
     prompt: {
       positive: 'an image of a banana',
       negative: 'bad quality',
@@ -255,7 +252,6 @@ export class SimpleProject extends BaseProject<
       editor: observable,
       preview: computed,
       request: action,
-      addModel: action,
       setSettings: action,
       prompts: computed,
       firstPrompt: computed,
@@ -299,6 +295,8 @@ export class SimpleProject extends BaseProject<
   }
 
   setSettings(settings: ProjectSimpleSettings) {
+    settings = convertSettings(settings);
+
     settings.output.height ||= 512;
     settings.output.width ||= 512;
     settings.output.batchSize ||= 1;
@@ -381,21 +379,6 @@ export class SimpleProject extends BaseProject<
       totalVram += modelStore.size(settings.checkpoint.vae);
     } else {
       totalVram += modelStore.size(settings.checkpoint.model);
-    }
-
-    if (settings.models.controlnet) {
-      for (const controlnet of settings.models.controlnet) {
-        if (controlnet.enabled) {
-          totalVram += modelStore.size(controlnet.model);
-        }
-      }
-    }
-
-    if (settings.models.ipadapter) {
-      for (const ipadapter of settings.models.ipadapter) {
-        totalVram += modelStore.size(ipadapter.model);
-        totalVram += modelStore.size(ipadapter.clipVision);
-      }
     }
 
     this.recurseFields((parent, key, field) => {
@@ -549,18 +532,6 @@ export class SimpleProject extends BaseProject<
     await this.handleImage(ProjectFileType.INPUT, this.settings.input, 'image');
     await this.handleImage(ProjectFileType.MASK, this.settings.input, 'mask');
 
-    if (this.settings.models.controlnet) {
-      for (const controlnet of this.settings.models.controlnet) {
-        await this.handleImage(ProjectFileType.INPUT, controlnet, 'image');
-      }
-    }
-
-    if (this.settings.models.ipadapter) {
-      for (const ipadapter of this.settings.models.ipadapter) {
-        await this.handleImage(ProjectFileType.INPUT, ipadapter, 'image');
-      }
-    }
-
     const promises: Promise<void>[] = [];
     this.recurseFields((parent, key, field) => {
       if (field.type === FieldType.IMAGE) {
@@ -598,37 +569,6 @@ export class SimpleProject extends BaseProject<
       projectId: this.id,
       settings: this.settings,
     });
-  }
-
-  addModel(
-    type: ModelType.CONTROLNET | ModelType.IPADAPTER | ModelType.LORA,
-    mrn: string,
-    strength = 1,
-  ) {
-    const settings = { ...this.settings };
-
-    switch (type) {
-      case ModelType.CONTROLNET:
-        this.settings.models[type]?.push({
-          enabled: true,
-          model: mrn,
-          strength,
-          image: '',
-          imageMode: 'cover',
-        });
-        break;
-      case ModelType.IPADAPTER:
-        this.settings.models[type]?.push({
-          enabled: true,
-          model: mrn,
-          strength,
-          image: '',
-          imageMode: 'cover',
-        });
-        break;
-    }
-
-    this.settings = settings;
   }
 
   selectTask(task?: Task<ProjectPromptTaskData>) {

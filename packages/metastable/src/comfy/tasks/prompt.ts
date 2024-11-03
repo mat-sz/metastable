@@ -6,6 +6,7 @@ import {
   MRN,
   preprocessPrompt,
   recurseFields,
+  setDefaultValues,
 } from '@metastable/common';
 import {
   Architecture,
@@ -76,24 +77,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     await this.metastable.resolve(mrn);
   }
 
-  private async validateModelArray(type: ModelType, array?: any[]) {
-    if (!array) {
-      return;
-    }
-
-    for (const model of array) {
-      if (model.enabled) {
-        try {
-          await this.validateModel(type, true, model.model);
-        } catch {
-          model.enabled = false;
-        }
-      }
-    }
-  }
-
   async init() {
     this.features = await this.metastable.feature.all();
+    const fields = mapProjectFields(this.features)[ProjectType.SIMPLE];
+    setDefaultValues(this.settings.featureData, fields);
 
     const settings = this.settings;
 
@@ -119,36 +106,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     }
 
     this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
-
-    await this.validateModelArray(
-      ModelType.CONTROLNET,
-      settings.models.controlnet,
-    );
-
-    if (settings.models.ipadapter) {
-      for (const modelSettings of settings.models.ipadapter) {
-        if (
-          !modelSettings.enabled ||
-          !modelSettings.image ||
-          !modelSettings.model ||
-          !modelSettings.clipVision
-        ) {
-          modelSettings.enabled = false;
-          continue;
-        }
-
-        await this.validateModel(
-          ModelType.IPADAPTER,
-          true,
-          modelSettings.model,
-        );
-        await this.validateModel(
-          ModelType.CLIP_VISION,
-          true,
-          modelSettings.clipVision,
-        );
-      }
-    }
 
     const config = await this.metastable.config.all();
 
@@ -188,25 +145,20 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     settings.sampler.tiling = !!settings.sampler.tiling;
 
     const promises: Promise<void>[] = [];
-    const fields = mapProjectFields(this.features);
 
-    recurseFields(
-      settings.featureData,
-      fields[ProjectType.SIMPLE],
-      (parent, key, field) => {
-        if (field.type === FieldType.MODEL) {
-          const fn = async () => {
-            try {
-              await this.validateModel(field.modelType, true, parent?.[key]);
-            } catch {
-              parent.enabled = false;
-            }
-          };
+    recurseFields(settings.featureData, fields, (parent, key, field) => {
+      if (field.type === FieldType.MODEL) {
+        const fn = async () => {
+          try {
+            await this.validateModel(field.modelType, true, parent?.[key]);
+          } catch {
+            parent.enabled = false;
+          }
+        };
 
-          promises.push(fn());
-        }
-      },
-    );
+        promises.push(fn());
+      }
+    });
 
     await Promise.all(promises);
 
