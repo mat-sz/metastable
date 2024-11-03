@@ -319,13 +319,14 @@ export const router = t.router({
           name: z.string(),
           type: z.nativeEnum(ProjectType),
           settings: z.any(),
+          ui: z.any().optional(),
           draft: z.boolean().optional(),
         }),
       )
       .mutation(
         async ({
           ctx: { metastable },
-          input: { name, settings, ...metadata },
+          input: { name, settings, ui, ...metadata },
         }) => {
           const project = await metastable.project.create(name);
           await project.metadata.set({
@@ -333,6 +334,11 @@ export const router = t.router({
             ...metadata,
           });
           await project.settings.set(settings);
+
+          if (ui) {
+            await project.ui.set(ui);
+          }
+
           return await project.json(true);
         },
       ),

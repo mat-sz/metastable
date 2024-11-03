@@ -181,6 +181,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       this.type,
       this.draft,
       this.settings,
+      this.ui,
     );
   }
 

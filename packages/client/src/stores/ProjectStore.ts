@@ -98,6 +98,7 @@ export class ProjectStore {
     type: ProjectType = ProjectType.SIMPLE,
     draft = false,
     settings: any = defaultSettings(),
+    ui?: any,
   ) {
     if (this.loading) {
       return;
@@ -113,6 +114,7 @@ export class ProjectStore {
       type,
       settings,
       draft,
+      ui,
     };
 
     try {
