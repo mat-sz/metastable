@@ -47,6 +47,8 @@ export async function gpu(): Promise<GraphicsControllerData[]> {
         vendor = 'AMD';
       } else if (normalized.includes('nvidia')) {
         vendor = 'NVIDIA';
+      } else {
+        vendor = controller.vendor || 'unknown';
       }
     }
 
