@@ -4,6 +4,15 @@ import { API } from '$api';
 import { IS_ELECTRON } from '$utils/config';
 
 export type ViewName = 'home' | 'models' | 'settings' | 'project';
+export interface CivitAIArgs {
+  query: string;
+  type: string;
+  nsfw: boolean;
+  sort?: string;
+  limit?: number;
+  cursor?: string;
+  baseModels?: string;
+}
 
 class UIStore {
   isFocused = false;
@@ -13,6 +22,13 @@ class UIStore {
   notificationPermission = Notification.permission;
 
   view: ViewName = 'home';
+
+  civitaiArgs: CivitAIArgs = {
+    query: '',
+    type: 'Checkpoint',
+    cursor: undefined,
+    nsfw: false,
+  };
 
   constructor() {
     makeAutoObservable(this);

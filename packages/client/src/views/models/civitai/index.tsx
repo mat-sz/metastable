@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
@@ -10,6 +11,7 @@ import { Card, CardTag, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
 import { Rating } from '$components/rating';
 import { Toggle } from '$components/toggle';
+import { CivitAIArgs, uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
 import { Model } from './Model';
 import { CivitAIModel, CivitAIResponse } from './types';
@@ -24,16 +26,6 @@ const CivitAISort = [
   'Most Images',
   'Newest',
 ];
-
-interface CivitAIArgs {
-  query: string;
-  type: string;
-  nsfw: boolean;
-  sort?: string;
-  limit?: number;
-  cursor?: string;
-  baseModels?: string;
-}
 
 async function fetchCivitAI({
   query,
@@ -100,12 +92,7 @@ export const CivitAI: React.FC = observer(() => {
   const [query, setQuery] = useState('');
 
   const [cursorHistory, setCursorHistory] = useState<string[]>([]);
-  const [args, setArgs] = useState<CivitAIArgs>({
-    query: '',
-    type: 'Checkpoint',
-    cursor: undefined,
-    nsfw: false,
-  });
+  const args = uiStore.civitaiArgs;
   const [item, setItem] = useState<CivitAIModel | undefined>();
   const { data, error, isLoading } = useQuery({
     queryKey: [
@@ -130,7 +117,9 @@ export const CivitAI: React.FC = observer(() => {
 
     const previous = cursorHistory[cursorHistory.length - 2];
     setCursorHistory(history => history.slice(0, -1));
-    setArgs(args => ({ ...args, cursor: previous }));
+    runInAction(() => {
+      uiStore.civitaiArgs = { ...uiStore.civitaiArgs, cursor: previous };
+    });
   };
 
   const updateArgs = (newArgs: Partial<CivitAIArgs>) => {
@@ -141,7 +130,13 @@ export const CivitAI: React.FC = observer(() => {
       setCursorHistory([]);
     }
 
-    setArgs(args => ({ ...args, cursor: undefined, ...newArgs }));
+    runInAction(() => {
+      uiStore.civitaiArgs = {
+        ...uiStore.civitaiArgs,
+        cursor: undefined,
+        ...newArgs,
+      };
+    });
   };
 
   return (

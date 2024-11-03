@@ -19,6 +19,7 @@
 - Resolved issues with out-of-memory crashes.
 - Fixed usage of TAESD decoder for previews.
 - Fixed problems with project metadata sometimes not loading correctly.
+- CivitAI tab now remembers search filters when switching between tabs.
 
 # 0.0.9 (2024-10-17)
 
