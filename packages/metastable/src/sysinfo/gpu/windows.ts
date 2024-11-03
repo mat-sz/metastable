@@ -102,6 +102,12 @@ function nvidiaCompareSubsystemId(windowsId?: string, nvidiaId?: string) {
 }
 
 export async function gpuWindows() {
+  const otherData: GraphicsControllerData[] = [];
+
+  try {
+    otherData.push(...(await nvidiaDevices()));
+  } catch {}
+
   try {
     const workload = [];
     workload.push(
@@ -113,14 +119,13 @@ export async function gpuWindows() {
       ),
     );
 
-    const nvidiaData = await nvidiaDevices();
     const data = await Promise.all(workload);
 
     const csections = data[0].replace(/\r/g, '').split(/\n\s*\n/);
     const vsections = data[1].replace(/\r/g, '').split(/\n\s*\n/);
     const controllers = parseLines(csections, vsections).map(controller => {
       if (controller.vendor?.toLowerCase() === 'nvidia') {
-        const nvidiaController = nvidiaData.find(device => {
+        const nvidiaController = otherData.find(device => {
           return nvidiaCompareSubsystemId(
             controller.subDeviceId,
             device.subDeviceId,

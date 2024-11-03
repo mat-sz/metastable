@@ -1,3 +1,9 @@
+# 0.0.11 (Upcoming)
+
+## Bug fixes
+
+- Resolved issues with AMD GPU detection on Windows.
+
 # 0.0.10 (2024-11-03)
 
 ## Features
