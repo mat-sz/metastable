@@ -3,11 +3,14 @@
 ## Features
 
 - Added an option to pad edges for inpainting.
+- Added support for PuLID.
+- Features are now split into modules that can be enabled/disabled.
 
 ## Improvements
 
 - Moved backend status to settings.
 - Reduced memory usage during image generation.
+- Refactored model path handling.
 
 ## Bug fixes
 

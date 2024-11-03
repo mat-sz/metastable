@@ -33,7 +33,9 @@ export class FeatureBase implements FeatureInstance {
   }
 
   async isEnabled() {
-    return await this.isInstalled();
+    const { features } = await this.metastable.config.get('python');
+    const enabled = features?.[this.id] ?? true;
+    return enabled && (await this.isInstalled());
   }
 
   async info(): Promise<Feature> {

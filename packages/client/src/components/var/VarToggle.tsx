@@ -9,6 +9,7 @@ export const VarToggle = ({
   label,
   path,
   value,
+  defaultValue,
   onChange,
   disabled,
   readOnly,
@@ -18,7 +19,7 @@ export const VarToggle = ({
 }: IVarBaseInputProps<boolean>): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
-    fallbackValue: value,
+    fallbackValue: value ?? defaultValue,
     onChange,
     error,
     errorPath,

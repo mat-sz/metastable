@@ -1,6 +1,7 @@
 import { TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { BsArrowClockwise } from 'react-icons/bs';
 import semverGte from 'semver/functions/gte';
 
 import { API } from '$api';
@@ -19,6 +20,12 @@ export const SettingsFeatures: React.FC = observer(() => {
   return (
     <TabPanel id="features">
       <h2>Optional features</h2>
+      <div className={styles.actions}>
+        <button onClick={() => API.instance.restart.mutate()}>
+          <BsArrowClockwise />
+          <span>Restart backend</span>
+        </button>
+      </div>
       {!available && (
         <Alert variant="warning">
           <div>
@@ -31,6 +38,9 @@ export const SettingsFeatures: React.FC = observer(() => {
           </div>
         </Alert>
       )}
+      <Alert variant="warning">
+        <div>Any changes here require a backend restart to be applied.</div>
+      </Alert>
       {features.map(feature => {
         const task = mainStore.tasks.queues.settings.find(
           task =>
@@ -47,7 +57,10 @@ export const SettingsFeatures: React.FC = observer(() => {
                 </span>
               ) : feature.installed ? (
                 <>
-                  <VarToggle value={feature.enabled} />
+                  <VarToggle
+                    path={`python.features.${feature.id}`}
+                    defaultValue={feature.enabled}
+                  />
                 </>
               ) : (
                 <button

@@ -97,6 +97,7 @@ export class Setup extends (EventEmitter as {
         ? path.relative(this.metastable.dataRoot, this._packagesDir)
         : undefined,
       bundleVersion: this._bundleVersion,
+      features: {},
     });
 
     this.metastable.reload();

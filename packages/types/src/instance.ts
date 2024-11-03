@@ -48,6 +48,7 @@ export interface ConfigType {
     pythonHome?: string;
     packagesDir?: string;
     bundleVersion?: string;
+    features: Record<string, boolean>;
   };
   comfy?: {
     vramMode?: ComfyVramMode;

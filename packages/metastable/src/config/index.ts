@@ -7,6 +7,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   python: {
     configured: false,
     mode: 'system',
+    features: {},
   },
   generation: {
     preview: true,

@@ -2,10 +2,15 @@
   padding: 1rem;
   background: var(--grey-300);
   border-radius: 5px;
+  margin-bottom: 0.5rem;
 
   .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
+}
+
+.actions {
+  margin-bottom: 1rem;
 }
