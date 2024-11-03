@@ -37,7 +37,7 @@ class ComfyPulid {
   }
 }
 
-const pulidField = {
+const field = {
   type: FieldType.CATEGORY,
   label: 'PuLID',
   enabledKey: 'enabled',
@@ -62,7 +62,7 @@ const pulidField = {
   },
 } as const;
 
-type PulidFieldType = FieldToType<typeof pulidField>;
+type FeatureFieldType = FieldToType<typeof field>;
 
 export class FeaturePulid extends FeaturePython {
   readonly id = 'pulid';
@@ -79,7 +79,7 @@ export class FeaturePulid extends FeaturePython {
   readonly pythonNamespaceGroup = 'pulid';
   readonly projectFields: FeatureProjectFields = {
     [ProjectType.SIMPLE]: {
-      pulid: pulidField,
+      pulid: field,
     },
   };
 
@@ -102,7 +102,7 @@ export class FeaturePulid extends FeaturePython {
 
   async onAfterConditioning(task: PromptTask) {
     const { settings, checkpoint, session } = task;
-    const pulidSettings = settings.featureData?.pulid as PulidFieldType;
+    const pulidSettings = settings.featureData?.pulid as FeatureFieldType;
     if (!pulidSettings?.enabled || !session || !checkpoint) {
       return;
     }

@@ -25,7 +25,7 @@ export class ComfyUpscaleModel {
   }
 }
 
-const upscaleField = {
+const field = {
   type: FieldType.CATEGORY,
   label: 'Upscale',
   enabledKey: 'enabled',
@@ -38,7 +38,7 @@ const upscaleField = {
   },
 } as const;
 
-type UpscaleFieldType = FieldToType<typeof upscaleField>;
+type FeatureFieldType = FieldToType<typeof field>;
 
 export class FeatureUpscale extends FeaturePython {
   readonly id = 'upscale';
@@ -47,7 +47,7 @@ export class FeatureUpscale extends FeaturePython {
   readonly pythonNamespaceGroup = 'upscale';
   readonly projectFields: FeatureProjectFields = {
     [ProjectType.SIMPLE]: {
-      upscale: upscaleField,
+      upscale: field,
     },
   };
 
@@ -60,7 +60,7 @@ export class FeatureUpscale extends FeaturePython {
 
   async onAfterSample(task: PromptTask) {
     const { settings, session, images } = task;
-    const upscaleSettings = settings.featureData?.upscale as UpscaleFieldType;
+    const upscaleSettings = settings.featureData?.upscale as FeatureFieldType;
     if (!upscaleSettings?.enabled || !session || !images) {
       return;
     }

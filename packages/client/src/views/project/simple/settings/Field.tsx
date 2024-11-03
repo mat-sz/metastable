@@ -3,7 +3,6 @@ import { BsX } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import {
-  VarAddModel,
   VarArray,
   VarButton,
   VarCategory,
@@ -14,6 +13,7 @@ import {
   VarToggle,
 } from '$components/var';
 import { SettingsCategory } from '../common/SettingsCategory';
+import { VarProjectAddModel } from '../common/VarProjectAddModel';
 import { VarProjectImage } from '../common/VarProjectImage';
 import { VarProjectModel } from '../common/VarProjectModel';
 
@@ -87,17 +87,19 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
             footer={({ append }) => (
               <>
                 {modelField ? (
-                  <VarAddModel
-                    label="Add"
+                  <VarProjectAddModel
+                    label={field.label}
                     modelType={modelField.modelType}
-                    // architecture={modelField.shouldFilterByArchitecture ? project}
+                    shouldFilterByArchitecture={
+                      modelField.shouldFilterByArchitecture
+                    }
                     onSelect={model => {
                       append({ model: model.mrn });
                     }}
                   />
                 ) : (
                   <VarButton
-                    buttonLabel="Add"
+                    buttonLabel={`Add ${field.label}`}
                     onClick={() => {
                       append({});
                     }}

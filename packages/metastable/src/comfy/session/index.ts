@@ -3,13 +3,7 @@ import EventEmitter from 'events';
 import { Architecture } from '@metastable/types';
 
 import type { Comfy } from '../index.js';
-import {
-  ComfyCheckpoint,
-  ComfyCLIPVision,
-  ComfyControlnet,
-  ComfyIPAdapter,
-  ComfyLatent,
-} from './models.js';
+import { ComfyCheckpoint, ComfyCLIPVision, ComfyLatent } from './models.js';
 import {
   ComfySessionLogEvent,
   ComfySessionProgressEvent,
@@ -69,28 +63,6 @@ class ComfySessionCheckpoint {
       vae,
       latent_type: 'sd',
     } as any);
-  }
-}
-
-class ComfySessionControlnet {
-  constructor(private session: ComfySession) {}
-
-  async load(path: string) {
-    const data = (await this.session.invoke('controlnet:load', {
-      path,
-    })) as RPCRef;
-    return new ComfyControlnet(this.session, data);
-  }
-}
-
-class ComfySessionIpadapter {
-  constructor(private session: ComfySession) {}
-
-  async load(path: string) {
-    const data = (await this.session.invoke('ipadapter:load', {
-      path,
-    })) as RPCRef;
-    return new ComfyIPAdapter(this.session, data);
   }
 }
 
@@ -165,9 +137,7 @@ export class ComfySession extends (EventEmitter as {
   new (): TypedEventEmitter<ComfySessionEvents>;
 }) {
   checkpoint = new ComfySessionCheckpoint(this);
-  controlnet = new ComfySessionControlnet(this);
   clipVision = new ComfySessionClipVision(this);
-  ipadapter = new ComfySessionIpadapter(this);
   image = new ComfySessionImage(this);
   tag = new ComfySessionTag(this);
 

@@ -1,4 +1,4 @@
-import { ModelType, ProjectType } from '@metastable/types';
+import { ProjectType } from '@metastable/types';
 import clsx from 'clsx';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -21,10 +21,11 @@ import { SettingsField } from './Field';
 import styles from './index.module.scss';
 import { General } from './sections/General';
 import { useSimpleProject } from '../../context';
-import { ModelArray } from '../common/ModelArray';
 
 const FEATURE_ICONS: Record<string, JSX.Element> = {
   lora: <BsRecordCircle />,
+  controlnet: <BsGearWideConnected />,
+  ipadapter: <BsPlugFill />,
   upscale: <BsFullscreen />,
   pulid: <BsEmojiSmile />,
 };
@@ -55,12 +56,6 @@ export const Settings: React.FC<SettingsProps> = observer(
       >
         <Tabs buttonStyle="icon">
           <Tab id="general" title="General" icon={<BsWrench />} />
-          <Tab
-            id="controlnets"
-            title="Controlnets"
-            icon={<BsGearWideConnected />}
-          />
-          <Tab id="ipadapters" title="IPAdapters" icon={<BsPlugFill />} />
           {sections.map(([key, section]) => (
             <Tab
               id={key}
@@ -105,27 +100,6 @@ export const Settings: React.FC<SettingsProps> = observer(
           <div>
             <TabPanel id="general">
               <General showPrompt={showPrompt} />
-            </TabPanel>
-            <TabPanel id="controlnets">
-              <ModelArray
-                label="Controlnet"
-                path="models.controlnet"
-                type={ModelType.CONTROLNET}
-                hasImage
-                strengthMin={0}
-                strengthMax={2}
-              />
-            </TabPanel>
-            <TabPanel id="ipadapters">
-              <ModelArray
-                label="IPAdapter"
-                path="models.ipadapter"
-                type={ModelType.IPADAPTER}
-                hasImage
-                hasClipVision
-                strengthMin={0}
-                strengthMax={1}
-              />
             </TabPanel>
             <VarScope path="featureData">
               {sections.map(([key, section]) => (

@@ -30,7 +30,7 @@ export class ComfyLORA {
   }
 }
 
-const loraField = {
+const field = {
   type: FieldType.ARRAY,
   label: 'LoRA',
   itemType: {
@@ -42,6 +42,7 @@ const loraField = {
         type: FieldType.MODEL,
         modelType: ModelType.LORA,
         label: 'Model',
+        shouldFilterByArchitecture: true,
       },
       strength: {
         type: FieldType.FLOAT,
@@ -55,16 +56,17 @@ const loraField = {
   },
 } as const;
 
-type LoraFieldType = FieldToType<typeof loraField>;
+type FeatureFieldType = FieldToType<typeof field>;
 
 export class FeatureLora extends FeaturePython {
   readonly id = 'lora';
   readonly name = 'LoRA';
   readonly projectFields: FeatureProjectFields = {
     [ProjectType.SIMPLE]: {
-      lora: loraField,
+      lora: field,
     },
   };
+  readonly pythonNamespaceGroup = 'lora';
 
   private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('lora:load', {
@@ -75,7 +77,7 @@ export class FeatureLora extends FeaturePython {
 
   async onBeforeConditioning(task: PromptTask) {
     const { settings, checkpoint, session } = task;
-    const loras = settings.featureData?.lora as LoraFieldType;
+    const loras = settings.featureData?.lora as FeatureFieldType;
     if (!loras?.length || !session || !checkpoint) {
       return;
     }

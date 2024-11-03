@@ -30,7 +30,7 @@ import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
-import { ComfyCheckpoint } from '../session/models.js';
+import { ComfyCheckpoint, ComfyConditioning } from '../session/models.js';
 import { ComfyPreviewSettings, RPCRef } from '../session/types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
@@ -41,6 +41,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private storeMetadata = false;
   public session?: ComfySession;
   public checkpoint?: ComfyCheckpoint;
+  public conditioning?: ComfyConditioning;
   private checkpointConfigPath?: string;
   private features: Feature[] = [];
   public images?: RPCRef[];
@@ -363,8 +364,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
       this.step('checkpoint');
       const settings = this.settings;
-      const checkpoint = await this.getCheckpoint(ctx);
-      this.checkpoint = checkpoint;
+      this.checkpoint = await this.getCheckpoint(ctx);
 
       await this.callFeatureHandlers('onBeforeConditioning');
 
@@ -380,53 +380,10 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         negative = applyStyleToPrompt(negative, style.negative);
       }
 
-      const conditioning = await checkpoint.conditioning(positive, negative);
-
-      const controlnets = settings.models.controlnet;
-      if (controlnets?.length) {
-        this.step('controlnet');
-        for (const controlnetSettings of controlnets) {
-          if (controlnetSettings.enabled) {
-            const { image } = await this.loadInput(
-              controlnetSettings.image!,
-              controlnetSettings.imageMode,
-            );
-            const controlnet = await ctx.controlnet.load(
-              await this.metastable.resolve(controlnetSettings.model!),
-            );
-            await controlnet.applyTo(
-              conditioning,
-              image,
-              controlnetSettings.strength,
-            );
-          }
-        }
-      }
-
-      const ipadapters = settings.models.ipadapter;
-      if (ipadapters?.length) {
-        this.step('ipadapter');
-        for (const ipadapterSettings of ipadapters) {
-          if (ipadapterSettings.enabled) {
-            const { image } = await this.loadInput(
-              ipadapterSettings.image!,
-              ipadapterSettings.imageMode,
-            );
-            const ipadapter = await ctx.ipadapter.load(
-              await this.metastable.resolve(ipadapterSettings.model!),
-            );
-            const clipVision = await ctx.clipVision.load(
-              await this.metastable.resolve(ipadapterSettings.clipVision!),
-            );
-            await ipadapter.applyTo(
-              checkpoint,
-              clipVision,
-              image,
-              ipadapterSettings.strength,
-            );
-          }
-        }
-      }
+      this.conditioning = await this.checkpoint.conditioning(
+        positive,
+        negative,
+      );
 
       await this.callFeatureHandlers('onAfterConditioning');
 
@@ -441,7 +398,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
             settings.output.width,
             settings.output.height,
             settings.output.batchSize || 1,
-            checkpoint.data.latent_type,
+            this.checkpoint.data.latent_type,
           );
           break;
         case 'image':
@@ -450,7 +407,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
               settings.input.image!,
               settings.input.imageMode,
             );
-            latent = await checkpoint.encode(image);
+            latent = await this.checkpoint.encode(image);
           }
           break;
         case 'image_masked':
@@ -460,7 +417,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
               settings.input.imageMode,
               settings.input.mask,
             );
-            latent = await checkpoint.encode(image, mask);
+            latent = await this.checkpoint.encode(image, mask);
           }
           break;
       }
@@ -474,16 +431,16 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       }
 
       this.step('sample');
-      const samples = await checkpoint.sample(
+      const samples = await this.checkpoint.sample(
         latent,
-        conditioning,
+        this.conditioning,
         {
           ...settings.sampler,
           isCircular,
         },
         this.preview,
       );
-      this.images = await checkpoint.decode(samples, isCircular);
+      this.images = await this.checkpoint.decode(samples, isCircular);
       const outputDir = this.project!.files.output.path;
 
       await this.callFeatureHandlers('onAfterSample');

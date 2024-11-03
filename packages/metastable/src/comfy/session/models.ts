@@ -84,55 +84,6 @@ export class ComfyCheckpoint {
   }
 }
 
-export class ComfyControlnet {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    conditioning: ComfyConditioning,
-    image: RPCRef,
-    strength: number,
-  ) {
-    const { positive, negative } = (await this.session.invoke(
-      'controlnet:apply',
-      {
-        controlnet: this.ref,
-        positive: conditioning.positive,
-        negative: conditioning.negative,
-        image,
-        strength,
-      },
-    )) as { positive: RPCRef; negative: RPCRef };
-    conditioning.positive = positive;
-    conditioning.negative = negative;
-  }
-}
-
-export class ComfyIPAdapter {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    checkpoint: ComfyCheckpoint,
-    clipVision: ComfyCLIPVision,
-    image: RPCRef,
-    strength: number,
-  ) {
-    const { model } = (await this.session.invoke('ipadapter:apply', {
-      ipadapter: this.ref,
-      clip_vision: clipVision.ref,
-      model: checkpoint.data.model,
-      image,
-      strength,
-    })) as { model: RPCRef };
-    checkpoint.data.model = model;
-  }
-}
-
 export class ComfyCLIPVision {
   constructor(public ref: RPCRef) {}
 }

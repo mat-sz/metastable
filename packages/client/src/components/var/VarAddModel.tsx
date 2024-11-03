@@ -10,7 +10,7 @@ import { uiStore } from '$stores/UIStore';
 import styles from './VarAddModel.module.scss';
 import { VarBase } from './VarBase';
 
-interface IVarAddModelProps {
+export interface IVarAddModelProps {
   label: string;
   modelType: ModelType;
   architecture?: Architecture;

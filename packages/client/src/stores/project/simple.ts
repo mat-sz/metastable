@@ -21,6 +21,7 @@ import {
   runInAction,
   toJS,
 } from 'mobx';
+import { get, set } from 'radash';
 
 import { recommendedResolutions, Resolution } from '$/data/resolutions';
 import { qualitySamplerSettings } from '$/data/samplerSettings';
@@ -55,45 +56,6 @@ class SimpleProjectValidator {
       }
     } else {
       this.validateModel(ModelType.CHECKPOINT, settings.checkpoint.model);
-    }
-
-    const controlnets = settings.models.controlnet;
-    if (controlnets?.length) {
-      for (const controlnet of controlnets) {
-        if (!controlnet.enabled) {
-          continue;
-        }
-
-        this.validateModel(ModelType.CONTROLNET, controlnet.model);
-
-        if (!controlnet.image) {
-          this.errors.push('No image input for ControlNet selected.');
-        }
-      }
-    }
-
-    const ipadapters = settings.models.ipadapter;
-    if (ipadapters?.length) {
-      for (const ipadapter of ipadapters) {
-        if (!ipadapter.enabled) {
-          continue;
-        }
-
-        this.validateModel(ModelType.IPADAPTER, ipadapter.model);
-
-        if (!ipadapter.clipVision) {
-          this.errors.push('No CLIP Vision model for IPAdapter selected.');
-        } else {
-          const model = modelStore.find(ipadapter.clipVision);
-          if (!model) {
-            this.errors.push('Selected CLIP Vision model does not exist.');
-          }
-        }
-
-        if (!ipadapter.image) {
-          this.errors.push('No image input for IPAdapter selected.');
-        }
-      }
     }
 
     const input = settings.input;
@@ -167,6 +129,22 @@ function convertModelKey(type: ModelType, object: any, key: string) {
   }
 }
 
+export function convertFeatureData(
+  settings: any,
+  inputPath: string,
+  outputPath: string,
+) {
+  const input = get(settings.models, inputPath);
+  if (input) {
+    const output = get(settings.featureData, outputPath);
+    if (!output) {
+      set(settings.featureData, outputPath, input);
+    }
+
+    set(settings, inputPath, undefined);
+  }
+}
+
 export function convertSettings(
   settings: ProjectSimpleSettings,
 ): ProjectSimpleSettings {
@@ -193,29 +171,11 @@ export function convertSettings(
 
   convertModelItem(ModelType.UPSCALE_MODEL, newSettings.upscale);
 
-  if (newSettings.models?.lora) {
-    if (!newSettings.featureData.lora) {
-      newSettings.featureData.lora = newSettings.models.lora;
-    }
-
-    newSettings.models.lora = undefined;
-  }
-
-  if (newSettings.upscale) {
-    if (!newSettings.featureData.upscale) {
-      newSettings.featureData.upscale = newSettings.upscale;
-    }
-
-    newSettings.upscale = undefined;
-  }
-
-  if (newSettings.pulid) {
-    if (!newSettings.featureData.pulid) {
-      newSettings.featureData.pulid = newSettings.pulid;
-    }
-
-    newSettings.pulid = undefined;
-  }
+  convertFeatureData(newSettings, 'models.lora', 'lora');
+  convertFeatureData(newSettings, 'models.controlnet', 'controlnet');
+  convertFeatureData(newSettings, 'models.ipadapter', 'ipadapter');
+  convertFeatureData(newSettings, 'upscale', 'upscale');
+  convertFeatureData(newSettings, 'pulid', 'pulid');
 
   return newSettings;
 }
