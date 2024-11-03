@@ -12,7 +12,7 @@ import {
   BsWrench,
 } from 'react-icons/bs';
 
-import { Alert } from '$components/alert';
+import { Alert, Alerts } from '$components/alert';
 import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
 import { VarScope, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
@@ -84,7 +84,7 @@ export const Settings: React.FC<SettingsProps> = observer(
             </div>
           </div>
           {hasMessages && (
-            <div className={styles.headerItem}>
+            <Alerts className={styles.headerItem}>
               {validationResult.errors.map((message, i) => (
                 <Alert variant="error" key={i}>
                   {message}
@@ -95,7 +95,7 @@ export const Settings: React.FC<SettingsProps> = observer(
                   {message}
                 </Alert>
               ))}
-            </div>
+            </Alerts>
           )}
           <div>
             <TabPanel id="general">

@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React from 'react';
 import {
-  BsCheckCircleFill,
-  BsExclamationTriangleFill,
-  BsXCircleFill,
+  BsCheckCircle,
+  BsExclamationTriangle,
+  BsXCircle,
 } from 'react-icons/bs';
 
 import styles from './index.module.scss';
@@ -20,10 +20,21 @@ export const Alert: React.FC<React.PropsWithChildren<AlertProps>> = ({
 }) => {
   return (
     <div className={clsx(styles.alert, styles[variant], className)}>
-      {variant === 'error' && <BsXCircleFill />}
-      {variant === 'warning' && <BsExclamationTriangleFill />}
-      {variant === 'ok' && <BsCheckCircleFill />}
+      {variant === 'error' && <BsXCircle />}
+      {variant === 'warning' && <BsExclamationTriangle />}
+      {variant === 'ok' && <BsCheckCircle />}
       <span>{children}</span>
     </div>
   );
+};
+
+interface AlertsProps {
+  className?: string;
+}
+
+export const Alerts: React.FC<React.PropsWithChildren<AlertsProps>> = ({
+  className,
+  children,
+}) => {
+  return <div className={clsx(styles.alerts, className)}>{children}</div>;
 };

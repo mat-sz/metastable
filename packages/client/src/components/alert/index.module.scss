@@ -1,46 +1,51 @@
 .alert {
   padding: 0.5rem;
   border-radius: 5px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   align-items: center;
   font-size: 0;
   margin: 1rem 0;
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  --icon-size: 1rem;
 
   span {
     font-size: 0.8rem;
   }
 
   svg {
-    font-size: 1.5rem;
+    min-width: var(--icon-size);
+    font-size: var(--icon-size);
     margin-right: 0.5rem;
   }
 
   &.error {
-    border: 1px solid var(--red-900);
-    background: var(--red-100);
-
-    svg {
-      color: var(--red-900);
-    }
+    color: var(--red-900);
   }
 
   &.warning {
-    border: 1px solid var(--yellow-900);
-    background: var(--yellow-100);
-
-    svg {
-      color: var(--yellow-900);
-    }
+    color: var(--yellow-900);
   }
 
   &.ok {
-    border: 1px solid var(--green-900);
-    background: var(--green-100);
+    color: var(--green-900);
+  }
+}
 
-    svg {
-      color: var(--green-900);
+.alerts {
+  margin: 1rem 0;
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+
+  & > div {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--grey-400);
     }
   }
 }
