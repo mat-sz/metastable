@@ -276,6 +276,7 @@ export class Metastable extends (EventEmitter as {
       }
     }
 
+    await this.python.refreshPackages();
     await this.refreshFeatures();
     for (const group of this.enabledNamespaceGroups) {
       args.push('--namespace', group);

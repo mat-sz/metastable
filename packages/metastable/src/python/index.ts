@@ -27,19 +27,27 @@ async function getPythonCommand() {
 }
 
 const PYTHON_PACKAGES = `
-from importlib.metadata import version
+import importlib.metadata
 import json
-names = %NAMES
+
+distributions = importlib.metadata.distributions()
+installed_packages = []
+for dist in distributions:
+  args = (dist.metadata['Name'], dist.version)
+  installed_packages.append(args)
+
+installed_packages.sort()
 output = {}
-for name in names:
-  try:
-    output[name] = version(name)
-  except:
-    output[name] = None
+
+for package_name, version in installed_packages:
+  output[package_name] = version
+
 print(json.dumps(output))
 `;
 
 export class PythonInstance {
+  public packages: Record<string, string | undefined> = {};
+
   constructor(
     public path: string,
     public pythonHome?: string,
@@ -92,10 +100,8 @@ export class PythonInstance {
     return JSON.parse(await this.stdout(['-c', code]));
   }
 
-  async packages(names: string[]): Promise<Record<string, string | null>> {
-    return await this.runPython(
-      PYTHON_PACKAGES.replace('%NAMES', JSON.stringify(names)),
-    );
+  async refreshPackages(): Promise<void> {
+    this.packages = await this.runPython(PYTHON_PACKAGES);
   }
 
   async pipInstall(packages: string[], onLog?: (data: string) => void) {

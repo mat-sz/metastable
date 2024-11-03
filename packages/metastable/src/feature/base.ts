@@ -57,22 +57,18 @@ export class FeaturePython extends FeatureBase {
       return false;
     }
 
-    let hasPackages = true;
     if (this.pythonPackages.length) {
       const python = this.metastable.python;
       if (!python) {
         return false;
       }
 
-      const packages = await python.packages(
-        this.pythonPackages.map(item => item.name),
-      );
-      if (Object.values(packages).includes(null)) {
-        hasPackages = false;
+      if (this.pythonPackages.some(item => !python.packages[item.name])) {
+        return false;
       }
     }
 
-    return hasPackages;
+    return true;
   }
 
   async install(onLog?: (data: string) => void) {
