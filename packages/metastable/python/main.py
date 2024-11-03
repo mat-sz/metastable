@@ -16,6 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 import comfy.samplers
 from rpc import RPC
 import output
+import importlib.util
 
 if os.name == "nt":
     import logging
@@ -76,9 +77,14 @@ if __name__ == "__main__":
     if args.namespace:
         namespaces.extend(args.namespace)
 
+    namespaces_dir = os.path.join(os.path.dirname(__file__), 'namespaces')
     for namespace in namespaces:
-        namespace_module = __import__(f'namespaces_{namespace}')
-        namespace_module.insert_all(rpc)
+        name = f'namespaces.{namespace}'
+        spec = importlib.util.spec_from_file_location(name, os.path.join(namespaces_dir, namespace, '__init__.py'))
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        spec.loader.exec_module(mod)
+        mod.insert_all(rpc)
 
     cuda_malloc_warning()
 
