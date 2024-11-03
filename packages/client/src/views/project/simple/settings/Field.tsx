@@ -74,11 +74,17 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
       }
     }
     case FieldType.ARRAY: {
+      const { itemType } = field;
       const modelField =
-        field.itemType.type === FieldType.CATEGORY &&
-        field.itemType.properties['model']?.type === FieldType.MODEL
-          ? (field.itemType.properties['model'] as FieldModel)
+        itemType.type === FieldType.CATEGORY &&
+        itemType.properties['model']?.type === FieldType.MODEL
+          ? (itemType.properties['model'] as FieldModel)
           : undefined;
+
+      const newObj = {} as any;
+      if (itemType.type === FieldType.CATEGORY && itemType.enabledKey) {
+        newObj[itemType.enabledKey] = true;
+      }
 
       return (
         <>
@@ -94,14 +100,14 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
                       modelField.shouldFilterByArchitecture
                     }
                     onSelect={model => {
-                      append({ model: model.mrn });
+                      append({ ...newObj, model: model.mrn });
                     }}
                   />
                 ) : (
                   <VarButton
                     buttonLabel={`Add ${field.label}`}
                     onClick={() => {
-                      append({});
+                      append({ ...newObj });
                     }}
                   />
                 )}
