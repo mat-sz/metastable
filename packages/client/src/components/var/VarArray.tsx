@@ -8,6 +8,7 @@ interface VarArrayItemContext<T> {
   element: T;
   index: number;
   array: T[];
+  update(value: T): void;
   remove(): void;
 }
 
@@ -73,6 +74,11 @@ export const VarArray = ({
                   element,
                   index,
                   array,
+                  update: (value: any) => {
+                    const newArray = [...currentArray];
+                    newArray[index] = value;
+                    setCurrentValue(newArray);
+                  },
                   remove: () => {
                     const newArray = [...currentArray];
                     newArray.splice(index, 1);

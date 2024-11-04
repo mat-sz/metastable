@@ -1,76 +1,50 @@
-import { Architecture, PromptStyle } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
-import { nanoid } from 'nanoid';
 import React from 'react';
-import { BsX } from 'react-icons/bs';
+import { BsPencil, BsTrash } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import { TabPanel } from '$components/tabs';
-import {
-  VarArray,
-  VarButton,
-  VarCategory,
-  VarSelect,
-  VarString,
-} from '$components/var';
-import { mainStore } from '$stores/MainStore';
+import { VarArray, VarButton } from '$components/var';
+import { SettingsPromptStyleAdd } from '$modals/settings/promptStyleAdd';
+import { SettingsPromptStyleEdit } from '$modals/settings/promptStyleEdit';
+import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 
-const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
-  ([label, value]) => ({ key: value, label, value }),
-);
-
 export const SettingsStyles: React.FC = observer(() => {
-  const config = mainStore.config;
-
   return (
     <TabPanel id="styles">
       <h2>Prompt styles</h2>
-      <VarArray path="styles">
-        {({ remove }) => (
-          <VarCategory
-            label={
-              <>
-                <span>Style</span>
-                <IconButton title="Delete" onClick={remove}>
-                  <BsX />
-                </IconButton>
-              </>
-            }
-            forceBorder
-          >
-            <VarString path="name" label="Name" />
-            <VarSelect
-              path="architecture"
-              label="Model architecture"
-              options={[
-                {
-                  key: 'any',
-                  label: 'Any',
-                  value: 'any',
-                },
-                ...MAPPED_ARCHITECTURES,
-              ]}
-            />
-            <VarString path="positive" label="Positive prompt" multiline />
-            <VarString path="negative" label="Negative prompt" multiline />
-          </VarCategory>
+      <VarArray
+        path="styles"
+        footer={({ append }) => (
+          <VarButton
+            buttonLabel="Add style"
+            onClick={() => {
+              modalStore.show(<SettingsPromptStyleAdd onAdd={append} />);
+            }}
+          />
+        )}
+      >
+        {({ remove, update, element }) => (
+          <div className={styles.style}>
+            <div>{element.name}</div>
+            <div className={styles.actions}>
+              <IconButton
+                onClick={() =>
+                  modalStore.show(
+                    <SettingsPromptStyleEdit value={element} onSave={update} />,
+                  )
+                }
+              >
+                <BsPencil />
+              </IconButton>
+              <IconButton onClick={remove}>
+                <BsTrash />
+              </IconButton>
+            </div>
+          </div>
         )}
       </VarArray>
-      <VarButton
-        buttonLabel="Add style"
-        onClick={() => {
-          const styles: PromptStyle[] = [
-            ...(config.data?.styles || []),
-            { id: nanoid(), name: '' },
-          ];
-          config.set({ ...config.data!, styles });
-        }}
-      />
-      <div className={styles.hint}>
-        <strong>Hint:</strong> Use {'{prompt}'} if you'd like for the input
-        prompt to be placed inside of the style prompt.
-      </div>
     </TabPanel>
   );
 });

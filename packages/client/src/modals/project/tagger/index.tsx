@@ -13,7 +13,6 @@ import {
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import type { TrainingProject } from '$stores/project';
-import styles from './index.module.scss';
 
 interface Props {
   project: TrainingProject;
@@ -33,33 +32,27 @@ export const ProjectTagger: React.FC<Props> = observer(
 
     return (
       <Modal title="Tagger" size="small">
-        <div className={styles.settings}>
-          <VarUI
-            className={styles.prompt}
-            onChange={setSettings}
-            values={settings}
-          >
-            <VarCategory label="Tagger">
-              <VarModel path="tagger.name" modelType={ModelType.TAGGER} />
-            </VarCategory>
-            <VarCategory label="Settings">
-              <VarSlider
-                label="Threshold"
-                path="threshold"
-                min={0}
-                max={1}
-                step={0.01}
-                defaultValue={0.35}
-                showInput
-              />
-              <VarToggle
-                label="Remove underscore"
-                path="removeUnderscore"
-                defaultValue={true}
-              />
-            </VarCategory>
-          </VarUI>
-        </div>
+        <VarUI onChange={setSettings} values={settings}>
+          <VarCategory label="Tagger">
+            <VarModel path="tagger.name" modelType={ModelType.TAGGER} />
+          </VarCategory>
+          <VarCategory label="Settings">
+            <VarSlider
+              label="Threshold"
+              path="threshold"
+              min={0}
+              max={1}
+              step={0.01}
+              defaultValue={0.35}
+              showInput
+            />
+            <VarToggle
+              label="Remove underscore"
+              path="removeUnderscore"
+              defaultValue={true}
+            />
+          </VarCategory>
+        </VarUI>
         <ModalActions>
           <Button variant="secondary" onClick={() => close()}>
             Cancel
