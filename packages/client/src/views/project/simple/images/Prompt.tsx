@@ -6,7 +6,7 @@ import { Button } from '$components/button';
 import { VarCategory, VarPrompt, VarUI } from '$components/var';
 import { useFileInput } from '$hooks/useFileInput';
 import { useHotkey } from '$hooks/useHotkey';
-import { PromptLoad } from '$modals/promptLoad';
+import { ProjectLoadPrompt } from '$modals/project';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 import { useSimpleProject } from '../../context';
@@ -17,7 +17,9 @@ export const Prompt: React.FC = observer(() => {
   const onFiles = useCallback(
     (files: File[]) => {
       if (files[0]) {
-        modalStore.show(<PromptLoad project={project} file={files[0]} />);
+        modalStore.show(
+          <ProjectLoadPrompt project={project} file={files[0]} />,
+        );
       }
     },
     [project],

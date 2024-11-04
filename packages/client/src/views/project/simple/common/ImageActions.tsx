@@ -9,7 +9,7 @@ import {
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
-import { PromptLoad } from '$modals/promptLoad';
+import { ProjectLoadPrompt } from '$modals/project';
 import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import { useSimpleProject } from '../../context';
@@ -61,7 +61,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
           const settings = data.metadata as any;
           if (settings) {
             modalStore.show(
-              <PromptLoad project={project} loadedSettings={settings} />,
+              <ProjectLoadPrompt project={project} loadedSettings={settings} />,
             );
           }
         }}

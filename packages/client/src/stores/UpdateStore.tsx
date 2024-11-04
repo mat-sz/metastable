@@ -2,7 +2,7 @@ import { UpdateInfo } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
-import { UpdateAvailable } from '$modals/updateAvailable';
+import { InstanceUpdateAvailable } from '$modals/instance';
 import { IS_ELECTRON } from '$utils/config';
 import { modalStore } from './ModalStore';
 
@@ -20,7 +20,7 @@ class UpdateStore {
       API.electron.autoUpdater.onUpdateDownloaded.subscribe(undefined, {
         onData: ({ updateDownloaded, version }) => {
           if (updateDownloaded) {
-            modalStore.show(<UpdateAvailable version={version!} />);
+            modalStore.show(<InstanceUpdateAvailable version={version!} />);
           }
         },
       });

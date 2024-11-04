@@ -6,7 +6,7 @@ import { Button } from '$components/button';
 import { Link } from '$components/link';
 import { TabPanel } from '$components/tabs';
 import { VarButton, VarCategory, VarToggle } from '$components/var';
-import { BundleReset } from '$modals/bundleReset';
+import { InstanceBundleReset } from '$modals/instance';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { updateStore } from '$stores/UpdateStore';
@@ -76,7 +76,7 @@ export const SettingsAbout: React.FC = observer(() => {
       <VarCategory label="Reset">
         <div className={styles.info}>
           <div className={styles.buttons}>
-            <Button onClick={() => modalStore.show(<BundleReset />)}>
+            <Button onClick={() => modalStore.show(<InstanceBundleReset />)}>
               Reset settings and Python dependencies
             </Button>
           </div>

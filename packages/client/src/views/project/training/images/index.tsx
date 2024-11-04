@@ -6,7 +6,7 @@ import { BsPlus, BsTagFill, BsTrash } from 'react-icons/bs';
 import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
-import { Tagger } from '$modals/tagger';
+import { ProjectTagger } from '$modals/project';
 import { modalStore } from '$stores/ModalStore';
 import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
@@ -70,7 +70,7 @@ export const Images: React.FC = observer(() => {
               <button
                 onClick={() => {
                   modalStore.show(
-                    <Tagger
+                    <ProjectTagger
                       project={project}
                       inputs={selection.map(item => item.name)}
                     />,

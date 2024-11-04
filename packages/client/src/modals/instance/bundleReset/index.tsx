@@ -2,24 +2,18 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
+import { setupStore } from '$stores/SetupStore';
 
-interface Props {
-  count: number;
-  onDelete: () => void;
-}
-
-export const ProjectFileDelete: React.FC<Props> = ({ count, onDelete }) => {
+export const InstanceBundleReset: React.FC = () => {
   const { close } = useModal();
 
   return (
-    <Modal title="Delete files" size="small">
+    <Modal title="Reset settings and Python dependencies" size="small">
       <div>
-        Are you sure you want to delete{' '}
-        <span>
-          {count} {count === 1 ? 'file' : 'files'}
-        </span>
-        ?
+        Are you sure you want to reset settings and Python dependencies?{' '}
       </div>
+      <div>This action might require you to download up to 2GB of data.</div>
+      <div>This will not delete your projects or models.</div>
       <ModalActions>
         <Button
           variant="secondary"
@@ -32,11 +26,11 @@ export const ProjectFileDelete: React.FC<Props> = ({ count, onDelete }) => {
         <Button
           variant="danger"
           onClick={() => {
-            onDelete();
+            setupStore.resetBundle();
             close();
           }}
         >
-          Delete
+          Confirm
         </Button>
       </ModalActions>
     </Modal>

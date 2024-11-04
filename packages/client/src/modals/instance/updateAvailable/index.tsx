@@ -8,7 +8,7 @@ interface Props {
   version: string;
 }
 
-export const UpdateAvailable: React.FC<Props> = ({ version }) => {
+export const InstanceUpdateAvailable: React.FC<Props> = ({ version }) => {
   const { close } = useModal();
 
   return (

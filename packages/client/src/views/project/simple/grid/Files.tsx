@@ -6,7 +6,7 @@ import { BsPlus, BsTrash } from 'react-icons/bs';
 import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
-import { ProjectFileDelete } from '$modals/projectFileDelete';
+import { ProjectDeleteFile } from '$modals/project';
 import { modalStore } from '$stores/ModalStore';
 import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
@@ -75,7 +75,7 @@ export const Files: React.FC<Props> = observer(({ type, allowUpload }) => {
             <button
               onClick={() => {
                 modalStore.show(
-                  <ProjectFileDelete
+                  <ProjectDeleteFile
                     count={selection.length}
                     onDelete={async () => {
                       for (const item of selection) {

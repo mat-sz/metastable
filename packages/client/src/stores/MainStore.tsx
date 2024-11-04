@@ -10,8 +10,8 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { defaultHotkeys } from '$/data/hotkeys';
 import { API } from '$api';
 import { parseHotkey } from '$hooks/useHotkey';
-import { BackendError } from '$modals/backendError';
-import { UnsavedProjects } from '$modals/unsavedProjects';
+import { InstanceBackendError } from '$modals/instance';
+import { ProjectUnsaved } from '$modals/project';
 import { IS_ELECTRON } from '$utils/config';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { ConfigStore } from './ConfigStore';
@@ -75,7 +75,7 @@ class MainStore {
             this.refresh();
             break;
           case 'error':
-            modalStore.show(<BackendError />);
+            modalStore.show(<InstanceBackendError />);
             break;
         }
       },
@@ -150,7 +150,7 @@ class MainStore {
 
   beforeUnload() {
     if (this.projects.draft.length) {
-      modalStore.show(<UnsavedProjects />);
+      modalStore.show(<ProjectUnsaved />);
       return false;
     }
 

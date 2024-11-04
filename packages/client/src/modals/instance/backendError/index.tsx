@@ -6,7 +6,7 @@ import { Log } from '$components/log';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { mainStore } from '$stores/MainStore';
 
-export const BackendError: React.FC = () => {
+export const InstanceBackendError: React.FC = () => {
   const { close } = useModal();
 
   return (

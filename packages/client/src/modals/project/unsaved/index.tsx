@@ -5,7 +5,7 @@ import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { mainStore } from '$stores/MainStore';
 
-export const UnsavedProjects: React.FC = observer(() => {
+export const ProjectUnsaved: React.FC = observer(() => {
   const { close } = useModal();
   const draftProjects = mainStore.projects.draft;
 

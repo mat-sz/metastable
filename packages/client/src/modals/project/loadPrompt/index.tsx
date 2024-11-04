@@ -26,7 +26,7 @@ interface Props {
   loadedSettings?: ExternalSettings;
 }
 
-export const PromptLoad: React.FC<Props> = observer(
+export const ProjectLoadPrompt: React.FC<Props> = observer(
   ({ project, file, loadedSettings }) => {
     const { close } = useModal();
     const [loaded, setLoaded] = useState(false);
