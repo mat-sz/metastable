@@ -1,8 +1,8 @@
 import { ProjectOrientation } from '@metastable/types';
 import { MdCropLandscape, MdCropPortrait, MdCropSquare } from 'react-icons/md';
 
-import { Resolution } from '$/data/resolutions';
 import { Switch, SwitchOptionDetails } from '$components/switch';
+import { Resolution } from '$data/resolutions';
 import { useVarUIValue } from './common/VarUIContext';
 import { VarBase } from './VarBase';
 

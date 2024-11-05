@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { hotkeyGroups } from '$/data/hotkeys';
 import { Hotkey } from '$components/hotkey';
 import { TabPanel } from '$components/tabs';
 import { VarHotkey } from '$components/var/VarHotkey';
+import { hotkeyGroups } from '$data/hotkeys';
 import styles from './index.module.scss';
 
 export const SettingsHotkeys: React.FC = observer(() => {

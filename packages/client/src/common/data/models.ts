@@ -1,6 +1,6 @@
 import { ModelType } from '@metastable/types';
 
-import { DownloadableModelGroup } from '../types/model';
+import { DownloadableModelGroup } from '$types/model';
 
 export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.CHECKPOINT]: 'Checkpoint',

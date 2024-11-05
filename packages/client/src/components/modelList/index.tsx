@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 
+import { downloadable, TYPE_NAMES } from '$data/models';
+import { DownloadableModel } from '$types/model';
 import styles from './index.module.scss';
-import { downloadable, TYPE_NAMES } from '../../data/models';
-import { DownloadableModel } from '../../types/model';
 import { IconButton } from '../iconButton';
 
 interface Props {

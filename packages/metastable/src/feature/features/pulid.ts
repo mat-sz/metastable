@@ -119,7 +119,7 @@ export class FeaturePulid extends FeaturePython {
       evaClip,
       insightface,
       image,
-      pulidSettings.strength ?? 1,
+      pulidSettings.strength,
     );
   }
 }

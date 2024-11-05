@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Popover } from 'react-tiny-popover';
 
-import { recommendedResolutions } from '$/data/resolutions';
+import { recommendedResolutions } from '$data/resolutions';
 import styles from './ResolutionSelect.module.scss';
 import { useSimpleProject } from '../../context';
 

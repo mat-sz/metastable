@@ -7,8 +7,8 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { defaultHotkeys } from '$/data/hotkeys';
 import { API } from '$api';
+import { defaultHotkeys } from '$data/hotkeys';
 import { parseHotkey } from '$hooks/useHotkey';
 import { InstanceBackendError } from '$modals/instance';
 import { ProjectUnsaved } from '$modals/project';

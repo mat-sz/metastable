@@ -6,7 +6,7 @@ import { BsBoxFill } from 'react-icons/bs';
 import { Checkbox } from '$components/checkbox';
 import { ModelList } from '$components/modelList';
 import { setupStore } from '$stores/SetupStore';
-import { DownloadableModel } from '../../../types/model';
+import { DownloadableModel } from '$types/model';
 import { Item } from '../components/Item';
 
 interface ModelCheckboxProps {

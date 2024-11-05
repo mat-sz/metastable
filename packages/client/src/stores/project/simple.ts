@@ -23,10 +23,10 @@ import {
 } from 'mobx';
 import { get, set } from 'radash';
 
-import { recommendedResolutions, Resolution } from '$/data/resolutions';
-import { qualitySamplerSettings } from '$/data/samplerSettings';
-import { PROMPT_STYLES } from '$/data/styles';
 import { API } from '$api';
+import { recommendedResolutions, Resolution } from '$data/resolutions';
+import { qualitySamplerSettings } from '$data/samplerSettings';
+import { PROMPT_STYLES } from '$data/styles';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { modelStore } from '$stores/ModelStore';
