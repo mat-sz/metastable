@@ -112,6 +112,14 @@ export const SettingsAbout: React.FC = observer(() => {
                 Kohya SD Scripts
               </Link>
             </li>
+            <li>
+              <Link href="https://github.com/ToTheBeginning/PuLID">PuLID</Link>
+            </li>
+            <li>
+              <Link href="https://github.com/cubiq/PuLID_ComfyUI">
+                ComfyUI PuLID node
+              </Link>
+            </li>
           </ul>
         </div>
       </VarCategory>
