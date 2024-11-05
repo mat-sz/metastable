@@ -16,7 +16,11 @@
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "#metastable": ["src/metastable.js"]
+    }
   },
   "include": ["src"]
 }

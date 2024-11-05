@@ -4,11 +4,11 @@ import path from 'path';
 
 import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
-import type { Metastable } from '../index.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
 import { TypedEventEmitter } from '../types.js';
@@ -29,7 +29,7 @@ export class Setup extends (EventEmitter as {
 
   private _checked = false;
 
-  constructor(private metastable: Metastable) {
+  constructor() {
     super();
   }
 
@@ -39,7 +39,7 @@ export class Setup extends (EventEmitter as {
 
   async status(): Promise<SetupStatus> {
     if (!this._checked) {
-      const python = await this.metastable.config.get('python');
+      const python = await Metastable.instance.config.get('python');
 
       if (python?.configured || this.skipPythonSetup) {
         this._status = 'done';
@@ -55,7 +55,7 @@ export class Setup extends (EventEmitter as {
 
   async details(): Promise<SetupDetails> {
     const controllers = await gpu();
-    const dataRoot = this.metastable.dataRoot;
+    const dataRoot = Metastable.instance.dataRoot;
     const usage = await disk.usage(dataRoot);
 
     return {
@@ -87,20 +87,20 @@ export class Setup extends (EventEmitter as {
     this._status = 'done';
     this.emitStatus();
 
-    await this.metastable.config.set('python', {
+    await Metastable.instance.config.set('python', {
       configured: true,
       mode: 'static',
       pythonHome: this._pythonHome
-        ? path.relative(this.metastable.dataRoot, this._pythonHome)
+        ? path.relative(Metastable.instance.dataRoot, this._pythonHome)
         : undefined,
       packagesDir: this._packagesDir
-        ? path.relative(this.metastable.dataRoot, this._packagesDir)
+        ? path.relative(Metastable.instance.dataRoot, this._packagesDir)
         : undefined,
       bundleVersion: this._bundleVersion,
       features: {},
     });
 
-    this.metastable.reload();
+    Metastable.instance.reload();
   }
 
   async start(settings: SetupSettings) {
@@ -112,7 +112,7 @@ export class Setup extends (EventEmitter as {
     this._status = 'in_progress';
     this.emitStatus();
 
-    const setupQueue = this.metastable.tasks.queues.setup;
+    const setupQueue = Metastable.instance.tasks.queues.setup;
     setupQueue.once('empty', () => {
       setupQueue.purge();
       this.done();
@@ -134,22 +134,22 @@ export class Setup extends (EventEmitter as {
         'download',
         assets.map(asset => ({
           url: asset.browser_download_url,
-          savePath: path.join(this.metastable.dataRoot, asset.name),
+          savePath: path.join(Metastable.instance.dataRoot, asset.name),
         })),
       ),
     );
 
-    const targetPath = path.join(this.metastable.dataRoot, 'python');
+    const targetPath = path.join(Metastable.instance.dataRoot, 'python');
     this._packagesDir = undefined;
     this._pythonHome = targetPath;
     const parts = assets.map(asset =>
-      path.join(this.metastable.dataRoot, asset.name),
+      path.join(Metastable.instance.dataRoot, asset.name),
     );
     setupQueue.add(new ExtractTask(parts, targetPath));
 
     if (settings.downloads.length) {
-      this.metastable.tasks.queues.setup.add(
-        new DownloadModelsTask(this.metastable, settings.downloads),
+      Metastable.instance.tasks.queues.setup.add(
+        new DownloadModelsTask(settings.downloads),
       );
     }
   }

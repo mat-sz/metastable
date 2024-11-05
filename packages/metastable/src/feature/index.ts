@@ -1,13 +1,13 @@
 import { Feature } from '@metastable/types';
 
-import { Metastable } from '../index.js';
+import { Metastable } from '#metastable';
 import { getFeatureInstances } from './features/index.js';
 import { FeatureInstallTask } from './installTask.js';
 
 export class FeatureManager {
-  features = getFeatureInstances(this.metastable);
+  features = getFeatureInstances();
 
-  constructor(private metastable: Metastable) {}
+  constructor() {}
 
   get availableFeatures() {
     return Object.values(this.features);
@@ -28,6 +28,6 @@ export class FeatureManager {
     }
 
     const task = new FeatureInstallTask(feature);
-    this.metastable.tasks.queues.settings.add(task);
+    Metastable.instance.tasks.queues.settings.add(task);
   }
 }

@@ -42,6 +42,9 @@
     "which": "^4.0.0",
     "zod": "^3.22.4"
   },
+  "imports": {
+    "#metastable": "./lib/metastable.js"
+  },
   "exports": {
     ".": {
       "require": "./lib/index.js",

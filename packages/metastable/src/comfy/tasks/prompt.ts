@@ -23,11 +23,11 @@ import {
 import PNG from 'meta-png';
 import sharp, { FitEnum } from 'sharp';
 
+import { Metastable } from '#metastable';
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
 import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
-import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
@@ -48,7 +48,6 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   public images?: RPCRef[];
 
   constructor(
-    private metastable: Metastable,
     private project: ProjectEntity,
     public settings: ProjectSimpleSettings,
   ) {
@@ -74,11 +73,11 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       throw new Error(`Invalid MRN for model type ${type}: ${mrn}`);
     }
 
-    await this.metastable.resolve(mrn);
+    await Metastable.instance.resolve(mrn);
   }
 
   async init() {
-    this.features = await this.metastable.feature.all();
+    this.features = await Metastable.instance.feature.all();
     const fields = mapProjectFields(this.features)[ProjectType.SIMPLE];
     setDefaultValues(this.settings.featureData, fields);
 
@@ -105,17 +104,17 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
       );
     }
 
-    this.embeddingsPath = await this.metastable.model.getEmbeddingsPath();
+    this.embeddingsPath = await Metastable.instance.model.getEmbeddingsPath();
 
-    const config = await this.metastable.config.all();
+    const config = await Metastable.instance.config.all();
 
     if (config.generation?.preview) {
       try {
-        const decoderModel = await this.metastable.model.getByName(
+        const decoderModel = await Metastable.instance.model.getByName(
           ModelType.VAE_APPROX,
           'taesd_decoder',
         );
-        const decoderXlModel = await this.metastable.model.getByName(
+        const decoderXlModel = await Metastable.instance.model.getByName(
           ModelType.VAE_APPROX,
           'taesdxl_decoder',
         );
@@ -189,21 +188,21 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   async getCheckpoint(ctx: ComfySession) {
     const data = this.settings.checkpoint;
     if (data.mode === 'advanced') {
-      const clipPaths = [await this.metastable.resolve(data.clip1!)];
+      const clipPaths = [await Metastable.instance.resolve(data.clip1!)];
       if (data.clip2) {
-        clipPaths.push(await this.metastable.resolve(data.clip2));
+        clipPaths.push(await Metastable.instance.resolve(data.clip2));
       }
 
       return await ctx.checkpoint.advanced({
         type: Architecture.FLUX1,
-        unetPath: await this.metastable.resolve(data.unet!),
+        unetPath: await Metastable.instance.resolve(data.unet!),
         clipPaths,
-        vaePath: await this.metastable.resolve(data.vae!),
+        vaePath: await Metastable.instance.resolve(data.vae!),
         embeddingsPath: this.embeddingsPath,
       });
     } else {
       return await ctx.checkpoint.load(
-        await this.metastable.resolve(data.model!),
+        await Metastable.instance.resolve(data.model!),
         this.embeddingsPath,
         data.clipSkip ? -1 * data.clipSkip : undefined,
         this.checkpointConfigPath,
@@ -225,7 +224,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     }
 
     if (url.startsWith('mrn:')) {
-      return await fs.readFile(await this.metastable.resolve(url));
+      return await fs.readFile(await Metastable.instance.resolve(url));
     }
 
     throw new Error('Unable to load input');
@@ -245,7 +244,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
         continue;
       }
 
-      const instance = this.metastable.feature.features[feature.id];
+      const instance = Metastable.instance.feature.features[feature.id];
       if (instance?.[handler]) {
         this.step(feature.id);
         await instance[handler](this);
@@ -301,7 +300,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   }
 
   private async generate() {
-    await this.metastable.comfy!.session(async ctx => {
+    await Metastable.instance.comfy!.session(async ctx => {
       this.session = ctx;
 
       ctx.on('progress', e => {

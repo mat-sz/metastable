@@ -6,6 +6,7 @@ import {
   ProjectType,
 } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { ComfyCheckpoint } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
@@ -85,7 +86,7 @@ export class FeaturePulid extends FeaturePython {
 
   private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('pulid:load', {
-      path: await this.metastable.resolve(mrn),
+      path: await Metastable.instance.resolve(mrn),
     })) as RPCRef;
     return new ComfyPulid(session, data);
   }
@@ -110,7 +111,7 @@ export class FeaturePulid extends FeaturePython {
     const pulid = await this.load(session, pulidSettings.model);
     const insightface = await this.loadInsightface(
       session,
-      this.metastable.internalPath,
+      Metastable.instance.internalPath,
     );
     const evaClip = await this.loadEvaClip(session);
     const { image } = await task.loadInputRaw(pulidSettings.image!);

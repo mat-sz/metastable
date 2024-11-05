@@ -6,6 +6,7 @@ import {
   ProjectType,
 } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import {
   ComfyCheckpoint,
@@ -87,7 +88,7 @@ export class FeatureIpAdapter extends FeaturePython {
 
   private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('ipadapter:load', {
-      path: await this.metastable.resolve(mrn),
+      path: await Metastable.instance.resolve(mrn),
     })) as RPCRef;
     return new ComfyIPAdapter(session, data);
   }
@@ -107,7 +108,7 @@ export class FeatureIpAdapter extends FeaturePython {
         );
         const ipadapter = await this.load(session, ipadapterSettings.model);
         const clipVision = await session.clipVision.load(
-          await this.metastable.resolve(ipadapterSettings.clipVision!),
+          await Metastable.instance.resolve(ipadapterSettings.clipVision!),
         );
         await ipadapter.applyTo(
           checkpoint,

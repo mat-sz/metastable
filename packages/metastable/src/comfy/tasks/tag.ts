@@ -7,13 +7,12 @@ import {
   TaskState,
 } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { ProjectEntity } from '../../data/project.js';
-import { Metastable } from '../../index.js';
 import { BaseTask } from '../../tasks/task.js';
 
 export class TagTask extends BaseTask<ProjectTaskData> {
   constructor(
-    private metastable: Metastable,
     private project: ProjectEntity,
     private settings: ProjectTaggingSettings,
   ) {
@@ -23,7 +22,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
 
   async init() {
     if (!this.settings.tagger.path) {
-      const model = await this.metastable.model.getByName(
+      const model = await Metastable.instance.model.getByName(
         ModelType.TAGGER,
         this.settings.tagger.name,
       );
@@ -34,7 +33,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
   }
 
   async execute() {
-    await this.metastable.comfy!.session(async ctx => {
+    await Metastable.instance.comfy!.session(async ctx => {
       ctx.on('progress', e => {
         this.progress = e.value / e.max;
       });

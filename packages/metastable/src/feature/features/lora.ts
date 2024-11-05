@@ -6,6 +6,7 @@ import {
   ProjectType,
 } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { ComfyCheckpoint } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
@@ -70,7 +71,7 @@ export class FeatureLora extends FeaturePython {
 
   private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('lora:load', {
-      path: await this.metastable.resolve(mrn),
+      path: await Metastable.instance.resolve(mrn),
     })) as RPCRef;
     return new ComfyLORA(session, data);
   }

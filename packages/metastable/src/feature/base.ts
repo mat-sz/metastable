@@ -1,7 +1,7 @@
 import { Feature, FeatureProjectFields } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { PromptTask } from '../comfy/tasks/prompt.js';
-import { Metastable } from '../index.js';
 
 export interface FeatureInstance {
   readonly id: string;
@@ -24,7 +24,7 @@ export class FeatureBase implements FeatureInstance {
   readonly description: string | undefined;
   readonly projectFields: FeatureProjectFields;
 
-  constructor(protected metastable: Metastable) {}
+  constructor() {}
 
   async install() {}
 
@@ -33,7 +33,7 @@ export class FeatureBase implements FeatureInstance {
   }
 
   async isEnabled() {
-    const { features } = await this.metastable.config.get('python');
+    const { features } = await Metastable.instance.config.get('python');
     const enabled = features?.[this.id] ?? true;
     return enabled && (await this.isInstalled());
   }
@@ -60,7 +60,7 @@ export class FeaturePython extends FeatureBase {
     }
 
     if (this.pythonPackages.length) {
-      const python = this.metastable.python;
+      const python = Metastable.instance.python;
       if (!python) {
         return false;
       }
@@ -75,7 +75,7 @@ export class FeaturePython extends FeatureBase {
 
   async install(onLog?: (data: string) => void) {
     if (this.pythonPackages.length) {
-      const python = this.metastable.python;
+      const python = Metastable.instance.python;
       if (!python) {
         throw new Error(`Metastable is not fully configured.`);
       }
@@ -86,6 +86,6 @@ export class FeaturePython extends FeatureBase {
       );
     }
 
-    await this.metastable.restartComfy();
+    await Metastable.instance.restartComfy();
   }
 }

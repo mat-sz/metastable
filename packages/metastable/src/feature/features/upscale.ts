@@ -6,6 +6,7 @@ import {
   ProjectType,
 } from '@metastable/types';
 
+import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { RPCRef } from '../../comfy/session/types.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
@@ -53,7 +54,7 @@ export class FeatureUpscale extends FeaturePython {
 
   private async load(session: ComfySession, mrn: string) {
     const data = (await session.invoke('upscale_model:load', {
-      path: await this.metastable.resolve(mrn),
+      path: await Metastable.instance.resolve(mrn),
     })) as RPCRef;
     return new ComfyUpscaleModel(session, data);
   }
