@@ -54,14 +54,3 @@ export function stdout(
 
   return wrapped.promise;
 }
-
-export function shell(command: string) {
-  return stdout(command, undefined, {
-    shell: true,
-    windowsHide: true,
-    env: {
-      ...process.env,
-      LANG: 'en_US.UTF-8',
-    },
-  });
-}

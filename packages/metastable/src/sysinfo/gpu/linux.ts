@@ -1,4 +1,4 @@
-import { shell } from '../../helpers/spawn.js';
+import { stdout } from '../../helpers/spawn.js';
 import { GraphicsControllerData } from '../types.js';
 import { rocmDevices } from './amd.js';
 import { normalizeBusAddress } from './helpers.js';
@@ -28,12 +28,14 @@ async function parseLines(lines: string[]): Promise<GraphicsControllerData[]> {
   let pciIDs: string[] = [];
   try {
     pciIDs = (
-      await shell(
-        'export LC_ALL=C; dmidecode -t 9 2>/dev/null; unset LC_ALL | grep "Bus Address: "',
-      )
+      await stdout('dmidecode', ['-t', '9'], {
+        env: {
+          LC_ALL: 'C',
+        },
+      })
     )
-      .toString()
-      .split('\n');
+      .split('\n')
+      .filter(line => line.includes('Bus Address: '));
     for (let i = 0; i < pciIDs.length; i++) {
       pciIDs[i] = pciIDs[i]
         .replace('Bus Address:', '')
@@ -251,14 +253,12 @@ export async function gpuLinux() {
   } catch {}
 
   try {
-    const stdout = await shell('lspci -vvv 2>/dev/null');
-    const lines = stdout.toString().split('\n');
+    const lines = (await stdout('lspci', ['-vvv'])).split('\n');
     controllers.push(...(await parseLines(lines)));
   } catch {}
 
   try {
-    const clinfoOut = await shell('clinfo --raw');
-    const lines = clinfoOut.toString().split('\n');
+    const lines = (await stdout('clinfo', ['--raw'])).split('\n');
     otherData.push(...parseLinesLinuxClinfo(lines));
   } catch {}
 
