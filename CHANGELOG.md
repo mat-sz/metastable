@@ -3,6 +3,7 @@
 ## Features
 
 - Added a refresh button to model browser.
+- Added storage of brush settings to mask editor.
 
 ## Bug fixes
 

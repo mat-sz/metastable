@@ -17,6 +17,7 @@ import { linePoints } from '$editor/helpers';
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point } from '$editor/types';
 import { useHotkey } from '$hooks/useHotkey';
+import { useStorage } from '$hooks/useStorage';
 import { loadImage } from '$utils/image';
 import styles from './MaskEditor.module.scss';
 
@@ -48,7 +49,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
   const [historyIndex, setHistoryIndex] = useState<number>(0);
   const [tool, setTool] = useState('add');
   const [loaded, setLoaded] = useState(false);
-  const [brushSettings, setBrushSettings] = useState({
+  const [brushSettings, setBrushSettings] = useStorage('maskeditor_brush', {
     size: 10,
     type: 'square',
   });
