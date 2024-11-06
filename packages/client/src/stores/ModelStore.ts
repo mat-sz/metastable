@@ -6,6 +6,7 @@ import { API } from '$api';
 
 class ModelStore {
   models: Record<string, Model[]> = {};
+  isLoading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -24,9 +25,11 @@ class ModelStore {
   }
 
   async refresh() {
+    this.isLoading = true;
     const data = await API.model.all.query();
     runInAction(() => {
       this.models = data;
+      this.isLoading = false;
     });
   }
 

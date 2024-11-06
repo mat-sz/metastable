@@ -8,10 +8,30 @@
     align-items: center;
     justify-content: space-between;
 
-    & > button {
+    .actions {
+      display: flex;
+      align-items: center;
       margin-top: -0.5rem;
+
+      & > * {
+        margin-left: 0.5rem;
+      }
+    }
+
+    .enabled {
+      color: var(--green-900);
+    }
+
+    button {
       padding: 0.5rem;
     }
+  }
+
+  .info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
   }
 
   &.small {

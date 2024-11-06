@@ -1,5 +1,9 @@
 # 0.0.11 (Upcoming)
 
+## Features
+
+- Added a refresh button to model browser.
+
 ## Bug fixes
 
 - Resolved issues with AMD GPU detection on Windows.
