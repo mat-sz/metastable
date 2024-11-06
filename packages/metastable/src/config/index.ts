@@ -23,6 +23,7 @@ const CONFIG_DEFAULTS: ConfigType = {
     hideWelcome: false,
   },
   styles: [],
+  modelFolders: {},
 };
 
 export class Config {

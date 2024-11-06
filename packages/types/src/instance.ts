@@ -1,6 +1,6 @@
 import { ComfyTorchInfo } from './comfy.js';
 import { Feature } from './feature.js';
-import { Architecture } from './model.js';
+import { Architecture, ModelType } from './model.js';
 
 export interface PromptStyle {
   id: string;
@@ -41,6 +41,11 @@ export type ComfyVramMode =
   | 'highvram'
   | 'gpu-only';
 
+export interface ExtraModelFolder {
+  name: string;
+  path: string;
+}
+
 export interface ConfigType {
   python: {
     configured: boolean;
@@ -73,6 +78,9 @@ export interface ConfigType {
     hotkeys?: Record<string, string>;
   };
   styles?: PromptStyle[];
+  modelFolders: {
+    [K in ModelType]?: ExtraModelFolder[];
+  };
 }
 
 export interface Utilization {

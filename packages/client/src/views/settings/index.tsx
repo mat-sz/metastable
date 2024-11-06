@@ -4,6 +4,7 @@ import React from 'react';
 import {
   BsDisplay,
   BsDownload,
+  BsFolder,
   BsGear,
   BsKeyboard,
   BsPalette,
@@ -21,6 +22,7 @@ import { SettingsFeatures } from './features';
 import { SettingsGeneral } from './general';
 import { SettingsHotkeys } from './hotkeys';
 import styles from './index.module.scss';
+import { SettingsModelFolders } from './modelFolders';
 import { SettingsStyles } from './styles';
 
 export const Settings: React.FC = observer(() => {
@@ -46,6 +48,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="general" title="General" icon={<BsGear />} />
           <Tab id="backend" title="Backend" icon={<BsDisplay />} />
           <Tab id="downloads" title="Downloads" icon={<BsDownload />} />
+          <Tab id="modelFolders" title="Model folders" icon={<BsFolder />} />
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab id="features" title="Optional features" icon={<BsPatchPlus />} />
@@ -60,6 +63,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsGeneral />
             <SettingsBackend />
             <SettingsDownloads />
+            <SettingsModelFolders />
             <SettingsStyles />
             <SettingsHotkeys />
             <SettingsFeatures />

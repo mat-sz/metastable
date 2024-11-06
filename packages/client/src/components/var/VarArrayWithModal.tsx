@@ -27,8 +27,6 @@ interface VarArrayWithModalValidateContext<T> {
   index?: number;
 }
 
-type ValidationResult = string | undefined;
-
 export interface IVarArrayWithModalProps<T = any>
   extends Omit<IVarBaseInputProps<T[]>, 'label' | 'children' | 'readOnly'> {
   addModalTitle?: string;
@@ -37,9 +35,7 @@ export interface IVarArrayWithModalProps<T = any>
   children?: (context: VarArrayWithModalItemContext<T>) => ReactNode;
   footer?: (context: VarArrayWithModalFooterContext<T>) => ReactNode;
   getEmptyObject?: () => T;
-  onValidate?: (
-    context: VarArrayWithModalValidateContext<T>,
-  ) => Promise<ValidationResult> | ValidationResult;
+  onValidate?: (context: VarArrayWithModalValidateContext<T>) => Promise<T> | T;
 }
 
 interface ItemModalProps {
@@ -47,7 +43,7 @@ interface ItemModalProps {
   initialData?: any;
   onSave: (data: any) => void;
   primaryButtonLabel?: string;
-  onValidate?: (data: any) => Promise<ValidationResult> | ValidationResult;
+  onValidate?: (data: any) => Promise<any> | any;
 }
 
 const ItemModal = ({
@@ -60,7 +56,7 @@ const ItemModal = ({
 }: React.PropsWithChildren<ItemModalProps>) => {
   const [data, setData] = useState<any>(initialData);
   const [isValidating, setIsValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<ValidationResult>();
+  const [validationResult, setValidationResult] = useState<string>();
   const { close } = useModal();
 
   return (
@@ -79,22 +75,20 @@ const ItemModal = ({
           onClick={async () => {
             if (onValidate) {
               setIsValidating(true);
+              setValidationResult(undefined);
 
-              let result: ValidationResult;
               try {
-                result = await onValidate(data);
+                onSave({ ...(await onValidate(data)) });
+                close();
               } catch (e) {
-                result = `${e}`;
+                setValidationResult(`${e}`);
               }
 
               setIsValidating(false);
-              if (result) {
-                setValidationResult(result);
-                return;
-              }
+            } else {
+              onSave({ ...data });
+              close();
             }
-            onSave({ ...data });
-            close();
           }}
         >
           {primaryButtonLabel}

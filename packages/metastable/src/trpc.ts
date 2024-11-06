@@ -22,7 +22,7 @@ import { nanoid } from 'nanoid';
 import { gte } from 'semver';
 import { z } from 'zod';
 
-import { getNextFilename } from './helpers/fs.js';
+import { exists, getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
 
 export interface TRPCContext {
@@ -214,6 +214,15 @@ export const router = t.router({
           return await metastable.config.all();
         }),
     },
+    validateModelPath: t.procedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        if (!(await exists(input))) {
+          throw new Error('Directory not found.');
+        }
+
+        return true;
+      }),
   },
   model: {
     onChange: t.procedure.subscription(({ ctx: { metastable } }) => {
