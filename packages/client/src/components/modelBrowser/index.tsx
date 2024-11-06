@@ -197,15 +197,15 @@ export const ModelBrowser: React.FC<Props> = observer(
     const models = listFiles(data, parts, false);
 
     return (
-      <div className={clsx(styles.models, styles[variant])}>
+      <div
+        className={clsx(styles.models, styles[variant])}
+        onClick={e => {
+          e.stopPropagation();
+        }}
+      >
         <div className={styles.header}>
           <Breadcrumbs value={parts} onChange={setParts} />
-          <div
-            className={styles.actions}
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
+          <div className={styles.actions}>
             {!!architecture && (
               <IconButton
                 title={

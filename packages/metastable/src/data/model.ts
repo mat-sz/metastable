@@ -7,6 +7,7 @@ import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
 import { Model, ModelDetails, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
+import { Metastable } from '#metastable';
 import { FileEntity } from './common.js';
 import {
   CONFIG_EXTENSIONS,
@@ -31,26 +32,6 @@ const MODEL_EXTENSIONS = [
   'sft',
 ];
 
-function parsedMrnToModelInfo(parsed: MRNDataParsed) {
-  const type = parsed.segments[1] as ModelType;
-  const name = parsed.segments[2];
-
-  if (!Object.values(ModelType).includes(type)) {
-    throw new Error(`Invalid model type: ${type}`);
-  }
-
-  if (!name) {
-    throw new Error(`Empty model name`);
-  }
-
-  return { type, name };
-}
-
-function mrnToModelInfo(mrn: string) {
-  const parsed = MRN.parse(mrn);
-  return parsedMrnToModelInfo(parsed);
-}
-
 export class ModelEntity extends FileEntity {
   type: ModelType | undefined = undefined;
   imageName: string | undefined = undefined;
@@ -58,6 +39,7 @@ export class ModelEntity extends FileEntity {
   simpleName: string;
   modelBaseDir: string | undefined = undefined;
   mrnBaseSegments: string[] = [];
+  baseParts: string[] = [];
   details: ModelDetails | undefined = undefined;
 
   constructor(_path: string) {
@@ -149,26 +131,34 @@ export class ModelEntity extends FileEntity {
 
   get mrn() {
     return MRN.serialize({
-      segments: [...this.mrnBaseSegments, this.name],
+      segments: [...this.mrnBaseSegments, this.fullName],
     });
   }
 
   get coverMrn() {
     if (this.imageName) {
       return MRN.serialize({
-        segments: [...this.mrnBaseSegments, this.name, 'cover'],
+        segments: [...this.mrnBaseSegments, this.fullName, 'cover'],
       });
     }
 
     return undefined;
   }
 
-  async json() {
-    await this.load();
-    const parts = this.modelBaseDir
+  get parts() {
+    const currentParts = this.modelBaseDir
       ? path.relative(this.modelBaseDir, this.path).split(path.sep)
       : [];
-    parts.pop();
+    currentParts.pop();
+    return [...this.baseParts, ...currentParts];
+  }
+
+  get fullName() {
+    return [...this.parts, this.name].join('/');
+  }
+
+  async json() {
+    await this.load();
 
     const json: Model = {
       type: this.type!,
@@ -179,7 +169,7 @@ export class ModelEntity extends FileEntity {
       metadata: this.metadata.json,
       file: {
         name: this.name,
-        parts,
+        parts: this.parts,
         path: this.path,
         size: (await stat(this.path)).size,
       },
@@ -197,16 +187,14 @@ type ModelRepositoryEvents = {
 export class ModelRepository extends (EventEmitter as {
   new (): TypedEventEmitter<ModelRepositoryEvents>;
 }) {
-  private searchPaths: { [key in ModelType]?: string[] } = {};
+  private searchPaths: {
+    [key in ModelType]?: { path: string; name?: string }[];
+  } = {};
   private cache: ModelEntity[] | undefined = undefined;
   private watcher: chokidar.FSWatcher | undefined = undefined;
 
   constructor(private baseDir: string) {
     super();
-
-    for (const type of Object.values(ModelType)) {
-      this.searchPaths[type] = [path.join(baseDir, type)];
-    }
   }
 
   private initWatcher() {
@@ -246,25 +234,46 @@ export class ModelRepository extends (EventEmitter as {
   }
 
   async refresh() {
+    const configFolders = await Metastable.instance.config.get('modelFolders');
+    for (const type of Object.values(ModelType)) {
+      this.searchPaths[type] = [{ path: path.join(this.baseDir, type) }];
+
+      if (configFolders[type]) {
+        for (const item of configFolders[type]) {
+          if (!item.name || !item.path) {
+            continue;
+          }
+
+          this.searchPaths[type].push({ ...item });
+        }
+      }
+    }
+
     const promises: Promise<ModelEntity | undefined>[] = [];
 
     for (const [modelType, paths] of Object.entries(this.searchPaths)) {
       for (const dirPath of paths) {
-        await mkdir(dirPath, { recursive: true });
-        const items = await walk(dirPath);
-        promises.push(
-          ...items.map(async item => {
-            try {
-              const model = await ModelEntity.fromDirent<ModelEntity>(item);
-              model.type = modelType as ModelType;
-              model.modelBaseDir = dirPath;
-              model.mrnBaseSegments = ['model', modelType];
-              return model;
-            } catch {
-              return undefined;
-            }
-          }),
-        );
+        try {
+          if (!dirPath.name) {
+            await mkdir(dirPath.path, { recursive: true });
+          }
+
+          const items = await walk(dirPath.path);
+          promises.push(
+            ...items.map(async item => {
+              try {
+                const model = await ModelEntity.fromDirent<ModelEntity>(item);
+                model.type = modelType as ModelType;
+                model.modelBaseDir = dirPath.path;
+                model.baseParts = dirPath.name ? [`~${dirPath.name}`] : [];
+                model.mrnBaseSegments = ['model', modelType];
+                return model;
+              } catch {
+                return undefined;
+              }
+            }),
+          );
+        } catch {}
       }
     }
 
@@ -307,8 +316,16 @@ export class ModelRepository extends (EventEmitter as {
   }
 
   async get(mrn: string): Promise<ModelEntity> {
-    const { type, name } = mrnToModelInfo(mrn);
-    return await this.getByName(type, name);
+    const parsed = MRN.parse(mrn);
+    const realMrn = MRN.serialize({ segments: parsed.segments.slice(0, 3) });
+
+    const models = await this.all();
+    const model = models.find(model => model.mrn === realMrn);
+    if (!model) {
+      throw new Error(`Unable to find model '${realMrn}'.`);
+    }
+    await model.load();
+    return model;
   }
 
   async getEmbeddingsPath(): Promise<string | undefined> {
@@ -326,9 +343,10 @@ export class ModelRepository extends (EventEmitter as {
   }
 
   async resolve(parsed: MRNDataParsed) {
-    const { type, name } = parsedMrnToModelInfo(parsed);
     const option = parsed.segments[3] || 'model';
-    const model = await this.getByName(type, name);
+    const model = await this.get(
+      MRN.serialize({ ...parsed, query: undefined }),
+    );
 
     switch (option) {
       case 'model':
