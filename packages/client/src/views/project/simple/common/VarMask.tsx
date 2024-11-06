@@ -35,19 +35,20 @@ export const VarMask = ({
   const [imageMrn] = useVarUIValue<string | undefined>({
     path: imagePath,
   });
-  const [isOpen, setIsOpen] = useState(false);
+  const [editorState, setEditorState] = useState<{
+    imageSrc: string;
+    maskSrc?: string;
+  }>();
 
-  const imageUrl = resolveImage(imageMrn);
-  const maskUrl = resolveImage(currentValue);
+  const imageSrc = resolveImage(imageMrn);
 
   return (
     <>
-      {isOpen && !!imageUrl && (
+      {!!editorState && (
         <MaskEditor
-          imageSrc={imageUrl}
-          maskSrc={maskUrl}
+          {...editorState}
           onClose={mask => {
-            setIsOpen(false);
+            setEditorState(undefined);
             if (mask) {
               setCurrentValue(mask);
             }
@@ -56,13 +57,22 @@ export const VarMask = ({
       )}
       <VarBase
         label={label}
-        disabled={!imageUrl}
+        disabled={!imageSrc}
         readOnly={readOnly}
         className={clsx(className, styles.mask)}
         error={currentError}
       >
         <div className={styles.actions}>
-          <Button onClick={() => setIsOpen(true)}>Edit mask</Button>
+          <Button
+            onClick={() =>
+              setEditorState({
+                imageSrc,
+                maskSrc: resolveImage(currentValue),
+              })
+            }
+          >
+            Edit mask
+          </Button>
           <ImageBrowseButton
             onSelect={url => setCurrentValue(url)}
             forceType={ProjectFileType.MASK}
