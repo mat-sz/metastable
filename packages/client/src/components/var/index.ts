@@ -3,6 +3,7 @@ export * from './VarUI';
 // Inputs
 export * from './VarAddModel';
 export * from './VarArray';
+export * from './VarArrayWithModal';
 export * from './VarBase';
 export * from './VarButton';
 export * from './VarInputType';

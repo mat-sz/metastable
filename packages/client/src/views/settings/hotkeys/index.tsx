@@ -14,19 +14,17 @@ export const SettingsHotkeys: React.FC = observer(() => {
       {Object.entries(hotkeyGroups).map(([groupId, group]) => (
         <div key={groupId} className={styles.group}>
           <h3>{group.label}</h3>
-          {Object.entries(group.hotkeys).map(([hotkeyId, hotkey]) => {
-            return (
-              <div id={hotkeyId} className={styles.hotkey}>
-                <div>{hotkey.label}</div>
-                <div>
-                  <Hotkey keys={hotkey.defaultKeys} />
-                </div>
-                <div>
-                  <VarHotkey path={`app.hotkeys.${groupId}_${hotkeyId}`} />
-                </div>
+          {Object.entries(group.hotkeys).map(([hotkeyId, hotkey]) => (
+            <div key={hotkeyId} id={hotkeyId} className={styles.hotkey}>
+              <div>{hotkey.label}</div>
+              <div>
+                <Hotkey keys={hotkey.defaultKeys} />
               </div>
-            );
-          })}
+              <div>
+                <VarHotkey path={`app.hotkeys.${groupId}_${hotkeyId}`} />
+              </div>
+            </div>
+          ))}
         </div>
       ))}
     </TabPanel>

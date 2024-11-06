@@ -13,6 +13,7 @@ interface VarArrayItemContext<T> {
 }
 
 interface VarArrayFooterContext<T> {
+  array: T[];
   append(item: T): void;
 }
 
@@ -92,6 +93,7 @@ export const VarArray = ({
       {typeof footer !== 'undefined' &&
         (typeof footer === 'function'
           ? footer({
+              array: currentArray,
               append: item => {
                 setCurrentValue([...currentArray, item]);
               },
