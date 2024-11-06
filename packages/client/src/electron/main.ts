@@ -193,7 +193,7 @@ async function createWindow() {
   const win = new BrowserWindow({
     title: 'Metastable',
     minWidth: 1200,
-    minHeight: 800,
+    minHeight: 700,
     x: mainWindowStateKeeper.x,
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,

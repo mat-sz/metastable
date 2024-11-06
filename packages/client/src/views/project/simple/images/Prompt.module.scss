@@ -1,0 +1,60 @@
+.prompt {
+  background: var(--grey-200);
+  overflow-y: auto;
+  position: relative;
+  margin-top: 1rem;
+  border-radius: 5px;
+
+  [varui-label] {
+    margin: 0;
+  }
+
+  .inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    [varui-label] {
+      margin: 1rem;
+
+      &:not(:last-child) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  [varui-category-title] {
+    margin: 0;
+    padding: 0 1rem;
+  }
+
+  [varui-category] {
+    border-bottom: none;
+  }
+
+  .actions {
+    background: var(--grey-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    padding-top: 0;
+
+    & > div {
+      display: flex;
+      align-items: center;
+    }
+
+    .hint {
+      margin-right: 1rem;
+      font-size: 0.8rem;
+    }
+
+    button:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+
+  .style {
+    width: 200px;
+  }
+}

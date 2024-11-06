@@ -84,18 +84,20 @@ export const Settings: React.FC<SettingsProps> = observer(
             </div>
           </div>
           {hasMessages && (
-            <Alerts className={styles.headerItem}>
-              {validationResult.errors.map((message, i) => (
-                <Alert variant="error" key={i}>
-                  {message}
-                </Alert>
-              ))}
-              {validationResult.warnings.map((message, i) => (
-                <Alert variant="warning" key={i}>
-                  {message}
-                </Alert>
-              ))}
-            </Alerts>
+            <div className={styles.headerItem}>
+              <Alerts>
+                {validationResult.errors.map((message, i) => (
+                  <Alert variant="error" key={i}>
+                    {message}
+                  </Alert>
+                ))}
+                {validationResult.warnings.map((message, i) => (
+                  <Alert variant="warning" key={i}>
+                    {message}
+                  </Alert>
+                ))}
+              </Alerts>
+            </div>
           )}
           <div>
             <TabPanel id="general">

@@ -9,6 +9,7 @@
 
 - Resolved issues with AMD GPU detection on Windows.
 - Fixed issues with mask editor reverting the mask at random.
+- Fixed layout issues in project generation preview.
 
 # 0.0.10 (2024-11-03)
 

@@ -1,0 +1,49 @@
+.preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
+  min-height: 250px;
+  max-height: 100%;
+}
+
+.progressPreview {
+  height: min(100%, 750px);
+  position: relative;
+
+  .stepInfo {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+
+    & > *:not(:first-child) {
+      margin-left: 0.5rem;
+    }
+  }
+
+  .imageContainer {
+    border-radius: 8px;
+    width: auto;
+    height: 100%;
+    background: var(--grey-200);
+    overflow: hidden;
+
+    img,
+    .placeholder {
+      width: auto;
+      height: 100%;
+    }
+
+    img {
+      filter: blur(3px);
+      transform: scale3d(1.02, 1.02, 1);
+    }
+  }
+}

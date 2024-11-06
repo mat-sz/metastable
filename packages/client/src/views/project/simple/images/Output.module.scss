@@ -1,0 +1,29 @@
+.imageActions {
+  background: var(--grey-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+
+  .hint {
+    margin-right: 1rem;
+    font-size: 0.8rem;
+  }
+
+  button:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
