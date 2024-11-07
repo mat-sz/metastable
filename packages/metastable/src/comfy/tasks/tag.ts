@@ -1,7 +1,6 @@
 import path from 'path';
 
 import {
-  ModelType,
   ProjectTaggingSettings,
   ProjectTaskData,
   TaskState,
@@ -21,14 +20,6 @@ export class TagTask extends BaseTask<ProjectTaskData> {
   }
 
   async init() {
-    if (!this.settings.tagger.path) {
-      const model = await Metastable.instance.model.getByName(
-        ModelType.TAGGER,
-        this.settings.tagger.name,
-      );
-      this.settings.tagger.path = model.path;
-    }
-
     return { projectId: this.project.id };
   }
 
@@ -43,7 +34,7 @@ export class TagTask extends BaseTask<ProjectTaskData> {
       );
       const threshold = this.settings.threshold || 0.35;
       const result = await ctx.tag.run(
-        this.settings.tagger.path!,
+        await Metastable.instance.resolve(this.settings.tagger),
         images,
         threshold,
         threshold,

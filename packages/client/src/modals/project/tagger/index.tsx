@@ -23,9 +23,7 @@ export const ProjectTagger: React.FC<Props> = observer(
   ({ inputs, project }) => {
     const [settings, setSettings] = useState<ProjectTaggingSettings>({
       inputs,
-      tagger: {
-        name: mainStore.defaultModelName(ModelType.TAGGER),
-      },
+      tagger: mainStore.defaultModelMrn(ModelType.TAGGER),
       threshold: 0.35,
       removeUnderscore: true,
     });
@@ -34,7 +32,7 @@ export const ProjectTagger: React.FC<Props> = observer(
       <Modal title="Tagger" size="small">
         <VarUI onChange={setSettings} values={settings}>
           <VarCategory label="Tagger">
-            <VarModel path="tagger.name" modelType={ModelType.TAGGER} />
+            <VarModel path="tagger" modelType={ModelType.TAGGER} />
           </VarCategory>
           <VarCategory label="Settings">
             <VarSlider

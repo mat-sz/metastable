@@ -13,10 +13,7 @@ import { mainStore } from '../MainStore';
 export function defaultSettings(): ProjectTrainingSettings {
   return {
     mode: 'lora',
-    base: {
-      name: mainStore.defaultModelMrn(ModelType.CHECKPOINT),
-      sdxl: false,
-    },
+    base: mainStore.defaultModelMrn(ModelType.CHECKPOINT),
     resolution: { width: 512, height: 512 },
     network: {
       alpha: 8,

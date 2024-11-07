@@ -5,12 +5,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import {
+  Architecture,
   LogItem,
   ProjectTrainingInputMetadata,
   ProjectTrainingSettings,
 } from '@metastable/types';
 import sharp from 'sharp';
 
+import { Metastable } from '#metastable';
 import type { ProjectEntity } from '../data/project.js';
 import { CircularBuffer } from '../helpers/buffer.js';
 import { JSONFile, removeFileExtension, TextFile } from '../helpers/fs.js';
@@ -79,15 +81,19 @@ export class Kohya extends EventEmitter {
       }
     }
 
+    const model = await Metastable.instance.model.get(settings.base);
+
     const mainPath = path.join(
       baseDir,
       'python_kohya',
-      settings.base.sdxl ? 'sdxl_train_network.py' : 'train_network.py',
+      model.details?.architecture === Architecture.SDXL
+        ? 'sdxl_train_network.py'
+        : 'train_network.py',
     );
 
     const config = {
       // Network
-      pretrained_model_name_or_path: settings.base.path!,
+      pretrained_model_name_or_path: model.path,
       network_module: 'networks.lora',
       network_dim: settings.network.dimensions,
       network_alpha: settings.network.alpha,

@@ -61,7 +61,7 @@ export interface ProjectTrainingInputMetadata {
 
 export interface ProjectTrainingSettings {
   mode: 'lora';
-  base: { name: string; path?: string; sdxl: boolean };
+  base: string;
   resolution: { width: number; height: number };
   network: {
     dimensions: number;
@@ -100,10 +100,7 @@ export interface ProjectTaggingSettings {
   inputs: string[];
   threshold: number;
   removeUnderscore: boolean;
-  tagger: {
-    name: string;
-    path?: string;
-  };
+  tagger: string;
 }
 
 export enum ProjectType {

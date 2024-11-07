@@ -326,14 +326,6 @@ export class Metastable extends (EventEmitter as {
 
   async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
     const project = await this.project.get(projectId);
-    if (!settings.base.path) {
-      const model = await this.model.getByName(
-        ModelType.CHECKPOINT,
-        settings.base.name,
-      );
-      settings.base.path = model.path;
-    }
-
     return await this.kohya?.train(project, settings);
   }
 

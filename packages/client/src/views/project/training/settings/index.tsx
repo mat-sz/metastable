@@ -77,8 +77,7 @@ export const Settings: React.FC = observer(() => {
         values={toJS(project.settings)}
       >
         <VarCategory label="Checkpoint">
-          <VarModel path="base.name" modelType={ModelType.CHECKPOINT} />
-          <VarToggle label="SDXL" path="base.sdxl" />
+          <VarModel path="base" modelType={ModelType.CHECKPOINT} />
         </VarCategory>
         <VarCategory label="Resolution">
           <VarSlider

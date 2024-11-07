@@ -229,11 +229,6 @@ class MainStore {
     return model?.mrn;
   }
 
-  defaultModelName(type: ModelType) {
-    const model = modelStore.defaultModel(type);
-    return model?.file.name;
-  }
-
   get searchFn() {
     return this.config.data?.ui?.fuzzySearch ? fuzzy : strIncludes;
   }
