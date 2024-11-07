@@ -33,6 +33,13 @@ export class Setup extends (EventEmitter as {
     super();
   }
 
+  async resetBundle(resetAll = false) {
+    await Metastable.instance.config.reset(resetAll ? undefined : 'python');
+    await Metastable.instance.deleteBundle();
+    this.resetStatus();
+    await this.emitStatus();
+  }
+
   resetStatus() {
     this._checked = false;
   }

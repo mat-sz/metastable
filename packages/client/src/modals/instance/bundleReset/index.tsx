@@ -4,13 +4,22 @@ import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { setupStore } from '$stores/SetupStore';
 
-export const InstanceBundleReset: React.FC = () => {
+interface Props {
+  resetAll?: boolean;
+}
+
+export const InstanceBundleReset: React.FC<Props> = ({ resetAll }) => {
   const { close } = useModal();
 
   return (
-    <Modal title="Reset settings and Python dependencies" size="small">
+    <Modal
+      title={resetAll ? 'Reset bundle and all settings' : 'Reset bundle'}
+      size="small"
+    >
       <div>
-        Are you sure you want to reset settings and Python dependencies?{' '}
+        {resetAll
+          ? 'Are you sure you want to reset all settings and Python dependencies?'
+          : 'Are you sure you want to reset Python dependencies?'}
       </div>
       <div>This action might require you to download up to 2GB of data.</div>
       <div>This will not delete your projects or models.</div>
@@ -26,7 +35,7 @@ export const InstanceBundleReset: React.FC = () => {
         <Button
           variant="danger"
           onClick={() => {
-            setupStore.resetBundle();
+            setupStore.resetBundle(resetAll);
             close();
           }}
         >

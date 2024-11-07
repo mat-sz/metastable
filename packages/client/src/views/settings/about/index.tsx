@@ -75,12 +75,17 @@ export const SettingsAbout: React.FC = observer(() => {
       )}
       <VarCategory label="Reset">
         <div className={styles.info}>
+          <div>This action will not delete your models or projects.</div>
           <div className={styles.buttons}>
+            <Button
+              onClick={() => modalStore.show(<InstanceBundleReset resetAll />)}
+            >
+              Reset bundle and all settings
+            </Button>
             <Button onClick={() => modalStore.show(<InstanceBundleReset />)}>
-              Reset settings and Python dependencies
+              Reset bundle
             </Button>
           </div>
-          <p>This action will not delete your models or projects.</p>
         </div>
       </VarCategory>
       <VarCategory label="Credits">

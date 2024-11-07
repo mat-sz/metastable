@@ -58,7 +58,12 @@ export class Config {
     await this.store({ ...all, [key]: value });
   }
 
-  async reset() {
-    await this.store({ ...CONFIG_DEFAULTS });
+  async reset(key?: keyof ConfigType) {
+    if (!key) {
+      await this.store({ ...CONFIG_DEFAULTS });
+    } else {
+      const data = await this.configFile.readJson();
+      await this.store({ ...data, [key]: CONFIG_DEFAULTS[key] });
+    }
   }
 }

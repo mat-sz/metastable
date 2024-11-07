@@ -312,9 +312,9 @@ class SetupStore {
     return { total, breakdown };
   }
 
-  async resetBundle() {
+  async resetBundle(resetAll = false) {
     this.status = 'required';
-    await API.instance.resetBundle.mutate();
+    await API.instance.resetBundle.mutate({ resetAll });
   }
 }
 

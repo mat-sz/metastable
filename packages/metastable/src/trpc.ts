@@ -195,12 +195,14 @@ export const router = t.router({
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
     }),
-    resetBundle: t.procedure.mutation(async ({ ctx: { metastable } }) => {
-      await metastable.config.reset();
-      await metastable.deleteBundle();
-      metastable.setup.resetStatus();
-      await metastable.setup.emitStatus();
+    resetAll: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+      await metastable.setup.resetBundle(true);
     }),
+    resetBundle: t.procedure
+      .input(z.object({ resetAll: z.boolean().optional() }))
+      .mutation(async ({ ctx: { metastable }, input: { resetAll } }) => {
+        await metastable.setup.resetBundle(resetAll);
+      }),
     config: {
       get: t.procedure.query(async ({ ctx: { metastable } }) => {
         return await metastable.config.all();
