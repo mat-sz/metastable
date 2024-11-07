@@ -30,16 +30,18 @@ export class Config {
   private configFile;
 
   constructor(configPath: string) {
-    this.configFile = new JSONFile<ConfigType>(configPath, CONFIG_DEFAULTS);
+    this.configFile = new JSONFile<Partial<ConfigType>>(
+      configPath,
+      CONFIG_DEFAULTS,
+    );
   }
 
   async all(): Promise<ConfigType> {
     const data = await this.configFile.readJson();
-
-    return assign({ ...CONFIG_DEFAULTS }, { ...data });
+    return assign({ ...CONFIG_DEFAULTS }, { ...data }) as ConfigType;
   }
 
-  async store(config: ConfigType): Promise<void> {
+  async store(config: Partial<ConfigType>): Promise<void> {
     await this.configFile.writeJson({ ...config });
   }
 
@@ -60,10 +62,16 @@ export class Config {
 
   async reset(key?: keyof ConfigType) {
     if (!key) {
-      await this.store({ ...CONFIG_DEFAULTS });
+      await this.store({});
     } else {
       const data = await this.configFile.readJson();
-      await this.store({ ...data, [key]: CONFIG_DEFAULTS[key] });
+      delete data[key];
+      await this.store({ ...data });
     }
+  }
+
+  async resetExceptFor(key: keyof ConfigType) {
+    const data = await this.configFile.readJson();
+    await this.store({ [key]: data[key] });
   }
 }

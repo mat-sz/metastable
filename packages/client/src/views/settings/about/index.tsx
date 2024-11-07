@@ -6,7 +6,7 @@ import { Button } from '$components/button';
 import { Link } from '$components/link';
 import { TabPanel } from '$components/tabs';
 import { VarButton, VarCategory, VarToggle } from '$components/var';
-import { InstanceBundleReset } from '$modals/instance';
+import { InstanceBundleReset, InstanceSettingsReset } from '$modals/instance';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { updateStore } from '$stores/UpdateStore';
@@ -66,7 +66,7 @@ export const SettingsAbout: React.FC = observer(() => {
                   Check for updates
                 </Button>
                 <Button href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md">
-                  Changelog
+                  View changelog
                 </Button>
               </div>
             </div>
@@ -84,6 +84,9 @@ export const SettingsAbout: React.FC = observer(() => {
             </Button>
             <Button onClick={() => modalStore.show(<InstanceBundleReset />)}>
               Reset bundle
+            </Button>
+            <Button onClick={() => modalStore.show(<InstanceSettingsReset />)}>
+              Reset all settings
             </Button>
           </div>
         </div>

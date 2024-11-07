@@ -232,6 +232,11 @@ export class Metastable extends (EventEmitter as {
     }
   }
 
+  async resetSettings() {
+    await this.config.resetExceptFor('python');
+    await this.restartComfy();
+  }
+
   async refreshFeatures() {
     const features = this.feature.availableFeatures;
     for (const feature of features) {

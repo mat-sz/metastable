@@ -195,8 +195,8 @@ export const router = t.router({
     restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
     }),
-    resetAll: t.procedure.mutation(async ({ ctx: { metastable } }) => {
-      await metastable.setup.resetBundle(true);
+    resetSettings: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+      await metastable.resetSettings();
     }),
     resetBundle: t.procedure
       .input(z.object({ resetAll: z.boolean().optional() }))
