@@ -157,6 +157,7 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
           max={field.max}
           step={field.step}
           defaultValue={field.defaultValue}
+          showInput
         />
       );
     case FieldType.MODEL:

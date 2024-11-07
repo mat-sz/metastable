@@ -1,3 +1,9 @@
+# 0.0.12 (Upcoming)
+
+## Bug fixes
+
+- Fixed display of input fields next to sliders.
+
 # 0.0.11 (2024-11-07)
 
 ## Features
