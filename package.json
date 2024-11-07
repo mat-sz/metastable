@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "check": "yarn build:deps && yarn lint && yarn workspace @metastable/client run tsc",
     "build": "yarn workspaces foreach -Api --topological-dev run build",
     "build:deps": "yarn workspaces foreach -Api --topological-dev --exclude @metastable/client --exclude @metastable/server --exclude metastable run build",
     "env": "dotenvx run -f .env.local -f .env",
