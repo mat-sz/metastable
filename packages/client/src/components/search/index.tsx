@@ -7,9 +7,15 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   autoFocus?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
-export const Search: React.FC<Props> = ({ value, onChange, autoFocus }) => {
+export const Search: React.FC<Props> = ({
+  value,
+  onChange,
+  onKeyDown,
+  autoFocus,
+}) => {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (autoFocus) {
@@ -26,6 +32,7 @@ export const Search: React.FC<Props> = ({ value, onChange, autoFocus }) => {
         value={value}
         autoFocus={autoFocus}
         onChange={e => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
       />
       {!!value && (
         <button onClick={() => onChange('')}>

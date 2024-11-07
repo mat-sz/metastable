@@ -1,5 +1,9 @@
 # 0.0.12 (Upcoming)
 
+## Features
+
+- Added keyboard shortcuts (`Up`/`Down`) for selecting models in model browser.
+
 ## Bug fixes
 
 - Fixed display of input fields next to sliders.

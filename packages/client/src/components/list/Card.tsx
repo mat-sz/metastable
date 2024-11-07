@@ -31,6 +31,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
 
   return (
     <div
+      role="button"
       className={styles.card}
       onClick={onClick}
       onContextMenu={menu ? onContextMenu : undefined}

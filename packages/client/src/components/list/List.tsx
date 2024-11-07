@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { BsGrid, BsList, BsListUl } from 'react-icons/bs';
 
 import styles from './index.module.scss';
@@ -27,11 +27,27 @@ export function List<T>({
 }: ListProps<T>): JSX.Element {
   const [search, setSearch] = useState('');
   const [selectedView, setSelectedView] = useState<string>('grid');
+  const listRef = useRef<HTMLDivElement>(null);
 
   let displayItems = items;
   if (quickFilter && search) {
     displayItems = quickFilter(items, search);
   }
+
+  const getItems = () => {
+    const listEl = listRef.current;
+    if (!listEl) {
+      return [];
+    }
+
+    return [...listEl.querySelectorAll(':scope > *[role="button"]')];
+  };
+
+  const getSelected = () => {
+    return listRef.current?.querySelector(
+      ':scope > *[role="button"][aria-selected="true"]',
+    ) as HTMLElement | undefined;
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -43,6 +59,45 @@ export function List<T>({
               value={search}
               onChange={setSearch}
               autoFocus={searchAutoFocus}
+              onKeyDown={e => {
+                switch (e.key) {
+                  case 'Enter':
+                    getSelected()?.click();
+                    break;
+                  case 'ArrowUp':
+                  case 'ArrowDown':
+                    {
+                      const items = getItems();
+                      const selected = getSelected();
+
+                      let currentIndex = -1;
+                      if (selected) {
+                        currentIndex = [...items].findIndex(
+                          el => el === selected,
+                        );
+                        selected.removeAttribute('aria-selected');
+                      }
+
+                      if (e.key === 'ArrowUp') {
+                        currentIndex--;
+                        if (currentIndex < 0) {
+                          currentIndex = items.length - 1;
+                        }
+                      } else {
+                        currentIndex++;
+                        if (currentIndex >= items.length) {
+                          currentIndex = -1;
+                        }
+                      }
+
+                      const newSelected = items[currentIndex];
+                      if (newSelected) {
+                        newSelected.setAttribute('aria-selected', 'true');
+                      }
+                    }
+                    break;
+                }
+              }}
             />
           )}
         </div>
@@ -70,6 +125,11 @@ export function List<T>({
                 [styles.small]: small,
               },
             )}
+            ref={listRef}
+            onPointerMove={() => {
+              const selected = getSelected();
+              selected?.removeAttribute('aria-selected');
+            }}
           >
             {displayItems.map(children)}
           </div>
