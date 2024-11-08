@@ -11,7 +11,7 @@ import {
   BsPatchPlus,
 } from 'react-icons/bs';
 
-import logo from '$/assets/logo.svg';
+import { LogoIcon } from '$components/logoIcon';
 import { Tab, TabContent, Tabs, TabView } from '$components/tabs';
 import { VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
@@ -52,11 +52,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab id="features" title="Optional features" icon={<BsPatchPlus />} />
-          <Tab
-            id="about"
-            title={`About ${__APP_NAME__}`}
-            icon={<img src={logo} alt="Logo" />}
-          />
+          <Tab id="about" title={`About ${__APP_NAME__}`} icon={<LogoIcon />} />
         </Tabs>
         <TabContent className={styles.content}>
           <div className={styles.wrapper}>

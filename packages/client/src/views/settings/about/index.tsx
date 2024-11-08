@@ -17,8 +17,8 @@ import { Social } from '../../common/Social';
 export const SettingsAbout: React.FC = observer(() => {
   return (
     <TabPanel id="about">
-      <h2>About Metastable</h2>
-      <VarCategory label="About Metastable">
+      <h2>About {__APP_NAME__}</h2>
+      <VarCategory label={`About ${__APP_NAME__}`}>
         <div className={styles.info}>
           <div>
             {__APP_NAME__} {__APP_VERSION__}
