@@ -9,6 +9,7 @@
 ## Bug fixes
 
 - Fixed display of input fields next to sliders.
+- Fixed page zoom issues on macOS.
 
 # 0.0.11 (2024-11-07)
 
