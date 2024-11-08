@@ -16,6 +16,11 @@ interface PointerState {
   scale: number;
 }
 
+interface ImageState {
+  offset: Point;
+  scale: number;
+}
+
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.25;
 
@@ -23,10 +28,23 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const pointerStateRef = useRef<PointerState[]>([]);
+  const imageStateRef = useRef<ImageState>({
+    offset: { x: 0, y: 0 },
+    scale: 1,
+  });
 
   const [loaded, setLoaded] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [imageOffset, setImageOffset] = useState<Point>({ x: 0, y: 0 });
+
+  const syncState = useCallback((state: Partial<ImageState>) => {
+    const imageEl = imageRef.current;
+    if (!imageEl) {
+      return;
+    }
+
+    imageStateRef.current = { ...imageStateRef.current, ...state };
+    const { offset, scale } = imageStateRef.current;
+    imageEl.style.transform = `translate(${offset.x}px, ${offset.y}px) scale(${scale})`;
+  }, []);
 
   const resetScale = useCallback(
     (isLoad = false) => {
@@ -46,13 +64,16 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
       const vector = Vector2.fromSize(wrapperRect)
         .sub(new Vector2(width, height).multiplyScalar(scale))
         .divideScalar(2);
-      setImageOffset(vector.point);
-      setScale(scale);
+      syncState({
+        offset: vector.point,
+        scale,
+      });
+
       if (isLoad) {
         setLoaded(true);
       }
     },
-    [setScale, setImageOffset, setLoaded],
+    [setLoaded, syncState],
   );
 
   useEffect(() => {
@@ -72,27 +93,48 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
     return <div className={styles.preview} />;
   }
 
-  const zoom = (e: React.WheelEvent) => {
-    e.stopPropagation();
+  const onWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const newScale = scale * (1 - Math.sign(e.deltaY) * 0.1);
-    const scaleRatio = newScale / scale;
-    const wrapperRect = wrapperRef.current!.getBoundingClientRect();
+      const isTrackpad =
+        (e as any).wheelDeltaY === e.deltaY * -3 || e.deltaMode === 0;
 
-    const vector = Vector2.fromEvent(e)
-      .sub(Vector2.fromPoint(wrapperRect))
-      .multiplyScalar(1 - scaleRatio)
-      .add(Vector2.fromPoint(imageOffset).multiplyScalar(scaleRatio));
+      if (isTrackpad && !e.ctrlKey) {
+        const { offset } = imageStateRef.current;
 
-    setImageOffset(vector.point);
-    setScale(newScale);
+        const changeVector = new Vector2(e.deltaX, e.deltaY).multiplyScalar(-1);
+        const vector = Vector2.fromPoint(offset).add(changeVector);
 
-    const p = pointerStateRef.current[0];
-    if (p) {
-      p.imageOffset = vector.clone();
-      p.start = Vector2.fromEvent(e);
-    }
-  };
+        syncState({
+          offset: vector.point,
+        });
+      } else {
+        const { scale, offset } = imageStateRef.current;
+        const newScale = scale * (1 - Math.sign(e.deltaY) * 0.1);
+        const scaleRatio = newScale / scale;
+        const wrapperRect = wrapperRef.current!.getBoundingClientRect();
+
+        const vector = Vector2.fromEvent(e)
+          .sub(Vector2.fromPoint(wrapperRect))
+          .multiplyScalar(1 - scaleRatio)
+          .add(Vector2.fromPoint(offset).multiplyScalar(scaleRatio));
+
+        syncState({
+          offset: vector.point,
+          scale: newScale,
+        });
+
+        const p = pointerStateRef.current[0];
+        if (p) {
+          p.imageOffset = vector.clone();
+          p.start = Vector2.fromEvent(e);
+        }
+      }
+    },
+    [syncState],
+  );
 
   const pan = () => {
     const pointers = pointerStateRef.current;
@@ -101,7 +143,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
       const p = pointers[0];
       const vector = p.imageOffset.clone().sub(p.start).add(p.current);
 
-      setImageOffset(vector.point);
+      syncState({
+        offset: vector.point,
+      });
     } else if (pointers.length === 2) {
       const [first, second] = pointers;
       const scaleRatio =
@@ -123,71 +167,90 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
             .multiplyScalar(scaleRatio),
         );
 
-      setImageOffset(vector.point);
-      setScale(second.scale * scaleRatio);
+      syncState({
+        offset: vector.point,
+        scale: second.scale * scaleRatio,
+      });
     }
   };
 
+  useEffect(() => {
+    const wrapperEl = wrapperRef.current;
+    if (!wrapperEl) {
+      return;
+    }
+
+    wrapperEl.addEventListener('wheel', onWheel, { passive: false });
+    return () =>
+      wrapperEl.removeEventListener('wheel', onWheel, {
+        passive: false,
+      } as any);
+  }, [onWheel]);
+
   return (
-    <div className={styles.preview} ref={wrapperRef}>
+    <div
+      className={styles.preview}
+      ref={wrapperRef}
+      onClick={e => e.stopPropagation()}
+      onDoubleClick={() => resetScale()}
+      onPointerDown={e => {
+        e.preventDefault();
+
+        if (e.pointerType === 'mouse' && e.button !== 0) {
+          return;
+        }
+
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
+
+        const { offset, scale } = imageStateRef.current;
+        const pointerState = {
+          start: Vector2.fromEvent(e),
+          current: Vector2.fromEvent(e),
+          imageOffset: Vector2.fromPoint(offset),
+          pointerId: e.pointerId,
+          scale: scale,
+        };
+
+        if (i !== -1) {
+          state[i] = pointerState;
+        } else {
+          state.push(pointerState);
+        }
+      }}
+      onPointerMove={e => {
+        e.preventDefault();
+
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
+        if (i !== -1) {
+          state[i].current = Vector2.fromEvent(e);
+        }
+
+        pan();
+      }}
+      onPointerUp={e => {
+        const state = pointerStateRef.current;
+        const i = state.findIndex(p => p.pointerId === e.pointerId);
+        if (i !== -1) {
+          state.splice(i, 1);
+
+          if (state.length === 1) {
+            const { offset } = imageStateRef.current;
+            state[0].imageOffset = Vector2.fromPoint(offset);
+            state[0].start = state[0].current.clone();
+          }
+        }
+      }}
+    >
       <img
         src={url}
-        onWheel={zoom}
-        onClick={e => e.stopPropagation()}
-        onPointerDown={e => {
-          e.preventDefault();
-          if (e.pointerType === 'mouse' && e.button !== 0) {
-            return;
-          }
-
-          const state = pointerStateRef.current;
-          const i = state.findIndex(p => p.pointerId === e.pointerId);
-
-          const pointerState = {
-            start: Vector2.fromEvent(e),
-            current: Vector2.fromEvent(e),
-            imageOffset: Vector2.fromPoint(imageOffset),
-            pointerId: e.pointerId,
-            scale: scale,
-          };
-
-          if (i !== -1) {
-            state[i] = pointerState;
-          } else {
-            state.push(pointerState);
-          }
-        }}
-        onPointerMove={e => {
-          e.preventDefault();
-
-          const state = pointerStateRef.current;
-          const i = state.findIndex(p => p.pointerId === e.pointerId);
-          if (i !== -1) {
-            state[i].current = Vector2.fromEvent(e);
-          }
-
-          pan();
-        }}
-        onPointerUp={e => {
-          const state = pointerStateRef.current;
-          const i = state.findIndex(p => p.pointerId === e.pointerId);
-          if (i !== -1) {
-            state.splice(i, 1);
-
-            if (state.length === 1) {
-              state[0].imageOffset = Vector2.fromPoint(imageOffset);
-              state[0].start = state[0].current.clone();
-            }
-          }
-        }}
-        onDoubleClick={() => resetScale()}
         ref={imageRef}
         draggable={false}
         onLoad={() => {
           resetScale(true);
         }}
         style={{
-          transform: `translate(${imageOffset.x}px, ${imageOffset.y}px) scale(${scale}) `,
           opacity: loaded ? 1 : 0.0001,
         }}
       />

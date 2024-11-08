@@ -4,6 +4,7 @@
 
 - Added buttons to reset all settings (without resetting the bundle) and reset the bundle (without resetting settings) to "About Metastable".
 - Added keyboard shortcuts (`Up`/`Down`/`Enter`) for selecting models in model browser.
+- Added support for trackpad gestures in image previews.
 
 ## Bug fixes
 
