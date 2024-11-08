@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Button } from '$components/button';
 import { ImageBrowseButton } from '$components/imageBrowser';
 import { ImageBrowserProps } from '$components/imageBrowser/ImageBrowser';
+import { MaskEditor } from '$components/maskEditor';
 import { useVarUIValue } from '$components/var/common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from '$components/var/VarBase';
 import { resolveImage } from '$utils/url';
-import { MaskEditor } from './MaskEditor';
 import styles from './VarMask.module.scss';
 
 interface IVarMaskProps extends IVarBaseInputProps<string> {

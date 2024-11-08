@@ -7,6 +7,7 @@ import {
   VarImage,
   VarImageMode,
   VarInputType,
+  VarMask,
   VarModel,
   VarNumber,
   VarOrientation,
@@ -23,7 +24,6 @@ import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
 import { StyleSelect } from '../../common/StyleSelect';
-import { VarMask } from '../../common/VarMask';
 
 interface Props {
   showPrompt?: boolean;

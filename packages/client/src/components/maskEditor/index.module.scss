@@ -1,0 +1,85 @@
+.editor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+
+  .header {
+    background: var(--grey-100);
+    box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: relative;
+    padding: 0.5rem 2rem;
+    border-radius: 2rem;
+    font-size: 0;
+
+    max-width: 960px;
+    margin: 1rem auto;
+
+    svg {
+      font-size: 1.4rem;
+    }
+  }
+
+  .toolSettings {
+    display: flex;
+    align-items: center;
+
+    & > div {
+      margin: 0;
+
+      &:not(:last-child) {
+        margin-right: 1rem;
+      }
+    }
+
+    .size {
+      width: 10rem;
+    }
+
+    .switch {
+      padding: 0;
+
+      & > button {
+        padding: 0.5rem;
+      }
+
+      svg {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+  }
+
+  .tools {
+    button {
+      margin-right: 0.25rem;
+    }
+  }
+
+  .actions {
+    button {
+      margin-left: 0.25rem;
+    }
+  }
+
+  .tools,
+  .actions {
+    button {
+      padding: 0.2rem;
+
+      &.active {
+        background: var(--grey-600);
+      }
+    }
+  }
+}
