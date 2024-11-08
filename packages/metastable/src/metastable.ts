@@ -10,15 +10,11 @@ import {
   LogItem,
   ModelType,
   Project,
-  ProjectSimpleSettings,
-  ProjectTaggingSettings,
   ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
 
 import { Comfy } from './comfy/index.js';
-import { PromptTask } from './comfy/tasks/prompt.js';
-import { TagTask } from './comfy/tasks/tag.js';
 import { Config } from './config/index.js';
 import { ModelRepository } from './data/model.js';
 import { ProjectRepository } from './data/project.js';
@@ -326,33 +322,9 @@ export class Metastable extends (EventEmitter as {
     });
   }
 
-  async prompt(projectId: Project['id'], settings: ProjectSimpleSettings) {
-    if (this.status !== 'ready') {
-      return undefined;
-    }
-
-    const project = await this.project.get(projectId);
-    const task = new PromptTask(project, settings);
-    this.tasks.queues.project.add(task);
-
-    return { id: task.id };
-  }
-
   async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
     const project = await this.project.get(projectId);
     return await this.kohya?.train(project, settings);
-  }
-
-  async tag(projectId: Project['id'], settings: ProjectTaggingSettings) {
-    if (this.status !== 'ready') {
-      return undefined;
-    }
-
-    const project = await this.project.get(projectId);
-    const task = new TagTask(project, settings);
-    this.tasks.queues.project.add(task);
-
-    return { id: task.id };
   }
 
   stopTraining(projectId: Project['id']) {

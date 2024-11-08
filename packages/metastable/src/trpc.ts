@@ -22,6 +22,9 @@ import { nanoid } from 'nanoid';
 import { gte } from 'semver';
 import { z } from 'zod';
 
+import { PostprocessTask } from './comfy/tasks/postprocess.js';
+import { PromptTask } from './comfy/tasks/prompt.js';
+import { TagTask } from './comfy/tasks/tag.js';
 import { exists, getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
 
@@ -419,7 +422,30 @@ export const router = t.router({
       .input(z.object({ projectId: z.string(), settings: z.any() }))
       .mutation(
         async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-          return await metastable.prompt(projectId, settings);
+          if (metastable.status !== 'ready') {
+            return undefined;
+          }
+
+          const project = await metastable.project.get(projectId);
+          const task = new PromptTask(project, settings);
+          metastable.tasks.queues.project.add(task);
+
+          return { id: task.id };
+        },
+      ),
+    postprocess: t.procedure
+      .input(z.object({ projectId: z.string(), settings: z.any() }))
+      .mutation(
+        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
+          if (metastable.status !== 'ready') {
+            return undefined;
+          }
+
+          const project = await metastable.project.get(projectId);
+          const task = new PostprocessTask(project, settings);
+          metastable.tasks.queues.project.add(task);
+
+          return { id: task.id };
         },
       ),
     file: {
@@ -550,7 +576,15 @@ export const router = t.router({
         .input(z.object({ projectId: z.string(), settings: z.any() }))
         .mutation(
           async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-            return await metastable.tag(projectId, settings);
+            if (metastable.status !== 'ready') {
+              return undefined;
+            }
+
+            const project = await metastable.project.get(projectId);
+            const task = new TagTask(project, settings);
+            metastable.tasks.queues.project.add(task);
+
+            return { id: task.id };
           },
         ),
     },

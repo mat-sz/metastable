@@ -87,7 +87,7 @@ export const ModelBrowserList: React.FC<ModelBrowserListProps> = observer(
   ({ data, variant, parts, setParts, onSelect }) => {
     const models = listFiles(data, parts, false);
     const allModels = listFiles(data, parts, true);
-    const directories = listDirectories(data, parts.length);
+    const directories = listDirectories(data, parts);
 
     return (
       <List

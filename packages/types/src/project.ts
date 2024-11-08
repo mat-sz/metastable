@@ -144,3 +144,11 @@ export type ProjectImageMode = 'cover' | 'contain' | 'center' | 'stretch';
 export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';
 
 export type ProjectOrientation = 'square' | 'portrait' | 'landscape';
+
+export interface ProcessImageSettings {
+  input: {
+    image: string;
+    imageMode?: ProjectImageMode;
+  };
+  featureData?: any;
+}
