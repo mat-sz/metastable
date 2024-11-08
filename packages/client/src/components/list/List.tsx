@@ -10,6 +10,7 @@ interface ListProps<T> {
   small?: boolean;
   items: T[];
   children: (item: T) => JSX.Element;
+  noResultsView?: JSX.Element;
   quickFilter?: (data: T[], search: string) => T[];
   header?: React.ReactNode;
   view?: string;
@@ -19,6 +20,7 @@ interface ListProps<T> {
 export function List<T>({
   header,
   children,
+  noResultsView,
   items,
   small,
   quickFilter,
@@ -134,7 +136,7 @@ export function List<T>({
             {displayItems.map(children)}
           </div>
         ) : (
-          <div className={styles.empty}>No results.</div>
+          <div className={styles.empty}>{noResultsView ?? 'No results.'}</div>
         )}
       </div>
     </div>

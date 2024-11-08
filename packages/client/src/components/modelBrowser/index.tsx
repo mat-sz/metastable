@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import {
   BsArrowClockwise,
+  BsBox,
   BsBoxFill,
   BsCheckCircle,
   BsCheckCircleFill,
@@ -21,6 +22,7 @@ import { ModelDelete, ModelEdit } from '$modals/model';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
+import { uiStore } from '$stores/UIStore';
 import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';
@@ -92,6 +94,18 @@ export const ModelBrowserList: React.FC<ModelBrowserListProps> = observer(
         small={variant === 'small'}
         items={[...directories, ...models]}
         view={variant === 'small' ? 'list' : undefined}
+        noResultsView={
+          <>
+            <div className={styles.hint}>No models found.</div>
+            <button
+              className={styles.selection}
+              onClick={() => uiStore.setView('models')}
+            >
+              <BsBox />
+              <span>Download models</span>
+            </button>
+          </>
+        }
         quickFilter={(_, search) =>
           mainStore.searchFn(
             allModels,
