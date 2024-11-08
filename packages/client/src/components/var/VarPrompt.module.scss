@@ -4,7 +4,7 @@
   overflow-y: scroll;
   background: var(--grey-300);
   border: 1px solid var(--grey-400);
-  height: 150px;
+  height: 100%;
   border-radius: 5px;
   --line-number-width: 4rem;
 
@@ -21,6 +21,7 @@
 
   .lines {
     position: relative;
+    min-height: 100%;
   }
 
   .line {
@@ -68,7 +69,7 @@
     border: none;
     width: auto;
     height: auto;
-    min-height: 0;
+    min-height: 100%;
     overflow: hidden;
     caret-color: var(--grey-900);
 

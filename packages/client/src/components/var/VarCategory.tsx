@@ -79,7 +79,9 @@ export const VarCategory = ({
           </span>
         )}
       </div>
-      {(!collapsible || !collapsedState) && <div>{children}</div>}
+      {(!collapsible || !collapsedState) && (
+        <div varui-category-body="">{children}</div>
+      )}
     </div>
   );
 };

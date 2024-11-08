@@ -4,6 +4,19 @@
   position: relative;
   margin-top: 1rem;
   border-radius: 5px;
+  min-height: 20rem;
+
+  &,
+  [varui-category],
+  [varui-category-body],
+  .inputs [varui-label] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  [varui-category-body] {
+    flex: 1;
+  }
 
   [varui-label] {
     margin: 0;
@@ -12,9 +25,16 @@
   .inputs {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    flex: 1;
 
     [varui-label] {
       margin: 1rem;
+      display: flex;
+      flex-direction: column;
+
+      [varui-label-body] {
+        flex: 1;
+      }
 
       &:not(:last-child) {
         margin-right: 0;
@@ -28,6 +48,7 @@
   }
 
   [varui-category] {
+    flex: 1;
     border-bottom: none;
   }
 
