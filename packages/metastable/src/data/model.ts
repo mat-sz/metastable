@@ -299,22 +299,6 @@ export class ModelRepository extends (EventEmitter as {
     return models.filter(model => model.type === type);
   }
 
-  async getByName(type: ModelType, name: string): Promise<ModelEntity> {
-    const basename = path.basename(name.replace(/[\\/]/g, path.sep));
-    const cache = await this.all();
-
-    const model = cache.find(
-      model =>
-        model.type === type &&
-        (model.name === basename || model.simpleName === basename),
-    );
-    if (!model) {
-      throw new Error(`Unable to find model '${name}' of type '${type}'.`);
-    }
-    await model.load();
-    return model;
-  }
-
   async get(mrn: string): Promise<ModelEntity> {
     const parsed = MRN.parse(mrn);
     const realMrn = MRN.serialize({ segments: parsed.segments.slice(0, 3) });

@@ -16,7 +16,6 @@ export enum ModelType {
   UNET = 'unet',
   UPSCALE_MODEL = 'upscale_model',
   VAE = 'vae',
-  VAE_APPROX = 'vae_approx',
 }
 
 export enum Architecture {

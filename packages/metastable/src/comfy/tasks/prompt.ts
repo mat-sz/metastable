@@ -36,7 +36,7 @@ import { ComfyPreviewSettings, RPCRef } from '../session/types.js';
 
 export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   private embeddingsPath?: string;
-  private preview: ComfyPreviewSettings = {
+  public preview: ComfyPreviewSettings = {
     method: 'auto',
   };
   private storeMetadata = false;
@@ -109,24 +109,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
     const config = await Metastable.instance.config.all();
 
     if (config.generation?.preview) {
-      try {
-        const decoderModel = await Metastable.instance.model.getByName(
-          ModelType.VAE_APPROX,
-          'taesd_decoder',
-        );
-        const decoderXlModel = await Metastable.instance.model.getByName(
-          ModelType.VAE_APPROX,
-          'taesdxl_decoder',
-        );
-
-        this.preview = {
-          method: 'taesd',
-          taesd: {
-            taesd_decoder: decoderModel.path,
-            taesdxl_decoder: decoderXlModel.path,
-          },
-        };
-      } catch {}
+      await this.callFeatureHandlers('onPromptPreviewInit');
     } else {
       this.preview = {
         method: 'none',
@@ -161,6 +144,7 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
 
     await Promise.all(promises);
 
+    await this.callFeatureHandlers('onPromptInit');
     return { projectId: this.project.id };
   }
 
@@ -237,7 +221,12 @@ export class PromptTask extends BaseTask<ProjectPromptTaskData> {
   }
 
   private async callFeatureHandlers(
-    handler: 'onBeforeConditioning' | 'onAfterConditioning' | 'onAfterSample',
+    handler:
+      | 'onPromptInit'
+      | 'onPromptPreviewInit'
+      | 'onBeforeConditioning'
+      | 'onAfterConditioning'
+      | 'onAfterSample',
   ) {
     for (const feature of this.features) {
       if (!feature.enabled) {

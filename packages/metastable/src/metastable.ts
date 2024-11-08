@@ -384,13 +384,7 @@ export class Metastable extends (EventEmitter as {
     );
   }
 
-  private mrnCache: Record<string, string> = {};
-
   async resolve(mrn: string) {
-    if (this.mrnCache[mrn]) {
-      return this.mrnCache[mrn];
-    }
-
     const parsed = MRN.parse(mrn);
     const scope = parsed.segments[0];
     let resolved: string | undefined = undefined;
@@ -410,7 +404,6 @@ export class Metastable extends (EventEmitter as {
       throw new Error(`File not found: ${mrn}`);
     }
 
-    this.mrnCache[mrn] = resolved;
     return resolved;
   }
 }

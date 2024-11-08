@@ -13,6 +13,8 @@ export interface FeatureInstance {
   isInstalled(): Promise<boolean>;
   isEnabled(): Promise<boolean>;
   info(): Promise<Feature>;
+  onPromptInit?(task: PromptTask): Promise<void>;
+  onPromptPreviewInit?(task: PromptTask): Promise<void>;
   onBeforeConditioning?(task: PromptTask): Promise<void>;
   onAfterConditioning?(task: PromptTask): Promise<void>;
   onAfterSample?(task: PromptTask): Promise<void>;
@@ -23,8 +25,6 @@ export class FeatureBase implements FeatureInstance {
   readonly name: string = '';
   readonly description: string | undefined;
   readonly projectFields: FeatureProjectFields;
-
-  constructor() {}
 
   async install() {}
 

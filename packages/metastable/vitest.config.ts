@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '#metastable': path.resolve(__dirname, './src/metastable.ts'),
+      '#helpers': path.resolve(__dirname, './src/helpers'),
     },
   },
 });

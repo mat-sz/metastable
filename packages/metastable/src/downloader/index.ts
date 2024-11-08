@@ -5,12 +5,11 @@ import { ReadableStream } from 'stream/web';
 
 import { DownloadData, DownloadSettings, TaskState } from '@metastable/types';
 
+import { getDownloadHeaders } from '#helpers/download.js';
 import { ModelEntity } from '../data/model.js';
 import { exists, tryMkdir, tryUnlink } from '../helpers/fs.js';
 import { SuperTask } from '../tasks/supertask.js';
 import { BaseTask } from '../tasks/task.js';
-
-const USER_AGENT = 'Metastable/0.0.0';
 
 export class BaseDownloadTask extends BaseTask<DownloadData> {
   private downloadUrl?: string;
@@ -43,7 +42,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
 
     const res = await fetch(this.url, {
       headers: {
-        'User-Agent': USER_AGENT,
+        ...getDownloadHeaders(),
         ...this.headers,
       },
     });
@@ -104,9 +103,7 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
 
     try {
       const res = await fetch(this.downloadUrl!, {
-        headers: {
-          'User-Agent': USER_AGENT,
-        },
+        headers: getDownloadHeaders(),
         signal: this.controller.signal,
       });
 
@@ -151,18 +148,6 @@ export class BaseDownloadTask extends BaseTask<DownloadData> {
   }
 }
 
-export async function download(
-  url: string,
-  savePath: string,
-  onProgress?: (task: DownloadTask) => void,
-): Promise<void> {
-  const task = new DownloadTask(url, savePath);
-  task.on('update', () => {
-    onProgress?.(task);
-  });
-  await task.execute();
-}
-
 export class DownloadTask extends BaseDownloadTask {
   constructor(
     public url: string,
@@ -198,9 +183,7 @@ export class DownloadModelTask extends BaseDownloadTask {
       if (imageUrl) {
         try {
           const res = await fetch(imageUrl, {
-            headers: {
-              'User-Agent': USER_AGENT,
-            },
+            headers: getDownloadHeaders(),
           });
 
           const data = await res.arrayBuffer();
@@ -226,7 +209,7 @@ export class DownloadModelTask extends BaseDownloadTask {
         try {
           const res = await fetch(configUrl, {
             headers: {
-              'User-Agent': USER_AGENT,
+              ...getDownloadHeaders(),
               ...this.headers,
             },
           });

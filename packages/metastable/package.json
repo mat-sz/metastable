@@ -43,7 +43,8 @@
     "zod": "^3.22.4"
   },
   "imports": {
-    "#metastable": "./lib/metastable.js"
+    "#metastable": "./lib/metastable.js",
+    "#helpers/*": "./lib/helpers/*"
   },
   "exports": {
     ".": {

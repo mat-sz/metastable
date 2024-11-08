@@ -19,7 +19,8 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
-      "#metastable": ["src/metastable.js"]
+      "#metastable": ["src/metastable.js"],
+      "#helpers": ["src/helpers/*"]
     }
   },
   "include": ["src"]

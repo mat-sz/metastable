@@ -18,7 +18,6 @@ export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.UNET]: 'UNET',
   [ModelType.UPSCALE_MODEL]: 'Upscale model',
   [ModelType.VAE]: 'VAE',
-  [ModelType.VAE_APPROX]: 'VAE Approximation',
 };
 
 export const downloadable: DownloadableModelGroup[] = [
@@ -237,45 +236,6 @@ export const downloadable: DownloadableModelGroup[] = [
   //     },
   //   ],
   // },
-  {
-    name: 'TAESD',
-    type: ModelType.VAE_APPROX,
-    description:
-      'Allows steps to be previewed while the image is being generated.',
-    models: [
-      {
-        name: 'TAESD',
-        source: 'github',
-        type: ModelType.VAE_APPROX,
-        downloads: [
-          {
-            type: ModelType.VAE_APPROX,
-            name: 'taesd_decoder.pth',
-            url: 'https://github.com/madebyollin/taesd/raw/main/taesd_decoder.pth',
-            size: 4915980,
-          },
-          {
-            type: ModelType.VAE_APPROX,
-            name: 'taesd_encoder.pth',
-            url: 'https://github.com/madebyollin/taesd/raw/main/taesd_encoder.pth',
-            size: 4915788,
-          },
-          {
-            type: ModelType.VAE_APPROX,
-            name: 'taesdxl_decoder.pth',
-            url: 'https://github.com/madebyollin/taesd/raw/main/taesdxl_decoder.pth',
-            size: 4915221,
-          },
-          {
-            type: ModelType.VAE_APPROX,
-            name: 'taesdxl_encoder.pth',
-            url: 'https://github.com/madebyollin/taesd/raw/main/taesdxl_encoder.pth',
-            size: 4915029,
-          },
-        ],
-      },
-    ],
-  },
   {
     name: 'RealESRGAN',
     type: ModelType.UPSCALE_MODEL,
