@@ -1,0 +1,20 @@
+.view {
+  display: grid;
+  --gutter-size: 1rem;
+
+  &.horizontal {
+    grid-template-rows: 1fr;
+
+    .gutter {
+      cursor: ew-resize;
+    }
+  }
+
+  &.vertical {
+    grid-template-columns: 1fr;
+
+    .gutter {
+      cursor: ns-resize;
+    }
+  }
+}

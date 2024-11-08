@@ -223,6 +223,7 @@ export function defaultSettings(): ProjectSimpleSettings {
 
 interface ProjectSimpleUI {
   collapsed?: Record<string, boolean>;
+  imagesSplit?: number[];
 }
 
 export class SimpleProject extends BaseProject<

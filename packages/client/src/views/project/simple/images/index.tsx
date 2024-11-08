@@ -1,6 +1,8 @@
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
+import { SplitView } from '$components/splitView';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
@@ -30,14 +32,27 @@ const Preview: React.FC = observer(() => {
   return <div className={styles.info}>Your output image will appear here.</div>;
 });
 
-export const Images: React.FC = () => {
+export const Images: React.FC = observer(() => {
+  const project = useSimpleProject();
+  const { imagesSplit = [9, 1] } = project.ui;
+
   return (
     <div className={styles.main}>
-      <div className={styles.center}>
+      <SplitView
+        className={styles.center}
+        direction="vertical"
+        minSizes={['0', '20rem']}
+        sizes={imagesSplit}
+        onChange={sizes => {
+          runInAction(() => {
+            project.ui.imagesSplit = sizes;
+          });
+        }}
+      >
         <Preview />
         <Prompt />
-      </div>
+      </SplitView>
       <Settings className={styles.settings} />
     </div>
   );
-};
+});
