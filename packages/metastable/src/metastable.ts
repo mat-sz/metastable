@@ -43,6 +43,7 @@ type MetastableEvents = {
   utilization: (data: Utilization) => void;
   backendLog: (data: LogItem[]) => void;
   backendStatus: (status: BackendStatus) => void;
+  infoUpdate: () => void;
 };
 
 export class Metastable extends (EventEmitter as {
@@ -199,8 +200,16 @@ export class Metastable extends (EventEmitter as {
   setStatus(status: BackendStatus) {
     if (this.status !== status) {
       this.emit('backendStatus', status);
+
+      if (status === 'ready') {
+        this.infoUpdated();
+      }
     }
     this.status = status;
+  }
+
+  infoUpdated() {
+    this.emit('infoUpdate');
   }
 
   restartKohya() {

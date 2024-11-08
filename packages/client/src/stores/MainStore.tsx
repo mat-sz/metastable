@@ -72,12 +72,16 @@ class MainStore {
 
         switch (status) {
           case 'ready':
-            this.refresh();
             break;
           case 'error':
             modalStore.show(<InstanceBackendError />);
             break;
         }
+      },
+    });
+    API.instance.onInfoUpdate.subscribe(undefined, {
+      onData: () => {
+        this.refresh();
       },
     });
     API.instance.onBackendLog.subscribe(undefined, {

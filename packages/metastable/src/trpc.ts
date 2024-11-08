@@ -142,6 +142,19 @@ export const router = t.router({
         };
       });
     }),
+    onInfoUpdate: t.procedure.subscription(({ ctx: { metastable } }) => {
+      return observable<void>(emit => {
+        const onEvent = () => {
+          emit.next();
+        };
+
+        metastable.on('infoUpdate', onEvent);
+
+        return () => {
+          metastable.off('infoUpdate', onEvent);
+        };
+      });
+    }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
       const info = (await metastable.comfy?.info()) || {
         schedulers: [],
