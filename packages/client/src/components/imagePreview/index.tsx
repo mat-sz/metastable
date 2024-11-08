@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Vector2 } from '$editor/primitives/Vector2';
-import { Point } from '$editor/types';
+import { Point, Size } from '$editor/types';
 import styles from './index.module.scss';
 
 interface ImagePreviewProps {
@@ -28,6 +28,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const pointerStateRef = useRef<PointerState[]>([]);
+  const wrapperSizeRef = useRef<Size>({ width: 0, height: 0 });
   const imageStateRef = useRef<ImageState>({
     offset: { x: 0, y: 0 },
     scale: 1,
@@ -77,17 +78,36 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
   );
 
   useEffect(() => {
-    const onResize = () => {
-      resetScale();
+    const wrapperEl = wrapperRef.current;
+    if (!wrapperEl) {
+      return;
+    }
+
+    const updateRect = () => {
+      const rect = wrapperEl.getBoundingClientRect();
+      wrapperSizeRef.current = { width: rect.width, height: rect.height };
+      return wrapperSizeRef.current;
     };
 
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [resetScale]);
+    const observer = new ResizeObserver(() => {
+      const oldSize = wrapperSizeRef.current;
+      const newSize = updateRect();
 
-  useEffect(() => {
-    setLoaded(false);
-  }, [url, setLoaded]);
+      const diffWidth = newSize.width - oldSize.width;
+      const diffHeight = newSize.height - oldSize.height;
+
+      const { offset } = imageStateRef.current;
+      syncState({
+        offset: {
+          x: offset.x + diffWidth / 2,
+          y: offset.y + diffHeight / 2,
+        },
+      });
+    });
+
+    observer.observe(wrapperEl);
+    return () => observer.disconnect();
+  }, [syncState]);
 
   if (!url) {
     return <div className={styles.preview} />;
@@ -247,6 +267,9 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
         src={url}
         ref={imageRef}
         draggable={false}
+        onLoadStart={() => {
+          setLoaded(false);
+        }}
         onLoad={() => {
           resetScale(true);
         }}

@@ -7,6 +7,10 @@
 - Added support for trackpad gestures in image previews.
 - Added support for resizing the prompt area.
 
+## Improvements
+
+- Improved handling of window resizes in image previews.
+
 ## Bug fixes
 
 - Fixed display of input fields next to sliders.
