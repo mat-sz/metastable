@@ -19,7 +19,7 @@ export const Output: React.FC<OutputProps> = ({ output }) => {
           <ImageActions file={output} type={ProjectFileType.OUTPUT} />
         </div>
       </div>
-      <ImagePreview url={resolveImage(output.mrn)} />
+      <ImagePreview className={styles.image} url={resolveImage(output.mrn)} />
     </div>
   );
 };

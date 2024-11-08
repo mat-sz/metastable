@@ -1,17 +1,18 @@
-import { ProjectFileType } from '@metastable/types';
 import clsx from 'clsx';
 import { useState } from 'react';
 
 import { Button } from '$components/button';
+import { ImageBrowseButton } from '$components/imageBrowser';
+import { ImageBrowserProps } from '$components/imageBrowser/ImageBrowser';
 import { useVarUIValue } from '$components/var/common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from '$components/var/VarBase';
 import { resolveImage } from '$utils/url';
-import { ImageBrowseButton } from './ImageBrowseButton';
 import { MaskEditor } from './MaskEditor';
 import styles from './VarMask.module.scss';
 
 interface IVarMaskProps extends IVarBaseInputProps<string> {
   imagePath: string;
+  imageBrowserProps?: Omit<ImageBrowserProps, 'onSelect'>;
 }
 
 export const VarMask = ({
@@ -24,6 +25,7 @@ export const VarMask = ({
   error,
   errorPath,
   label = 'Mask',
+  imageBrowserProps,
 }: IVarMaskProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
@@ -73,10 +75,12 @@ export const VarMask = ({
           >
             Edit mask
           </Button>
-          <ImageBrowseButton
-            onSelect={url => setCurrentValue(url)}
-            forceType={ProjectFileType.MASK}
-          />
+          {!!imageBrowserProps && (
+            <ImageBrowseButton
+              onSelect={url => setCurrentValue(url)}
+              {...imageBrowserProps}
+            />
+          )}
         </div>
       </VarBase>
     </>

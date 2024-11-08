@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Vector2 } from '$editor/primitives/Vector2';
@@ -5,6 +6,7 @@ import { Point, Size } from '$editor/types';
 import styles from './index.module.scss';
 
 interface ImagePreviewProps {
+  className?: string;
   url?: string;
 }
 
@@ -24,7 +26,10 @@ interface ImageState {
 const MAX_SCALE = 3;
 const MIN_SCALE = 0.25;
 
-export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
+export const ImagePreview: React.FC<ImagePreviewProps> = ({
+  url,
+  className,
+}) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const pointerStateRef = useRef<PointerState[]>([]);
@@ -209,7 +214,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ url }) => {
 
   return (
     <div
-      className={styles.preview}
+      className={clsx(styles.preview, className)}
       ref={wrapperRef}
       onClick={e => e.stopPropagation()}
       onDoubleClick={() => resetScale()}

@@ -32,7 +32,7 @@ Example: `a photo of a {red|blue|yellow|green} banana`.
 
 Metastable introduces a new feature that allows for certain parts of the prompt to be disabled.
 
-Inline comments are designated the `#- comment -#` syntax:
+Inline comments are designated using the `#- comment -#` syntax:
 
 ```
 a photo of a beautiful sunset over #- new york -# los angeles

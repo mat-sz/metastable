@@ -4,8 +4,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 5px;
+  border-radius: 5px 5px 0 0;
 
   & > div {
     display: flex;
@@ -20,6 +19,10 @@
   button:not(:last-child) {
     margin-right: 1rem;
   }
+}
+
+.image {
+  border-radius: 0 0 5px 5px;
 }
 
 .wrapper {

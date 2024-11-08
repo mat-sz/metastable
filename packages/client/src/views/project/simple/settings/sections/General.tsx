@@ -1,9 +1,10 @@
-import { ModelType } from '@metastable/types';
+import { ModelType, ProjectFileType } from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import {
+  VarImage,
   VarImageMode,
   VarInputType,
   VarModel,
@@ -23,7 +24,6 @@ import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
 import { StyleSelect } from '../../common/StyleSelect';
 import { VarMask } from '../../common/VarMask';
-import { VarProjectImage } from '../../common/VarProjectImage';
 
 interface Props {
   showPrompt?: boolean;
@@ -103,13 +103,17 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         />
         {project.settings.input.type !== 'none' && (
           <>
-            <VarProjectImage
+            <VarImage
               label="Image"
               path="input.image"
               onChange={() => {
                 runInAction(() => {
                   project.settings.input.mask = undefined;
                 });
+              }}
+              imageBrowserProps={{
+                files: project.imageFiles,
+                showBreadcrumbs: true,
               }}
             />
             <VarImageMode label="Image mode" path="input.imageMode" />
@@ -119,6 +123,10 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                   label="Mask"
                   path="input.mask"
                   imagePath="input.image"
+                  imageBrowserProps={{
+                    defaultParts: [ProjectFileType.MASK],
+                    files: project.imageFiles,
+                  }}
                 />
                 <VarSlider
                   label="Pad edges"

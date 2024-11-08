@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import { BsUpload } from 'react-icons/bs';
 
+import { ImageBrowseButton } from '$components/imageBrowser';
+import { ImageBrowserProps } from '$components/imageBrowser/ImageBrowser';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarImage.module.scss';
@@ -13,6 +15,10 @@ function filterItems(items: DataTransferItemList) {
   }
 
   return undefined;
+}
+
+export interface IVarImageProps extends IVarBaseInputProps<string> {
+  imageBrowserProps?: Omit<ImageBrowserProps, 'onSelect'>;
 }
 
 /**
@@ -28,7 +34,8 @@ export const VarImage = ({
   className,
   error,
   errorPath,
-}: IVarBaseInputProps<string>): JSX.Element => {
+  imageBrowserProps,
+}: IVarImageProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
     fallbackValue: value,
@@ -47,7 +54,17 @@ export const VarImage = ({
 
   return (
     <VarBase
-      label={label}
+      label={
+        <div className={styles.header}>
+          <span>{label}</span>
+          {!!imageBrowserProps && (
+            <ImageBrowseButton
+              onSelect={url => setCurrentValue(url)}
+              {...imageBrowserProps}
+            />
+          )}
+        </div>
+      }
       disabled={disabled}
       readOnly={readOnly}
       className={className}

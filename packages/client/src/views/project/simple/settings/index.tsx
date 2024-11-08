@@ -1,6 +1,6 @@
 import { ProjectType } from '@metastable/types';
 import clsx from 'clsx';
-import { toJS } from 'mobx';
+import { runInAction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
@@ -13,11 +13,12 @@ import {
 } from 'react-icons/bs';
 
 import { Alert, Alerts } from '$components/alert';
+import { FieldRenderer } from '$components/fieldRenderer';
+import { FieldContext } from '$components/fieldRenderer/context';
 import { Tab, TabPanel, Tabs, TabView } from '$components/tabs';
 import { VarScope, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
-import { SettingsField } from './Field';
 import styles from './index.module.scss';
 import { General } from './sections/General';
 import { useSimpleProject } from '../../context';
@@ -104,11 +105,28 @@ export const Settings: React.FC<SettingsProps> = observer(
               <General showPrompt={showPrompt} />
             </TabPanel>
             <VarScope path="featureData">
-              {sections.map(([key, section]) => (
-                <TabPanel id={key} key={key}>
-                  <SettingsField id={key} field={section} isRoot />
-                </TabPanel>
-              ))}
+              <FieldContext.Provider
+                value={{
+                  architecture: project.architecture,
+                  collapsed: project.ui.collapsed,
+                  imageFiles: project.imageFiles,
+                  onToggleCollapsed: (key, collapsed) => {
+                    runInAction(() => {
+                      if (!project.ui.collapsed) {
+                        project.ui.collapsed = {};
+                      }
+
+                      project.ui.collapsed[key] = collapsed;
+                    });
+                  },
+                }}
+              >
+                {sections.map(([key, section]) => (
+                  <TabPanel id={key} key={key}>
+                    <FieldRenderer id={key} field={section} isRoot />
+                  </TabPanel>
+                ))}
+              </FieldContext.Provider>
             </VarScope>
           </div>
         </VarUI>

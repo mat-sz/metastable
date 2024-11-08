@@ -3,38 +3,41 @@ import { BsX } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import {
+  VarAddModel,
   VarArray,
   VarButton,
   VarCategory,
+  VarImage,
   VarImageMode,
+  VarModel,
   VarNumber,
   VarScope,
   VarSlider,
   VarToggle,
 } from '$components/var';
-import { SettingsCategory } from '../common/SettingsCategory';
-import { VarProjectAddModel } from '../common/VarProjectAddModel';
-import { VarProjectImage } from '../common/VarProjectImage';
-import { VarProjectModel } from '../common/VarProjectModel';
+import { useFieldContext } from './context';
 
-interface SettingsFieldProps {
+interface FieldRendererProps {
   id?: string;
   isRoot?: boolean;
   field: Field;
   labelSuffix?: React.ReactNode;
 }
 
-export const SettingsField: React.FC<SettingsFieldProps> = ({
+export const FieldRenderer: React.FC<FieldRendererProps> = ({
   id,
   isRoot = false,
   field,
   labelSuffix,
 }) => {
+  const { architecture, imageFiles, collapsed, onToggleCollapsed } =
+    useFieldContext();
+
   switch (field.type) {
     case FieldType.SECTION:
     case FieldType.SCOPE: {
       const scopeChildren = Object.entries(field.properties).map(
-        ([key, value]) => <SettingsField id={key} key={key} field={value} />,
+        ([key, value]) => <FieldRenderer id={key} key={key} field={value} />,
       );
       return id ? (
         <VarScope path={id}>{scopeChildren}</VarScope>
@@ -47,7 +50,7 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
         <>
           {!!field.enabledKey && <VarToggle label="Enable" path="enabled" />}
           {Object.entries(field.properties).map(([key, value]) => (
-            <SettingsField id={key} key={key} field={value} />
+            <FieldRenderer id={key} key={key} field={value} />
           ))}
         </>
       );
@@ -63,15 +66,25 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
         scopeChildren
       );
 
+      let isCollapsed: boolean | undefined = undefined;
+      let toggleCollapsed: (() => void) | undefined = undefined;
+
       if (id && isRoot) {
-        return (
-          <SettingsCategory label={label} sectionId={id}>
-            {children}
-          </SettingsCategory>
-        );
-      } else {
-        return <VarCategory label={label}>{children}</VarCategory>;
+        isCollapsed = collapsed?.[id];
+        toggleCollapsed = () => {
+          onToggleCollapsed?.(id, !isCollapsed);
+        };
       }
+
+      return (
+        <VarCategory
+          label={label}
+          collapsed={isCollapsed}
+          onToggleCollapsed={toggleCollapsed}
+        >
+          {children}
+        </VarCategory>
+      );
     }
     case FieldType.ARRAY: {
       const { itemType } = field;
@@ -93,11 +106,13 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
             footer={({ append }) => (
               <>
                 {modelField ? (
-                  <VarProjectAddModel
+                  <VarAddModel
                     label={field.label}
                     modelType={modelField.modelType}
-                    shouldFilterByArchitecture={
+                    architecture={
                       modelField.shouldFilterByArchitecture
+                        ? architecture
+                        : undefined
                     }
                     onSelect={model => {
                       append({ ...newObj, model: model.mrn });
@@ -115,7 +130,7 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
             )}
           >
             {({ remove }) => (
-              <SettingsField
+              <FieldRenderer
                 field={field.itemType}
                 labelSuffix={
                   <IconButton title="Delete" onClick={remove}>
@@ -162,17 +177,31 @@ export const SettingsField: React.FC<SettingsFieldProps> = ({
       );
     case FieldType.MODEL:
       return (
-        <VarProjectModel
+        <VarModel
           label={field.label}
           path={id}
           modelType={field.modelType}
-          shouldFilterByArchitecture={field.shouldFilterByArchitecture}
+          architecture={
+            field.shouldFilterByArchitecture ? architecture : undefined
+          }
         />
       );
     case FieldType.IMAGE:
       return (
         <>
-          <VarProjectImage label={field.label} path={id} />
+          <VarImage
+            label={field.label}
+            path={id}
+            imageBrowserProps={
+              imageFiles
+                ? {
+                    files: imageFiles,
+                    showBreadcrumbs: true,
+                    defaultParts: ['input'],
+                  }
+                : undefined
+            }
+          />
           {!!field.modeKey && (
             <VarImageMode label="Image mode" path={field.modeKey} />
           )}

@@ -269,6 +269,7 @@ export class SimpleProject extends BaseProject<
       queued: computed,
       autoSizes: computed,
       beforeRequest: action,
+      imageFiles: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
@@ -325,24 +326,35 @@ export class SimpleProject extends BaseProject<
 
     if (settings.sampler.quality !== 'custom') {
       const samplerSettings = qualitySamplerSettings[settings.sampler.quality];
-      settings.sampler = { ...settings.sampler, ...samplerSettings };
+      if (samplerSettings) {
+        settings.sampler = { ...settings.sampler, ...samplerSettings };
+      }
     }
 
     this.settings = settings;
   }
 
-  get autoSizes(): Record<ProjectOrientation, Resolution> | undefined {
-    const sizes: any = {};
-    const recommended = recommendedResolutions[this.architecture!];
-    if (recommended) {
-      for (const key of Object.keys(recommended)) {
-        sizes[key] = (recommended as any)[key][0];
-      }
+  get imageFiles(): ImageFile[] {
+    const files: ImageFile[] = [];
 
-      return sizes;
+    for (const type of Object.values(ProjectFileType)) {
+      files.push(...this.files[type].map(file => ({ ...file, parts: [type] })));
     }
 
-    return undefined;
+    return files;
+  }
+
+  get autoSizes(): Record<ProjectOrientation, Resolution> | undefined {
+    const recommended = recommendedResolutions[this.architecture!];
+    if (!recommended) {
+      return undefined;
+    }
+
+    const sizes: any = {};
+    for (const key of Object.keys(recommended)) {
+      sizes[key] = (recommended as any)[key][0];
+    }
+    return sizes;
   }
 
   get architecture(): Architecture | undefined {

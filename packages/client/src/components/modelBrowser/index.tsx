@@ -23,6 +23,7 @@ import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { uiStore } from '$stores/UIStore';
+import { arrayStartsWith } from '$utils/array';
 import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';
@@ -44,15 +45,7 @@ function listFiles(data: Model[], parts: string[], all = false) {
       continue;
     }
 
-    let fail = false;
-    for (let i = 0; i < parts.length; i++) {
-      if (model.file.parts[i] !== parts[i]) {
-        fail = true;
-        break;
-      }
-    }
-
-    if (fail) {
+    if (!arrayStartsWith(model.file.parts, parts)) {
       continue;
     }
 
@@ -62,11 +55,18 @@ function listFiles(data: Model[], parts: string[], all = false) {
   return models;
 }
 
-function listDirectories(data: Model[], index: number) {
+function listDirectories(data: Model[], parts: string[]) {
   const set = new Set<string>();
 
   for (const model of data) {
-    const first = model.file.parts[index];
+    if (
+      model.file.parts.length !== parts.length + 1 ||
+      !arrayStartsWith(model.file.parts, parts)
+    ) {
+      continue;
+    }
+
+    const first = model.file.parts[parts.length];
     if (first) {
       set.add(first);
     }
