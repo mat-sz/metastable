@@ -1,15 +1,16 @@
 import { ImageFile, ProjectFileType } from '@metastable/types';
 import React from 'react';
 import {
-  BsArrowRightSquareFill,
-  BsFolderFill,
-  BsGearFill,
-  BsTrashFill,
+  BsArrowRightSquare,
+  BsFolder,
+  BsGear,
+  BsMagic,
+  BsTrash,
 } from 'react-icons/bs';
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
-import { ProjectLoadPrompt } from '$modals/project';
+import { ProjectLoadPrompt, ProjectPostprocess } from '$modals/project';
 import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import { useSimpleProject } from '../../context';
@@ -30,7 +31,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
           project.deleteFile(type, file.name);
         }}
       >
-        <BsTrashFill />
+        <BsTrash />
       </IconButton>
       <IconButton
         title="Use as input image"
@@ -38,7 +39,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
           project.useInputImage(file.mrn);
         }}
       >
-        <BsArrowRightSquareFill />
+        <BsArrowRightSquare />
       </IconButton>
       {IS_ELECTRON && (
         <IconButton
@@ -47,9 +48,19 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
             API.electron.shell.showItemInFolder.mutate(file.mrn);
           }}
         >
-          <BsFolderFill />
+          <BsFolder />
         </IconButton>
       )}
+      <IconButton
+        title="Reveal in explorer"
+        onClick={() => {
+          modalStore.show(
+            <ProjectPostprocess project={project} imageMrn={file.mrn} />,
+          );
+        }}
+      >
+        <BsMagic />
+      </IconButton>
       <IconButton
         title="Load settings from current image"
         onClick={async () => {
@@ -66,7 +77,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
           }
         }}
       >
-        <BsGearFill />
+        <BsGear />
       </IconButton>
     </>
   );

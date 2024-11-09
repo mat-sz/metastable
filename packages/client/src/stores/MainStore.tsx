@@ -135,6 +135,12 @@ class MainStore {
     return joinFields(this.info.features);
   }
 
+  get postprocessFields() {
+    return joinFields(
+      this.info.features.filter(feature => feature.type === 'postprocess'),
+    );
+  }
+
   get hotkeys() {
     const overrides = this.config.data?.app?.hotkeys;
     const hotkeys = { ...defaultHotkeys };

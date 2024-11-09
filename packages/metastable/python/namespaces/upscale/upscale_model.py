@@ -26,6 +26,11 @@ class UpscaleModelNamespace:
         device = comfy.model_management.get_torch_device()
         upscale_model.to(device)
         images = torch.stack(images)
+
+        # TODO: Refactor this
+        if images.dim() == 5:
+            images = images.squeeze(1)
+
         in_img = images.movedim(-1,-3).to(device)
 
         tile = 512

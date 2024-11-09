@@ -5,6 +5,7 @@ import {
   FieldType,
   ImageFile,
   ModelType,
+  PostprocessSettings,
   ProjectFileType,
   ProjectOrientation,
   ProjectPromptTaskData,
@@ -581,6 +582,13 @@ export class SimpleProject extends BaseProject<
     await API.project.prompt.mutate({
       projectId: this.id,
       settings: this.settings,
+    });
+  }
+
+  async postprocess(settings: PostprocessSettings) {
+    await API.project.postprocess.mutate({
+      projectId: this.id,
+      settings: settings,
     });
   }
 
