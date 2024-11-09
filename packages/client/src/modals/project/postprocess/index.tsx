@@ -1,11 +1,12 @@
 import { PostprocessSettings } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Button } from '$components/button';
 import { FieldRenderer } from '$components/fieldRenderer';
 import { Modal, ModalActions } from '$components/modal';
 import { VarScope, VarUI } from '$components/var';
+import { useStorage } from '$hooks/useStorage';
 import { mainStore } from '$stores/MainStore';
 import type { SimpleProject } from '$stores/project';
 
@@ -17,12 +18,15 @@ interface Props {
 export const ProjectPostprocess: React.FC<Props> = observer(
   ({ imageMrn, project }) => {
     const sections = Object.entries(mainStore.postprocessFields);
-    const [settings, setSettings] = useState<PostprocessSettings>({
-      input: {
-        image: imageMrn,
+    const [settings, setSettings] = useStorage<PostprocessSettings>(
+      'project.postprocess',
+      {
+        input: {
+          image: imageMrn,
+        },
+        featureData: {},
       },
-      featureData: {},
-    });
+    );
 
     return (
       <Modal title="Postprocess image" size="small">
