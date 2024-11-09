@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BsFolderFill } from 'react-icons/bs';
-import { Popover } from 'react-tiny-popover';
 
+import { Popover } from '$components/popover';
 import { ImageBrowser, ImageBrowserProps } from './ImageBrowser';
 
 export const ImageBrowseButton = ({

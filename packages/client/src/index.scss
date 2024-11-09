@@ -52,6 +52,8 @@
   --red-700: #92292d;
   --red-800: #b12126;
   --red-900: rgb(255, 97, 102);
+
+  color: var(--grey-900);
 }
 
 /* Firefox */
@@ -86,7 +88,6 @@
 
 body {
   background: var(--grey-100);
-  color: var(--grey-900);
   line-height: 1.4;
   user-select: none;
 

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { BsXLg } from 'react-icons/bs';
 
+import { PopoverContext } from '$components/popover/context';
 import { useModal } from './context';
 import styles from './Modal.module.scss';
 
@@ -31,30 +32,32 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
   }, [wrappedClose]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      className={styles.dialog}
-      onPointerUp={() => {
-        wrappedClose();
-        pointerInsideRef.current = false;
-      }}
-      onClose={wrappedClose}
-    >
-      <div
-        className={clsx(styles.modal, styles[`modal_${size}`])}
-        onPointerDown={() => {
-          pointerInsideRef.current = true;
+    <PopoverContext.Provider value={{ parentElementRef: dialogRef }}>
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        onPointerUp={() => {
+          wrappedClose();
+          pointerInsideRef.current = false;
         }}
+        onClose={wrappedClose}
       >
-        <div className={styles.title}>
-          <span>{title}</span>
-          <button onClick={close}>
-            <BsXLg />
-          </button>
+        <div
+          className={clsx(styles.modal, styles[`modal_${size}`])}
+          onPointerDown={() => {
+            pointerInsideRef.current = true;
+          }}
+        >
+          <div className={styles.title}>
+            <span>{title}</span>
+            <button onClick={close}>
+              <BsXLg />
+            </button>
+          </div>
+          <div className={styles.body}>{children}</div>
         </div>
-        <div className={styles.body}>{children}</div>
-      </div>
-    </dialog>
+      </dialog>
+    </PopoverContext.Provider>
   );
 };
 

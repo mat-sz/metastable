@@ -2,9 +2,9 @@ import { Architecture, Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { Popover } from 'react-tiny-popover';
 
 import { ModelBrowser } from '$components/modelBrowser';
+import { Popover } from '$components/popover';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';

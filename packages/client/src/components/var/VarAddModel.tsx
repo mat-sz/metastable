@@ -1,9 +1,9 @@
 import { Architecture, Model, ModelType } from '@metastable/types';
 import { useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
-import { Popover } from 'react-tiny-popover';
 
 import { ModelBrowser } from '$components/modelBrowser';
+import { Popover } from '$components/popover';
 import styles from './VarAddModel.module.scss';
 import { VarBase } from './VarBase';
 

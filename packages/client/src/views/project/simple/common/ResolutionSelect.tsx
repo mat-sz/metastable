@@ -2,8 +2,8 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { Popover } from 'react-tiny-popover';
 
+import { Popover } from '$components/popover';
 import { recommendedResolutions } from '$data/resolutions';
 import styles from './ResolutionSelect.module.scss';
 import { useSimpleProject } from '../../context';
