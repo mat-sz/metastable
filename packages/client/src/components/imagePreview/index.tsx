@@ -23,9 +23,6 @@ interface ImageState {
   scale: number;
 }
 
-const MAX_SCALE = 3;
-const MIN_SCALE = 0.25;
-
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
   url,
   className,
@@ -56,15 +53,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     (isLoad = false) => {
       const wrapperRect = wrapperRef.current!.getBoundingClientRect();
 
-      const height = imageRef.current!.naturalHeight;
-      const width = imageRef.current!.naturalWidth;
-      const scale = Math.max(
-        Math.min(
-          wrapperRect.width / width,
-          wrapperRect.height / height,
-          MAX_SCALE,
-        ),
-        MIN_SCALE,
+      const { naturalHeight: height, naturalWidth: width } = imageRef.current!;
+      const scale = Math.min(
+        wrapperRect.width / width,
+        wrapperRect.height / height,
       );
 
       const vector = Vector2.fromSize(wrapperRect)
