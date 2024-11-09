@@ -1,15 +1,10 @@
-import {
-  FeatureProjectFields,
-  FieldToType,
-  FieldType,
-  ModelType,
-  ProjectType,
-} from '@metastable/types';
+import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { ComfyConditioning } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
@@ -75,11 +70,10 @@ type FeatureFieldType = FieldToType<typeof field>;
 export class FeatureControlnet extends FeaturePython {
   readonly id = 'controlnet';
   readonly name = 'Controlnet';
-  readonly projectFields: FeatureProjectFields = {
-    [ProjectType.SIMPLE]: {
-      controlnet: field,
-    },
+  readonly fields = {
+    controlnet: field,
   };
+  readonly type = 'prompting';
   readonly pythonNamespaceGroup = 'controlnet';
 
   private async load(session: ComfySession, mrn: string) {
@@ -89,26 +83,32 @@ export class FeatureControlnet extends FeaturePython {
     return new ComfyControlnet(session, data);
   }
 
-  async onAfterConditioning(task: PromptTask) {
-    const { settings, checkpoint, session, conditioning } = task;
-    const controlnets = settings.featureData?.controlnet as FeatureFieldType;
-    if (!controlnets?.length || !session || !checkpoint || !conditioning) {
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask)) {
       return;
     }
 
-    for (const controlnetSettings of controlnets) {
-      if (controlnetSettings.enabled) {
-        const { image } = await task.loadInput(
-          controlnetSettings.image!,
-          (controlnetSettings as any).imageMode,
-        );
-        const controlnet = await this.load(session, controlnetSettings.model);
-        await controlnet.applyTo(
-          conditioning,
-          image,
-          controlnetSettings.strength,
-        );
+    task.after('conditioning', async () => {
+      const { settings, checkpoint, session, conditioning } = task;
+      const controlnets = settings.featureData?.controlnet as FeatureFieldType;
+      if (!controlnets?.length || !session || !checkpoint || !conditioning) {
+        return;
       }
-    }
+
+      for (const controlnetSettings of controlnets) {
+        if (controlnetSettings.enabled) {
+          const { image } = await task.loadInput(
+            controlnetSettings.image!,
+            (controlnetSettings as any).imageMode,
+          );
+          const controlnet = await this.load(session, controlnetSettings.model);
+          await controlnet.applyTo(
+            conditioning,
+            image,
+            controlnetSettings.strength,
+          );
+        }
+      }
+    });
   }
 }

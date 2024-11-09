@@ -3,8 +3,9 @@ import path from 'path';
 import { download } from '#helpers/download.js';
 import { exists, tryMkdir } from '#helpers/fs.js';
 import { Metastable } from '#metastable';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
+import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeatureBase } from '../base.js';
-import { PromptTask } from 'src/comfy/tasks/prompt.js';
 
 const TAESD_EXTENSION = '.pth';
 const TAESD_NAMES = [
@@ -57,10 +58,20 @@ export class FeatureTaesd extends FeatureBase {
     ).includes(false);
   }
 
-  async onPromptInit(task: PromptTask) {
-    task.preview = {
-      method: 'taesd',
-      taesd: this.getDict(),
-    };
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask)) {
+      return;
+    }
+
+    task.after('load', () => {
+      if (task.preview.method === 'none') {
+        return;
+      }
+
+      task.preview = {
+        method: 'taesd',
+        taesd: this.getDict(),
+      };
+    });
   }
 }

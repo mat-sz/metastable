@@ -1,10 +1,4 @@
-import {
-  Feature,
-  Field,
-  FieldProperties,
-  FieldType,
-  ProjectType,
-} from '@metastable/types';
+import { Feature, Field, FieldProperties, FieldType } from '@metastable/types';
 
 export type FieldHandler = (parent: any, key: string, field: Field) => void;
 
@@ -57,24 +51,17 @@ export function recurseFields(
   }
 }
 
-export function mapProjectFields(features: Feature[]) {
-  const result: Record<ProjectType, FieldProperties> = {} as any;
-
-  for (const projectType of Object.values(ProjectType)) {
-    result[projectType] = {};
-  }
+export function joinFields(features: Feature[]) {
+  const result: FieldProperties = {} as any;
 
   for (const feature of features) {
     if (!feature.enabled) {
       continue;
     }
 
-    for (const projectType of Object.values(ProjectType)) {
-      const fields = feature.projectFields?.[projectType];
-      if (fields) {
-        for (const [key, value] of Object.entries(fields)) {
-          result[projectType][key] = value;
-        }
+    if (feature.fields) {
+      for (const [key, value] of Object.entries(feature.fields)) {
+        result[key] = value;
       }
     }
   }

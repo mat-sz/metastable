@@ -1,4 +1,3 @@
-import { ProjectType } from '@metastable/types';
 import clsx from 'clsx';
 import { runInAction, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -46,7 +45,7 @@ export const Settings: React.FC<SettingsProps> = observer(
       validationResult.errors.length || validationResult.warnings.length
     );
     const memoryUsage = project.memoryUsage;
-    const fields = mainStore.projectFields[ProjectType.SIMPLE];
+    const fields = mainStore.projectFields;
     const sections = Object.entries(fields);
 
     return (

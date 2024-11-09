@@ -17,10 +17,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "rootDir": "./src",
-    "baseUrl": ".",
     "paths": {
-      "#metastable": ["src/metastable.js"],
-      "#helpers": ["src/helpers/*"]
+      "#metastable": ["./src/metastable.js"],
+      "#helpers": ["./src/helpers/*"]
     }
   },
   "include": ["src"]

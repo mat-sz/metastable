@@ -95,7 +95,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   get extraFields() {
-    return mainStore.projectFields[this.type];
+    return mainStore.projectFields;
   }
 
   get tasks() {

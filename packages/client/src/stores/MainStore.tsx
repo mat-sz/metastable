@@ -1,4 +1,4 @@
-import { mapProjectFields } from '@metastable/common';
+import { joinFields } from '@metastable/common';
 import {
   BackendStatus,
   InstanceInfo,
@@ -132,7 +132,7 @@ class MainStore {
   }
 
   get projectFields() {
-    return mapProjectFields(this.info.features);
+    return joinFields(this.info.features);
   }
 
   get hotkeys() {

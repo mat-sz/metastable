@@ -1,15 +1,10 @@
-import {
-  FeatureProjectFields,
-  FieldToType,
-  FieldType,
-  ModelType,
-  ProjectType,
-} from '@metastable/types';
+import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { ComfyCheckpoint } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
@@ -62,11 +57,10 @@ type FeatureFieldType = FieldToType<typeof field>;
 export class FeatureLora extends FeaturePython {
   readonly id = 'lora';
   readonly name = 'LoRA';
-  readonly projectFields: FeatureProjectFields = {
-    [ProjectType.SIMPLE]: {
-      lora: field,
-    },
+  readonly fields = {
+    lora: field,
   };
+  readonly type = 'prompting';
   readonly pythonNamespaceGroup = 'lora';
 
   private async load(session: ComfySession, mrn: string) {
@@ -76,20 +70,27 @@ export class FeatureLora extends FeaturePython {
     return new ComfyLORA(session, data);
   }
 
-  async onBeforeConditioning(task: PromptTask) {
-    const { settings, checkpoint, session } = task;
-    const loras = settings.featureData?.lora as FeatureFieldType;
-    if (!loras?.length || !session || !checkpoint) {
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask)) {
       return;
     }
 
-    if (loras?.length) {
-      for (const loraSettings of loras) {
-        if (loraSettings.enabled) {
-          const lora = await this.load(session, loraSettings.model);
-          await lora.applyTo(checkpoint, loraSettings.strength);
+    task.after('checkpoint', async () => {
+      const { settings, checkpoint, session } = task;
+      const loras = settings.featureData?.lora as FeatureFieldType;
+      if (!loras?.length || !session || !checkpoint) {
+        return;
+      }
+
+      if (loras?.length) {
+        task.step('lora');
+        for (const loraSettings of loras) {
+          if (loraSettings.enabled) {
+            const lora = await this.load(session, loraSettings.model);
+            await lora.applyTo(checkpoint, loraSettings.strength);
+          }
         }
       }
-    }
+    });
   }
 }

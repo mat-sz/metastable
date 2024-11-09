@@ -1,30 +1,28 @@
-import { Feature, FeatureProjectFields } from '@metastable/types';
+import { Feature, FieldProperties } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { PromptTask } from '../comfy/tasks/prompt.js';
+import { BaseComfyTask } from '../comfy/tasks/base.js';
 
 export interface FeatureInstance {
   readonly id: string;
   readonly name: string;
   readonly description: string | undefined;
-  readonly projectFields: FeatureProjectFields;
+  readonly type: string | undefined;
+  readonly fields: FieldProperties | undefined;
 
   install(onLog?: (data: string) => void): Promise<void>;
   isInstalled(): Promise<boolean>;
   isEnabled(): Promise<boolean>;
   info(): Promise<Feature>;
-  onPromptInit?(task: PromptTask): Promise<void>;
-  onPromptPreviewInit?(task: PromptTask): Promise<void>;
-  onBeforeConditioning?(task: PromptTask): Promise<void>;
-  onAfterConditioning?(task: PromptTask): Promise<void>;
-  onAfterSample?(task: PromptTask): Promise<void>;
+  onTask?(task: BaseComfyTask): Promise<void>;
 }
 
 export class FeatureBase implements FeatureInstance {
   readonly id: string = '';
   readonly name: string = '';
   readonly description: string | undefined;
-  readonly projectFields: FeatureProjectFields;
+  readonly type: string | undefined;
+  readonly fields: FieldProperties | undefined;
 
   async install() {}
 
@@ -43,7 +41,8 @@ export class FeatureBase implements FeatureInstance {
       id: this.id,
       name: this.name,
       description: this.description,
-      projectFields: this.projectFields,
+      fields: this.fields,
+      type: this.type,
       enabled: await this.isEnabled(),
       installed: await this.isInstalled(),
     };

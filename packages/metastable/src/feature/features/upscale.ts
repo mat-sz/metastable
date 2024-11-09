@@ -1,14 +1,10 @@
-import {
-  FeatureProjectFields,
-  FieldToType,
-  FieldType,
-  ModelType,
-  ProjectType,
-} from '@metastable/types';
+import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { RPCRef } from '../../comfy/session/types.js';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
+import { PostprocessTask } from '../../comfy/tasks/postprocess.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
@@ -46,10 +42,9 @@ export class FeatureUpscale extends FeaturePython {
   readonly name = 'Upscale';
   readonly pythonPackages = [{ name: 'spandrel' }];
   readonly pythonNamespaceGroup = 'upscale';
-  readonly projectFields: FeatureProjectFields = {
-    [ProjectType.SIMPLE]: {
-      upscale: field,
-    },
+  readonly type = 'postprocess';
+  readonly fields = {
+    upscale: field,
   };
 
   private async load(session: ComfySession, mrn: string) {
@@ -59,14 +54,20 @@ export class FeatureUpscale extends FeaturePython {
     return new ComfyUpscaleModel(session, data);
   }
 
-  async onAfterSample(task: PromptTask) {
-    const { settings, session, images } = task;
-    const upscaleSettings = settings.featureData?.upscale as FeatureFieldType;
-    if (!upscaleSettings?.enabled || !session || !images) {
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask) && !(task instanceof PostprocessTask)) {
       return;
     }
 
-    const upscaleModel = await this.load(session, upscaleSettings.model);
-    task.images = await upscaleModel.applyTo(images);
+    (task as any).after('postprocess', async () => {
+      const { settings, session, images } = task;
+      const upscaleSettings = settings.featureData?.upscale as FeatureFieldType;
+      if (!upscaleSettings?.enabled || !session || !images) {
+        return;
+      }
+
+      const upscaleModel = await this.load(session, upscaleSettings.model);
+      task.images = await upscaleModel.applyTo(images);
+    });
   }
 }

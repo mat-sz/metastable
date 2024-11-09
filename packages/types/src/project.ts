@@ -1,7 +1,11 @@
 import { ImageFile } from './file.js';
 import { PromptStyleWithSource } from './instance.js';
 
-export interface ProjectSimpleSettings {
+export interface BaseSettings {
+  featureData?: any;
+}
+
+export interface ProjectSimpleSettings extends BaseSettings {
   version: number;
   checkpoint:
     | {
@@ -31,7 +35,6 @@ export interface ProjectSimpleSettings {
     height: number;
     batchSize: number;
     format?: string;
-    path?: string;
   };
   prompt: {
     positive: string;
@@ -51,7 +54,6 @@ export interface ProjectSimpleSettings {
   client: {
     randomizeSeed: boolean;
   };
-  featureData?: any;
 }
 
 export interface ProjectTrainingInputMetadata {
@@ -59,7 +61,7 @@ export interface ProjectTrainingInputMetadata {
   caption?: string;
 }
 
-export interface ProjectTrainingSettings {
+export interface ProjectTrainingSettings extends BaseSettings {
   mode: 'lora';
   base: string;
   resolution: { width: number; height: number };
@@ -96,7 +98,7 @@ export interface ProjectTrainingSettings {
   };
 }
 
-export interface ProjectTaggingSettings {
+export interface ProjectTaggingSettings extends BaseSettings {
   inputs: string[];
   threshold: number;
   removeUnderscore: boolean;
@@ -145,10 +147,11 @@ export type ProjectQuality = 'low' | 'medium' | 'high' | 'very_high' | 'custom';
 
 export type ProjectOrientation = 'square' | 'portrait' | 'landscape';
 
-export interface ProcessImageSettings {
+export interface PostprocessSettings extends BaseSettings {
   input: {
     image: string;
-    imageMode?: ProjectImageMode;
   };
-  featureData?: any;
+  output?: {
+    format?: string;
+  };
 }

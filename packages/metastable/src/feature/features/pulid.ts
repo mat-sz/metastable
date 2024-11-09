@@ -1,15 +1,10 @@
-import {
-  FeatureProjectFields,
-  FieldToType,
-  FieldType,
-  ModelType,
-  ProjectType,
-} from '@metastable/types';
+import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
 import { ComfyCheckpoint } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
@@ -78,10 +73,9 @@ export class FeaturePulid extends FeaturePython {
     { name: 'huggingface-hub' },
   ];
   readonly pythonNamespaceGroup = 'pulid';
-  readonly projectFields: FeatureProjectFields = {
-    [ProjectType.SIMPLE]: {
-      pulid: field,
-    },
+  readonly type = 'prompting';
+  readonly fields = {
+    pulid: field,
   };
 
   private async load(session: ComfySession, mrn: string) {
@@ -101,26 +95,32 @@ export class FeaturePulid extends FeaturePython {
     })) as RPCRef;
   }
 
-  async onAfterConditioning(task: PromptTask) {
-    const { settings, checkpoint, session } = task;
-    const pulidSettings = settings.featureData?.pulid as FeatureFieldType;
-    if (!pulidSettings?.enabled || !session || !checkpoint) {
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask)) {
       return;
     }
 
-    const pulid = await this.load(session, pulidSettings.model);
-    const insightface = await this.loadInsightface(
-      session,
-      Metastable.instance.internalPath,
-    );
-    const evaClip = await this.loadEvaClip(session);
-    const { image } = await task.loadInputRaw(pulidSettings.image!);
-    await pulid.applyTo(
-      checkpoint,
-      evaClip,
-      insightface,
-      image,
-      pulidSettings.strength,
-    );
+    task.after('conditioning', async () => {
+      const { settings, checkpoint, session } = task;
+      const pulidSettings = settings.featureData?.pulid as FeatureFieldType;
+      if (!pulidSettings?.enabled || !session || !checkpoint) {
+        return;
+      }
+
+      const pulid = await this.load(session, pulidSettings.model);
+      const insightface = await this.loadInsightface(
+        session,
+        Metastable.instance.internalPath,
+      );
+      const evaClip = await this.loadEvaClip(session);
+      const { image } = await task.loadInputRaw(pulidSettings.image!);
+      await pulid.applyTo(
+        checkpoint,
+        evaClip,
+        insightface,
+        image,
+        pulidSettings.strength,
+      );
+    });
   }
 }

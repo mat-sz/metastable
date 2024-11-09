@@ -1,15 +1,11 @@
-import { Field } from './field.js';
-import { ProjectType } from './project.js';
-
-export type FeatureProjectFields =
-  | { [K in ProjectType]?: Record<string, Field> }
-  | undefined;
+import { FieldProperties } from './field.js';
 
 export interface Feature {
   id: string;
   name: string;
   description?: string;
-  projectFields?: FeatureProjectFields;
+  type?: string;
+  fields?: FieldProperties;
   installed: boolean;
   enabled: boolean;
 }

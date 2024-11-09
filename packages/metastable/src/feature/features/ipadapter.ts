@@ -1,10 +1,4 @@
-import {
-  FeatureProjectFields,
-  FieldToType,
-  FieldType,
-  ModelType,
-  ProjectType,
-} from '@metastable/types';
+import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
 import { ComfySession } from '../../comfy/session/index.js';
@@ -79,11 +73,10 @@ type FeatureFieldType = FieldToType<typeof field>;
 export class FeatureIpAdapter extends FeaturePython {
   readonly id = 'ipadapter';
   readonly name = 'IPAdapter';
-  readonly projectFields: FeatureProjectFields = {
-    [ProjectType.SIMPLE]: {
-      ipadapter: field,
-    },
+  readonly fields = {
+    ipadapter: field,
   };
+  readonly type = 'prompting';
   readonly pythonNamespaceGroup = 'ipadapter';
 
   private async load(session: ComfySession, mrn: string) {

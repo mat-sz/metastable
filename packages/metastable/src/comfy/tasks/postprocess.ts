@@ -1,274 +1,69 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import {
-  mapProjectFields,
-  MRN,
-  recurseFields,
-  setDefaultValues,
-} from '@metastable/common';
-import {
-  Feature,
-  FieldType,
-  ImageFile,
-  ModelType,
-  ProjectImageMode,
-  ProjectPromptTaskData,
-  ProjectSimpleSettings,
-  ProjectType,
-  TaskState,
-} from '@metastable/types';
-import sharp, { FitEnum } from 'sharp';
+import { ImageFile, PostprocessSettings } from '@metastable/types';
 
-import { Metastable } from '#metastable';
+import { BaseComfyTask, BaseComfyTaskHandlers } from './base.js';
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
-import { SHARP_FIT_MAP } from '../../helpers/image.js';
-import { BaseTask } from '../../tasks/task.js';
-import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
 import { RPCRef } from '../session/types.js';
 
-export class PostprocessTask extends BaseTask<ProjectPromptTaskData> {
+type PostprocessTaskHandlers = BaseComfyTaskHandlers & {
+  postprocess: () => Promise<void> | void;
+};
+
+export class PostprocessTask extends BaseComfyTask<
+  PostprocessTaskHandlers,
+  PostprocessSettings
+> {
   public session?: ComfySession;
-  private features: Feature[] = [];
   public images?: RPCRef[];
 
-  constructor(
-    private project: ProjectEntity,
-    public settings: ProjectSimpleSettings,
-  ) {
-    super('prompt', { projectId: project.id });
+  constructor(project: ProjectEntity, settings: PostprocessSettings) {
+    super('prompt', project, settings);
     this.created();
   }
 
-  private async validateModel(
-    type: ModelType,
-    required: boolean,
-    mrn?: string,
-  ) {
-    if (!mrn) {
-      if (required) {
-        throw new Error(`Missing ${type} model.`);
-      } else {
-        return;
-      }
-    }
-
-    const parsed = MRN.parse(mrn);
-    if (parsed.segments[0] !== 'model') {
-      throw new Error(`Invalid MRN for model type ${type}: ${mrn}`);
-    }
-
-    await Metastable.instance.resolve(mrn);
-  }
-
   async init() {
-    this.features = await Metastable.instance.feature.all();
-    const fields = mapProjectFields(this.features)[ProjectType.SIMPLE];
-    setDefaultValues(this.settings.featureData, fields);
-
     const settings = this.settings;
 
     if (!settings.input.image) {
       throw new Error('Input image is required.');
     }
 
-    settings.sampler.tiling = !!settings.sampler.tiling;
-
-    const promises: Promise<void>[] = [];
-
-    recurseFields(settings.featureData, fields, (parent, key, field) => {
-      if (field.type === FieldType.MODEL) {
-        const fn = async () => {
-          try {
-            await this.validateModel(field.modelType, true, parent?.[key]);
-          } catch {
-            parent.enabled = false;
-          }
-        };
-
-        promises.push(fn());
-      }
-    });
-
-    await Promise.all(promises);
-    return { projectId: this.project.id };
+    return await super.init();
   }
 
-  private stepStart: number | undefined;
-  private stepName: string | undefined;
+  protected async process() {
+    const ctx = this.session!;
 
-  private step(name: string, max?: number) {
-    const stepTime = { ...this.data.stepTime };
-    if (this.stepStart && this.stepName) {
-      stepTime[this.stepName] = Date.now() - this.stepStart;
+    const settings = this.settings;
+
+    const { image } = await this.loadInputRaw(settings.input.image);
+    this.images = [image];
+    const outputDir = this.project!.files.output.path;
+
+    await this.executeHandlers('postprocess');
+
+    this.step('save');
+    const ext = settings.output?.format || 'png';
+    const outputs: ImageFile[] = [];
+
+    for (const image of this.images) {
+      const bytes = await ctx.image.dump(image, ext);
+      const buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+
+      const filename = await getNextFilename(outputDir, ext);
+      await fs.writeFile(path.join(outputDir, filename), buffer);
+      const output = await this.project!.files.output.get(filename);
+      await output.metadata.set(settings);
+      outputs.push(await output.json());
     }
-    this.stepStart = Date.now();
-    this.stepName = name;
 
     this.data = {
       ...this.data,
-      step: name,
-      stepValue: 0,
-      stepMax: max,
-      preview: undefined,
-      stepTime,
+      outputs,
     };
-  }
-
-  cancel() {
-    if (this.state === TaskState.RUNNING && this.session) {
-      this.session.destroy();
-    }
-
-    this.state = TaskState.CANCELLING;
-  }
-
-  private async inputAsBuffer(url: string): Promise<Buffer> {
-    if (url.startsWith('data:')) {
-      return Buffer.from(url.split(',')[1], 'base64');
-    }
-
-    if (url.startsWith('mrn:')) {
-      return await fs.readFile(await Metastable.instance.resolve(url));
-    }
-
-    throw new Error('Unable to load input');
-  }
-
-  async loadInputRaw(url: string) {
-    const buffer = await this.inputAsBuffer(url);
-
-    return await this.session!.image.load(bufferToRpcBytes(buffer));
-  }
-
-  private async callFeatureHandlers(
-    handler:
-      | 'onPromptInit'
-      | 'onPromptPreviewInit'
-      | 'onBeforeConditioning'
-      | 'onAfterConditioning'
-      | 'onAfterSample',
-  ) {
-    for (const feature of this.features) {
-      if (!feature.enabled) {
-        continue;
-      }
-
-      const instance = Metastable.instance.feature.features[feature.id];
-      if (instance?.[handler]) {
-        this.step(feature.id);
-        await instance[handler](this as any);
-      }
-    }
-  }
-
-  private async prepareImage(url: string, fit?: keyof FitEnum) {
-    const buffer = await this.inputAsBuffer(url);
-    const image = sharp(buffer);
-
-    const { padEdges } = this.settings.input;
-    const { width, height } = this.settings.output;
-    image.resize({
-      width,
-      height,
-      fit,
-    });
-
-    if (padEdges) {
-      image.extend({
-        top: padEdges,
-        bottom: padEdges,
-        left: padEdges,
-        right: padEdges,
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      });
-
-      image.resize({
-        width,
-        height,
-        fit,
-      });
-    }
-
-    return image;
-  }
-
-  async loadInput(url: string, mode?: ProjectImageMode, maskUrl?: string) {
-    const fit = SHARP_FIT_MAP[mode!] || 'fill';
-    const image = await this.prepareImage(url, fit);
-
-    if (maskUrl) {
-      const maskImage = await this.prepareImage(url, fit);
-      image.composite([
-        { input: await maskImage.png().toBuffer(), blend: 'dest-out' },
-      ]);
-    }
-
-    return await this.session!.image.load(
-      bufferToRpcBytes(await image.png().toBuffer()),
-    );
-  }
-
-  private async generate() {
-    await Metastable.instance.comfy!.session(async ctx => {
-      this.session = ctx;
-
-      ctx.on('progress', e => {
-        this.progress = e.value / e.max;
-        this.data = {
-          ...this.data,
-          stepValue: e.value,
-          stepMax: e.max,
-          preview: e.preview,
-        };
-      });
-
-      const settings = this.settings;
-      const { image } = await this.loadInput(
-        settings.input.image!,
-        settings.input.imageMode,
-      );
-
-      this.images = [image];
-      const outputDir = this.project!.files.output.path;
-
-      await this.callFeatureHandlers('onAfterSample');
-
-      this.step('save');
-      const ext = settings.output?.format || 'png';
-      const outputs: ImageFile[] = [];
-
-      for (const image of this.images) {
-        const bytes = await ctx.image.dump(image, ext);
-        const buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
-
-        const filename = await getNextFilename(outputDir, ext);
-        await fs.writeFile(path.join(outputDir, filename), buffer);
-        const output = await this.project!.files.output.get(filename);
-        await output.metadata.set(settings);
-        outputs.push(await output.json());
-      }
-
-      this.data = {
-        ...this.data,
-        outputs,
-      };
-    });
-  }
-
-  async execute() {
-    try {
-      await this.generate();
-    } catch (e) {
-      if (this.state === TaskState.CANCELLING) {
-        return TaskState.CANCELLED;
-      }
-
-      throw e;
-    }
-
-    return TaskState.SUCCESS;
   }
 }
