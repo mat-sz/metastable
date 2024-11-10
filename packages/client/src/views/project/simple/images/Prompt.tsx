@@ -87,7 +87,7 @@ export const Prompt: React.FC = observer(() => {
               Clear queue
             </Button>
           )}
-          {!!project.firstPrompt && (
+          {!!project.firstTask && (
             <Button onClick={() => project.cancel()} variant="danger">
               Cancel
             </Button>

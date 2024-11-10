@@ -21,8 +21,7 @@ export class PostprocessTask extends BaseComfyTask<
   public images?: RPCRef[];
 
   constructor(project: ProjectEntity, settings: PostprocessSettings) {
-    super('prompt', project, settings);
-    this.created();
+    super('postprocess', project, settings);
   }
 
   async init() {

@@ -1,4 +1,4 @@
-import { ProjectPromptTaskData, Task, TaskState } from '@metastable/types';
+import { ProjectTaskData, Task, TaskState } from '@metastable/types';
 import React from 'react';
 
 import { Button } from '$components/button';
@@ -8,7 +8,7 @@ import styles from './TaskLog.module.scss';
 import { useSimpleProject } from '../../context';
 
 interface TaskLogProps {
-  task: Task<ProjectPromptTaskData>;
+  task: Task<ProjectTaskData>;
 }
 
 export const TaskLog: React.FC<TaskLogProps> = ({ task }) => {

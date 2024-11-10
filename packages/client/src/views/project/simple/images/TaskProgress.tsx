@@ -1,4 +1,4 @@
-import { ProjectPromptTaskData, Task } from '@metastable/types';
+import { ProjectTaskData, Task } from '@metastable/types';
 import React from 'react';
 
 import { ProgressCircle } from '$components/progressCircle';
@@ -18,7 +18,7 @@ const STEP_MAP: Record<string, string> = {
 };
 
 interface TaskProgressProps {
-  task: Task<ProjectPromptTaskData>;
+  task: Task<ProjectTaskData>;
   aspectRatio?: number;
 }
 

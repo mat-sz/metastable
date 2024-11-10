@@ -65,6 +65,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       tasks: computed,
       firstTask: computed,
       queueCount: computed,
+      queued: computed,
       progressValue: computed,
       progressMax: computed,
       progressMarquee: computed,
@@ -113,8 +114,15 @@ export class BaseProject<TSettings = any, TUI = any> {
     );
   }
 
+  get queued() {
+    return this.tasks.filter(
+      item =>
+        item.state !== TaskState.RUNNING && item.state !== TaskState.CANCELLING,
+    );
+  }
+
   get queueCount() {
-    return this.tasks.length;
+    return this.queued.length;
   }
 
   get progressValue(): number | undefined {

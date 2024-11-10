@@ -124,9 +124,6 @@ export interface Project {
 
 export interface ProjectTaskData {
   projectId: string;
-}
-
-export interface ProjectPromptTaskData extends ProjectTaskData {
   preview?: string;
   step?: string;
   stepValue?: number;

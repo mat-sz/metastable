@@ -56,9 +56,9 @@ export const SimpleProjectView: React.FC = observer(() => {
           </div>
         )}
         <div className={styles.generated}>
-          {!!project.prompts.length && (
+          {!!project.tasks.length && (
             <ul className={styles.queue}>
-              {project.prompts.map(item => (
+              {project.tasks.map(item => (
                 <li
                   className={clsx({
                     [styles.failed]: item.state === TaskState.FAILED,

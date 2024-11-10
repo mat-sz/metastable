@@ -8,8 +8,8 @@ import {
   PostprocessSettings,
   ProjectFileType,
   ProjectOrientation,
-  ProjectPromptTaskData,
   ProjectSimpleSettings,
+  ProjectTaskData,
   PromptStyleWithSource,
   Task,
   TaskState,
@@ -234,7 +234,7 @@ export class SimpleProject extends BaseProject<
   editor: Editor | undefined = undefined;
   addOutputToEditor: Point | undefined = undefined;
   stepTime: Record<string, number> | undefined = undefined;
-  currentTask: Task<ProjectPromptTaskData> | undefined = undefined;
+  currentTask: Task<ProjectTaskData> | undefined = undefined;
   lastOutputName: string | undefined = undefined;
 
   constructor(data: APIProject) {
@@ -252,12 +252,9 @@ export class SimpleProject extends BaseProject<
 
     makeObservable(this, {
       editor: observable,
-      preview: computed,
       request: action,
       setSettings: action,
-      prompts: computed,
-      firstPrompt: computed,
-      onPromptDone: action,
+      onTaskDone: action,
       stepTime: observable,
       currentTask: observable,
       selectOutput: action,
@@ -267,19 +264,14 @@ export class SimpleProject extends BaseProject<
       availableStyles: computed,
       discard: action,
       isLastOutput: computed,
-      queued: computed,
       autoSizes: computed,
       beforeRequest: action,
       imageFiles: computed,
     });
 
-    mainStore.tasks.on('delete', (task: Task<ProjectPromptTaskData>) => {
-      if (
-        task.type === 'prompt' &&
-        task.data.projectId === this.id &&
-        task.data.outputs
-      ) {
-        this.onPromptDone(task);
+    mainStore.tasks.on('delete', (task: Task<ProjectTaskData>) => {
+      if (task.data.projectId === this.id && task.data.outputs) {
+        this.onTaskDone(task);
       }
     });
   }
@@ -367,21 +359,6 @@ export class SimpleProject extends BaseProject<
     return model?.details?.architecture;
   }
 
-  get prompts(): Task<ProjectPromptTaskData>[] {
-    return this.tasks.filter(task => task.type === 'prompt');
-  }
-
-  get firstPrompt() {
-    return this.prompts.find(
-      item =>
-        item.state === TaskState.RUNNING || item.state === TaskState.PREPARING,
-    );
-  }
-
-  get preview() {
-    return this.firstPrompt?.data.preview;
-  }
-
   get memoryUsage() {
     const settings = this.settings;
     let totalVram = 0;
@@ -458,7 +435,7 @@ export class SimpleProject extends BaseProject<
     return (
       !!this.lastOutputName &&
       this.currentOutput?.name === this.lastOutputName &&
-      !this.firstPrompt
+      !this.firstTask
     );
   }
 
@@ -470,15 +447,8 @@ export class SimpleProject extends BaseProject<
     await this.request();
   }
 
-  get queued() {
-    return this.prompts.filter(
-      item =>
-        item.state !== TaskState.RUNNING && item.state !== TaskState.CANCELLING,
-    );
-  }
-
   async dismissTask(taskId: string) {
-    const task = this.prompts.find(task => task.id === taskId);
+    const task = this.tasks.find(task => task.id === taskId);
     if (!task) {
       return;
     }
@@ -504,7 +474,7 @@ export class SimpleProject extends BaseProject<
   }
 
   async cancel() {
-    const task = this.firstPrompt;
+    const task = this.firstTask;
     if (!task) {
       return;
     }
@@ -586,13 +556,14 @@ export class SimpleProject extends BaseProject<
   }
 
   async postprocess(settings: PostprocessSettings) {
+    this.selectOutput(undefined);
     await API.project.postprocess.mutate({
       projectId: this.id,
       settings: settings,
     });
   }
 
-  selectTask(task?: Task<ProjectPromptTaskData>) {
+  selectTask(task?: Task<ProjectTaskData>) {
     this.mode = 'images';
     this.currentTask = task;
     this.currentOutput = undefined;
@@ -604,7 +575,7 @@ export class SimpleProject extends BaseProject<
     this.currentTask = undefined;
   }
 
-  onPromptDone(task: Task<ProjectPromptTaskData>) {
+  onTaskDone(task: Task<ProjectTaskData>) {
     const outputs = task.data.outputs!;
     this.selectOutput(outputs[0]);
     this.files.output.push(...outputs);

@@ -46,7 +46,6 @@ export class PromptTask extends BaseComfyTask<
 
   constructor(project: ProjectEntity, settings: ProjectSimpleSettings) {
     super('prompt', project, settings);
-    this.created();
   }
 
   async init() {

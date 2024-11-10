@@ -12,7 +12,6 @@ export class TagTask extends BaseComfyTask<
 > {
   constructor(project: ProjectEntity, settings: ProjectTaggingSettings) {
     super('tag', project, settings);
-    this.created();
   }
 
   async init() {

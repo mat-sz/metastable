@@ -8,23 +8,16 @@ import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
 import { Settings } from '../settings';
 import { Output } from './Output';
-import { TaskLog } from './TaskLog';
-import { TaskProgress } from './TaskProgress';
+import { TaskView } from './TaskView';
 
 const Preview: React.FC = observer(() => {
   const project = useSimpleProject();
   const task =
     project.currentTask ||
-    (!project.currentOutput ? project.prompts[0] : undefined);
+    (!project.currentOutput ? project.firstTask : undefined);
 
-  if (!project.currentTask && !project.currentOutput && project.firstPrompt) {
-    const { width, height } = project.settings.output;
-    const aspectRatio = width / height;
-    return (
-      <TaskProgress task={project.firstPrompt} aspectRatio={aspectRatio} />
-    );
-  } else if (task) {
-    return <TaskLog task={task} />;
+  if (task) {
+    return <TaskView task={task} />;
   } else if (project.currentOutput) {
     return <Output output={project.currentOutput} />;
   }

@@ -11,7 +11,7 @@ import {
   Feature,
   FieldType,
   ModelType,
-  ProjectPromptTaskData,
+  ProjectTaskData,
   TaskState,
 } from '@metastable/types';
 
@@ -30,7 +30,7 @@ export type BaseComfyTaskHandlers = {
 export class BaseComfyTask<
   THandlers extends TaskHandlers = any,
   TSettings extends BaseSettings = BaseSettings,
-> extends BaseTask<ProjectPromptTaskData> {
+> extends BaseTask<ProjectTaskData> {
   public session?: ComfySession;
   private features: Feature[] = [];
 
