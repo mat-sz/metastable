@@ -13,6 +13,7 @@ export const TYPE_NAMES: Record<ModelType, string> = {
   [ModelType.HYPERNETWORK]: 'HyperNetwork',
   [ModelType.IPADAPTER]: 'IPAdapter',
   [ModelType.LORA]: 'LoRA',
+  [ModelType.SEGMENT_ANYTHING]: 'Segment Anything',
   [ModelType.STYLE_MODEL]: 'Style model',
   [ModelType.TAGGER]: 'Tagger',
   [ModelType.UNET]: 'UNET',
@@ -402,6 +403,182 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/h94/IP-Adapter',
+      },
+    ],
+  },
+  {
+    name: 'Segment Anything 2',
+    type: ModelType.SEGMENT_ANYTHING,
+    models: [
+      {
+        name: 'Segment Anything 2.1 - Tiny (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_tiny.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_tiny.safetensors',
+            size: 155906872,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Tiny (FP16)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        recommended: true,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_tiny-fp16.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_tiny-fp16.safetensors',
+            size: 77980668,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Small (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_small.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_small.safetensors',
+            size: 184303872,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Small (FP16)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        recommended: true,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_small-fp16.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_small-fp16.safetensors',
+            size: 92181820,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Base (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_base_plus.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_base_plus.safetensors',
+            size: 323474320,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Base (FP16)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_base_plus-fp16.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_base_plus-fp16.safetensors',
+            size: 161773292,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Large (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_large.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_large.safetensors',
+            size: 897893808,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2.1 - Large (FP16)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2.1_hiera_large-fp16.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_large-fp16.safetensors',
+            size: 448999828,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2 - Tiny (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2_hiera_tiny.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2_hiera_tiny.safetensors',
+            size: 155840544,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2 - Small (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2_hiera_small.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2_hiera_small.safetensors',
+            size: 184237544,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2 - Base (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2_hiera_base_plus.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2_hiera_base_plus.safetensors',
+            size: 323407992,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
+      },
+      {
+        name: 'Segment Anything 2 - Large (FP32)',
+        source: 'huggingface',
+        type: ModelType.IPADAPTER,
+        downloads: [
+          {
+            type: ModelType.CLIP_VISION,
+            name: 'sam2_hiera_large.safetensors',
+            url: 'https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2_hiera_large.safetensors',
+            size: 897827480,
+          },
+        ],
+        homepage: 'https://huggingface.co/Kijai/sam2-safetensors',
       },
     ],
   },
