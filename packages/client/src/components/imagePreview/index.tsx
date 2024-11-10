@@ -1,8 +1,10 @@
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import { Vector2 } from '$editor/primitives/Vector2';
 import { Point, Size } from '$editor/types';
+import { useEventListener } from '$hooks/useEventListener';
+import { useResizeObserver } from '$hooks/useResizeObserver';
 import styles from './index.module.scss';
 
 interface ImagePreviewProps {
@@ -72,31 +74,22 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     });
   }, [setLoaded, syncState, updateRect]);
 
-  useEffect(() => {
-    const wrapperEl = wrapperRef.current;
-    if (!wrapperEl) {
-      return;
-    }
+  const onResize = useCallback(() => {
+    const oldSize = wrapperSizeRef.current;
+    const newSize = updateRect();
 
-    const observer = new ResizeObserver(() => {
-      const oldSize = wrapperSizeRef.current;
-      const newSize = updateRect();
+    const diffWidth = newSize.width - oldSize.width;
+    const diffHeight = newSize.height - oldSize.height;
 
-      const diffWidth = newSize.width - oldSize.width;
-      const diffHeight = newSize.height - oldSize.height;
-
-      const { offset } = imageStateRef.current;
-      syncState({
-        offset: {
-          x: offset.x + diffWidth / 2,
-          y: offset.y + diffHeight / 2,
-        },
-      });
+    const { offset } = imageStateRef.current;
+    syncState({
+      offset: {
+        x: offset.x + diffWidth / 2,
+        y: offset.y + diffHeight / 2,
+      },
     });
-
-    observer.observe(wrapperEl);
-    return () => observer.disconnect();
-  }, [syncState, updateRect]);
+  }, [updateRect, syncState]);
+  useResizeObserver(onResize, wrapperRef);
 
   if (!url) {
     return <div className={styles.preview} />;
@@ -183,18 +176,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     }
   };
 
-  useEffect(() => {
-    const wrapperEl = wrapperRef.current;
-    if (!wrapperEl) {
-      return;
-    }
-
-    wrapperEl.addEventListener('wheel', onWheel, { passive: false });
-    return () =>
-      wrapperEl.removeEventListener('wheel', onWheel, {
-        passive: false,
-      } as any);
-  }, [onWheel]);
+  useEventListener('wheel', onWheel, wrapperRef, { passive: false });
 
   return (
     <div

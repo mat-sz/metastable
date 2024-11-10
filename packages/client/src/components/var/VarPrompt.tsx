@@ -1,7 +1,8 @@
 import { lexPrompt, PromptTokenType } from '@metastable/common';
 import clsx from 'clsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
+import { useEventListener } from '$hooks/useEventListener';
 import { matchHotkey } from '$hooks/useHotkey';
 import {
   deleteText,
@@ -75,13 +76,7 @@ export const VarPrompt = ({
     setCurrentLine(getCurrentLineIndex(textareaRef.current));
   }, [setCurrentLine]);
 
-  useEffect(() => {
-    document.addEventListener('selectionchange', updateCurrentLine);
-
-    return () => {
-      document.removeEventListener('selectionchange', updateCurrentLine);
-    };
-  }, [updateCurrentLine]);
+  useEventListener('selectionchange', updateCurrentLine);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const el = e.currentTarget;

@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
+import { useEventListener } from '$hooks/useEventListener';
+import { useResizeObserver } from '$hooks/useResizeObserver';
 import styles from './index.module.scss';
 
 export const Carousel: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -19,23 +21,8 @@ export const Carousel: React.FC<React.PropsWithChildren> = ({ children }) => {
     setHasAfter(el.scrollWidth - el.scrollLeft - el.clientWidth > threshold);
   }, [setHasBefore, setHasAfter]);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver(computeVisibility);
-    resizeObserver.observe(el);
-
-    el.addEventListener('scroll', computeVisibility);
-    computeVisibility();
-
-    return () => {
-      el.removeEventListener('scroll', computeVisibility);
-      resizeObserver.disconnect();
-    };
-  }, [computeVisibility]);
+  useResizeObserver(computeVisibility, ref);
+  useEventListener('scroll', computeVisibility, ref);
 
   return (
     <div className={styles.carousel}>
