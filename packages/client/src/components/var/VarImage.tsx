@@ -3,6 +3,7 @@ import { BsUpload } from 'react-icons/bs';
 
 import { ImageBrowseButton } from '$components/imageBrowser';
 import { ImageBrowserProps } from '$components/imageBrowser/ImageBrowser';
+import { resolveImage } from '$utils/url';
 import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarImage.module.scss';
@@ -97,7 +98,7 @@ export const VarImage = ({
           className={styles.background}
           style={{
             backgroundImage: currentValue
-              ? `url('${currentValue}')`
+              ? `url('${resolveImage(currentValue, 'thumbnail')}')`
               : undefined,
           }}
           title="Image preview"
