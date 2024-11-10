@@ -38,6 +38,15 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const [loaded, setLoaded] = useState(false);
 
+  const updateRect = useCallback(() => {
+    const wrapperEl = wrapperRef.current;
+    const rect = wrapperEl?.getBoundingClientRect();
+    wrapperSizeRef.current = rect
+      ? { width: rect.width, height: rect.height }
+      : { width: 0, height: 0 };
+    return wrapperSizeRef.current;
+  }, []);
+
   const syncState = useCallback((state: Partial<ImageState>) => {
     const imageEl = imageRef.current;
     if (!imageEl) {
@@ -49,42 +58,25 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     imageEl.style.transform = `translate(${offset.x}px, ${offset.y}px) scale(${scale})`;
   }, []);
 
-  const resetScale = useCallback(
-    (isLoad = false) => {
-      const wrapperRect = wrapperRef.current!.getBoundingClientRect();
+  const resetScale = useCallback(() => {
+    const size = updateRect();
+    const { naturalHeight: height, naturalWidth: width } = imageRef.current!;
+    const scale = Math.min(size.width / width, size.height / height);
 
-      const { naturalHeight: height, naturalWidth: width } = imageRef.current!;
-      const scale = Math.min(
-        wrapperRect.width / width,
-        wrapperRect.height / height,
-      );
-
-      const vector = Vector2.fromSize(wrapperRect)
-        .sub(new Vector2(width, height).multiplyScalar(scale))
-        .divideScalar(2);
-      syncState({
-        offset: vector.point,
-        scale,
-      });
-
-      if (isLoad) {
-        setLoaded(true);
-      }
-    },
-    [setLoaded, syncState],
-  );
+    const vector = Vector2.fromSize(size)
+      .sub(new Vector2(width, height).multiplyScalar(scale))
+      .divideScalar(2);
+    syncState({
+      offset: vector.point,
+      scale,
+    });
+  }, [setLoaded, syncState, updateRect]);
 
   useEffect(() => {
     const wrapperEl = wrapperRef.current;
     if (!wrapperEl) {
       return;
     }
-
-    const updateRect = () => {
-      const rect = wrapperEl.getBoundingClientRect();
-      wrapperSizeRef.current = { width: rect.width, height: rect.height };
-      return wrapperSizeRef.current;
-    };
 
     const observer = new ResizeObserver(() => {
       const oldSize = wrapperSizeRef.current;
@@ -104,7 +96,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
     observer.observe(wrapperEl);
     return () => observer.disconnect();
-  }, [syncState]);
+  }, [syncState, updateRect]);
 
   if (!url) {
     return <div className={styles.preview} />;
@@ -268,7 +260,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           setLoaded(false);
         }}
         onLoad={() => {
-          resetScale(true);
+          resetScale();
+          setLoaded(true);
         }}
         style={{
           opacity: loaded ? 1 : 0.0001,
