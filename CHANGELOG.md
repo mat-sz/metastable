@@ -11,6 +11,7 @@
 ## Improvements
 
 - Improved handling of window resizes in image previews.
+- Updated ComfyUI code to latest version.
 
 ## Bug fixes
 
