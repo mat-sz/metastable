@@ -41,7 +41,6 @@ export class FeatureSegment extends FeaturePython {
   readonly id = 'segment';
   readonly name = 'Segment Anything';
   readonly pythonNamespaceGroup = 'segment';
-  readonly type = 'postprocess';
   readonly fields = {
     segment: field,
   };

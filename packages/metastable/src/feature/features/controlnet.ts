@@ -73,7 +73,7 @@ export class FeatureControlnet extends FeaturePython {
   readonly fields = {
     controlnet: field,
   };
-  readonly type = 'prompting';
+  readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'controlnet';
 
   private async load(session: ComfySession, mrn: string) {

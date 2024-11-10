@@ -7,7 +7,7 @@ export interface FeatureInstance {
   readonly id: string;
   readonly name: string;
   readonly description: string | undefined;
-  readonly type: string | undefined;
+  readonly tags: string[] | undefined;
   readonly fields: FieldProperties | undefined;
 
   install(onLog?: (data: string) => void): Promise<void>;
@@ -21,7 +21,7 @@ export class FeatureBase implements FeatureInstance {
   readonly id: string = '';
   readonly name: string = '';
   readonly description: string | undefined;
-  readonly type: string | undefined;
+  readonly tags: string[] | undefined;
   readonly fields: FieldProperties | undefined;
 
   async install() {}
@@ -42,7 +42,7 @@ export class FeatureBase implements FeatureInstance {
       name: this.name,
       description: this.description,
       fields: this.fields,
-      type: this.type,
+      tags: this.tags,
       enabled: await this.isEnabled(),
       installed: await this.isInstalled(),
     };

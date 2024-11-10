@@ -76,7 +76,7 @@ export class FeatureIpAdapter extends FeaturePython {
   readonly fields = {
     ipadapter: field,
   };
-  readonly type = 'prompting';
+  readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'ipadapter';
 
   private async load(session: ComfySession, mrn: string) {

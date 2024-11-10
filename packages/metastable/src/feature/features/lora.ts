@@ -60,7 +60,7 @@ export class FeatureLora extends FeaturePython {
   readonly fields = {
     lora: field,
   };
-  readonly type = 'prompting';
+  readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'lora';
 
   private async load(session: ComfySession, mrn: string) {

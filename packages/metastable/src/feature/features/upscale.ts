@@ -42,7 +42,7 @@ export class FeatureUpscale extends FeaturePython {
   readonly name = 'Upscale';
   readonly pythonPackages = [{ name: 'spandrel' }];
   readonly pythonNamespaceGroup = 'upscale';
-  readonly type = 'postprocess';
+  readonly tags = ['simple', 'postprocess'];
   readonly fields = {
     upscale: field,
   };

@@ -4,7 +4,7 @@ export interface Feature {
   id: string;
   name: string;
   description?: string;
-  type?: string;
+  tags?: string[];
   fields?: FieldProperties;
   installed: boolean;
   enabled: boolean;

@@ -132,12 +132,16 @@ class MainStore {
   }
 
   get projectFields() {
-    return joinFields(this.info.features);
+    return joinFields(
+      this.info.features.filter(feature => feature.tags?.includes('simple')),
+    );
   }
 
   get postprocessFields() {
     return joinFields(
-      this.info.features.filter(feature => feature.type === 'postprocess'),
+      this.info.features.filter(feature =>
+        feature.tags?.includes('postprocess'),
+      ),
     );
   }
 

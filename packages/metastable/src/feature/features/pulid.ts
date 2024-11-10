@@ -73,7 +73,7 @@ export class FeaturePulid extends FeaturePython {
     { name: 'huggingface-hub' },
   ];
   readonly pythonNamespaceGroup = 'pulid';
-  readonly type = 'prompting';
+  readonly tags = ['simple'];
   readonly fields = {
     pulid: field,
   };
