@@ -19,15 +19,11 @@ export const ProjectPostprocess: React.FC<Props> = observer(
   ({ imageMrn, project }) => {
     const { close } = useModal();
     const sections = Object.entries(mainStore.postprocessFields);
-    const [settings, setSettings] = useStorage<PostprocessSettings>(
-      'project.postprocess',
-      {
-        input: {
-          image: imageMrn,
-        },
-        featureData: {},
-      },
-    );
+    const [settings, setSettings] = useStorage<
+      Omit<PostprocessSettings, 'input'>
+    >('project.postprocess', {
+      featureData: {},
+    });
 
     return (
       <Modal title="Postprocess image" size="small">
@@ -45,7 +41,12 @@ export const ProjectPostprocess: React.FC<Props> = observer(
           <Button
             variant="primary"
             onClick={() => {
-              project.postprocess(settings);
+              project.postprocess({
+                ...settings,
+                input: {
+                  image: imageMrn,
+                },
+              });
               close();
             }}
           >

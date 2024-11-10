@@ -36,6 +36,8 @@ Metastable bundles code from:
 - [kohya-ss/sd-scripts](https://github.com/kohya-ss/sd-scripts)
 - [ToTheBeginning/PuLID](https://github.com/ToTheBeginning/PuLID)
 - [cubiq/PuLID_ComfyUI](https://github.com/cubiq/PuLID_ComfyUI)
+- [facebookresearch/sam2](https://github.com/facebookresearch/sam2)
+- [kijai/ComfyUI-segment-anything-2](https://github.com/kijai/ComfyUI-segment-anything-2)
 
 ## Automatic installation
 

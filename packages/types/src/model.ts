@@ -11,6 +11,7 @@ export enum ModelType {
   HYPERNETWORK = 'hypernetwork',
   IPADAPTER = 'ipadapter',
   LORA = 'lora',
+  SEGMENT_ANYTHING = 'segment_anything',
   STYLE_MODEL = 'style_model',
   TAGGER = 'tagger',
   UNET = 'unet',

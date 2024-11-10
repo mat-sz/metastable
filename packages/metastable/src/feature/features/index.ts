@@ -4,6 +4,7 @@ import { FeatureUpscale } from './upscale.js';
 import { FeatureInstance } from '../base.js';
 import { FeatureControlnet } from './controlnet.js';
 import { FeatureIpAdapter } from './ipadapter.js';
+import { FeatureSegment } from './segment.js';
 import { FeatureTaesd } from './taesd.js';
 
 export function getFeatureInstances(): Record<string, FeatureInstance> {
@@ -14,5 +15,6 @@ export function getFeatureInstances(): Record<string, FeatureInstance> {
     upscale: new FeatureUpscale(),
     pulid: new FeaturePulid(),
     taesd: new FeatureTaesd(),
+    segment: new FeatureSegment(),
   };
 }

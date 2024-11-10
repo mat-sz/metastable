@@ -128,6 +128,16 @@ export const SettingsAbout: React.FC = observer(() => {
                 ComfyUI PuLID node
               </Link>
             </li>
+            <li>
+              <Link href="https://github.com/facebookresearch/sam2">
+                Segment Anything 2
+              </Link>
+            </li>
+            <li>
+              <Link href="https://github.com/kijai/ComfyUI-segment-anything-2">
+                ComfyUI Segment Anything 2 node
+              </Link>
+            </li>
           </ul>
         </div>
       </VarCategory>
