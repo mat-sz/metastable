@@ -1,0 +1,9 @@
+{
+  "categories": {
+    "Checkpoint": "Checkpoint",
+    "TextualInversion": "Embedding",
+    "Hypernetwork": "Hypernetwork",
+    "LORA": "LoRA",
+    "Controlnet": "Controlnet"
+  }
+}

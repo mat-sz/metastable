@@ -2,25 +2,6 @@ import { ModelType } from '@metastable/types';
 
 import { DownloadableModelGroup } from '$types/model';
 
-export const TYPE_NAMES: Record<ModelType, string> = {
-  [ModelType.CHECKPOINT]: 'Checkpoint',
-  [ModelType.CLIP]: 'CLIP',
-  [ModelType.CLIP_VISION]: 'CLIP Vision',
-  [ModelType.CONTROLNET]: 'ControlNet',
-  [ModelType.DIFFUSER]: 'Diffuser',
-  [ModelType.EMBEDDING]: 'Embedding',
-  [ModelType.GLIGEN]: 'GLIGEN',
-  [ModelType.HYPERNETWORK]: 'HyperNetwork',
-  [ModelType.IPADAPTER]: 'IPAdapter',
-  [ModelType.LORA]: 'LoRA',
-  [ModelType.SEGMENT_ANYTHING]: 'Segment Anything',
-  [ModelType.STYLE_MODEL]: 'Style model',
-  [ModelType.TAGGER]: 'Tagger',
-  [ModelType.UNET]: 'UNET',
-  [ModelType.UPSCALE_MODEL]: 'Upscale model',
-  [ModelType.VAE]: 'VAE',
-};
-
 export const downloadable: DownloadableModelGroup[] = [
   {
     name: 'Stable Diffusion',

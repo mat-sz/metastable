@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom/client';
 import { TRPC, TRPCClient } from '$api';
 import { App } from './App.tsx';
 import './onError.ts';
+import './i18n.ts';
 
 const queryClient = new QueryClient();
 
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <DndProvider backend={HTML5Backend}>
       <TRPC.Provider client={TRPCClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <Suspense fallback="Loading...">
+            <App />
+          </Suspense>
         </QueryClientProvider>
       </TRPC.Provider>
     </DndProvider>

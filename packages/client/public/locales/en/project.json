@@ -1,0 +1,13 @@
+{
+  "imageMode": {
+    "stretch": "Stretch",
+    "center": "Center",
+    "cover": "Cover",
+    "contain": "Contain"
+  },
+  "fileType": {
+    "input": "Inputs",
+    "output": "Outputs",
+    "mask": "Masks"
+  }
+}

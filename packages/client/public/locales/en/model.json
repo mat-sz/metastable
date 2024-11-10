@@ -1,0 +1,20 @@
+{
+  "type": {
+    "checkpoint": "Checkpoint",
+    "clip": "CLIP",
+    "clip_vision": "CLIP Vision",
+    "controlnet": "ControlNet",
+    "diffuser": "Diffuser",
+    "embedding": "Embedding",
+    "gligen": "GLIGEN",
+    "hypernetwork": "HyperNetwork",
+    "ipadapter": "IPAdapter",
+    "lora": "LoRA",
+    "segment_anything": "Segment Anything",
+    "style_model": "Style model",
+    "tagger": "Tagger",
+    "unet": "UNET",
+    "upscale_model": "Upscale model",
+    "vae": "VAE"
+  }
+}

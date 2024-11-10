@@ -1,4 +1,4 @@
-import { ProjectFileType, ProjectOrientation } from '@metastable/types';
+import { ProjectOrientation } from '@metastable/types';
 import { glueIsSourceLoaded } from 'fxglue';
 
 export const ACCEPT_IMAGES = 'image/png,image/jpeg';
@@ -45,19 +45,6 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
     }
   });
 }
-
-export const imageModeOptions = [
-  { key: 'stretch', label: 'Stretch' },
-  { key: 'center', label: 'Center' },
-  { key: 'cover', label: 'Cover' },
-  { key: 'contain', label: 'Contain' },
-];
-
-export const TYPE_MAP: Record<ProjectFileType, string> = {
-  [ProjectFileType.INPUT]: 'Inputs',
-  [ProjectFileType.OUTPUT]: 'Outputs',
-  [ProjectFileType.MASK]: 'Masks',
-};
 
 export function detectOrientation(
   width: number,

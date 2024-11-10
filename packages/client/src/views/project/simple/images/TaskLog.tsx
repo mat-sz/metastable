@@ -1,5 +1,6 @@
 import { ProjectTaskData, Task, TaskState } from '@metastable/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '$components/button';
 import { LogSimple } from '$components/log';
@@ -13,12 +14,14 @@ interface TaskLogProps {
 
 export const TaskLog: React.FC<TaskLogProps> = ({ task }) => {
   const project = useSimpleProject();
+  const { t } = useTranslation('task');
+  const taskType = t(`task:type.${task.type}`);
 
   return (
     <div className={styles.log}>
       {task.state === TaskState.FAILED && (
         <>
-          <div>Image generation failed.</div>
+          <div>{taskType} failed.</div>
           {task.log && <LogSimple log={task.log} />}
           <div>
             <Button
@@ -32,7 +35,7 @@ export const TaskLog: React.FC<TaskLogProps> = ({ task }) => {
           </div>
         </>
       )}
-      {task.state === TaskState.QUEUED && <div>Image generation queued.</div>}
+      {task.state === TaskState.QUEUED && <div>{taskType} queued.</div>}
     </div>
   );
 };

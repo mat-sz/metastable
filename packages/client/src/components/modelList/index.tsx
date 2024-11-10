@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 
-import { downloadable, TYPE_NAMES } from '$data/models';
+import { downloadable } from '$data/models';
 import { DownloadableModel } from '$types/model';
 import styles from './index.module.scss';
 import { IconButton } from '../iconButton';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
+  const { t } = useTranslation('model');
   const [openGroup, setOpenGroup] = useState(0);
 
   return (
@@ -22,7 +24,7 @@ export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
             <div className={styles.info}>
               {group.recommended && <BsStarFill />}
               <div className={styles.title}>{group.name}</div>
-              <div className={styles.type}>{TYPE_NAMES[group.type]}</div>
+              <div className={styles.type}>{t(`model:type.${group.type}`)}</div>
             </div>
             {group.description && (
               <div className={styles.description}>{group.description}</div>
@@ -38,7 +40,7 @@ export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
                       {model.recommended && <BsStarFill />}
                       <span>{model.name}</span>
                       <div className={styles.type}>
-                        {TYPE_NAMES[model.type]}
+                        {t(`model:type.${group.type}`)}
                       </div>
                       {!!model.homepage && (
                         <IconButton href={model.homepage}>

@@ -1,0 +1,20 @@
+{
+  "task": {
+    "prompt": "Image generation",
+    "postprocess": "Image postprocessing",
+    "tag": "Tagging"
+  },
+  "step": {
+    "checkpoint": "Loading checkpoint...",
+    "lora": "Loading LoRAs...",
+    "conditioning": "Conditioning...",
+    "controlnet": "Loading ControlNets...",
+    "ipadapter": "Loading IPAdapter...",
+    "input": "Preparing input...",
+    "sample": "Sampling...",
+    "upscale": "Upscaling...",
+    "save": "Saving...",
+    "pulid": "Loading PuLID...",
+    "default": "Loading..."
+  }
+}

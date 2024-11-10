@@ -1,21 +1,9 @@
 import { ProjectTaskData, Task } from '@metastable/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ProgressCircle } from '$components/progressCircle';
 import styles from './TaskProgress.module.scss';
-
-const STEP_MAP: Record<string, string> = {
-  checkpoint: 'Loading checkpoint...',
-  lora: 'Loading LoRAs...',
-  conditioning: 'Conditioning...',
-  controlnet: 'Loading ControlNets...',
-  ipadapter: 'Loading IPAdapter...',
-  input: 'Preparing input...',
-  sample: 'Sampling...',
-  upscale: 'Upscaling...',
-  save: 'Saving...',
-  pulid: 'Loading PuLID...',
-};
 
 interface TaskProgressProps {
   task: Task<ProjectTaskData>;
@@ -26,9 +14,10 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({
   task,
   aspectRatio = 1,
 }) => {
-  const { step = '', stepValue, stepMax, preview } = task.data;
+  const { t } = useTranslation('task');
+  const { step = 'default', stepValue, stepMax, preview } = task.data;
 
-  const stepName = STEP_MAP[step] ? STEP_MAP[step] : 'Loading...';
+  const stepName = t(`task:step.${step}`);
   const stepProgress =
     typeof stepMax === 'number' ? ` (${stepValue || 0}/${stepMax})` : '';
   const stepInfo = `${stepName}${stepProgress}`;
