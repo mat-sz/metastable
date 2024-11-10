@@ -82,12 +82,19 @@ class VAENamespace:
         else:
             decoded = vae.decode(samples)
         
+        if len(decoded.shape) == 5: #Combine batches
+            decoded = decoded.reshape(-1, decoded.shape[-3], decoded.shape[-2], decoded.shape[-1])
+        
         # So we can iterate over this.
         return [value for value in decoded]
 
     @RPC.autoref
     @RPC.method("encode")
     def encode(vae, image, mask=None):
+        # TODO: Refactor when types are added.
+        image = image.unsqueeze(0)
+        mask = image.unsqueeze(0)
+
         if mask is not None:
             return vae_encode_inpaint(vae, image, mask)
 

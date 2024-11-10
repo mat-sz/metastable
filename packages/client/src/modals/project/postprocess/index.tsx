@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { FieldRenderer } from '$components/fieldRenderer';
-import { Modal, ModalActions } from '$components/modal';
+import { Modal, ModalActions, useModal } from '$components/modal';
 import { VarScope, VarUI } from '$components/var';
 import { useStorage } from '$hooks/useStorage';
 import { mainStore } from '$stores/MainStore';
@@ -17,6 +17,7 @@ interface Props {
 
 export const ProjectPostprocess: React.FC<Props> = observer(
   ({ imageMrn, project }) => {
+    const { close } = useModal();
     const sections = Object.entries(mainStore.postprocessFields);
     const [settings, setSettings] = useStorage<PostprocessSettings>(
       'project.postprocess',

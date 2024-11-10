@@ -11,13 +11,16 @@ class ControlnetNamespace:
     @RPC.autoref
     @RPC.method("apply")
     def apply(controlnet, positive, negative, image, strength):
+        # TODO: Refactor when types are added.
+        image = image.unsqueeze(0)
+        
         start_percent = 0.0
         end_percent = 1.0
 
         if strength == 0:
             return (positive, negative)
 
-        control_hint = image.movedim(-1,1)
+        control_hint = image.movedim(-1,-3)
         cnets = {}
 
         def apply_to_conditioning(conditioning):

@@ -147,6 +147,7 @@ export class Comfy extends (EventEmitter as {
         });
         break;
       case 'rpc.log':
+        this.log(e.data.type, e.data.text);
         this.sessions[e.data.sessionId]?.emit('log', {
           type: e.data.type,
           text: e.data.text,

@@ -14,7 +14,7 @@ class ImageNamespace:
         i = ImageOps.exif_transpose(i)
         image = i.convert("RGB")
         image = np.array(image).astype(np.float32) / 255.0
-        image = torch.from_numpy(image)[None,]
+        image = torch.from_numpy(image)
 
         if 'A' in i.getbands():
             mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
@@ -24,7 +24,7 @@ class ImageNamespace:
         
         return {
             "image": image,
-            "mask": mask.unsqueeze(0)
+            "mask": mask
         }
 
     @RPC.autoref
