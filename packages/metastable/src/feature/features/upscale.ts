@@ -66,6 +66,7 @@ export class FeatureUpscale extends FeaturePython {
         return;
       }
 
+      task.step('upscale');
       const upscaleModel = await this.load(session, upscaleSettings.model);
       task.images = await upscaleModel.applyTo(images);
     });

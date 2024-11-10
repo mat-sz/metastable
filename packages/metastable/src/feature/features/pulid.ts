@@ -107,6 +107,7 @@ export class FeaturePulid extends FeaturePython {
         return;
       }
 
+      task.step('pulid');
       const pulid = await this.load(session, pulidSettings.model);
       const insightface = await this.loadInsightface(
         session,

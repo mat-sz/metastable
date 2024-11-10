@@ -95,6 +95,7 @@ export class FeatureControlnet extends FeaturePython {
         return;
       }
 
+      task.step('controlnet');
       for (const controlnetSettings of controlnets) {
         if (controlnetSettings.enabled) {
           const { image } = await task.loadInput(

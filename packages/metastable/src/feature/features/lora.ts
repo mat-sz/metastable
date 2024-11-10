@@ -82,13 +82,11 @@ export class FeatureLora extends FeaturePython {
         return;
       }
 
-      if (loras?.length) {
-        task.step('lora');
-        for (const loraSettings of loras) {
-          if (loraSettings.enabled) {
-            const lora = await this.load(session, loraSettings.model);
-            await lora.applyTo(checkpoint, loraSettings.strength);
-          }
+      task.step('lora');
+      for (const loraSettings of loras) {
+        if (loraSettings.enabled) {
+          const lora = await this.load(session, loraSettings.model);
+          await lora.applyTo(checkpoint, loraSettings.strength);
         }
       }
     });

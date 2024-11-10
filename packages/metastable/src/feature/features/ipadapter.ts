@@ -7,6 +7,7 @@ import {
   ComfyCLIPVision,
 } from '../../comfy/session/models.js';
 import { RPCRef } from '../../comfy/session/types.js';
+import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
@@ -86,30 +87,37 @@ export class FeatureIpAdapter extends FeaturePython {
     return new ComfyIPAdapter(session, data);
   }
 
-  async onAfterConditioning(task: PromptTask) {
-    const { settings, checkpoint, session } = task;
-    const ipadapters = settings.featureData?.ipadapter as FeatureFieldType;
-    if (!ipadapters?.length || !session || !checkpoint) {
+  async onTask(task: BaseComfyTask) {
+    if (!(task instanceof PromptTask)) {
       return;
     }
 
-    for (const ipadapterSettings of ipadapters) {
-      if (ipadapterSettings.enabled) {
-        const { image } = await task.loadInput(
-          ipadapterSettings.image!,
-          (ipadapterSettings as any).imageMode,
-        );
-        const ipadapter = await this.load(session, ipadapterSettings.model);
-        const clipVision = await session.clipVision.load(
-          await Metastable.instance.resolve(ipadapterSettings.clipVision!),
-        );
-        await ipadapter.applyTo(
-          checkpoint,
-          clipVision,
-          image,
-          ipadapterSettings.strength,
-        );
+    task.after('conditioning', async () => {
+      const { settings, checkpoint, session } = task;
+      const ipadapters = settings.featureData?.ipadapter as FeatureFieldType;
+      if (!ipadapters?.length || !session || !checkpoint) {
+        return;
       }
-    }
+
+      task.step('ipadapter');
+      for (const ipadapterSettings of ipadapters) {
+        if (ipadapterSettings.enabled) {
+          const { image } = await task.loadInput(
+            ipadapterSettings.image!,
+            (ipadapterSettings as any).imageMode,
+          );
+          const ipadapter = await this.load(session, ipadapterSettings.model);
+          const clipVision = await session.clipVision.load(
+            await Metastable.instance.resolve(ipadapterSettings.clipVision!),
+          );
+          await ipadapter.applyTo(
+            checkpoint,
+            clipVision,
+            image,
+            ipadapterSettings.strength,
+          );
+        }
+      }
+    });
   }
 }

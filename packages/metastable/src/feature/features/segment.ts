@@ -64,6 +64,7 @@ export class FeatureSegment extends FeaturePython {
         return;
       }
 
+      task.step('segment');
       const model = await this.load(session, segmentSettings.model);
       task.images![0] = await model.applyTo(images[0]);
     });
