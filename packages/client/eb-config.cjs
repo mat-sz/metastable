@@ -42,7 +42,9 @@ const config = {
       target: 'nsis',
       arch: ['x64'],
     },
-    sign: './build/win-sign.cjs',
+    signtoolOptions: {
+      sign: './build/win-sign.cjs',
+    },
     artifactName: '${productName}-win32-${arch}-${version}.${ext}',
     asarUnpack: [
       '**/node_modules/sharp/**/*',

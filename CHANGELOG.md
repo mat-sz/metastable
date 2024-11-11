@@ -1,3 +1,9 @@
+# 0.0.13 (2024-11-11)
+
+## Bug fixes
+
+- Fixed the app crashing on start.
+
 # 0.0.12 (2024-11-11)
 
 ## Features
