@@ -202,7 +202,7 @@ class Backend {
       if (res && ((res.status >= 500 && res.status < 600) || !res.status))
         return callback(
           'failed loading ' + url + '; status code: ' + res.status,
-          true /* retry */,
+          false /* retry */,
         );
       if (res && res.status >= 400 && res.status < 500)
         return callback(
@@ -221,7 +221,7 @@ class Backend {
         if (isNetworkError) {
           return callback(
             'failed loading ' + url + ': ' + err.message,
-            true /* retry */,
+            false /* retry */,
           );
         }
       }
