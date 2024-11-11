@@ -100,8 +100,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       e.preventDefault();
       e.stopPropagation();
 
-      const isTrackpad =
-        (e as any).wheelDeltaY === e.deltaY * -3 || e.deltaMode === 0;
+      const isTrackpad = (e as any).wheelDeltaY === e.deltaY * -3;
 
       if (isTrackpad && !e.ctrlKey) {
         const { offset } = imageStateRef.current;
