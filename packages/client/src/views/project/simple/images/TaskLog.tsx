@@ -1,6 +1,6 @@
 import { ProjectTaskData, Task, TaskState } from '@metastable/types';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18not';
 
 import { Button } from '$components/button';
 import { LogSimple } from '$components/log';

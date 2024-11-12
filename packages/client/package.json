@@ -26,7 +26,9 @@
     "electron-context-menu": "^4.0.4",
     "electron-settings": "^4.0.4",
     "electron-updater": "6.1.8",
+    "i18not": "^0.1.2",
     "nanoid": "^5.0.4",
+    "react-i18not": "^0.1.1",
     "trpc-electron": "^0.1.1"
   },
   "devDependencies": {
@@ -49,8 +51,6 @@
     "exifreader": "^4.22.1",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
-    "i18next": "^23.16.5",
-    "i18next-browser-languagedetector": "^8.0.0",
     "js-base64": "^3.7.7",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.4",
@@ -59,7 +59,6 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
-    "react-i18next": "^15.1.1",
     "react-icons": "^4.11.0",
     "react-tiny-popover": "^8.0.4",
     "react-use-pointer-drag": "^0.1.2",

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18not';
 import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 
 import { downloadable } from '$data/models';

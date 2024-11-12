@@ -1,6 +1,6 @@
 import { ProjectFileType } from '@metastable/types';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18not';
 
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import { Files } from './Files';

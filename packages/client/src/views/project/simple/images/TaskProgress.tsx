@@ -1,6 +1,6 @@
 import { ProjectTaskData, Task } from '@metastable/types';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18not';
 
 import { ProgressCircle } from '$components/progressCircle';
 import styles from './TaskProgress.module.scss';
