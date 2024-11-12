@@ -6,18 +6,22 @@ import { ProgressBar } from '$components/progressBar';
 import { filesize } from '$utils/file';
 import styles from './Utilization.module.scss';
 
+const EMPTY_UTILIZATION: UtilizationData = {
+  cpuUsage: 0,
+  hddTotal: 1,
+  hddUsed: 0,
+  ramTotal: 1,
+  ramUsed: 0,
+};
+
 export const Utilization: React.FC = () => {
   const [utilization, setUtilization] = useState<UtilizationData>({
-    cpuUsage: 0,
-    hddTotal: 1,
-    hddUsed: 0,
-    ramTotal: 1,
-    ramUsed: 0,
+    ...EMPTY_UTILIZATION,
   });
 
   TRPC.instance.onUtilization.useSubscription(undefined, {
     onData: utilization => {
-      setUtilization(utilization);
+      setUtilization({ ...EMPTY_UTILIZATION, ...utilization });
     },
   });
 
