@@ -93,9 +93,9 @@ class VAENamespace:
     def encode(vae, image, mask=None):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
-        mask = mask.unsqueeze(0)
 
         if mask is not None:
+            mask = mask.unsqueeze(0)
             return vae_encode_inpaint(vae, image, mask)
 
         return vae_encode(vae, image)

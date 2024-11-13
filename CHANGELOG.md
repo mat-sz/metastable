@@ -1,3 +1,9 @@
+# 0.0.14 (Upcoming)
+
+## Bug fixes
+
+- Fixed img2img errors.
+
 # 0.0.13 (2024-11-11)
 
 ## Bug fixes
