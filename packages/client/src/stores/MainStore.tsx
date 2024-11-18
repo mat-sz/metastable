@@ -35,8 +35,6 @@ class MainStore {
   };
   backendLog: LogItem[] = [];
 
-  trainingQueue: { id: string }[] = [];
-
   backendStatus: BackendStatus = 'starting';
   infoReady = false;
 

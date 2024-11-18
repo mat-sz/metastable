@@ -1,10 +1,6 @@
 import React from 'react';
 
-import type {
-  BaseProject,
-  SimpleProject,
-  TrainingProject,
-} from '$stores/project';
+import type { BaseProject, SimpleProject } from '$stores/project';
 
 export const ProjectContext = React.createContext<BaseProject>(
   undefined as any,
@@ -15,4 +11,3 @@ export function useProject<T extends BaseProject>(): T {
 }
 
 export const useSimpleProject = useProject<SimpleProject>;
-export const useTraningProject = useProject<TrainingProject>;

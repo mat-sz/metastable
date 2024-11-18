@@ -9,8 +9,6 @@ import {
   DownloadSettings,
   LogItem,
   ModelType,
-  Project,
-  ProjectTrainingSettings,
   Utilization,
 } from '@metastable/types';
 
@@ -25,7 +23,6 @@ import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
 import { resolveConfigPath, rmdir } from './helpers/fs.js';
 import { parseArgString } from './helpers/shell.js';
-import { Kohya } from './kohya/index.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import * as cpu from './sysinfo/cpu.js';
@@ -53,7 +50,6 @@ export class Metastable extends (EventEmitter as {
   setup = new Setup();
   tasks = new Tasks();
   feature = new FeatureManager();
-  kohya?: Kohya;
   project;
   model;
   vram = 0;
@@ -160,7 +156,6 @@ export class Metastable extends (EventEmitter as {
   async reload() {
     await this.reloadPython();
     await this.restartComfy();
-    this.restartKohya();
   }
 
   async reloadPython() {
@@ -206,18 +201,6 @@ export class Metastable extends (EventEmitter as {
 
   infoUpdated() {
     this.emit('infoUpdate');
-  }
-
-  restartKohya() {
-    if (!this.python) {
-      return;
-    }
-
-    this.kohya?.removeAllListeners();
-    this.kohya?.stopAll();
-
-    this.kohya = new Kohya(this.python!);
-    // this.kohya.on('event', this.onEvent);
   }
 
   async stopComfy() {
@@ -320,15 +303,6 @@ export class Metastable extends (EventEmitter as {
       this.logBuffer.push(e);
       this.emit('backendLog', [e]);
     });
-  }
-
-  async train(projectId: Project['id'], settings: ProjectTrainingSettings) {
-    const project = await this.project.get(projectId);
-    return await this.kohya?.train(project, settings);
-  }
-
-  stopTraining(projectId: Project['id']) {
-    return this.kohya?.stop(projectId);
   }
 
   async downloadModel(data: DownloadSettings) {

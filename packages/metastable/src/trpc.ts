@@ -557,20 +557,6 @@ export const router = t.router({
           });
         }),
     },
-    training: {
-      start: t.procedure
-        .input(z.object({ projectId: z.string(), settings: z.any() }))
-        .mutation(
-          async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-            return await metastable.train(projectId, settings);
-          },
-        ),
-      stop: t.procedure
-        .input(z.object({ projectId: z.string() }))
-        .mutation(async ({ ctx: { metastable }, input: { projectId } }) => {
-          return await metastable.stopTraining(projectId);
-        }),
-    },
     tagger: {
       start: t.procedure
         .input(z.object({ projectId: z.string(), settings: z.any() }))
