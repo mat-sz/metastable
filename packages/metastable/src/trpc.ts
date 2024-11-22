@@ -115,19 +115,19 @@ export const router = t.router({
     }),
     onBackendLog: t.procedure.subscription(({ ctx: { metastable } }) => {
       return observable<LogItem[]>(emit => {
-        const onEvent = (data: LogItem[]) => {
-          emit.next(data);
+        const onEvent = (data: LogItem) => {
+          emit.next([data]);
         };
 
         const logItems = metastable.logBuffer.items;
         if (logItems?.length) {
-          onEvent(logItems);
+          emit.next(logItems);
         }
 
-        metastable.on('backendLog', onEvent);
+        metastable.logBuffer.on('append', onEvent);
 
         return () => {
-          metastable.off('backendLog', onEvent);
+          metastable.logBuffer.off('append', onEvent);
         };
       });
     }),

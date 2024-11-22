@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Fixed img2img errors.
+- Added error handling for backend initialization.
 
 # 0.0.13 (2024-11-11)
 

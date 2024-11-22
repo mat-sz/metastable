@@ -33,7 +33,6 @@ import { Tasks } from './tasks/index.js';
 
 type MetastableEvents = {
   utilization: (data: Utilization) => void;
-  backendLog: (data: LogItem[]) => void;
   backendStatus: (status: BackendStatus) => void;
   infoUpdate: () => void;
 };
@@ -157,7 +156,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
   async reloadPython() {
     const config = await this.config.all();
-    if (!this.settings.skipPythonSetup && !config.python.configured) {
+    if (!(this.settings.skipPythonSetup || config.python.configured)) {
       return;
     }
 
@@ -200,7 +199,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     this.emit('infoUpdate');
   }
 
-  async stopComfy() {
+  stopComfy() {
     this.comfy?.removeAllListeners();
     this.comfy?.stop(true);
   }
@@ -237,30 +236,13 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }
   }
 
-  async restartComfy() {
-    this.stopComfy();
-
+  private async getComfyOptions() {
     const config = await this.config.all();
-    if (
-      !this.python ||
-      (!this.settings.skipPythonSetup && !config.python.configured)
-    ) {
-      return;
-    }
 
     const args: string[] = [];
 
     if (this.settings.comfyArgs) {
       args.push(...this.settings.comfyArgs);
-    }
-
-    const { pythonHome } = this.python;
-    if (pythonHome) {
-      const torchMode = await getBundleTorchMode(pythonHome);
-
-      if (torchMode === 'directml') {
-        args.push('--directml');
-      }
     }
 
     if (os.platform() === 'darwin' && os.arch() === 'arm64') {
@@ -279,27 +261,53 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       }
     }
 
-    await this.python.refreshPackages();
-    await this.refreshFeatures();
-    for (const group of this.enabledNamespaceGroups) {
-      args.push('--namespace', group);
+    if (this.python) {
+      const { pythonHome } = this.python;
+      if (pythonHome) {
+        const torchMode = await getBundleTorchMode(pythonHome);
+
+        if (torchMode === 'directml') {
+          args.push('--directml');
+        }
+      }
+
+      await this.python.refreshPackages();
+      await this.refreshFeatures();
+      for (const group of this.enabledNamespaceGroups) {
+        args.push('--namespace', group);
+      }
     }
 
-    this.setStatus('starting');
-    this.comfy = new Comfy(
-      this.python,
-      this.settings.comfyMainPath,
-      args,
-      config.comfy?.env,
-    );
+    return { args, env: config.comfy?.env };
+  }
 
-    const comfy = this.comfy;
-    comfy.on('status', status => this.setStatus(status));
+  async restartComfy() {
+    try {
+      this.stopComfy();
 
-    comfy.on('log', e => {
-      this.logBuffer.push(e);
-      this.emit('backendLog', [e]);
-    });
+      if (!this.python) {
+        return;
+      }
+      const { args, env } = await this.getComfyOptions();
+
+      this.setStatus('starting');
+      const comfy = new Comfy(
+        this.python,
+        this.settings.comfyMainPath,
+        args,
+        env,
+      );
+      comfy.on('status', status => this.setStatus(status));
+      comfy.on('log', e => this.logBuffer.push(e));
+      this.comfy = comfy;
+    } catch (e) {
+      this.logBuffer.push({
+        text: e instanceof Error ? e.stack || e.toString() : `${e}`,
+        timestamp: Date.now(),
+        type: 'stderr',
+      });
+      this.setStatus('error');
+    }
   }
 
   async downloadModel(data: DownloadSettings) {

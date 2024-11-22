@@ -1,7 +1,14 @@
-export class CircularBuffer<T> {
+import { EventEmitter } from './events.js';
+
+type CircularBufferEvents<T> = {
+  append: (data: T) => void;
+};
+export class CircularBuffer<T> extends EventEmitter<CircularBufferEvents<T>> {
   private array: T[] = [];
 
-  constructor(private maxLength: number) {}
+  constructor(private maxLength: number) {
+    super();
+  }
 
   get length() {
     return this.array.length;
@@ -13,6 +20,7 @@ export class CircularBuffer<T> {
     }
 
     this.array.push(item);
+    this.emit('append', item);
   }
 
   get items() {
