@@ -1,9 +1,7 @@
-import EventEmitter from 'events';
-
 import { Task } from '@metastable/types';
 
 import { BaseQueue, QueueTaskEvents } from './queue.js';
-import { TypedEventEmitter } from '../types.js';
+import { EventEmitter } from '../helpers/events.js';
 
 export * from './queue.js';
 export * from './task.js';
@@ -15,9 +13,7 @@ const FORWARDED_EVENTS: (keyof QueueTaskEvents)[] = [
   'log',
 ];
 
-export class Tasks extends (EventEmitter as {
-  new (): TypedEventEmitter<QueueTaskEvents>;
-}) {
+export class Tasks extends EventEmitter<QueueTaskEvents> {
   queues: Record<string, BaseQueue> = {
     downloads: new BaseQueue('downloads'),
     settings: new BaseQueue('settings', {

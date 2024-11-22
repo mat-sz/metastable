@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import os from 'os';
 import path from 'path';
 
@@ -9,17 +8,15 @@ import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
+import { EventEmitter } from '../helpers/events.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
-import { TypedEventEmitter } from '../types.js';
 
 export type SetupEvents = {
   status: (status: SetupStatus) => void;
 };
 
-export class Setup extends (EventEmitter as {
-  new (): TypedEventEmitter<SetupEvents>;
-}) {
+export class Setup extends EventEmitter<SetupEvents> {
   settings: SetupSettings | undefined = undefined;
   skipPythonSetup: boolean = false;
   private _status: SetupStatus = 'required';

@@ -1,4 +1,3 @@
-import EventEmitter from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -13,8 +12,8 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
+import { EventEmitter } from '../helpers/events.js';
 import { directorySize, getAvailableName, rmdir } from '../helpers/fs.js';
-import { TypedEventEmitter } from '../types.js';
 
 export class ProjectImageEntity extends ImageEntity {
   type: ProjectFileType;
@@ -130,9 +129,7 @@ type ProjectRepositoryEvents = {
   change: () => void;
   projectChange: (id: string, type: ProjectFileType) => void;
 };
-export class ProjectRepository extends (EventEmitter as {
-  new (): TypedEventEmitter<ProjectRepositoryEvents>;
-}) {
+export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
   private cache: ProjectEntity[] | undefined = undefined;
   private watcher: chokidar.FSWatcher | undefined = undefined;
 

@@ -1,3 +1,5 @@
+import { EventEmitter as OriginalEventEmitter } from 'events';
+
 export type EventMap = {
   [key: string]: (...args: any[]) => void;
 };
@@ -45,3 +47,10 @@ export interface TypedEventEmitter<Events extends EventMap> {
   getMaxListeners(): number;
   setMaxListeners(maxListeners: number): this;
 }
+
+interface EventEmitterConstructor {
+  new <T extends EventMap>(): TypedEventEmitter<T>;
+}
+
+export const EventEmitter: EventEmitterConstructor =
+  OriginalEventEmitter as EventEmitterConstructor;

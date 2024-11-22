@@ -1,5 +1,3 @@
-import { EventEmitter } from 'events';
-
 import {
   Task,
   TaskCreateEvent,
@@ -11,7 +9,7 @@ import {
 } from '@metastable/types';
 
 import { BaseTask } from './task.js';
-import { TypedEventEmitter } from '../types.js';
+import { EventEmitter } from '../helpers/events.js';
 
 export type QueueTaskEvents = {
   create: (event: TaskCreateEvent) => void;
@@ -33,9 +31,7 @@ export interface BaseQueueSettings {
 }
 
 export class BaseQueue<T = any>
-  extends (EventEmitter as {
-    new (): TypedEventEmitter<BaseQueueEvents>;
-  })
+  extends EventEmitter<BaseQueueEvents>
   implements TaskQueue<T>
 {
   #tasks: BaseTask<T>[] = [];

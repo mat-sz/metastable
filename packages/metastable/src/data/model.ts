@@ -1,4 +1,3 @@
-import EventEmitter from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import path from 'path';
 
@@ -9,6 +8,7 @@ import chokidar from 'chokidar';
 
 import { Metastable } from '#metastable';
 import { FileEntity } from './common.js';
+import { EventEmitter } from '../helpers/events.js';
 import {
   CONFIG_EXTENSIONS,
   exists,
@@ -19,7 +19,6 @@ import {
   walk,
 } from '../helpers/fs.js';
 import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
-import { TypedEventEmitter } from '../types.js';
 
 const MODEL_EXTENSIONS = [
   'ckpt',
@@ -184,9 +183,7 @@ type ModelRepositoryEvents = {
   change: () => void;
 };
 
-export class ModelRepository extends (EventEmitter as {
-  new (): TypedEventEmitter<ModelRepositoryEvents>;
-}) {
+export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
   private searchPaths: {
     [key in ModelType]?: { path: string; name?: string }[];
   } = {};

@@ -1,5 +1,4 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
-import EventEmitter from 'events';
 import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
@@ -9,8 +8,8 @@ import es from 'event-stream';
 import { nanoid } from 'nanoid/non-secure';
 
 import { ComfySession } from './session/index.js';
+import { EventEmitter } from '../helpers/events.js';
 import type { PythonInstance } from '../python/index.js';
-import { TypedEventEmitter } from '../types.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -42,9 +41,7 @@ interface RPCResponse {
   id: string;
 }
 
-export class Comfy extends (EventEmitter as {
-  new (): TypedEventEmitter<BackendEvents>;
-}) {
+export class Comfy extends EventEmitter<BackendEvents> {
   process?: ChildProcessWithoutNullStreams;
 
   sessions: Record<string, ComfySession> = {};

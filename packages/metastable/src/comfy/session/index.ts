@@ -1,7 +1,6 @@
-import EventEmitter from 'events';
-
 import { Architecture } from '@metastable/types';
 
+import { EventEmitter } from '../../helpers/events.js';
 import type { Comfy } from '../index.js';
 import { ComfyCheckpoint, ComfyCLIPVision, ComfyLatent } from './models.js';
 import {
@@ -10,7 +9,6 @@ import {
   RPCBytes,
   RPCRef,
 } from './types.js';
-import { TypedEventEmitter } from '../../types.js';
 
 export type ComfySessionEvents = {
   progress: (event: ComfySessionProgressEvent) => void;
@@ -133,9 +131,7 @@ class ComfySessionTag {
   }
 }
 
-export class ComfySession extends (EventEmitter as {
-  new (): TypedEventEmitter<ComfySessionEvents>;
-}) {
+export class ComfySession extends EventEmitter<ComfySessionEvents> {
   checkpoint = new ComfySessionCheckpoint(this);
   clipVision = new ComfySessionClipVision(this);
   image = new ComfySessionImage(this);

@@ -1,4 +1,3 @@
-import EventEmitter from 'events';
 import { mkdir } from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -21,6 +20,7 @@ import { FeaturePython } from './feature/base.js';
 import { FeatureManager } from './feature/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
+import { EventEmitter } from './helpers/events.js';
 import { resolveConfigPath, rmdir } from './helpers/fs.js';
 import { parseArgString } from './helpers/shell.js';
 import { PythonInstance } from './python/index.js';
@@ -30,7 +30,6 @@ import * as disk from './sysinfo/disk.js';
 import { gpu, gpuUtilization } from './sysinfo/gpu.js';
 import * as ram from './sysinfo/ram.js';
 import { Tasks } from './tasks/index.js';
-import { TypedEventEmitter } from './types.js';
 
 type MetastableEvents = {
   utilization: (data: Utilization) => void;
@@ -39,9 +38,7 @@ type MetastableEvents = {
   infoUpdate: () => void;
 };
 
-export class Metastable extends (EventEmitter as {
-  new (): TypedEventEmitter<MetastableEvents>;
-}) {
+export class Metastable extends EventEmitter<MetastableEvents> {
   private static _instance: Metastable;
 
   config;
