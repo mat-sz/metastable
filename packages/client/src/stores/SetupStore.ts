@@ -31,6 +31,7 @@ class SetupStore {
 
   gpuIndex: number = 0;
   downloads: DownloadSettings[] = [];
+  useZluda = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -71,13 +72,14 @@ class SetupStore {
     let torchMode: TorchMode = 'cpu';
 
     const gpu = this.details?.graphics[this.gpuIndex];
+    const platform = this.details?.os.platform.value;
     if (gpu) {
       if (gpu.vendor.toLowerCase().includes('nvidia')) {
         torchMode = 'cuda';
       } else if (gpu.vendor.toLowerCase().includes('amd')) {
-        if (this.details?.os.platform.value === 'win32') {
-          torchMode = 'directml';
-        } else if (this.details?.os.platform.value === 'linux') {
+        if (platform === 'win32') {
+          torchMode = this.useZluda ? 'zluda' : 'directml';
+        } else if (platform === 'linux') {
           torchMode = 'rocm';
         }
       }
@@ -87,6 +89,12 @@ class SetupStore {
       downloads: toJS(this.downloads),
       torchMode,
     });
+  }
+
+  get shouldDisplayZludaToggle() {
+    const gpu = this.details?.graphics[this.gpuIndex];
+    const platform = this.details?.os.platform.value.toLowerCase();
+    return platform === 'win32' && gpu?.vendor.toLowerCase().includes('amd');
   }
 
   get requirements() {

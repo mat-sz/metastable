@@ -1,5 +1,9 @@
 # 0.0.14 (Upcoming)
 
+## Features
+
+- Added experimental support for ZLUDA on Windows. Requires [HIP SDK 5.7](https://www.amd.com/en/developer/resources/rocm-hub/hip-sdk.html) to be installed, and a compatible GPU (or patches for older GPUs). Bundle reset required, "Use ZLUDA" needs to be selected in the Hardware section during setup.
+
 ## Bug fixes
 
 - Fixed img2img errors.

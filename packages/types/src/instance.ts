@@ -14,7 +14,7 @@ export type PromptStyleSource = 'system' | 'user' | 'model';
 
 export type PromptStyleWithSource = PromptStyle & { source: PromptStyleSource };
 
-export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu';
+export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu' | 'zluda';
 
 export interface InstanceInfo {
   samplers: string[];
