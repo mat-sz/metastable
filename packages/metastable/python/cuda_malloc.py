@@ -49,12 +49,16 @@ def cuda_malloc_supported():
         names = get_gpu_names()
     except:
         names = set()
-    for x in names:
-        if "NVIDIA" in x:
+    for x in names:       
+        if "AMD" in x:
+            return False
+        elif "NVIDIA" in x:
             for b in blacklist:
                 if b in x:
                     return False
-    return True
+            return True
+
+    return False
 
 
 if not args.cuda_malloc:
