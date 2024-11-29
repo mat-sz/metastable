@@ -1,6 +1,7 @@
-import { GraphicsControllerData } from '../types.js';
-import * as util from '../util.js';
-import { nvidiaDevices } from './nvidia.js';
+import os from 'os';
+
+import * as util from '../../util.js';
+import { GPUInfo, GPUInfoProvider } from '../types.js';
 
 function matchDeviceId(str: string) {
   // Match PCI device identifier (there's an order of increasing generality):
@@ -27,10 +28,7 @@ function matchDeviceId(str: string) {
   };
 }
 
-function parseLines(
-  sections: string[],
-  vections: string[],
-): GraphicsControllerData[] {
+function parseLines(sections: string[], vections: string[]): GPUInfo[] {
   const memorySizes: Record<string, number> = {};
   for (const i in vections) {
     if ({}.hasOwnProperty.call(vections, i)) {
@@ -49,7 +47,7 @@ function parseLines(
     }
   }
 
-  const controllers: GraphicsControllerData[] = [];
+  const controllers: GPUInfo[] = [];
   for (const i in sections) {
     if ({}.hasOwnProperty.call(sections, i)) {
       if (sections[i].trim() !== '') {
@@ -88,27 +86,24 @@ function parseLines(
   return controllers;
 }
 
-function nvidiaCompareSubsystemId(windowsId?: string, nvidiaId?: string) {
-  if (!windowsId || !nvidiaId) {
-    return false;
-  }
+// function nvidiaCompareSubsystemId(windowsId?: string, nvidiaId?: string) {
+//   if (!windowsId || !nvidiaId) {
+//     return false;
+//   }
 
-  const windowsSubDeviceId = windowsId.toLowerCase();
-  const nvidiaSubDeviceIdParts = nvidiaId.toLowerCase().split('x');
-  const nvidiaSubDeviceId = nvidiaSubDeviceIdParts.pop()!;
-  return (
-    windowsSubDeviceId.padStart(8, '0') === nvidiaSubDeviceId.padStart(8, '0')
-  );
-}
+//   const windowsSubDeviceId = windowsId.toLowerCase();
+//   const nvidiaSubDeviceIdParts = nvidiaId.toLowerCase().split('x');
+//   const nvidiaSubDeviceId = nvidiaSubDeviceIdParts.pop()!;
+//   return (
+//     windowsSubDeviceId.padStart(8, '0') === nvidiaSubDeviceId.padStart(8, '0')
+//   );
+// }
 
-export async function gpuWindows() {
-  const otherData: GraphicsControllerData[] = [];
-
-  try {
-    otherData.push(...(await nvidiaDevices()));
-  } catch {}
-
-  try {
+const provider: GPUInfoProvider = {
+  async isAvailable() {
+    return os.platform() === 'win32';
+  },
+  async devices() {
     const workload = [];
     workload.push(
       util.powerShell('Get-CimInstance win32_VideoController | fl *'),
@@ -123,23 +118,8 @@ export async function gpuWindows() {
 
     const csections = data[0].replace(/\r/g, '').split(/\n\s*\n/);
     const vsections = data[1].replace(/\r/g, '').split(/\n\s*\n/);
-    const controllers = parseLines(csections, vsections).map(controller => {
-      if (controller.vendor?.toLowerCase() === 'nvidia') {
-        const nvidiaController = otherData.find(device => {
-          return nvidiaCompareSubsystemId(
-            controller.subDeviceId,
-            device.subDeviceId,
-          );
-        });
+    return parseLines(csections, vsections);
+  },
+};
 
-        return { ...controller, ...nvidiaController };
-      } else {
-        return controller;
-      }
-    });
-
-    return controllers;
-  } catch {}
-
-  return [];
-}
+export default provider;

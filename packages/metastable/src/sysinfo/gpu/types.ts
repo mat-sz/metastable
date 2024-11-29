@@ -1,4 +1,4 @@
-export interface GraphicsControllerData {
+export interface GPUInfo {
   vendor?: string;
   vendorId?: string;
   model?: string;
@@ -18,9 +18,15 @@ export interface GraphicsControllerData {
   temperatureGpu?: number;
 }
 
-export interface GraphicsControllerUtilization {
+export interface GPUUtilization {
   memoryTotal?: number;
   memoryUsed?: number;
   utilizationGpu?: number;
   temperatureGpu?: number;
+}
+
+export interface GPUInfoProvider {
+  isAvailable(): Promise<boolean>;
+  devices(): Promise<GPUInfo[]>;
+  utilization?(): Promise<GPUUtilization[]>;
 }

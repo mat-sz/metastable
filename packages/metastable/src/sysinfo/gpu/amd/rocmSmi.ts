@@ -3,38 +3,21 @@ import os from 'os';
 
 import which from 'which';
 
-import { parseNumber } from '../../helpers/common.js';
-import { stdout } from '../../helpers/spawn.js';
-import {
-  GraphicsControllerData,
-  GraphicsControllerUtilization,
-} from '../types.js';
-import { normalizeBusAddress } from './helpers.js';
+import { memoized, parseNumber } from '#helpers/common.js';
+import { stdout } from '#helpers/spawn.js';
+import { normalizeBusAddress } from '../helpers.js';
+import { GPUInfoProvider } from '../types.js';
 
-let _rocmSmiPath: string | undefined = undefined;
-let _rocmSmiRetry = true;
-
-async function getRocmSmi() {
-  if (_rocmSmiPath) {
-    return _rocmSmiPath;
-  }
-
-  if (!_rocmSmiRetry) {
-    return false;
-  }
-
+async function _locateSmi() {
   switch (os.platform()) {
     case 'linux':
-      try {
-        _rocmSmiPath = await which('rocm-smi');
-      } catch {
-        _rocmSmiRetry = false;
-      }
-      break;
+      return await which('rocm-smi');
   }
 
-  return _rocmSmiPath;
+  return undefined;
 }
+
+const getRocmSmi = memoized(_locateSmi);
 
 interface RocmSmiShow {
   meminfoVram?: boolean;
@@ -96,7 +79,7 @@ type RocmSmiRow<TShow extends RocmSmiShow> = (TShow['meminfoVram'] extends true
       }
     : {});
 
-export async function rocmSmi<TShow extends RocmSmiShow>(
+async function rocmSmi<TShow extends RocmSmiShow>(
   show: TShow,
 ): Promise<RocmSmiRow<TShow>[]> {
   const rocmSmiPath = await getRocmSmi();
@@ -122,49 +105,53 @@ export async function rocmSmi<TShow extends RocmSmiShow>(
   return Object.values(JSON.parse(output)) as any[];
 }
 
-export async function rocmDevices(): Promise<GraphicsControllerData[]> {
-  const gpus = await rocmSmi({
-    meminfoVram: true,
-    bus: true,
-    id: true,
-    productName: true,
-    use: true,
-    temp: true,
-  });
+const provider: GPUInfoProvider = {
+  async isAvailable() {
+    return !!(await getRocmSmi());
+  },
+  async devices() {
+    const gpus = await rocmSmi({
+      meminfoVram: true,
+      bus: true,
+      id: true,
+      productName: true,
+      use: true,
+      temp: true,
+    });
 
-  return gpus.map(gpu => {
-    const vram = parseNumber(gpu['VRAM Total Memory (B)']);
-    const vramUsed = parseNumber(gpu['VRAM Total Used Memory (B)']);
-    return {
-      subDeviceId: gpu['Device ID'],
-      name: gpu['Card model'],
-      model: gpu['Card model'],
-      vendor: gpu['Card vendor'],
-      busAddress: normalizeBusAddress(gpu['PCI Bus']),
-      memoryTotal: vram,
-      memoryUsed: vramUsed,
+    return gpus.map(gpu => {
+      const vram = parseNumber(gpu['VRAM Total Memory (B)']);
+      const vramUsed = parseNumber(gpu['VRAM Total Used Memory (B)']);
+      return {
+        subDeviceId: gpu['Device ID'],
+        name: gpu['Card model'],
+        model: gpu['Card model'],
+        vendor: gpu['Card vendor'],
+        busAddress: normalizeBusAddress(gpu['PCI Bus']),
+        memoryTotal: vram,
+        memoryUsed: vramUsed,
+        utilizationGpu: parseNumber(gpu['GPU use (%)']),
+        temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
+        vram: vram || 0,
+        vramDynamic: false,
+        bus: 'PCI',
+      };
+    });
+  },
+  async utilization() {
+    const gpus = await rocmSmi({
+      meminfoVram: true,
+      use: true,
+      temp: true,
+    });
+
+    return gpus.map(gpu => ({
+      memoryTotal: parseNumber(gpu['VRAM Total Memory (B)']),
+      memoryUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
       utilizationGpu: parseNumber(gpu['GPU use (%)']),
       temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
-      vram: vram || 0,
-      vramDynamic: false,
-      bus: 'PCI',
-    };
-  });
-}
+    }));
+  },
+};
 
-export async function rocmUtilization(): Promise<
-  GraphicsControllerUtilization[]
-> {
-  const gpus = await rocmSmi({
-    meminfoVram: true,
-    use: true,
-    temp: true,
-  });
-
-  return gpus.map(gpu => ({
-    memoryTotal: parseNumber(gpu['VRAM Total Memory (B)']),
-    memoryUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
-    utilizationGpu: parseNumber(gpu['GPU use (%)']),
-    temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
-  }));
-}
+export default provider;

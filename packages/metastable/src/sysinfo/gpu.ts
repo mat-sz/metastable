@@ -1,71 +1,29 @@
-import os from 'os';
+import { allResolved } from '#helpers/common.js';
+import { getProviders } from './gpu/index.js';
+import { GPUInfo } from './gpu/types.js';
 
-import { rocmUtilization } from './gpu/amd.js';
-import { gpuLinux } from './gpu/linux.js';
-import { nvidiaUtilization } from './gpu/nvidia.js';
-import { gpuWindows } from './gpu/windows.js';
-import {
-  GraphicsControllerData,
-  GraphicsControllerUtilization,
-} from './types.js';
-
-export async function gpu(): Promise<GraphicsControllerData[]> {
-  let controllers: GraphicsControllerData[] = [];
-  try {
-    switch (os.platform()) {
-      case 'win32':
-        controllers = await gpuWindows();
-        break;
-      case 'linux':
-        controllers = await gpuLinux();
-        break;
-      case 'darwin':
-        controllers = [
-          {
-            vendor: 'Apple',
-            vramDynamic: false,
-            vram: os.totalmem(),
-            memoryTotal: os.totalmem(),
-          },
-        ];
-    }
-  } catch {
-    //
+export async function gpu(): Promise<GPUInfo[]> {
+  const providers = await getProviders();
+  if (!providers) {
+    return [];
   }
 
-  controllers = controllers.map(controller => {
-    const normalized = controller.vendor?.toLowerCase();
-    let vendor = 'unknown';
-
-    if (normalized) {
-      if (normalized.includes('apple')) {
-        vendor = 'Apple';
-      } else if (
-        normalized.includes('advanced') ||
-        normalized.includes('amd')
-      ) {
-        vendor = 'AMD';
-      } else if (normalized.includes('nvidia')) {
-        vendor = 'NVIDIA';
-      } else {
-        vendor = controller.vendor || 'unknown';
-      }
-    }
-
-    return { ...controller, vendor };
-  });
-
-  return controllers;
+  return (await allResolved(providers.map(provider => provider.devices())))
+    .filter(out => !!out)
+    .flat();
 }
 
 export async function gpuUtilization() {
-  const utilization: GraphicsControllerUtilization[] = [];
-  try {
-    utilization.push(...(await nvidiaUtilization()));
-  } catch {}
-  try {
-    utilization.push(...(await rocmUtilization()));
-  } catch {}
+  const providers = await getProviders();
+  if (!providers) {
+    return undefined;
+  }
+
+  const utilization = (
+    await allResolved(providers.map(provider => provider.utilization?.()))
+  )
+    .filter(out => !!out)
+    .flat();
 
   if (utilization.length) {
     return utilization[0];

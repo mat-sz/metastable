@@ -13,3 +13,32 @@ export function parseNumber(input?: number | string | null) {
 
   return input;
 }
+
+export function memoized<T>(
+  fn: () => Promise<T> | T,
+): () => Promise<T | undefined> {
+  let called = false;
+  let result: T | undefined;
+
+  return async () => {
+    if (!called) {
+      called = true;
+      try {
+        result = await fn();
+      } catch {
+        result = undefined;
+      }
+    }
+
+    return result;
+  };
+}
+
+export async function allResolved<T extends readonly unknown[] | []>(
+  values: T,
+): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> | undefined }> {
+  const results = await Promise.allSettled(values);
+  return results.map(result =>
+    result.status === 'fulfilled' ? result.value : undefined,
+  ) as any;
+}
