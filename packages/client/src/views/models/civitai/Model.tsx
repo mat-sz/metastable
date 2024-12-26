@@ -44,7 +44,7 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
                   configUrl,
                   configType,
                   metadata: {
-                    name: model.name,
+                    name: `${model.name} - ${version.name}`,
                     nsfw: model.nsfw,
                     source: 'civitai',
                     sourceId: `${model.id}`,

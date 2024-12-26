@@ -1,3 +1,9 @@
+# 0.0.15 (Upcoming)
+
+## Features
+
+- Added version to names of models downloaded from CivitAI.
+
 # 0.0.14 (2024-11-27)
 
 ## Features
