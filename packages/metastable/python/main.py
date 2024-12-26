@@ -4,6 +4,11 @@ import cli_args
 sys.modules['comfy.cli_args'] = cli_args
 args = cli_args.args
 
+use_zluda = args.zluda_path and args.rocm_path and args.rocm_version
+if use_zluda:
+    from zluda import enable_zluda
+    enable_zluda()
+
 import torch
 if not torch.cuda.is_available() and not args.directml and not torch.backends.mps.is_available():
     args.cpu = True
@@ -34,13 +39,6 @@ import comfy.utils
 import comfy.model_management
 
 torch_device_name = comfy.model_management.get_torch_device_name(comfy.model_management.get_torch_device())
-
-if "[ZLUDA]" in torch_device_name:
-    print("ZLUDA detected, updating PyTorch configuration.")
-    torch.backends.cudnn.enabled = False
-    torch.backends.cuda.enable_flash_sdp(False)
-    torch.backends.cuda.enable_math_sdp(True)
-    torch.backends.cuda.enable_mem_efficient_sdp(False)
 
 def cuda_malloc_warning():
     device = comfy.model_management.get_torch_device()
