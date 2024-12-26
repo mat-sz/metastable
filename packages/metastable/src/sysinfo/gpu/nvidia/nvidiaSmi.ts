@@ -11,8 +11,6 @@ import { normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
 async function _locateSmi() {
-  console.log('_locateSmi called');
-
   switch (os.platform()) {
     case 'win32': {
       const basePath = util.WINDIR + '\\System32\\DriverStore\\FileRepository';

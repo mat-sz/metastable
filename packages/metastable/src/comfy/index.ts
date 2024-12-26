@@ -159,7 +159,7 @@ export class Comfy extends EventEmitter<BackendEvents> {
     }
 
     const args: string[] = [...this.args];
-    const proc = this.python.spawn([this.mainPath, ...args], {
+    const proc = await this.python.spawn([this.mainPath, ...args], {
       ...this.env,
       PYTORCH_MPS_HIGH_WATERMARK_RATIO: '0.0',
     });

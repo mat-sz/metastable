@@ -4,7 +4,7 @@ import path from 'path';
 
 import which from 'which';
 
-import { stdout } from '../helpers/spawn.js';
+import { stdout } from '#helpers/spawn.js';
 
 const PYTHON_COMMANDS = [
   'python3.11',
@@ -45,6 +45,12 @@ for package_name, version in installed_packages:
 print(json.dumps(output))
 `;
 
+interface SpawnConfig {
+  path: string;
+  args: string[];
+  env: NodeJS.ProcessEnv;
+}
+
 export class PythonInstance {
   public packages: Record<string, string | undefined> = {};
 
@@ -55,7 +61,7 @@ export class PythonInstance {
   ) {}
 
   private get env() {
-    const env: Record<string, string> = {};
+    const env: NodeJS.ProcessEnv = {};
 
     if (this.packagesDir) {
       env.PYTHONPATH = this.packagesDir;
@@ -69,15 +75,29 @@ export class PythonInstance {
     return env;
   }
 
-  spawn(args: string[], env?: Record<string, string>) {
-    const proc = spawn(this.path, ['-u', ...args], {
+  private async getSpawnConfig(
+    args: string[],
+    env?: NodeJS.ProcessEnv,
+  ): Promise<SpawnConfig> {
+    const mergedEnv: SpawnConfig['env'] = {
+      ...process.env,
+      ...this.env,
+      ...env,
+    };
+
+    return {
+      path: this.path,
+      args: ['-u', ...args],
+      env: mergedEnv,
+    };
+  }
+
+  async spawn(args: string[], env?: NodeJS.ProcessEnv) {
+    const spawnConfig = await this.getSpawnConfig(args, env);
+    const proc = spawn(spawnConfig.path, spawnConfig.args, {
       cwd: process.cwd(),
       detached: true,
-      env: {
-        ...process.env,
-        ...this.env,
-        ...env,
-      },
+      env: spawnConfig.env,
       stdio: ['pipe', 'pipe', 'pipe', 'pipe'],
     });
 
@@ -89,8 +109,9 @@ export class PythonInstance {
   }
 
   private async stdout(args: string[], onLog?: (data: string) => void) {
-    return await stdout(this.path, ['-u', ...args], {
-      env: { ...process.env, ...this.env },
+    const spawnConfig = await this.getSpawnConfig(args);
+    return await stdout(spawnConfig.path, spawnConfig.args, {
+      env: spawnConfig.env,
       onLog,
       timeout: undefined,
     });

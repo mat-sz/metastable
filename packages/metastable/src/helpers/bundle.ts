@@ -13,7 +13,9 @@ export async function getBundleTorchMode(
       {
         const packagesDir = path.join(pythonPath, 'Lib', 'site-packages');
 
-        if (
+        if (await exists(path.join(pythonPath, 'zluda', 'nvcuda.dll'))) {
+          return 'zluda';
+        } else if (
           await exists(path.join(packagesDir, 'torch', 'lib', 'torch_cuda.dll'))
         ) {
           return 'cuda';
