@@ -52,7 +52,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
         </IconButton>
       )}
       <IconButton
-        title="Reveal in explorer"
+        title="Postprocess image"
         onClick={() => {
           modalStore.show(
             <ProjectPostprocess project={project} imageMrn={file.mrn} />,
