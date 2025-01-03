@@ -77,6 +77,15 @@ class CheckpointNamespace:
     def load(path, embeddings_path=None, clip_layer=None, config_path=None):
         (model, clip, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
 
+        if model == None:
+            raise Exception("Checkpoint loading error: missing model")
+        
+        if clip == None:
+            raise Exception("Checkpoint loading error: missing CLIP")
+        
+        if vae == None:
+            raise Exception("Checkpoint loading error: missing VAE")
+
         if clip_layer == None or clip_layer == 0:
             clip.clip_layer(None)
         else:
