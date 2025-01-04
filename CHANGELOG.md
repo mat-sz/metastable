@@ -4,6 +4,15 @@
 
 - Added version to names of models downloaded from CivitAI.
 
+## Improvements
+
+- Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
+
+## Bug fixes
+
+- Fixed notarization issues on macOS.
+- Fixed setup error display (during extraction step).
+
 # 0.0.14 (2024-11-27)
 
 ## Features

@@ -20,7 +20,10 @@ export class Tasks extends EventEmitter<QueueTaskEvents> {
       dismissSuccessful: true,
       dismissCancelled: true,
     }),
-    setup: new BaseQueue('setup', { stopOnFailure: true }),
+    setup: new BaseQueue('setup', {
+      startAutomatically: false,
+      stopOnFailure: true,
+    }),
     project: new BaseQueue('project', {
       dismissSuccessful: true,
       dismissCancelled: true,

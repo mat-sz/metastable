@@ -3,6 +3,7 @@ import path from 'path';
 
 import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
 
+import { exists } from '#helpers/fs.js';
 import { Metastable } from '#metastable';
 import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
@@ -11,6 +12,7 @@ import { MultiDownloadTask } from '../downloader/index.js';
 import { EventEmitter } from '../helpers/events.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
+import { CleanupTask } from './tasks/cleanup.js';
 
 export type SetupEvents = {
   status: (status: SetupStatus) => void;
@@ -107,6 +109,44 @@ export class Setup extends EventEmitter<SetupEvents> {
     Metastable.instance.reload();
   }
 
+  async enqueueBundle(
+    name: string,
+    sourceRepo: string,
+    destination: string,
+    versionPrefix: string,
+    isBase = false,
+  ) {
+    const setupQueue = Metastable.instance.tasks.queues.setup;
+    const release = await getLatestReleaseInfo(sourceRepo);
+    if (isBase) {
+      this._bundleVersion = release.name;
+    }
+
+    const assets = release.assets.filter(item =>
+      item.name.startsWith(versionPrefix),
+    );
+
+    setupQueue.add(
+      new MultiDownloadTask(
+        `download.${name}`,
+        assets.map(asset => ({
+          url: asset.browser_download_url,
+          savePath: path.join(Metastable.instance.dataRoot, asset.name),
+        })),
+      ),
+    );
+
+    const parts = assets.map(asset =>
+      path.join(Metastable.instance.dataRoot, asset.name),
+    );
+    setupQueue.add(
+      new ExtractTask(`extract.${name}`, {
+        parts,
+        destination: destination,
+      }),
+    );
+  }
+
   async start(settings: SetupSettings) {
     if (this.settings) {
       return;
@@ -122,39 +162,29 @@ export class Setup extends EventEmitter<SetupEvents> {
       this.done();
     });
 
-    const baseRelease = await getLatestReleaseInfo(
-      'metastable-studio/bundle-torch',
-    );
-    this._bundleVersion = baseRelease.name;
-
-    const assets = baseRelease.assets.filter(item =>
-      item.name.startsWith(
-        `${os.platform()}-${os.arch()}-${this.settings?.torchMode || 'cpu'}`,
-      ),
-    );
-
-    setupQueue.add(
-      new MultiDownloadTask(
-        'download',
-        assets.map(asset => ({
-          url: asset.browser_download_url,
-          savePath: path.join(Metastable.instance.dataRoot, asset.name),
-        })),
-      ),
-    );
-
     const targetPath = path.join(Metastable.instance.dataRoot, 'python');
     this._packagesDir = undefined;
     this._pythonHome = targetPath;
-    const parts = assets.map(asset =>
-      path.join(Metastable.instance.dataRoot, asset.name),
+
+    if (await exists(targetPath)) {
+      setupQueue.add(new CleanupTask(targetPath));
+    }
+
+    const torchMode = this.settings?.torchMode || 'cpu';
+    await this.enqueueBundle(
+      'torch',
+      'metastable-studio/bundle-torch',
+      targetPath,
+      `${os.platform()}-${os.arch()}-${torchMode}`,
+      true,
     );
-    setupQueue.add(new ExtractTask(parts, targetPath));
 
     if (settings.downloads.length) {
       Metastable.instance.tasks.queues.setup.add(
         new DownloadModelsTask(settings.downloads),
       );
     }
+
+    setupQueue.next();
   }
 }

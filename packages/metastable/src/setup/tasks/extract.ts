@@ -5,19 +5,24 @@ import path from 'path';
 import { TaskState } from '@metastable/types';
 import tarStream from 'tar-stream';
 
-import { rmdir, tryMkdir, tryUnlink } from '../../helpers/fs.js';
+import { tryMkdir, tryUnlink } from '../../helpers/fs.js';
 import { WrappedPromise } from '../../helpers/promise.js';
 import { BaseTask } from '../../tasks/task.js';
+
+interface ExtractTaskOptions {
+  parts: string[];
+  destination: string;
+}
 
 export class ExtractTask extends BaseTask {
   #offset = 0;
   #size = 0;
 
   constructor(
-    private partPaths: string[],
-    private targetPath: string,
+    name: string,
+    private options: ExtractTaskOptions,
   ) {
-    super('extract', undefined);
+    super(name, undefined);
   }
 
   private lastProgress = Date.now();
@@ -29,40 +34,44 @@ export class ExtractTask extends BaseTask {
   }
 
   async execute() {
+    const { parts, destination } = this.options;
+    await tryMkdir(destination);
+
+    parts.sort();
+
     this.#size = 0;
-    for (const part of this.partPaths) {
+    for (const part of parts) {
       this.#size += (await stat(part)).size;
     }
 
     const { createBrotliDecompress } = await import('zlib');
 
-    this.appendLog('Removing old data...');
-    try {
-      await rmdir(path.join(this.targetPath));
-    } catch {}
-
-    await tryMkdir(this.targetPath);
-
     const wrapped = new WrappedPromise<TaskState>();
-    const parts = this.partPaths.sort();
-
     const extract = tarStream.extract();
 
     extract.on('entry', (header, stream, cb) => {
-      const filePath = path.join(this.targetPath, header.name);
+      const filePath = path.join(destination, header.name);
 
       switch (header.type) {
         case 'file':
-          writeFile(filePath, stream, { mode: header.mode }).then(() => cb());
+          writeFile(filePath, stream, { mode: header.mode })
+            .then(() => cb())
+            .catch(e => wrapped.reject(e));
           break;
         case 'directory':
-          mkdir(filePath).then(() => cb());
+          mkdir(filePath)
+            .then(() => cb())
+            .catch(e => wrapped.reject(e));
           break;
         case 'link':
-          link(header.linkname!, filePath).then(() => cb());
+          link(header.linkname!, filePath)
+            .then(() => cb())
+            .catch(e => wrapped.reject(e));
           break;
         case 'symlink':
-          symlink(header.linkname!, filePath).then(() => cb());
+          symlink(header.linkname!, filePath)
+            .then(() => cb())
+            .catch(e => wrapped.reject(e));
           break;
       }
     });
@@ -94,7 +103,7 @@ export class ExtractTask extends BaseTask {
       });
     };
 
-    this.appendLog(`Extracting to: ${this.targetPath}`);
+    this.appendLog(`Extracting to: ${destination}`);
     next();
 
     return await wrapped.promise;

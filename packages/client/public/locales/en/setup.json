@@ -1,0 +1,11 @@
+{
+  "task": {
+    "cleanup": "Cleaning up...",
+    "download": {
+      "torch": "Downloading dependencies..."
+    },
+    "extract": {
+      "torch": "Installing dependencies..."
+    }
+  }
+}

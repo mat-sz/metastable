@@ -1,6 +1,7 @@
 import { TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { useTranslation } from 'react-i18not';
 import { BsBox, BsDownload, BsHourglassSplit } from 'react-icons/bs';
 
 import { Loading } from '$components/loading';
@@ -17,14 +18,10 @@ const TASK_ICONS: Record<string, React.ReactNode> = {
   extract: <BsBox />,
 };
 
-const TASK_TITLE: Record<string, string> = {
-  download: 'Download dependencies',
-  extract: 'Install dependencies',
-};
-
 export const Step2: React.FC = observer(() => {
   const details = setupStore.details;
   const tasks = mainStore.tasks.queues.setup || [];
+  const { t } = useTranslation('setup');
 
   return (
     <div className={styles.setup}>
@@ -39,7 +36,7 @@ export const Step2: React.FC = observer(() => {
               <Item
                 key={task.id}
                 id={task.id}
-                title={TASK_TITLE[task.type] || ''}
+                title={t(`setup:task.${task.type}`)}
                 icon={TASK_ICONS[task.type] || <BsHourglassSplit />}
                 status={
                   task.state === TaskState.SUCCESS
@@ -50,7 +47,7 @@ export const Step2: React.FC = observer(() => {
                 }
                 description={
                   task.state === TaskState.RUNNING &&
-                  task.type === 'download' ? (
+                  typeof task.data?.speed !== 'undefined' ? (
                     <>
                       <span>{filesize(task.data.speed)}/s</span>
                       {!!(task.data.offset && task.data.size) && (
