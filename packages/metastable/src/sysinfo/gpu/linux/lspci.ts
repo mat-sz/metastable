@@ -1,26 +1,29 @@
 import os from 'os';
 
 import { stdout } from '#helpers/spawn.js';
-import { normalizeBusAddress } from '../helpers.js';
+import { getVendor, normalizeBusAddress } from '../helpers.js';
 import { GPUInfo, GPUInfoProvider } from '../types.js';
+
+const PROVIDER_ID = 'lspci';
 
 async function parseLines(lines: string[]): Promise<GPUInfo[]> {
   const controllers: GPUInfo[] = [];
   let currentController: GPUInfo = {
+    source: PROVIDER_ID,
     vram: 0,
-    vramDynamic: false,
   };
   let isGraphicsController = false;
 
   function maybePush() {
     if (currentController.busAddress) {
+      currentController.vendor = getVendor(currentController.vendor);
       currentController.busAddress = normalizeBusAddress(
         currentController.busAddress,
       );
       controllers.push(currentController);
       currentController = {
+        source: PROVIDER_ID,
         vram: 0,
-        vramDynamic: false,
       };
     }
   }
@@ -59,14 +62,11 @@ async function parseLines(lines: string[]): Promise<GPUInfo[]> {
     if ('' !== line.trim()) {
       if (' ' !== line[0] && '\t' !== line[0]) {
         // first line of new entry
-        const isExternal = pciIDs.indexOf(line.split(' ')[0]) >= 0;
-        let vgapos = line.toLowerCase().indexOf(' vga ');
-        const _3dcontrollerpos = line.toLowerCase().indexOf('3d controller');
-        if (vgapos !== -1 || _3dcontrollerpos !== -1) {
-          // VGA
-          if (_3dcontrollerpos !== -1 && vgapos === -1) {
-            vgapos = _3dcontrollerpos;
-          }
+        const idxVGA = line.toLowerCase().indexOf(' vga ');
+        const idx3D = line.toLowerCase().indexOf('3d controller');
+        if (idxVGA !== -1 || idx3D !== -1) {
+          const idxStart = idx3D !== -1 && idxVGA === -1 ? idx3D : idxVGA;
+          const idxEnd = line.search(/\[[0-9a-f]{4}:[0-9a-f]{4}]|$/);
           maybePush();
 
           const pciIDCandidate = line.split(' ')[0];
@@ -74,74 +74,12 @@ async function parseLines(lines: string[]): Promise<GPUInfo[]> {
             currentController.busAddress = pciIDCandidate;
           }
           isGraphicsController = true;
-          const endpos = line.search(/\[[0-9a-f]{4}:[0-9a-f]{4}]|$/);
-          const parts = line.substring(vgapos, endpos - vgapos).split(':');
-          currentController.busAddress = line.substring(0, vgapos).trim();
+          const parts = line.substring(idxStart, idxEnd - idxStart).split(':');
+          currentController.busAddress = line.substring(0, idxStart).trim();
           if (parts.length > 1) {
             parts[1] = parts[1].trim();
-            if (parts[1].toLowerCase().indexOf('corporation') >= 0) {
-              currentController.vendor = parts[1]
-                .substring(
-                  0,
-                  parts[1].toLowerCase().indexOf('corporation') + 11,
-                )
-                .trim();
-              currentController.model = parts[1]
-                .substring(
-                  parts[1].toLowerCase().indexOf('corporation') + 11,
-                  200,
-                )
-                .split('(')[0]
-                .trim();
-              currentController.bus =
-                pciIDs.length > 0 && isExternal ? 'PCIe' : 'Onboard';
-              currentController.vram = 0;
-              currentController.vramDynamic = false;
-            } else if (parts[1].toLowerCase().indexOf(' inc.') >= 0) {
-              if ((parts[1].match(/]/g) || []).length > 1) {
-                currentController.vendor = parts[1]
-                  .substring(0, parts[1].toLowerCase().indexOf(']') + 1)
-                  .trim();
-                currentController.model = parts[1]
-                  .substring(parts[1].toLowerCase().indexOf(']') + 1, 200)
-                  .trim()
-                  .split('(')[0]
-                  .trim();
-              } else {
-                currentController.vendor = parts[1]
-                  .substring(0, parts[1].toLowerCase().indexOf(' inc.') + 5)
-                  .trim();
-                currentController.model = parts[1]
-                  .substring(parts[1].toLowerCase().indexOf(' inc.') + 5, 200)
-                  .trim()
-                  .split('(')[0]
-                  .trim();
-              }
-              currentController.bus =
-                pciIDs.length > 0 && isExternal ? 'PCIe' : 'Onboard';
-              currentController.vram = 0;
-              currentController.vramDynamic = false;
-            } else if (parts[1].toLowerCase().indexOf(' ltd.') >= 0) {
-              if ((parts[1].match(/]/g) || []).length > 1) {
-                currentController.vendor = parts[1]
-                  .substring(0, parts[1].toLowerCase().indexOf(']') + 1)
-                  .trim();
-                currentController.model = parts[1]
-                  .substring(parts[1].toLowerCase().indexOf(']') + 1, 200)
-                  .trim()
-                  .split('(')[0]
-                  .trim();
-              } else {
-                currentController.vendor = parts[1]
-                  .substring(0, parts[1].toLowerCase().indexOf(' ltd.') + 5)
-                  .trim();
-                currentController.model = parts[1]
-                  .substring(parts[1].toLowerCase().indexOf(' ltd.') + 5, 200)
-                  .trim()
-                  .split('(')[0]
-                  .trim();
-              }
-            }
+            currentController.vendor = getVendor(parts[1]);
+            currentController.name = parts[1];
           }
         } else {
           isGraphicsController = false;
@@ -150,14 +88,6 @@ async function parseLines(lines: string[]): Promise<GPUInfo[]> {
       if (isGraphicsController) {
         // within VGA details
         const parts = line.split(':');
-        if (
-          parts.length > 1 &&
-          parts[0].replace(/ +/g, '').toLowerCase().indexOf('devicename') !==
-            -1 &&
-          parts[1].toLowerCase().indexOf('onboard') !== -1
-        ) {
-          currentController.bus = 'Onboard';
-        }
         if (
           parts.length > 1 &&
           parts[0].replace(/ +/g, '').toLowerCase().indexOf('region') !== -1 &&

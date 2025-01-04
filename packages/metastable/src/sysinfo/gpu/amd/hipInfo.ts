@@ -4,9 +4,10 @@ import path from 'path';
 import { memoized, parseNumber } from '#helpers/common.js';
 import { exists } from '#helpers/fs.js';
 import { stdout } from '#helpers/spawn.js';
-import { normalizeBusAddress } from '../helpers.js';
+import { getVendor, normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
+const PROVIDER_ID = 'hipInfo';
 const SUPPORTED_HIP_SDK_VERSIONS = ['5.7', '6.1'];
 const HIP_SDK_PATH = 'C:\\Program Files\\AMD\\ROCm';
 const HIP_SDK_HIPINFO = 'bin\\hipInfo.exe';
@@ -108,38 +109,34 @@ const provider: GPUInfoProvider = {
   async devices() {
     const rows = await hipInfo();
     return rows.map(row => {
-      const vram = parseMemory(row['memInfo.total'] || row['totalGlobalMem']);
+      const vram =
+        parseMemory(row['memInfo.total'] || row['totalGlobalMem']) || 0;
       const vramFree = parseMemory(row['memInfo.free']);
 
       return {
+        source: PROVIDER_ID,
         name: row['Name'],
-        vendor: 'AMD',
+        vendor: getVendor(row['Name']),
         busAddress: normalizeBusAddress(
           `${row['pciBusID']}:${row['pciDeviceID']}.${row['pciDomainID']}`,
         ),
-        memoryTotal: vram,
-        memoryUsed:
-          typeof vramFree === 'number' && typeof vram === 'number'
-            ? vram - vramFree
-            : undefined,
-        vram: vram || 0,
-        vramDynamic: false,
-        bus: 'PCI',
+        vram,
+        memoryUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
       };
     });
   },
   async utilization() {
     const rows = await hipInfo();
     return rows.map(row => {
-      const vram = parseMemory(row['memInfo.total'] || row['totalGlobalMem']);
+      const vram =
+        parseMemory(row['memInfo.total'] || row['totalGlobalMem']) || 0;
       const vramFree = parseMemory(row['memInfo.free']);
 
       return {
-        memoryTotal: vram,
-        memoryUsed:
-          typeof vramFree === 'number' && typeof vram === 'number'
-            ? vram - vramFree
-            : undefined,
+        source: PROVIDER_ID,
+        vendor: getVendor(row['Name']),
+        vram,
+        memoryUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
       };
     });
   },

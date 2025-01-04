@@ -5,8 +5,10 @@ import which from 'which';
 
 import { memoized, parseNumber } from '#helpers/common.js';
 import { stdout } from '#helpers/spawn.js';
-import { normalizeBusAddress } from '../helpers.js';
+import { getVendor, normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
+
+const PROVIDER_ID = 'rocm-smi';
 
 async function _locateSmi() {
   switch (os.platform()) {
@@ -120,21 +122,18 @@ const provider: GPUInfoProvider = {
     });
 
     return gpus.map(gpu => {
-      const vram = parseNumber(gpu['VRAM Total Memory (B)']);
+      const vram = parseNumber(gpu['VRAM Total Memory (B)']) || 0;
       const vramUsed = parseNumber(gpu['VRAM Total Used Memory (B)']);
       return {
+        source: PROVIDER_ID,
         subDeviceId: gpu['Device ID'],
         name: gpu['Card model'],
-        model: gpu['Card model'],
-        vendor: gpu['Card vendor'],
+        vendor: getVendor(gpu['Card vendor']),
         busAddress: normalizeBusAddress(gpu['PCI Bus']),
-        memoryTotal: vram,
+        vram,
         memoryUsed: vramUsed,
         utilizationGpu: parseNumber(gpu['GPU use (%)']),
         temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
-        vram: vram || 0,
-        vramDynamic: false,
-        bus: 'PCI',
       };
     });
   },
@@ -143,14 +142,20 @@ const provider: GPUInfoProvider = {
       meminfoVram: true,
       use: true,
       temp: true,
+      productName: true,
     });
 
-    return gpus.map(gpu => ({
-      memoryTotal: parseNumber(gpu['VRAM Total Memory (B)']),
-      memoryUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
-      utilizationGpu: parseNumber(gpu['GPU use (%)']),
-      temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
-    }));
+    return gpus.map(gpu => {
+      const vram = parseNumber(gpu['VRAM Total Memory (B)']) || 0;
+      return {
+        source: PROVIDER_ID,
+        vendor: getVendor(gpu['Card vendor']),
+        vram,
+        memoryUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
+        utilizationGpu: parseNumber(gpu['GPU use (%)']),
+        temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
+      };
+    });
   },
 };
 

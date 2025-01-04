@@ -1,8 +1,10 @@
 import os from 'os';
 
 import { stdout } from '#helpers/spawn.js';
-import { normalizeBusAddress } from '../helpers.js';
+import { getVendor, normalizeBusAddress } from '../helpers.js';
 import { GPUInfo, GPUInfoProvider } from '../types.js';
+
+const PROVIDER_ID = 'clinfo';
 
 function parseLines(lines: string[]) {
   const controllers: GPUInfo[] = [];
@@ -46,15 +48,15 @@ function parseLines(lines: string[]) {
       }
       if (busAddress) {
         const controller: GPUInfo = {
+          source: PROVIDER_ID,
           busAddress: normalizeBusAddress(busAddress),
           vram: 0,
-          vramDynamic: false,
         };
-        controller.vendor = device['CL_DEVICE_VENDOR'];
+        controller.vendor = getVendor(device['CL_DEVICE_VENDOR']);
         if (device['CL_DEVICE_BOARD_NAME_AMD']) {
-          controller.model = device['CL_DEVICE_BOARD_NAME_AMD'];
+          controller.name = device['CL_DEVICE_BOARD_NAME_AMD'];
         } else {
-          controller.model = device['CL_DEVICE_NAME'];
+          controller.name = device['CL_DEVICE_NAME'];
         }
         const memory = parseInt(device['CL_DEVICE_GLOBAL_MEM_SIZE']);
         if (!isNaN(memory)) {

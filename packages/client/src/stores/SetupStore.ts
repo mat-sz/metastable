@@ -44,11 +44,6 @@ class SetupStore {
     const details = await API.setup.details.query();
     runInAction(() => {
       this.details = details;
-      const gpus = [...this.details.graphics]
-        .map((value, i) => ({ i, ...value }))
-        .sort((a, b) => b.vram - a.vram);
-      const bestGpu = gpus[0];
-      this.gpuIndex = bestGpu?.i || 0;
     });
   }
 

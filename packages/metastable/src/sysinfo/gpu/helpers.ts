@@ -47,3 +47,21 @@ export function deduplicateInfo(devices: GPUInfo[]) {
 
   return newDevices;
 }
+
+export function getVendor(name = '') {
+  const normalized = name.toLowerCase();
+
+  if (normalized.includes('nvidia')) {
+    return 'NVIDIA';
+  }
+
+  if (normalized.includes('amd') || normalized.includes('advanced')) {
+    return 'AMD';
+  }
+
+  if (normalized.includes('intel')) {
+    return 'Intel';
+  }
+
+  return 'Unknown';
+}

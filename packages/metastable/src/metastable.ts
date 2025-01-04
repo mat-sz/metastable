@@ -111,7 +111,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       ramUsed: free.used,
       gpuTemperature: gpu?.temperatureGpu,
       gpuUsage: gpu?.utilizationGpu,
-      vramTotal: gpu?.memoryTotal,
+      vramTotal: gpu?.vram,
       vramUsed: gpu?.memoryUsed,
     });
     setTimeout(() => {

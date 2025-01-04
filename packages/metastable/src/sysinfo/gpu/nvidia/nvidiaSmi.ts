@@ -10,6 +10,8 @@ import * as util from '../../util.js';
 import { normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
+const PROVIDER_ID = 'nvidia-smi';
+
 async function _locateSmi() {
   switch (os.platform()) {
     case 'win32': {
@@ -120,29 +122,25 @@ const provider: GPUInfoProvider = {
   async devices() {
     const gpus = await nvidiaSmi(devicesColumns);
 
-    return gpus.map(gpu => {
-      const vram = parseMemory(gpu['memory.total']);
-      return {
-        subDeviceId: gpu['pci.sub_device_id'],
-        name: gpu['name'],
-        model: gpu['name'],
-        vendor: 'NVIDIA',
-        busAddress: normalizeBusAddress(gpu['pci.bus_id']),
-        memoryTotal: vram,
-        memoryUsed: parseMemory(gpu['memory.used']),
-        utilizationGpu: parseNumber(gpu['utilization.gpu']),
-        temperatureGpu: parseNumber(gpu['temperature.gpu']),
-        vram: vram,
-        vramDynamic: false,
-        bus: 'PCI',
-      };
-    });
+    return gpus.map(gpu => ({
+      source: PROVIDER_ID,
+      subDeviceId: gpu['pci.sub_device_id'],
+      name: gpu['name'],
+      vendor: 'NVIDIA',
+      busAddress: normalizeBusAddress(gpu['pci.bus_id']),
+      vram: parseMemory(gpu['memory.total']),
+      memoryUsed: parseMemory(gpu['memory.used']),
+      utilizationGpu: parseNumber(gpu['utilization.gpu']),
+      temperatureGpu: parseNumber(gpu['temperature.gpu']),
+    }));
   },
   async utilization() {
     const gpus = await nvidiaSmi(utilizationColumns);
 
     return gpus.map(gpu => ({
-      memoryTotal: parseMemory(gpu['memory.total']),
+      source: PROVIDER_ID,
+      vendor: 'NVIDIA',
+      vram: parseMemory(gpu['memory.total']),
       memoryUsed: parseMemory(gpu['memory.used']),
       utilizationGpu: parseNumber(gpu['utilization.gpu']),
       temperatureGpu: parseNumber(gpu['temperature.gpu']),

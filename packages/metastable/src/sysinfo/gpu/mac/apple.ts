@@ -2,6 +2,8 @@ import os from 'os';
 
 import { GPUInfoProvider } from '../types.js';
 
+const PROVIDER_ID = 'apple';
+
 const provider: GPUInfoProvider = {
   async isAvailable() {
     return os.platform() === 'darwin';
@@ -9,10 +11,9 @@ const provider: GPUInfoProvider = {
   async devices() {
     return [
       {
+        source: PROVIDER_ID,
         vendor: 'Apple',
-        vramDynamic: false,
         vram: os.totalmem(),
-        memoryTotal: os.totalmem(),
       },
     ];
   },

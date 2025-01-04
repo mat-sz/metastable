@@ -1,7 +1,10 @@
 import os from 'os';
 
 import * as util from '../../util.js';
+import { getVendor } from '../helpers.js';
 import { GPUInfo, GPUInfoProvider } from '../types.js';
+
+const PROVIDER_ID = 'powershell';
 
 function matchDeviceId(str: string) {
   // Match PCI device identifier (there's an order of increasing generality):
@@ -15,17 +18,7 @@ function matchDeviceId(str: string) {
   const matchingDeviceId = str.match(
     /PCI\\(VEN_[0-9A-F]{4})&(DEV_[0-9A-F]{4})(?:&(SUBSYS_[0-9A-F]{8}))?(?:&(REV_[0-9A-F]{2}))?/i,
   );
-  if (!matchingDeviceId) {
-    return undefined;
-  }
-
-  return {
-    fullId: matchingDeviceId[0].toUpperCase(),
-    vendorId: matchingDeviceId[1] || undefined,
-    deviceId: matchingDeviceId[2] || undefined,
-    subsystemId: matchingDeviceId[3] || undefined,
-    revisionId: matchingDeviceId[4] || undefined,
-  };
+  return matchingDeviceId?.[0].toUpperCase();
 }
 
 function parseLines(sections: string[], vections: string[]): GPUInfo[] {
@@ -40,7 +33,7 @@ function parseLines(sections: string[], vections: string[]): GPUInfo[] {
             util.getValue(lines, 'HardwareInformation.qwMemorySize'),
           );
           if (!isNaN(quadWordmemorySize)) {
-            memorySizes[id.fullId] = quadWordmemorySize;
+            memorySizes[id] = quadWordmemorySize;
           }
         }
       }
@@ -54,50 +47,27 @@ function parseLines(sections: string[], vections: string[]): GPUInfo[] {
         const lines = sections[i].trim().split('\n');
         const id = matchDeviceId(util.getValue(lines, 'PNPDeviceID', ':'));
 
-        let subDeviceId: string | undefined = undefined;
         let memorySize: number | undefined = undefined;
         if (id) {
-          subDeviceId = id.subsystemId;
-          if (subDeviceId) {
-            subDeviceId = subDeviceId.split('_')[1];
-          }
-
-          if (memorySizes[id.fullId]) {
-            memorySize = memorySizes[id.fullId];
+          if (memorySizes[id]) {
+            memorySize = memorySizes[id];
           }
         }
 
         controllers.push({
-          vendor: util.getValue(lines, 'AdapterCompatibility', ':'),
-          model: util.getValue(lines, 'name', ':'),
-          bus: util.getValue(lines, 'PNPDeviceID', ':').startsWith('PCI')
-            ? 'PCI'
-            : undefined,
+          source: PROVIDER_ID,
+          vendor: getVendor(util.getValue(lines, 'AdapterCompatibility', ':')),
+          name: util.getValue(lines, 'name', ':'),
           vram:
             typeof memorySize !== 'number'
               ? util.toInt(util.getValue(lines, 'AdapterRAM', ':'))
               : memorySize,
-          vramDynamic: util.getValue(lines, 'VideoMemoryType', ':') === '2',
-          subDeviceId,
         });
       }
     }
   }
   return controllers;
 }
-
-// function nvidiaCompareSubsystemId(windowsId?: string, nvidiaId?: string) {
-//   if (!windowsId || !nvidiaId) {
-//     return false;
-//   }
-
-//   const windowsSubDeviceId = windowsId.toLowerCase();
-//   const nvidiaSubDeviceIdParts = nvidiaId.toLowerCase().split('x');
-//   const nvidiaSubDeviceId = nvidiaSubDeviceIdParts.pop()!;
-//   return (
-//     windowsSubDeviceId.padStart(8, '0') === nvidiaSubDeviceId.padStart(8, '0')
-//   );
-// }
 
 const provider: GPUInfoProvider = {
   async isAvailable() {
