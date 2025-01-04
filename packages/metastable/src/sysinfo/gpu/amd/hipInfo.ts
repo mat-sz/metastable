@@ -8,7 +8,7 @@ import { getVendor, normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
 const PROVIDER_ID = 'hipInfo';
-const SUPPORTED_HIP_SDK_VERSIONS = ['5.7', '6.1'];
+const SUPPORTED_HIP_SDK_VERSIONS = ['5.7', '6.1', '6.2'];
 const HIP_SDK_PATH = 'C:\\Program Files\\AMD\\ROCm';
 const HIP_SDK_HIPINFO = 'bin\\hipInfo.exe';
 

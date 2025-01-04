@@ -1,12 +1,10 @@
 # 0.0.15 (Upcoming)
 
-## Features
-
-- Added version to names of models downloaded from CivitAI.
-
 ## Improvements
 
 - Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
+- Added version to names of models downloaded from CivitAI.
+- ZLUDA is now automatically enabled during setup if compatible HIP SDK is installed.
 
 ## Bug fixes
 

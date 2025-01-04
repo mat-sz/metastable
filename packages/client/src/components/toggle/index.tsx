@@ -6,14 +6,21 @@ interface ToggleProps {
   label?: string;
   value?: boolean;
   onChange?: (value: boolean) => void;
+  disabled?: boolean;
 }
 
-export const Toggle: React.FC<ToggleProps> = ({ label, value, onChange }) => {
+export const Toggle: React.FC<ToggleProps> = ({
+  label,
+  value,
+  onChange,
+  disabled,
+}) => {
   return (
     <label className={styles.toggle}>
       <input
         type="checkbox"
         className={styles.input}
+        disabled={disabled}
         checked={value}
         onChange={e => onChange?.(e.target.checked)}
       />

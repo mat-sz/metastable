@@ -23,6 +23,7 @@ export const HardwareItem: React.FC = observer(() => {
       {setupStore.shouldDisplayZludaToggle && (
         <div className={styles.toggle}>
           <Toggle
+            disabled={!setupStore.isZludaAvailable}
             label="Use ZLUDA (Experimental)"
             value={setupStore.useZluda}
             onChange={value => {
@@ -32,8 +33,8 @@ export const HardwareItem: React.FC = observer(() => {
             }}
           />
           <div className={styles.info}>
-            Requires HIP SDK 5.7 to be installed and a compatible AMD GPU. Not
-            well tested, use at your own risk.
+            Requires HIP SDK 5.7 or 6.1 to be installed and a compatible AMD
+            GPU. Not well tested, use at your own risk.
           </div>
         </div>
       )}

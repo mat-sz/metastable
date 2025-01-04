@@ -44,6 +44,9 @@ class SetupStore {
     const details = await API.setup.details.query();
     runInAction(() => {
       this.details = details;
+      if (this.shouldDisplayZludaToggle) {
+        this.useZluda = this.isZludaAvailable;
+      }
     });
   }
 
@@ -66,12 +69,12 @@ class SetupStore {
   start() {
     let torchMode: TorchMode = 'cpu';
 
-    const gpu = this.details?.graphics[this.gpuIndex];
+    const gpu = this.gpu;
     const platform = this.details?.os.platform.value;
     if (gpu) {
-      if (gpu.vendor.toLowerCase().includes('nvidia')) {
+      if (gpu.vendor === 'NVIDIA') {
         torchMode = 'cuda';
-      } else if (gpu.vendor.toLowerCase().includes('amd')) {
+      } else if (gpu.vendor === 'AMD') {
         if (platform === 'win32') {
           torchMode = this.useZluda ? 'zluda' : 'directml';
         } else if (platform === 'linux') {
@@ -86,10 +89,17 @@ class SetupStore {
     });
   }
 
+  get gpu() {
+    return this.details?.graphics[this.gpuIndex];
+  }
+
   get shouldDisplayZludaToggle() {
-    const gpu = this.details?.graphics[this.gpuIndex];
     const platform = this.details?.os.platform.value.toLowerCase();
-    return platform === 'win32' && gpu?.vendor.toLowerCase().includes('amd');
+    return platform === 'win32' && this.gpu?.vendor === 'AMD';
+  }
+
+  get isZludaAvailable() {
+    return !!this.details?.environment.hipSdkVersion;
   }
 
   get requirements() {
@@ -187,8 +197,7 @@ class SetupStore {
 
     const requirements: Requirement[] = [];
 
-    const gpu = this.details.graphics[this.gpuIndex];
-
+    const gpu = this.gpu;
     const vendor = gpu?.vendor || 'Unknown';
     const vram = gpu?.vram || 0;
     const humanVram = vram ? filesize(vram) : 'unknown';

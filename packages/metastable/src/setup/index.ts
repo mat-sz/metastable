@@ -79,6 +79,9 @@ export class Setup extends EventEmitter<SetupEvents> {
         free: usage.free,
         total: usage.size,
       },
+      environment: {
+        hipSdkVersion: await getHipSdkVersion(),
+      },
     };
   }
 

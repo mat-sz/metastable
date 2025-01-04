@@ -38,10 +38,16 @@ export interface SetupStorage {
   free: number;
   total: number;
 }
+
+export interface SetupEnvironment {
+  hipSdkVersion?: string;
+}
+
 export interface SetupDetails {
   os: SetupOS;
   graphics: SetupGraphics[];
   storage: SetupStorage;
+  environment: SetupEnvironment;
 }
 
 export interface SetupSettings {
