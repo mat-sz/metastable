@@ -184,12 +184,12 @@ export class Setup extends EventEmitter<SetupEvents> {
       const sdkVersion = await getHipSdkVersion();
 
       if (sdkVersion) {
-        const variant = `rocm${sdkVersion.replace('.', '')}`;
+        const variant = `rocm${sdkVersion.split('.')[0]}`;
         await this.enqueueBundle(
           'zluda',
           'metastable-studio/bundle-zluda',
-          targetPath,
-          `${os.platform()}--${variant}`,
+          path.join(targetPath, 'zluda'),
+          `${os.platform()}-${os.arch()}-${variant}`,
         );
       }
     }

@@ -59,7 +59,7 @@ export class ExtractTask extends BaseTask {
             .catch(e => wrapped.reject(e));
           break;
         case 'directory':
-          mkdir(filePath, { recursive: true })
+          mkdir(filePath)
             .then(() => cb())
             .catch(e => wrapped.reject(e));
           break;
