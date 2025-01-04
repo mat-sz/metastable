@@ -188,7 +188,7 @@ export class Setup extends EventEmitter<SetupEvents> {
         await this.enqueueBundle(
           'zluda',
           'metastable-studio/bundle-zluda',
-          path.join(targetPath, 'zluda'),
+          targetPath,
           `${os.platform()}-${os.arch()}-${variant}`,
         );
       }
