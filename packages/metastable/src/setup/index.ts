@@ -13,6 +13,7 @@ import { EventEmitter } from '../helpers/events.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
 import { CleanupTask } from './tasks/cleanup.js';
+import { getHipSdkVersion } from '../sysinfo/gpu/amd/hipInfo.js';
 
 export type SetupEvents = {
   status: (status: SetupStatus) => void;
@@ -178,6 +179,20 @@ export class Setup extends EventEmitter<SetupEvents> {
       `${os.platform()}-${os.arch()}-${torchMode}`,
       true,
     );
+
+    if (torchMode === 'zluda') {
+      const sdkVersion = await getHipSdkVersion();
+
+      if (sdkVersion) {
+        const variant = `rocm${sdkVersion.replace('.', '')}`;
+        await this.enqueueBundle(
+          'zluda',
+          'metastable-studio/bundle-zluda',
+          targetPath,
+          `${os.platform()}--${variant}`,
+        );
+      }
+    }
 
     if (settings.downloads.length) {
       Metastable.instance.tasks.queues.setup.add(

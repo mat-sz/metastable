@@ -2,10 +2,12 @@
   "task": {
     "cleanup": "Cleaning up...",
     "download": {
-      "torch": "Downloading dependencies..."
+      "torch": "Downloading dependencies...",
+      "zluda": "Downloading ZLUDA..."
     },
     "extract": {
-      "torch": "Installing dependencies..."
+      "torch": "Installing dependencies...",
+      "zluda": "Installing ZLUDA..."
     }
   }
 }

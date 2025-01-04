@@ -12,7 +12,7 @@ const SUPPORTED_HIP_SDK_VERSIONS = ['5.7', '6.1'];
 const HIP_SDK_PATH = 'C:\\Program Files\\AMD\\ROCm';
 const HIP_SDK_HIPINFO = 'bin\\hipInfo.exe';
 
-function getHipSdkPath(version: string) {
+export function getHipSdkPath(version: string) {
   return path.join(HIP_SDK_PATH, version);
 }
 
