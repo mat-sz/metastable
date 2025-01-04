@@ -11,6 +11,7 @@
 - Fixed ZLUDA support.
 - Fixed notarization issues on macOS.
 - Fixed setup error display (during extraction step).
+- Fixed issues with saving/renaming projects on Windows.
 
 # 0.0.14 (2024-11-27)
 

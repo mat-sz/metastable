@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
@@ -148,6 +149,7 @@ export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
       .watch(this.baseDir, {
         ignoreInitial: true,
         ignorePermissionErrors: true,
+        usePolling: os.platform() === 'win32',
       })
       .on('all', async (event: string, filePath: string) => {
         if (['addDir', 'unlinkDir'].includes(event)) {

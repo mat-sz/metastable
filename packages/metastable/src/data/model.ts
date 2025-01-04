@@ -1,4 +1,5 @@
 import { mkdir, stat, writeFile } from 'fs/promises';
+import os from 'os';
 import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
@@ -204,6 +205,7 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
       .watch(this.baseDir, {
         ignoreInitial: true,
         ignorePermissionErrors: true,
+        usePolling: os.platform() === 'win32',
       })
       .on('all', (event: string) => {
         if (!['add', 'change', 'unlink'].includes(event)) {
