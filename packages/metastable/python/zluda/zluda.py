@@ -2,7 +2,7 @@ import sys
 from typing import Union
 import torch
 from torch._prims_common import DeviceLikeType
-from hijacks import do_hijack
+from .hijacks import do_hijack
 from comfy.model_management import get_torch_device
 from comfy.cli_args import args
 

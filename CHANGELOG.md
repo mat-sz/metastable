@@ -10,6 +10,7 @@
 
 ## Bug fixes
 
+- Fixed ZLUDA support.
 - Fixed notarization issues on macOS.
 - Fixed setup error display (during extraction step).
 

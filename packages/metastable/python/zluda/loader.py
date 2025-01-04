@@ -8,7 +8,7 @@ def get_targets():
     ZLUDA_TARGETS = []
 
     if sys.platform == 'win32':
-        HIPSDK_TARGETS = ['rocblas.dll', 'rocsolver.dll', f'hiprtc{"".join([v.zfill(2) for v in args.rocm_version.split(".")])}.dll']
+        HIPSDK_TARGETS = ['rocblas.dll', 'rocsolver.dll', f'hiprtc{"".join([v.zfill(2) for v in args.hip_version.split(".")])}.dll']
         ZLUDA_TARGETS = ['nvcuda.dll', 'nvml.dll', 'cublas64_11.dll', 'cusparse64_11.dll', 'nvrtc64_112_0.dll']
     
     return (HIPSDK_TARGETS, ZLUDA_TARGETS)
@@ -20,7 +20,7 @@ def load() -> None:
     (HIPSDK_TARGETS, ZLUDA_TARGETS) = get_targets()
 
     for v in HIPSDK_TARGETS:
-        ctypes.windll.LoadLibrary(os.path.join(args.rocm_path, 'bin', v))
+        ctypes.windll.LoadLibrary(os.path.join(args.hip_path, 'bin', v))
     for v in ZLUDA_TARGETS:
         ctypes.windll.LoadLibrary(os.path.join(args.zluda_path, v))
 

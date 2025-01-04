@@ -4,7 +4,7 @@ import cli_args
 sys.modules['comfy.cli_args'] = cli_args
 args = cli_args.args
 
-use_zluda = args.zluda_path and args.rocm_path and args.rocm_version
+use_zluda = args.zluda_path and args.hip_path and args.hip_version
 if use_zluda:
     from zluda import enable_zluda
     enable_zluda()

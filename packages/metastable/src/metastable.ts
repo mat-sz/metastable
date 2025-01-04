@@ -27,6 +27,7 @@ import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import * as cpu from './sysinfo/cpu.js';
 import * as disk from './sysinfo/disk.js';
+import { getHipSdkPath, getHipSdkVersion } from './sysinfo/gpu/amd/hipInfo.js';
 import { gpu, gpuUtilization } from './sysinfo/gpu.js';
 import * as ram from './sysinfo/ram.js';
 import { Tasks } from './tasks/index.js';
@@ -268,6 +269,13 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
         if (torchMode === 'directml') {
           args.push('--directml');
+        } else if (torchMode === 'zluda') {
+          const hipVersion = await getHipSdkVersion();
+          if (hipVersion) {
+            args.push('--zluda-path', path.join(pythonHome, 'zluda'));
+            args.push('--hip-path', getHipSdkPath(hipVersion));
+            args.push('--hip-version', hipVersion);
+          }
         }
       }
 

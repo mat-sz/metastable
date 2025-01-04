@@ -71,7 +71,7 @@ parser.add_argument("--verbose", action="store_true", help="Enables more debug p
 
 parser.add_argument("--namespace", action="append", help="Add extra namespace", required=False)
 parser.add_argument("--zluda-path", type=str, help="ZLUDA path", required=False)
-parser.add_argument("--rocm-path", type=str, help="ROCM path", required=False)
-parser.add_argument("--rocm-version", type=str, help="ROCM version", required=False)
+parser.add_argument("--hip-path", type=str, help="HIP SDK path", required=False)
+parser.add_argument("--hip-version", type=str, help="HIP SDK version", required=False)
 
 args = parser.parse_args()
