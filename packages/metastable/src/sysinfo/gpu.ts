@@ -1,4 +1,5 @@
 import { allResolved } from '#helpers/common.js';
+import { deduplicateInfo } from './gpu/helpers.js';
 import { getProviders } from './gpu/index.js';
 import { GPUInfo, GPUUtilization } from './gpu/types.js';
 
@@ -14,12 +15,15 @@ function gpuValue(gpu: GPUInfo | GPUUtilization) {
   return (PROVIDER_WEIGHT[gpu.source] || 0) + (gpu.vram || 0);
 }
 
-function sortGpus<T extends GPUInfo[] | GPUUtilization[]>(
+function flattenGpus<T extends GPUInfo[] | GPUUtilization[]>(
   gpus: (T | undefined)[],
 ): T {
-  const flattened = gpus.filter(out => !!out).flat() as any as T;
-  flattened.sort((a, b) => gpuValue(b) - gpuValue(a));
-  return flattened;
+  return gpus.filter(out => !!out).flat() as any as T;
+}
+
+function sortGpus<T extends GPUInfo[] | GPUUtilization[]>(gpus: T): T {
+  gpus.sort((a, b) => gpuValue(b) - gpuValue(a));
+  return gpus;
 }
 
 export async function gpu(): Promise<GPUInfo[]> {
@@ -29,7 +33,7 @@ export async function gpu(): Promise<GPUInfo[]> {
   }
 
   const data = await allResolved(providers.map(provider => provider.devices()));
-  return sortGpus(data);
+  return sortGpus(deduplicateInfo(flattenGpus(data)));
 }
 
 export async function gpuUtilization() {
@@ -41,7 +45,7 @@ export async function gpuUtilization() {
   const utilization = await allResolved(
     providers.map(provider => provider.utilization?.()),
   );
-  const sorted = sortGpus(utilization);
+  const sorted = sortGpus(flattenGpus(utilization));
 
   if (sorted.length) {
     return sorted[0];

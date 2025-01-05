@@ -102,6 +102,12 @@ function parseMemory(str: string) {
   return Math.floor(output);
 }
 
+function getBusAddress(row: HipInfoRow) {
+  return normalizeBusAddress(
+    `${parseInt(row['pciBusID'], 10).toString(16)}:${parseInt(row['pciDeviceID'], 10).toString(16)}.${parseInt(row['pciDomainID'], 10).toString(16)}`,
+  );
+}
+
 const provider: GPUInfoProvider = {
   async isAvailable() {
     return !!(await getHipInfo());
@@ -117,9 +123,7 @@ const provider: GPUInfoProvider = {
         source: PROVIDER_ID,
         name: row['Name'],
         vendor: getVendor(row['Name']),
-        busAddress: normalizeBusAddress(
-          `${row['pciBusID']}:${row['pciDeviceID']}.${row['pciDomainID']}`,
-        ),
+        busAddress: getBusAddress(row),
         vram,
         memoryUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
       };

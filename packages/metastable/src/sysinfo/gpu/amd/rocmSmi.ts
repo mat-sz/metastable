@@ -115,7 +115,6 @@ const provider: GPUInfoProvider = {
     const gpus = await rocmSmi({
       meminfoVram: true,
       bus: true,
-      id: true,
       productName: true,
       use: true,
       temp: true,
@@ -126,7 +125,6 @@ const provider: GPUInfoProvider = {
       const vramUsed = parseNumber(gpu['VRAM Total Used Memory (B)']);
       return {
         source: PROVIDER_ID,
-        subDeviceId: gpu['Device ID'],
         name: gpu['Card model'],
         vendor: getVendor(gpu['Card vendor']),
         busAddress: normalizeBusAddress(gpu['PCI Bus']),

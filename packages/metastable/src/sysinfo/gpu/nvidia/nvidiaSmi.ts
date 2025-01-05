@@ -81,7 +81,6 @@ async function nvidiaSmi<
 }
 
 const devicesColumns = [
-  'pci.sub_device_id',
   'name',
   'pci.bus_id',
   'fan.speed',
@@ -124,7 +123,6 @@ const provider: GPUInfoProvider = {
 
     return gpus.map(gpu => ({
       source: PROVIDER_ID,
-      subDeviceId: gpu['pci.sub_device_id'],
       name: gpu['name'],
       vendor: 'NVIDIA',
       busAddress: normalizeBusAddress(gpu['pci.bus_id']),

@@ -11,8 +11,8 @@ async function _getProviders() {
       mac.getProviders(),
       linux.getProviders(),
       windows.getProviders(),
-      nvidia.getProviders(),
       amd.getProviders(),
+      nvidia.getProviders(),
     ])
   )
     .filter(out => !!out)
