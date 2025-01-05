@@ -1,3 +1,5 @@
+import { on } from 'events';
+
 import {
   BackendStatus,
   LogItem,
@@ -100,63 +102,53 @@ export const router = t.router({
       }),
   },
   instance: {
-    onUtilization: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<Utilization>(emit => {
-        const onEvent = (data: Utilization) => {
-          emit.next(data);
-        };
-
-        metastable.on('utilization', onEvent);
-
-        return () => {
-          metastable.off('utilization', onEvent);
-        };
-      });
+    onUtilization: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [data] of on(metastable, 'utilization', { signal })) {
+        yield data as Utilization;
+      }
     }),
-    onBackendLog: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<LogItem[]>(emit => {
-        const onEvent = (data: LogItem) => {
-          emit.next([data]);
-        };
+    onBackendLog: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      const logItems = metastable.logBuffer.items;
+      if (logItems?.length) {
+        yield logItems;
+      }
 
-        const logItems = metastable.logBuffer.items;
-        if (logItems?.length) {
-          emit.next(logItems);
-        }
-
-        metastable.logBuffer.on('append', onEvent);
-
-        return () => {
-          metastable.logBuffer.off('append', onEvent);
-        };
-      });
+      for await (const [data] of on(metastable.logBuffer, 'append', {
+        signal,
+      })) {
+        yield [data as LogItem];
+      }
     }),
-    onBackendStatus: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<BackendStatus>(emit => {
-        const onEvent = (data: BackendStatus) => {
-          emit.next(data);
-        };
+    onBackendStatus: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      yield metastable.status;
 
-        onEvent(metastable.status);
-        metastable.on('backendStatus', onEvent);
-
-        return () => {
-          metastable.off('backendStatus', onEvent);
-        };
-      });
+      for await (const [data] of on(metastable, 'backendStatus', {
+        signal,
+      })) {
+        yield data as BackendStatus;
+      }
     }),
-    onInfoUpdate: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<void>(emit => {
-        const onEvent = () => {
-          emit.next();
-        };
+    onInfoUpdate: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      yield;
 
-        metastable.on('infoUpdate', onEvent);
-
-        return () => {
-          metastable.off('infoUpdate', onEvent);
-        };
-      });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for await (const _ of on(metastable, 'infoUpdate', {
+        signal,
+      })) {
+        yield;
+      }
     }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
       const info = (await metastable.comfy?.info()) || {
@@ -243,17 +235,14 @@ export const router = t.router({
       }),
   },
   model: {
-    onChange: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<void>(emit => {
-        const onEvent = () => {
-          emit.next();
-        };
-
-        metastable.model.on('change', onEvent);
-        return () => {
-          metastable.model.off('change', onEvent);
-        };
-      });
+    onChange: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for await (const _ of on(metastable.model, 'change', { signal })) {
+        yield;
+      }
     }),
     all: t.procedure.query(async ({ ctx: { metastable } }) => {
       const models = await metastable.model.all();
@@ -297,18 +286,13 @@ export const router = t.router({
       }),
   },
   setup: {
-    onStatus: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<SetupStatus>(emit => {
-        const onEvent = (status: SetupStatus) => {
-          emit.next(status);
-        };
-
-        metastable.setup.on('status', onEvent);
-
-        return () => {
-          metastable.setup.off('status', onEvent);
-        };
-      });
+    onStatus: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [status] of on(metastable.setup, 'status', { signal })) {
+        yield status as SetupStatus;
+      }
     }),
     status: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.status();
@@ -542,19 +526,18 @@ export const router = t.router({
             projectId: z.string(),
           }),
         )
-        .subscription(({ ctx: { metastable }, input: { projectId } }) => {
-          return observable<ProjectFileType>(emit => {
-            const onChange = (id: string, type: ProjectFileType) => {
-              if (id === projectId) {
-                emit.next(type);
-              }
-            };
-            metastable.project.on('projectChange', onChange);
-
-            return () => {
-              metastable.project.off('projectChange', onChange);
-            };
-          });
+        .subscription(async function* ({
+          signal,
+          ctx: { metastable },
+          input: { projectId },
+        }) {
+          for await (const [id, type] of on(metastable.model, 'change', {
+            signal,
+          })) {
+            if (id === projectId) {
+              yield type as ProjectFileType;
+            }
+          }
         }),
     },
     tagger: {
@@ -576,57 +559,37 @@ export const router = t.router({
     },
   },
   task: {
-    onCreate: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<TaskCreateEvent>(emit => {
-        const onEvent = (event: TaskCreateEvent) => {
-          emit.next(event);
-        };
-
-        metastable.tasks.on('create', onEvent);
-
-        return () => {
-          metastable.tasks.off('create', onEvent);
-        };
-      });
+    onCreate: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [event] of on(metastable.tasks, 'create', { signal })) {
+        yield event as TaskCreateEvent;
+      }
     }),
-    onUpdate: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<TaskUpdateEvent>(emit => {
-        const onEvent = (event: TaskUpdateEvent) => {
-          emit.next(event);
-        };
-
-        metastable.tasks.on('update', onEvent);
-
-        return () => {
-          metastable.tasks.off('update', onEvent);
-        };
-      });
+    onUpdate: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [event] of on(metastable.tasks, 'update', { signal })) {
+        yield event as TaskUpdateEvent;
+      }
     }),
-    onDelete: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<TaskDeleteEvent>(emit => {
-        const onEvent = (event: TaskDeleteEvent) => {
-          emit.next(event);
-        };
-
-        metastable.tasks.on('delete', onEvent);
-
-        return () => {
-          metastable.tasks.off('delete', onEvent);
-        };
-      });
+    onDelete: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [event] of on(metastable.tasks, 'delete', { signal })) {
+        yield event as TaskDeleteEvent;
+      }
     }),
-    onLog: t.procedure.subscription(({ ctx: { metastable } }) => {
-      return observable<TaskLogEvent>(emit => {
-        const onEvent = (event: TaskLogEvent) => {
-          emit.next(event);
-        };
-
-        metastable.tasks.on('log', onEvent);
-
-        return () => {
-          metastable.tasks.off('log', onEvent);
-        };
-      });
+    onLog: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      for await (const [event] of on(metastable.tasks, 'log', { signal })) {
+        yield event as TaskLogEvent;
+      }
     }),
     all: t.procedure.query(({ ctx: { metastable } }) => {
       return metastable.tasks.all();
