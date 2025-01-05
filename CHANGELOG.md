@@ -4,6 +4,7 @@
 
 - Added version to names of models downloaded from CivitAI.
 - Added detection of GPU drivers during setup.
+- Added support for DirectML on Intel Arc GPUs on Windows.
 - Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
 - ZLUDA is now automatically enabled during setup if compatible HIP SDK is installed.
 

@@ -99,6 +99,12 @@ export class Setup extends EventEmitter<SetupEvents> {
                 potentialTorchModes.push('rocm');
               }
               break;
+            case 'Intel':
+              if (item.name?.includes('Arc') && platform === 'win32') {
+                torchModes.push('directml');
+                potentialTorchModes.push('directml');
+              }
+              break;
             case 'NVIDIA':
               potentialTorchModes.push('cuda');
               break;
