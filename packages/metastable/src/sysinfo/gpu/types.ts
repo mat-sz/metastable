@@ -1,6 +1,6 @@
 export interface GPUInfo {
   source: string;
-  vendor?: string;
+  vendor: string;
   busAddress?: string;
   vram: number;
   name?: string;
@@ -11,7 +11,7 @@ export interface GPUInfo {
 
 export interface GPUUtilization {
   source: string;
-  vendor?: string;
+  vendor: string;
   vram: number;
   memoryUsed?: number;
   utilizationGpu?: number;

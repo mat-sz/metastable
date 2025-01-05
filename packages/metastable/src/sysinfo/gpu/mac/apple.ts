@@ -13,6 +13,7 @@ const provider: GPUInfoProvider = {
       {
         source: PROVIDER_ID,
         vendor: 'Apple',
+        name: 'Integrated GPU',
         vram: os.totalmem(),
       },
     ];

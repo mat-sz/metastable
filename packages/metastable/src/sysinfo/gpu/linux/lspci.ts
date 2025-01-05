@@ -9,6 +9,7 @@ const PROVIDER_ID = 'lspci';
 async function parseLines(lines: string[]): Promise<GPUInfo[]> {
   const controllers: GPUInfo[] = [];
   let currentController: GPUInfo = {
+    vendor: 'Unknown',
     source: PROVIDER_ID,
     vram: 0,
   };
@@ -22,6 +23,7 @@ async function parseLines(lines: string[]): Promise<GPUInfo[]> {
       );
       controllers.push(currentController);
       currentController = {
+        vendor: 'Unknown',
         source: PROVIDER_ID,
         vram: 0,
       };

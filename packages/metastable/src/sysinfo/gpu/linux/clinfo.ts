@@ -49,15 +49,11 @@ function parseLines(lines: string[]) {
       if (busAddress) {
         const controller: GPUInfo = {
           source: PROVIDER_ID,
+          vendor: getVendor(device['CL_DEVICE_VENDOR']),
+          name: device['CL_DEVICE_BOARD_NAME_AMD'] || device['CL_DEVICE_NAME'],
           busAddress: normalizeBusAddress(busAddress),
           vram: 0,
         };
-        controller.vendor = getVendor(device['CL_DEVICE_VENDOR']);
-        if (device['CL_DEVICE_BOARD_NAME_AMD']) {
-          controller.name = device['CL_DEVICE_BOARD_NAME_AMD'];
-        } else {
-          controller.name = device['CL_DEVICE_NAME'];
-        }
         const memory = parseInt(device['CL_DEVICE_GLOBAL_MEM_SIZE']);
         if (!isNaN(memory)) {
           controller.vram = memory;

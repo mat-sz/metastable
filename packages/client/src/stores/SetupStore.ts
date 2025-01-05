@@ -173,9 +173,17 @@ class SetupStore {
     const requirements: Requirement[] = [];
 
     const gpu = this.gpu;
-    const vendor = gpu?.vendor || 'Unknown';
-    const vram = gpu?.vram || 0;
-    const humanVram = vram ? filesize(vram) : 'unknown';
+    if (!gpu) {
+      return {
+        description:
+          'Unable to detect a GPU. CPU inference will be used instead.',
+        status: 'error',
+        requirements: [],
+      };
+    }
+
+    const { vendor, vram } = gpu;
+    const humanVram = filesize(vram);
 
     let description = `Found compatible hardware: ${gpu?.name}`;
     let status: SetupItemState['status'] = 'ok';
@@ -193,11 +201,7 @@ class SetupStore {
       satisfied: vram > VRAM_RECOMMENDED,
     });
 
-    if (!gpu) {
-      description =
-        'Unable to detect a GPU. CPU inference will be used instead.';
-      status = 'error';
-    } else if (gpu.torchModes.length === 0) {
+    if (!gpu.torchModes.length) {
       description =
         'GPU drivers are missing. CPU inference will be used instead.';
       status = 'error';
