@@ -117,7 +117,6 @@ const provider: GPUInfoProvider = {
     return rows.map(row => {
       const vram =
         parseMemory(row['memInfo.total'] || row['totalGlobalMem']) || 0;
-      const vramFree = parseMemory(row['memInfo.free']);
 
       return {
         source: PROVIDER_ID,
@@ -125,7 +124,6 @@ const provider: GPUInfoProvider = {
         vendor: getVendor(row['Name']),
         busAddress: getBusAddress(row),
         vram,
-        memoryUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
       };
     });
   },
@@ -139,8 +137,9 @@ const provider: GPUInfoProvider = {
       return {
         source: PROVIDER_ID,
         vendor: getVendor(row['Name']),
+        busAddress: getBusAddress(row),
         vram,
-        memoryUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
+        vramUsed: typeof vramFree === 'number' ? vram - vramFree : undefined,
       };
     });
   },

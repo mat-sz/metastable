@@ -116,28 +116,23 @@ const provider: GPUInfoProvider = {
       meminfoVram: true,
       bus: true,
       productName: true,
-      use: true,
-      temp: true,
     });
 
     return gpus.map(gpu => {
       const vram = parseNumber(gpu['VRAM Total Memory (B)']) || 0;
-      const vramUsed = parseNumber(gpu['VRAM Total Used Memory (B)']);
       return {
         source: PROVIDER_ID,
         name: gpu['Card model'],
         vendor: getVendor(gpu['Card vendor']),
         busAddress: normalizeBusAddress(gpu['PCI Bus']),
         vram,
-        memoryUsed: vramUsed,
-        utilizationGpu: parseNumber(gpu['GPU use (%)']),
-        temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
       };
     });
   },
   async utilization() {
     const gpus = await rocmSmi({
       meminfoVram: true,
+      bus: true,
       use: true,
       temp: true,
       productName: true,
@@ -148,10 +143,11 @@ const provider: GPUInfoProvider = {
       return {
         source: PROVIDER_ID,
         vendor: getVendor(gpu['Card vendor']),
+        busAddress: normalizeBusAddress(gpu['PCI Bus']),
         vram,
-        memoryUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
-        utilizationGpu: parseNumber(gpu['GPU use (%)']),
-        temperatureGpu: parseNumber(gpu['Temperature (Sensor junction) (C)']),
+        vramUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
+        utilization: parseNumber(gpu['GPU use (%)']),
+        temperature: parseNumber(gpu['Temperature (Sensor junction) (C)']),
       };
     });
   },

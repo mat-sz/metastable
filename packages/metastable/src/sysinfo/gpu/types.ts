@@ -4,18 +4,16 @@ export interface GPUInfo {
   busAddress?: string;
   vram: number;
   name?: string;
-  memoryUsed?: number;
-  utilizationGpu?: number;
-  temperatureGpu?: number;
 }
 
 export interface GPUUtilization {
   source: string;
   vendor: string;
+  busAddress?: string;
   vram: number;
-  memoryUsed?: number;
-  utilizationGpu?: number;
-  temperatureGpu?: number;
+  vramUsed?: number;
+  utilization?: number;
+  temperature?: number;
 }
 
 export interface GPUInfoProvider {

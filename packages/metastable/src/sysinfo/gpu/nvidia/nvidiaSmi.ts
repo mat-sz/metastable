@@ -80,24 +80,10 @@ async function nvidiaSmi<
   return result;
 }
 
-const devicesColumns = [
-  'name',
-  'pci.bus_id',
-  'fan.speed',
-  'memory.total',
-  'memory.used',
-  'memory.free',
-  'utilization.gpu',
-  'utilization.memory',
-  'temperature.gpu',
-  'temperature.memory',
-  'power.draw',
-  'power.limit',
-  'clocks.gr',
-  'clocks.mem',
-] as const;
+const devicesColumns = ['name', 'pci.bus_id', 'memory.total'] as const;
 
 const utilizationColumns = [
+  'pci.bus_id',
   'memory.total',
   'memory.used',
   'memory.free',
@@ -127,9 +113,6 @@ const provider: GPUInfoProvider = {
       vendor: 'NVIDIA',
       busAddress: normalizeBusAddress(gpu['pci.bus_id']),
       vram: parseMemory(gpu['memory.total']),
-      memoryUsed: parseMemory(gpu['memory.used']),
-      utilizationGpu: parseNumber(gpu['utilization.gpu']),
-      temperatureGpu: parseNumber(gpu['temperature.gpu']),
     }));
   },
   async utilization() {
@@ -139,9 +122,10 @@ const provider: GPUInfoProvider = {
       source: PROVIDER_ID,
       vendor: 'NVIDIA',
       vram: parseMemory(gpu['memory.total']),
-      memoryUsed: parseMemory(gpu['memory.used']),
-      utilizationGpu: parseNumber(gpu['utilization.gpu']),
-      temperatureGpu: parseNumber(gpu['temperature.gpu']),
+      vramUsed: parseMemory(gpu['memory.used']),
+      busAddress: normalizeBusAddress(gpu['pci.bus_id']),
+      utilization: parseNumber(gpu['utilization.gpu']),
+      temperature: parseNumber(gpu['temperature.gpu']),
     }));
   },
 };

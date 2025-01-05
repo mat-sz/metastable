@@ -110,10 +110,10 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       hddUsed: usage.used,
       ramTotal: free.total,
       ramUsed: free.used,
-      gpuTemperature: gpu?.temperatureGpu,
-      gpuUsage: gpu?.utilizationGpu,
+      gpuTemperature: gpu?.temperature,
+      gpuUsage: gpu?.utilization,
       vramTotal: gpu?.vram,
-      vramUsed: gpu?.memoryUsed,
+      vramUsed: gpu?.vramUsed,
     });
     setTimeout(() => {
       this.refreshUtilization();
