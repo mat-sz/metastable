@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events';
+
 import {
   Task,
   TaskCreateEvent,
@@ -9,18 +11,17 @@ import {
 } from '@metastable/types';
 
 import { BaseTask } from './task.js';
-import { EventEmitter } from '../helpers/events.js';
 
 export type QueueTaskEvents = {
-  create: (event: TaskCreateEvent) => void;
-  update: (event: TaskUpdateEvent) => void;
-  delete: (event: TaskDeleteEvent) => void;
-  log: (event: TaskLogEvent) => void;
+  create: [event: TaskCreateEvent];
+  update: [event: TaskUpdateEvent];
+  delete: [event: TaskDeleteEvent];
+  log: [event: TaskLogEvent];
 };
 
 export type BaseQueueEvents = QueueTaskEvents & {
-  empty: () => void;
-  failed: () => void;
+  empty: [];
+  failed: [];
 };
 
 export interface BaseQueueSettings {

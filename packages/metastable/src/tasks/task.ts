@@ -1,12 +1,13 @@
+import { EventEmitter } from 'events';
+
 import { Task, TaskState } from '@metastable/types';
 import { nanoid } from 'nanoid/non-secure';
 
-import { EventEmitter } from '../helpers/events.js';
 import { WrappedPromise } from '../helpers/promise.js';
 
 export type BaseTaskEvents<T> = {
-  update: (data: Partial<Task<T>>) => void;
-  log: (data: string) => void;
+  update: [data: Partial<Task<T>>];
+  log: [data: string];
 };
 
 export class BaseTask<T = any>

@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
+import { EventEmitter } from 'events';
 import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
@@ -8,7 +9,6 @@ import es from 'event-stream';
 import { nanoid } from 'nanoid/non-secure';
 
 import { ComfySession } from './session/index.js';
-import { EventEmitter } from '../helpers/events.js';
 import type { PythonInstance } from '../python/index.js';
 
 const baseDir = path.join(
@@ -18,9 +18,9 @@ const baseDir = path.join(
 );
 
 type BackendEvents = {
-  log: (data: LogItem) => void;
-  reset: () => void;
-  status: (status: BackendStatus) => void;
+  log: [item: LogItem];
+  reset: [];
+  status: [status: BackendStatus];
 };
 
 interface RPCRequest {

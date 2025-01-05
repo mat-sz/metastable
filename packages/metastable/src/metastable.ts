@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { mkdir } from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -20,7 +21,6 @@ import { FeaturePython } from './feature/base.js';
 import { FeatureManager } from './feature/index.js';
 import { CircularBuffer } from './helpers/buffer.js';
 import { getBundleTorchMode } from './helpers/bundle.js';
-import { EventEmitter } from './helpers/events.js';
 import { resolveConfigPath, rmdir } from './helpers/fs.js';
 import { parseArgString } from './helpers/shell.js';
 import { PythonInstance } from './python/index.js';
@@ -32,11 +32,11 @@ import { gpu, gpuUtilization } from './sysinfo/gpu.js';
 import * as ram from './sysinfo/ram.js';
 import { Tasks } from './tasks/index.js';
 
-type MetastableEvents = {
-  utilization: (data: Utilization) => void;
-  backendStatus: (status: BackendStatus) => void;
-  infoUpdate: () => void;
-};
+interface MetastableEvents {
+  utilization: [data: Utilization];
+  backendStatus: [status: BackendStatus];
+  infoUpdate: [];
+}
 
 export class Metastable extends EventEmitter<MetastableEvents> {
   private static _instance: Metastable;

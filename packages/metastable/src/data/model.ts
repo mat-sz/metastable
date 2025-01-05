@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -9,7 +10,6 @@ import chokidar from 'chokidar';
 
 import { Metastable } from '#metastable';
 import { FileEntity } from './common.js';
-import { EventEmitter } from '../helpers/events.js';
 import {
   CONFIG_EXTENSIONS,
   exists,
@@ -181,7 +181,7 @@ export class ModelEntity extends FileEntity {
 }
 
 type ModelRepositoryEvents = {
-  change: () => void;
+  change: [];
 };
 
 export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {

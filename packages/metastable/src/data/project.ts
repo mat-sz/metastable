@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -13,7 +14,6 @@ import {
   ImageEntity,
   Metadata,
 } from './common.js';
-import { EventEmitter } from '../helpers/events.js';
 import { directorySize, getAvailableName, rmdir } from '../helpers/fs.js';
 
 export class ProjectImageEntity extends ImageEntity {
@@ -127,8 +127,8 @@ export class ProjectEntity extends DirectoryEntity {
 }
 
 type ProjectRepositoryEvents = {
-  change: () => void;
-  projectChange: (id: string, type: ProjectFileType) => void;
+  change: [];
+  projectChange: [id: string, type: ProjectFileType];
 };
 export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
   private cache: ProjectEntity[] | undefined = undefined;

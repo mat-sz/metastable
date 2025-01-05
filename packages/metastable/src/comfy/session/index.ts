@@ -1,6 +1,7 @@
+import { EventEmitter } from 'events';
+
 import { Architecture } from '@metastable/types';
 
-import { EventEmitter } from '../../helpers/events.js';
 import type { Comfy } from '../index.js';
 import { ComfyCheckpoint, ComfyCLIPVision, ComfyLatent } from './models.js';
 import {
@@ -11,8 +12,8 @@ import {
 } from './types.js';
 
 export type ComfySessionEvents = {
-  progress: (event: ComfySessionProgressEvent) => void;
-  log: (event: ComfySessionLogEvent) => void;
+  progress: [event: ComfySessionProgressEvent];
+  log: [event: ComfySessionLogEvent];
 };
 
 class ComfySessionCheckpoint {

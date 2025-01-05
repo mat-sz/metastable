@@ -1,7 +1,8 @@
+import { EventEmitter } from 'events';
+
 import { Task } from '@metastable/types';
 
 import { BaseQueue, QueueTaskEvents } from './queue.js';
-import { EventEmitter } from '../helpers/events.js';
 
 export * from './queue.js';
 export * from './task.js';

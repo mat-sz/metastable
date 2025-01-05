@@ -1,7 +1,7 @@
-import { EventEmitter } from './events.js';
+import { EventEmitter } from 'events';
 
 type CircularBufferEvents<T> = {
-  append: (data: T) => void;
+  append: [data: T];
 };
 export class CircularBuffer<T> extends EventEmitter<CircularBufferEvents<T>> {
   private array: T[] = [];

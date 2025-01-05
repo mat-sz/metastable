@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import os from 'os';
 import path from 'path';
 
@@ -14,14 +15,13 @@ import { getLatestReleaseInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
 import { MultiDownloadTask } from '../downloader/index.js';
-import { EventEmitter } from '../helpers/events.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
 import { CleanupTask } from './tasks/cleanup.js';
 import { getHipSdkVersion } from '../sysinfo/gpu/amd/hipInfo.js';
 
 export type SetupEvents = {
-  status: (status: SetupStatus) => void;
+  status: [status: SetupStatus];
 };
 
 export class Setup extends EventEmitter<SetupEvents> {
