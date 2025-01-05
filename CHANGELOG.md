@@ -1,5 +1,9 @@
 # 0.0.15 (Upcoming)
 
+## Features
+
+- Added a setting to reserve a certain amount of VRAM.
+
 ## Improvements
 
 - Added version to names of models downloaded from CivitAI.

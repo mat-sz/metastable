@@ -251,10 +251,14 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }
 
     if (config.comfy) {
-      const { vramMode = 'auto', extraArgs } = config.comfy;
+      const { vramMode = 'auto', reserveVram, extraArgs } = config.comfy;
 
       if (vramMode !== 'auto') {
         args.push(`--${vramMode}`);
+      }
+
+      if (reserveVram) {
+        args.push('--reserve-vram', `${reserveVram}`);
       }
 
       if (extraArgs) {

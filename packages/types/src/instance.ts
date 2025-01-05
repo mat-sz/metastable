@@ -57,6 +57,7 @@ export interface ConfigType {
   };
   comfy?: {
     vramMode?: ComfyVramMode;
+    reserveVram?: number;
     extraArgs?: string;
     env?: Record<string, string>;
   };
