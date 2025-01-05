@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ReactDOM from 'react-dom/client';
 
-import { TRPC, TRPCClient } from '$api';
+import { API, TRPC } from '$api';
 import { App } from './App.tsx';
 import './onError.ts';
 import './i18n.ts';
@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <DndProvider backend={HTML5Backend}>
-      <TRPC.Provider client={TRPCClient} queryClient={queryClient}>
+      <TRPC.Provider client={API} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <Suspense fallback="Loading...">
             <App />

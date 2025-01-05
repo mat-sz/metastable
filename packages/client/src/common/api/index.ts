@@ -1,10 +1,4 @@
-import {
-  createTRPCClient,
-  createWSClient,
-  httpLink,
-  splitLink,
-  wsLink,
-} from '@trpc/client';
+import { createWSClient, httpLink, splitLink, wsLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import { toJS } from 'mobx';
 import { ipcLink } from 'trpc-electron/renderer';
@@ -59,11 +53,8 @@ const link = IS_ELECTRON
         transformer,
       }),
     });
-export const API = createTRPCClient<Router>({
-  links: [link],
-});
 
 export const TRPC = createTRPCReact<Router>();
-export const TRPCClient = TRPC.createClient({
+export const API = TRPC.createClient({
   links: [link],
 });

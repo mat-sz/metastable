@@ -24,7 +24,7 @@
     "@fastify/static": "^7.0.4",
     "@fastify/websocket": "^10.0.1",
     "@metastable/metastable": "workspace:^",
-    "@trpc/server": "^11.0.0-rc.601",
+    "@trpc/server": "11.0.0-rc.682",
     "fastify": "^4.27.0",
     "http-errors": "^2.0.0",
     "json-schema-to-ts": "^2.9.2",
