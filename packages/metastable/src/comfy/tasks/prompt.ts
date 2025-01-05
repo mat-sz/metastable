@@ -156,7 +156,7 @@ export class PromptTask extends BaseComfyTask<
     const image = await this.prepareImage(url, fit);
 
     if (maskUrl) {
-      const maskImage = await this.prepareImage(url, fit);
+      const maskImage = await this.prepareImage(maskUrl, fit);
       image.composite([
         { input: await maskImage.png().toBuffer(), blend: 'dest-out' },
       ]);

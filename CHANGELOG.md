@@ -14,6 +14,7 @@
 - Fixed notarization issues on macOS.
 - Fixed setup error display (during extraction step).
 - Fixed issues with saving/renaming projects on Windows.
+- Fixed issues with inpainting masks not being correctly loaded.
 
 # 0.0.14 (2024-11-27)
 
