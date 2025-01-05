@@ -27,9 +27,12 @@ export interface SetupOS {
   isGlibc?: boolean;
 }
 
-export interface SetupGraphics {
+export interface SetupGPU {
   vendor: string;
+  name: string;
   vram: number;
+  torchModes: TorchMode[];
+  potentialTorchModes: TorchMode[];
 }
 
 export interface SetupStorage {
@@ -39,15 +42,10 @@ export interface SetupStorage {
   total: number;
 }
 
-export interface SetupEnvironment {
-  hipSdkVersion?: string;
-}
-
 export interface SetupDetails {
   os: SetupOS;
-  graphics: SetupGraphics[];
+  gpus: SetupGPU[];
   storage: SetupStorage;
-  environment: SetupEnvironment;
 }
 
 export interface SetupSettings {

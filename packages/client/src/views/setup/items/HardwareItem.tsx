@@ -11,6 +11,9 @@ import { Item } from '../components/Item';
 
 export const HardwareItem: React.FC = observer(() => {
   const item = setupStore.hardware;
+  const gpu = setupStore.gpu;
+  const shouldDisplayZludaToggle = gpu?.potentialTorchModes.includes('zluda');
+  const isZludaAvailable = gpu?.torchModes.includes('zluda');
 
   return (
     <Item
@@ -20,15 +23,15 @@ export const HardwareItem: React.FC = observer(() => {
       description={item.description}
       status={item.status}
     >
-      {setupStore.shouldDisplayZludaToggle && (
+      {shouldDisplayZludaToggle && (
         <div className={styles.toggle}>
           <Toggle
-            disabled={!setupStore.isZludaAvailable}
+            disabled={!isZludaAvailable}
             label="Use ZLUDA (Experimental)"
-            value={setupStore.useZluda}
+            value={setupStore.torchMode === 'zluda'}
             onChange={value => {
               runInAction(() => {
-                setupStore.useZluda = value;
+                setupStore.torchMode = value ? 'zluda' : 'directml';
               });
             }}
           />

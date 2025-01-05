@@ -1,7 +1,12 @@
 import os from 'os';
 import path from 'path';
 
-import { SetupDetails, SetupSettings, SetupStatus } from '@metastable/types';
+import {
+  SetupDetails,
+  SetupSettings,
+  SetupStatus,
+  TorchMode,
+} from '@metastable/types';
 
 import { exists } from '#helpers/fs.js';
 import { Metastable } from '#metastable';
@@ -64,23 +69,54 @@ export class Setup extends EventEmitter<SetupEvents> {
     const controllers = await gpu();
     const dataRoot = Metastable.instance.dataRoot;
     const usage = await disk.usage(dataRoot);
+    const platform = os.platform();
 
     return {
       os: await getOS(),
-      graphics: controllers.map(item => {
-        return {
-          vendor: item.vendor || 'unknown',
-          vram: item.vram,
-        };
-      }),
+      gpus: controllers
+        .filter(item => !!item.name)
+        .map(item => {
+          const torchModes: TorchMode[] = [];
+          const potentialTorchModes: TorchMode[] = [];
+          switch (item.source) {
+            case 'rocm-smi':
+              torchModes.push('rocm');
+              break;
+            case 'hipInfo':
+              torchModes.push('zluda');
+              break;
+            case 'nvidia-smi':
+              torchModes.push('cuda');
+              break;
+          }
+
+          switch (item.vendor) {
+            case 'AMD':
+              if (platform === 'win32') {
+                torchModes.push('directml');
+                potentialTorchModes.push('zluda', 'directml');
+              } else if (platform === 'linux') {
+                potentialTorchModes.push('rocm');
+              }
+              break;
+            case 'NVIDIA':
+              potentialTorchModes.push('cuda');
+              break;
+          }
+
+          return {
+            vendor: item.vendor || 'unknown',
+            name: item.name!,
+            vram: item.vram,
+            torchModes,
+            potentialTorchModes,
+          };
+        }),
       storage: {
         dataRoot,
         diskPath: usage.diskPath,
         free: usage.free,
         total: usage.size,
-      },
-      environment: {
-        hipSdkVersion: await getHipSdkVersion(),
       },
     };
   }

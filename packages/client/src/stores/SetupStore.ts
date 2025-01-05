@@ -31,7 +31,7 @@ class SetupStore {
 
   gpuIndex: number = 0;
   downloads: DownloadSettings[] = [];
-  useZluda = false;
+  torchMode: TorchMode = 'cpu';
 
   constructor() {
     makeAutoObservable(this);
@@ -44,10 +44,13 @@ class SetupStore {
     const details = await API.setup.details.query();
     runInAction(() => {
       this.details = details;
-      if (this.shouldDisplayZludaToggle) {
-        this.useZluda = this.isZludaAvailable;
-      }
+      this.selectGpu(0);
     });
+  }
+
+  selectGpu(index: number) {
+    this.gpuIndex = index;
+    this.torchMode = this.gpu?.torchModes[0] || 'cpu';
   }
 
   async refresh() {
@@ -67,39 +70,14 @@ class SetupStore {
   }
 
   start() {
-    let torchMode: TorchMode = 'cpu';
-
-    const gpu = this.gpu;
-    const platform = this.details?.os.platform.value;
-    if (gpu) {
-      if (gpu.vendor === 'NVIDIA') {
-        torchMode = 'cuda';
-      } else if (gpu.vendor === 'AMD') {
-        if (platform === 'win32') {
-          torchMode = this.useZluda ? 'zluda' : 'directml';
-        } else if (platform === 'linux') {
-          torchMode = 'rocm';
-        }
-      }
-    }
-
     API.setup.start.mutate({
       downloads: toJS(this.downloads),
-      torchMode,
+      torchMode: this.torchMode,
     });
   }
 
   get gpu() {
-    return this.details?.graphics[this.gpuIndex];
-  }
-
-  get shouldDisplayZludaToggle() {
-    const platform = this.details?.os.platform.value.toLowerCase();
-    return platform === 'win32' && this.gpu?.vendor === 'AMD';
-  }
-
-  get isZludaAvailable() {
-    return !!this.details?.environment.hipSdkVersion;
+    return this.details?.gpus[this.gpuIndex];
   }
 
   get requirements() {
@@ -192,9 +170,6 @@ class SetupStore {
       };
     }
 
-    let description = 'Your computer is compatible.';
-    let status: SetupItemState['status'] = 'ok';
-
     const requirements: Requirement[] = [];
 
     const gpu = this.gpu;
@@ -202,11 +177,14 @@ class SetupStore {
     const vram = gpu?.vram || 0;
     const humanVram = vram ? filesize(vram) : 'unknown';
 
+    let description = `Found compatible hardware: ${gpu?.name}`;
+    let status: SetupItemState['status'] = 'ok';
+
     requirements.push({
       name: 'GPU Vendor',
       expected: GPU_VENDORS.join(', '),
       actual: vendor,
-      satisfied: GPU_VENDORS.some(item => vendor.includes(item)),
+      satisfied: GPU_VENDORS.includes(vendor),
     });
     requirements.push({
       name: 'GPU VRAM',
@@ -216,8 +194,16 @@ class SetupStore {
     });
 
     if (!gpu) {
-      description = 'A GPU is required for an optimal user experience.';
+      description =
+        'Unable to detect a GPU. CPU inference will be used instead.';
       status = 'error';
+    } else if (gpu.torchModes.length === 0) {
+      description =
+        'GPU drivers are missing. CPU inference will be used instead.';
+      status = 'error';
+    } else if (this.torchMode === 'directml') {
+      description = 'Suboptimal DirectML mode will be used.';
+      status = 'warning';
     } else if (vram < VRAM_MIN) {
       description = `Current amount of VRAM (${humanVram}) is lower than the minimum required (${filesize(
         VRAM_MIN,
@@ -228,7 +214,7 @@ class SetupStore {
         VRAM_RECOMMENDED,
       )}).`;
       status = 'warning';
-    } else if (!vendor.includes('NVIDIA')) {
+    } else if (vendor !== 'NVIDIA') {
       description = `Non-NVIDIA GPUs haven't been tested, but should work correctly.`;
       status = 'warning';
     }

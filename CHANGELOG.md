@@ -2,8 +2,9 @@
 
 ## Improvements
 
-- Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
 - Added version to names of models downloaded from CivitAI.
+- Added detection of GPU drivers during setup.
+- Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
 - ZLUDA is now automatically enabled during setup if compatible HIP SDK is installed.
 
 ## Bug fixes
