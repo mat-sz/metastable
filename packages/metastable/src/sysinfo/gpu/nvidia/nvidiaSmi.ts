@@ -6,16 +6,16 @@ import which from 'which';
 
 import { memoized, parseNumber } from '#helpers/common.js';
 import { stdout } from '#helpers/spawn.js';
-import * as util from '../../util.js';
 import { normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
 const PROVIDER_ID = 'nvidia-smi';
+const WINDIR = process.env.WINDIR || 'C:\\Windows';
 
 async function _locateSmi() {
   switch (os.platform()) {
     case 'win32': {
-      const basePath = util.WINDIR + '\\System32\\DriverStore\\FileRepository';
+      const basePath = WINDIR + '\\System32\\DriverStore\\FileRepository';
       // find all directories that have an nvidia-smi.exe file
       const candidates = await Promise.all(
         (await fs.readdir(basePath)).map(async dir => {

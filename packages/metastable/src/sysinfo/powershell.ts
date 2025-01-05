@@ -1,51 +1,19 @@
 import { spawn } from 'child_process';
 import os from 'os';
 
-export const WINDIR = process.env.WINDIR || 'C:\\Windows';
-
 const _psToUTF8 =
   '$OutputEncoding = [System.Console]::OutputEncoding = [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8 ; ';
 
-export function toInt(value: string) {
-  let result = parseInt(value, 10);
-  if (isNaN(result)) {
-    result = 0;
+export function parseFl(str: string) {
+  const lines = str.trim().split('\n');
+  const obj: Record<string, string> = {};
+  for (const line of lines) {
+    const split = line.split(':');
+    const key = split.shift()!.trim();
+    const value = split.join(':').trim();
+    obj[key] = value;
   }
-  return result;
-}
-
-export function getValue(
-  lines: string[],
-  property: string,
-  separator = ':',
-  trimmed = false,
-  lineMatch = false,
-) {
-  property = property.toLowerCase();
-  let result = '';
-  lines.some(line => {
-    let lineLower = line.toLowerCase().replace(/\t/g, '');
-    if (trimmed) {
-      lineLower = lineLower.trim();
-    }
-    if (
-      lineLower.startsWith(property) &&
-      (lineMatch
-        ? lineLower.match(property + separator) ||
-          lineLower.match(property + ' ' + separator)
-        : true)
-    ) {
-      const parts = trimmed
-        ? line.trim().split(separator)
-        : line.split(separator);
-      if (parts.length >= 2) {
-        parts.shift();
-        result = parts.join(separator).trim();
-        return true;
-      }
-    }
-  });
-  return result;
+  return obj;
 }
 
 export function powerShell(cmd: string): Promise<string> {
