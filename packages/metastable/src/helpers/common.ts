@@ -14,6 +14,14 @@ export function parseNumber(input?: number | string | null) {
   return input;
 }
 
+export function splitAt(str: string, index: number): [string, string] {
+  return [str.substring(0, index), str.substring(index)];
+}
+
+export function arrayParseInt(array: string[], radix = 10) {
+  return array.map(str => parseInt(str, radix));
+}
+
 export function memoized<T>(
   fn: () => Promise<T> | T,
 ): () => Promise<T | undefined> {
