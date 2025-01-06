@@ -11,6 +11,9 @@ export const SettingsDownloads: React.FC = observer(() => {
       <VarCategory label="CivitAI">
         <VarString path="civitai.apiKey" label="CivitAI API key" />
       </VarCategory>
+      <VarCategory label="HuggingFace">
+        <VarString path="huggingface.apiKey" label="HuggingFace API key" />
+      </VarCategory>
     </TabPanel>
   );
 });

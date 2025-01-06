@@ -343,8 +343,16 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }
 
     const headers: Record<string, string> = {};
-    if (url.hostname.includes('civitai')) {
+    if (url.hostname.includes('civitai.com')) {
       const settings = await this.config.get('civitai');
+      const apiKey = settings?.apiKey?.trim();
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+    }
+
+    if (url.hostname.includes('huggingface.co')) {
+      const settings = await this.config.get('huggingface');
       const apiKey = settings?.apiKey?.trim();
       if (apiKey) {
         headers['Authorization'] = `Bearer ${apiKey}`;

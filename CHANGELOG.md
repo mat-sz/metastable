@@ -4,6 +4,7 @@
 
 - Added a setting to reserve a certain amount of VRAM.
 - Added support for more than 2 CLIP models in advanced mode.
+- Added authorization for HuggingFace downloads.
 
 ## Improvements
 

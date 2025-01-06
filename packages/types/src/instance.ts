@@ -64,6 +64,9 @@ export interface ConfigType {
   civitai?: {
     apiKey?: string;
   };
+  huggingface?: {
+    apiKey?: string;
+  };
   ui?: {
     fuzzySearch?: boolean;
     notifications?: boolean;
