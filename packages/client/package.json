@@ -29,7 +29,7 @@
     "i18not": "^0.1.2",
     "nanoid": "^5.0.4",
     "react-i18not": "^0.1.1",
-    "trpc-electron": "^0.1.1"
+    "trpc-electron": "^0.1.2"
   },
   "devDependencies": {
     "@metastable/common": "workspace:^",

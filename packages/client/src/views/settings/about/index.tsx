@@ -37,9 +37,7 @@ export const SettingsAbout: React.FC = observer(() => {
           <VarButton
             buttonLabel="Reveal in explorer"
             onClick={() =>
-              API.electron.shell.showItemInFolder.mutate(
-                mainStore.info.dataRoot,
-              )
+              API.electron.shell.openPath.mutate(mainStore.info.dataRoot)
             }
           />
         )}

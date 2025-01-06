@@ -16,7 +16,6 @@ import {
   Utilization,
 } from '@metastable/types';
 import { initTRPC, TRPCError } from '@trpc/server';
-import { observable } from '@trpc/server/observable';
 import { type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
@@ -141,13 +140,13 @@ export const router = t.router({
       signal,
       ctx: { metastable },
     }) {
-      yield;
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for await (const _ of on(metastable, 'infoUpdate', {
+      const iter = on(metastable, 'infoUpdate', {
         signal,
-      })) {
+      });
+
+      while (true) {
         yield;
+        await iter.next();
       }
     }),
     info: t.procedure.query(async ({ ctx: { metastable } }) => {
@@ -239,8 +238,10 @@ export const router = t.router({
       signal,
       ctx: { metastable },
     }) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      for await (const _ of on(metastable.model, 'change', { signal })) {
+      const iter = on(metastable.model, 'change', { signal });
+
+      while (true) {
+        await iter.next();
         yield;
       }
     }),
@@ -612,42 +613,35 @@ export const router = t.router({
   },
   electron: {
     window: {
-      onResize: electronProcedure.subscription(({ ctx: { win } }) => {
-        return observable<{ isMaximized: boolean; isFullScreen: boolean }>(
-          emit => {
-            const refresh = () => {
-              emit.next({
-                isMaximized: win.isMaximized(),
-                isFullScreen: win.isFullScreen(),
-              });
-            };
+      onResize: electronProcedure.subscription(async function* ({
+        signal,
+        ctx: { win },
+      }) {
+        const iter = on(win, 'resize', { signal });
 
-            refresh();
-            win.on('resize', refresh);
-
-            return () => {
-              win.off('resize', refresh);
-            };
-          },
-        );
+        while (true) {
+          yield {
+            isMaximized: win.isMaximized(),
+            isFullScreen: win.isFullScreen(),
+          };
+          await iter.next();
+        }
       }),
-      onFocusChange: electronProcedure.subscription(({ ctx: { win } }) => {
-        return observable<{ isFocused: boolean }>(emit => {
-          const refresh = () => {
-            emit.next({
-              isFocused: win.isFocused(),
-            });
-          };
+      onFocusChange: electronProcedure.subscription(async function* ({
+        signal,
+        ctx: { win },
+      }) {
+        const iterators = [
+          on(win, 'focus', { signal }),
+          on(win, 'blur', { signal }),
+        ];
 
-          refresh();
-          win.on('focus', refresh);
-          win.on('blur', refresh);
-
-          return () => {
-            win.off('focus', refresh);
-            win.off('blur', refresh);
+        while (true) {
+          yield {
+            isFocused: win.isFocused(),
           };
-        });
+          await Promise.race(iterators.map(iterators => iterators.next()));
+        }
       }),
       minimize: electronProcedure.mutation(({ ctx: { win } }) => {
         win.minimize();
@@ -679,26 +673,23 @@ export const router = t.router({
           if (input.startsWith('mrn:')) {
             input = await metastable.resolve(input);
           }
-          shell.openPath(input);
+          await shell.openPath(input);
         }),
     },
     autoUpdater: {
-      onUpdateDownloaded: autoUpdaterProcedure.subscription(
-        ({ ctx: { autoUpdater } }) => {
-          return observable<{ updateDownloaded: boolean; version?: string }>(
-            emit => {
-              autoUpdater.on('update-downloaded', info => {
-                emit.next({
-                  updateDownloaded: true,
-                  version: info.version,
-                });
-              });
-
-              return () => {};
-            },
-          );
-        },
-      ),
+      onUpdateDownloaded: autoUpdaterProcedure.subscription(async function* ({
+        signal,
+        ctx: { autoUpdater },
+      }) {
+        for await (const [info] of on(autoUpdater, 'update-downloaded', {
+          signal,
+        })) {
+          yield {
+            updateDownloaded: true,
+            version: info.version,
+          };
+        }
+      }),
       install: autoUpdaterProcedure.mutation(({ ctx: { autoUpdater } }) => {
         autoUpdater.quitAndInstall();
       }),

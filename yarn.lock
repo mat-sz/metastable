@@ -1322,7 +1322,7 @@ __metadata:
     react-use-pointer-drag: "npm:^0.1.2"
     sass-embedded: "npm:^1.79.3"
     semver: "npm:^7.6.3"
-    trpc-electron: "npm:^0.1.1"
+    trpc-electron: "npm:^0.1.2"
     typescript: "npm:^5.0.2"
     use-context-menu: "npm:^0.4.13"
     vite: "npm:^5.4.5"
@@ -9219,14 +9219,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"trpc-electron@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "trpc-electron@npm:0.1.1"
+"trpc-electron@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "trpc-electron@npm:0.1.2"
   peerDependencies:
     "@trpc/client": ">=11.0.0"
     "@trpc/server": ">=11.0.0"
     electron: ">19.0.0"
-  checksum: 10c0/db9a5f733de765535d0bb7aeb86fb282fc8545bef3cabcc1b310a2d8371c71583e54b0a35bf613e8f1cdc8dfe8a398a966422c28876bb4f0f4c432e865006972
+  checksum: 10c0/e7196dbf0d5bd4bf43ab9649bf45a1e2ce44fd34a528c2c2794ce866e9ce7bcbcc6561ca9423cc5532712f064c064fbc124a1f893e84dd2e0a4c22e207892209
   languageName: node
   linkType: hard
 
