@@ -2,11 +2,16 @@ import { ModelType, ProjectFileType } from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { BsX } from 'react-icons/bs';
 
+import { IconButton } from '$components/iconButton';
 import {
+  VarAddModel,
+  VarArray,
   VarImage,
   VarImageMode,
   VarInputType,
+  VarLabelActions,
   VarMask,
   VarModel,
   VarNumber,
@@ -53,20 +58,39 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               label="UNET"
             />
             <VarModel
-              path="checkpoint.clip1"
-              modelType={ModelType.CLIP}
-              label="CLIP 1"
-            />
-            <VarModel
-              path="checkpoint.clip2"
-              modelType={ModelType.CLIP}
-              label="CLIP 2"
-            />
-            <VarModel
               path="checkpoint.vae"
               modelType={ModelType.VAE}
               label="VAE"
             />
+            <VarArray
+              path="checkpoint.clip"
+              footer={({ append }) => (
+                <VarAddModel
+                  label="CLIP"
+                  modelType={ModelType.CLIP}
+                  onSelect={model => {
+                    append(model.mrn);
+                  }}
+                />
+              )}
+            >
+              {({ remove }) => (
+                <VarModel
+                  path=""
+                  modelType={ModelType.CLIP}
+                  label={
+                    <VarLabelActions
+                      label="CLIP"
+                      actions={
+                        <IconButton onClick={remove}>
+                          <BsX />
+                        </IconButton>
+                      }
+                    />
+                  }
+                />
+              )}
+            </VarArray>
           </>
         ) : (
           <VarModel

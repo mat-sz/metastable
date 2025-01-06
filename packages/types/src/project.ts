@@ -16,8 +16,7 @@ export interface ProjectSimpleSettings extends BaseSettings {
     | {
         mode: 'advanced';
         unet?: string;
-        clip1?: string;
-        clip2?: string;
+        clip?: string[];
         vae?: string;
       };
   input: {

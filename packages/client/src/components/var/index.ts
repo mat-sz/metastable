@@ -9,6 +9,7 @@ export * from './VarButton';
 export * from './VarInputType';
 export * from './VarImage';
 export * from './VarImageMode';
+export * from './VarLabelActions';
 export * from './VarMask';
 export * from './VarModel';
 export * from './VarNumber';

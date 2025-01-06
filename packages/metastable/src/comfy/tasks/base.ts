@@ -77,7 +77,7 @@ export class BaseComfyTask<
       if (required) {
         throw new Error(`Missing ${type} model.`);
       } else {
-        return;
+        return false;
       }
     }
 
@@ -86,7 +86,8 @@ export class BaseComfyTask<
       throw new Error(`Invalid MRN for model type ${type}: ${mrn}`);
     }
 
-    await Metastable.instance.resolve(mrn);
+    const path = await Metastable.instance.resolve(mrn);
+    return !!path;
   }
 
   async init() {

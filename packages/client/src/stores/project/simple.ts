@@ -45,16 +45,8 @@ class SimpleProjectValidator {
   constructor(settings: ProjectSimpleSettings) {
     if (settings.checkpoint.mode === 'advanced') {
       this.validateModel(ModelType.UNET, settings.checkpoint.unet);
-      this.validateModel(ModelType.CLIP, settings.checkpoint.clip1);
       this.validateModel(ModelType.VAE, settings.checkpoint.vae);
-
-      if (settings.checkpoint.clip2) {
-        this.validateModel(ModelType.CLIP, settings.checkpoint.clip2);
-
-        if (settings.checkpoint.clip1 === settings.checkpoint.clip2) {
-          this.errors.push('CLIP1 must be a different model from CLIP2.');
-        }
-      }
+      this.validateModel(ModelType.CLIP, settings.checkpoint.clip?.[0]);
     } else {
       this.validateModel(ModelType.CHECKPOINT, settings.checkpoint.model);
     }
@@ -159,6 +151,18 @@ export function convertSettings(
     convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip1');
     convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip2');
     convertModelKey(ModelType.VAE, newSettings.checkpoint, 'vae');
+
+    if (!newSettings.checkpoint.clip) {
+      newSettings.checkpoint.clip = [];
+
+      if (newSettings.checkpoint.clip1) {
+        newSettings.checkpoint.clip.push(newSettings.checkpoint.clip1);
+      }
+
+      if (newSettings.checkpoint.clip2) {
+        newSettings.checkpoint.clip.push(newSettings.checkpoint.clip2);
+      }
+    }
   } else {
     convertModelItem(ModelType.CHECKPOINT, newSettings.checkpoint);
   }
@@ -364,10 +368,11 @@ export class SimpleProject extends BaseProject<
     let totalVram = 0;
 
     if (settings.checkpoint.mode === 'advanced') {
-      totalVram += modelStore.size(settings.checkpoint.unet);
-      totalVram += modelStore.size(settings.checkpoint.clip1);
-      totalVram += modelStore.size(settings.checkpoint.clip2);
-      totalVram += modelStore.size(settings.checkpoint.vae);
+      totalVram += [
+        settings.checkpoint.unet,
+        ...(settings.checkpoint.clip || []),
+        settings.checkpoint.vae,
+      ].reduce((size, current) => size + modelStore.size(current), 0);
     } else {
       totalVram += modelStore.size(settings.checkpoint.model);
     }

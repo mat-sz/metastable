@@ -57,12 +57,19 @@ export class PromptTask extends BaseComfyTask<
 
     if (settings.checkpoint.mode === 'advanced') {
       await this.validateModel(ModelType.UNET, true, settings.checkpoint.unet);
-      await this.validateModel(ModelType.CLIP, true, settings.checkpoint.clip1);
-      await this.validateModel(
-        ModelType.CLIP,
-        false,
-        settings.checkpoint.clip2,
-      );
+
+      let clipFound = false;
+      if (settings.checkpoint.clip) {
+        for (const clipMrn of settings.checkpoint.clip) {
+          if (await this.validateModel(ModelType.CLIP, false, clipMrn)) {
+            clipFound = true;
+          }
+        }
+      }
+      if (!clipFound) {
+        throw new Error('Missing CLIP model.');
+      }
+
       await this.validateModel(ModelType.VAE, true, settings.checkpoint.vae);
     } else {
       await this.validateModel(
@@ -98,10 +105,11 @@ export class PromptTask extends BaseComfyTask<
   async getCheckpoint(ctx: ComfySession) {
     const data = this.settings.checkpoint;
     if (data.mode === 'advanced') {
-      const clipPaths = [await Metastable.instance.resolve(data.clip1!)];
-      if (data.clip2) {
-        clipPaths.push(await Metastable.instance.resolve(data.clip2));
-      }
+      const clipPaths = await Promise.all(
+        data
+          .clip!.filter(mrn => !!mrn)
+          .map(mrn => Metastable.instance.resolve(mrn)),
+      );
 
       return await ctx.checkpoint.advanced({
         type: Architecture.FLUX1,
