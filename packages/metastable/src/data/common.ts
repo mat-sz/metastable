@@ -1,5 +1,5 @@
 import { Dirent } from 'fs';
-import fs, { mkdir } from 'fs/promises';
+import fs, { mkdir, stat } from 'fs/promises';
 import path from 'path';
 
 import {
@@ -163,6 +163,7 @@ export class DirectoryEntity extends BaseEntity {
 
 export class FileEntity extends BaseEntity {
   metadata;
+  size = 0;
 
   constructor(_path: string) {
     super(_path);
@@ -178,6 +179,10 @@ export class FileEntity extends BaseEntity {
   }
 
   async load(): Promise<void> {
+    if (!this.size) {
+      this.size = (await stat(this.path)).size;
+    }
+
     await this.metadata.get(true);
   }
 

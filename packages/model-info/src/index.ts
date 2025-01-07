@@ -4,7 +4,7 @@ import { readPytorch } from './pytorch.js';
 import { readSafetensors } from './safetensors.js';
 
 export const PYTORCH_EXTENSIONS = ['ckpt', 'pt', 'bin', 'pth'];
-export const SAFETENSORS_EXTENSIONS = ['safetensors'];
+export const SAFETENSORS_EXTENSIONS = ['safetensors', 'sft', 'st'];
 export const SUPPORTED_MODEL_TYPES = [
   ModelType.CHECKPOINT,
   ModelType.LORA,

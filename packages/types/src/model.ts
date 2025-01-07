@@ -62,3 +62,14 @@ export interface Model {
   metadata?: ModelMetadata;
   details?: ModelDetails;
 }
+
+export interface Metamodel {
+  version: number;
+  type: ModelType;
+  ref: {
+    model?: string;
+    unet?: string;
+    clip?: string[];
+    vae?: string;
+  };
+}

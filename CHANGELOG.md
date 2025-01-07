@@ -7,6 +7,7 @@
 - Added authorization for HuggingFace downloads.
 - Added support for loading checkpoints that don't contain VAE/CLIP/UNET (e.g. SD 3.x) and then supplying external models.
 - Added a button to reset selection in model fields.
+- Added support for "metacheckpoints" - metadata files that combine multiple separate models into one virtual checkpoint.
 
 ## Improvements
 

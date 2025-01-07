@@ -104,6 +104,27 @@ export class PromptTask extends BaseComfyTask<
     const mainModel = await Metastable.instance.model.get(mainMrn);
     const type = mainModel.details?.architecture || Architecture.SD1;
 
+    if (mainModel.isMetamodel) {
+      const { clip, unet, vae } = data;
+      data = {
+        mode: 'advanced',
+        model: undefined,
+        ...mainModel.metamodel?.json?.ref,
+      };
+
+      if (clip?.length) {
+        data.clip = clip;
+      }
+
+      if (unet) {
+        data.unet = unet;
+      }
+
+      if (vae) {
+        data.vae = vae;
+      }
+    }
+
     const clipMrns = data.clip?.filter(mrn => !!mrn) || [];
     const clipPaths = await Promise.all(
       clipMrns.map(mrn => Metastable.instance.resolve(mrn)),

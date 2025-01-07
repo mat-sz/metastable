@@ -1,15 +1,15 @@
 import { EventEmitter } from 'events';
-import { mkdir, stat, writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
 import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
-import { Model, ModelDetails, ModelType } from '@metastable/types';
+import { Metamodel, Model, ModelDetails, ModelType } from '@metastable/types';
 import chokidar from 'chokidar';
 
 import { Metastable } from '#metastable';
-import { FileEntity } from './common.js';
+import { FileEntity, Metadata } from './common.js';
 import {
   CONFIG_EXTENSIONS,
   exists,
@@ -30,6 +30,7 @@ const MODEL_EXTENSIONS = [
   'onnx',
   'st',
   'sft',
+  'msmeta',
 ];
 
 export class ModelEntity extends FileEntity {
@@ -41,10 +42,15 @@ export class ModelEntity extends FileEntity {
   mrnBaseSegments: string[] = [];
   baseParts: string[] = [];
   details: ModelDetails | undefined = undefined;
+  metamodel: Metadata<Metamodel> | undefined = undefined;
 
   constructor(_path: string) {
     super(_path);
     this.simpleName = removeFileExtension(this.name);
+  }
+
+  get isMetamodel() {
+    return this.name.toLowerCase().endsWith('.msmeta');
   }
 
   async load(): Promise<void> {
@@ -56,7 +62,7 @@ export class ModelEntity extends FileEntity {
       throw new Error('Not a valid model file.');
     }
 
-    await this.metadata.get(true);
+    await super.load();
 
     this.imageName = await testExtensions(
       this.metadataPath,
@@ -74,7 +80,10 @@ export class ModelEntity extends FileEntity {
       await generateThumbnail(imagePath);
     }
 
-    if (!this.details && SUPPORTED_MODEL_TYPES.includes(this.type!)) {
+    if (this.isMetamodel) {
+      this.metamodel = new Metadata(this.path);
+      await this.metamodel.get();
+    } else if (!this.details && SUPPORTED_MODEL_TYPES.includes(this.type!)) {
       try {
         this.details = await getModelDetails(this.path);
       } catch (e) {
@@ -83,6 +92,52 @@ export class ModelEntity extends FileEntity {
           corrupt: true,
         };
       }
+    }
+  }
+
+  async loadMetamodel() {
+    if (!this.metamodel || this.details) {
+      return;
+    }
+
+    try {
+      const data = await this.metamodel.get();
+      const mainMrn = data.ref?.model || data.ref?.unet;
+      if (
+        data.version !== 1 ||
+        data.type !== ModelType.CHECKPOINT ||
+        !data.ref ||
+        !mainMrn
+      ) {
+        throw new Error('Invalid metamodel');
+      }
+
+      const mrns = [
+        data.ref.model,
+        data.ref.unet,
+        ...(data.ref.clip || []),
+        data.ref.vae,
+      ].filter(mrn => !!mrn) as string[];
+      if (mrns.includes(this.mrn)) {
+        throw new Error('Self-referencing meta model');
+      }
+
+      const models = await Promise.all(
+        mrns.map(mrn => Metastable.instance.model.get(mrn)),
+      );
+      if (models.some(model => model.isMetamodel)) {
+        throw new Error("Metamodels can't reference other metamodels");
+      }
+
+      const mainModel = await Metastable.instance.model.get(mainMrn);
+      this.details = mainModel.details;
+
+      this.size = models.reduce((total, model) => total + model.size, 0);
+    } catch (e) {
+      console.warn(`Unable to load metamodel ${this.mrn} - ${e}`);
+      this.details = {
+        corrupt: true,
+      };
     }
   }
 
@@ -171,7 +226,7 @@ export class ModelEntity extends FileEntity {
         name: this.name,
         parts: this.parts,
         path: this.path,
-        size: (await stat(this.path)).size,
+        size: this.size,
       },
       details: this.details,
     };
@@ -282,6 +337,9 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
       .filter(result => result.status === 'fulfilled' && result.value)
       .map(result => (result as any).value) as ModelEntity[];
     this.cache = models;
+
+    await Promise.allSettled(models.map(model => model.loadMetamodel()));
+
     return models;
   }
 
