@@ -386,4 +386,12 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
     return resolved;
   }
+
+  async tryResolve(mrn?: string) {
+    if (!mrn) {
+      return undefined;
+    }
+
+    return await this.resolve(mrn);
+  }
 }

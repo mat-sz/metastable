@@ -15,13 +15,13 @@ export class ComfyLORA {
   ) {}
 
   async applyTo(checkpoint: ComfyCheckpoint, strength: number) {
-    const { model, clip } = (await this.session.invoke('lora:apply', {
+    const { unet, clip } = (await this.session.invoke('lora:apply', {
       lora: this.ref,
-      model: checkpoint.data.model,
+      unet: checkpoint.data.unet,
       clip: checkpoint.data.clip,
       strength,
-    })) as { model: RPCRef; clip: RPCRef };
-    checkpoint.data.model = model;
+    })) as { unet: RPCRef; clip: RPCRef };
+    checkpoint.data.unet = unet;
     checkpoint.data.clip = clip;
   }
 }

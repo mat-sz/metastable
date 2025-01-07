@@ -41,7 +41,6 @@ export class PromptTask extends BaseComfyTask<
   public session?: ComfySession;
   public checkpoint?: ComfyCheckpoint;
   public conditioning?: ComfyConditioning;
-  private checkpointConfigPath?: string;
   public images?: RPCRef[];
 
   constructor(project: ProjectEntity, settings: ProjectSimpleSettings) {
@@ -55,23 +54,7 @@ export class PromptTask extends BaseComfyTask<
       throw new Error("Image is required if input type is not 'none'.");
     }
 
-    if (settings.checkpoint.mode === 'advanced') {
-      await this.validateModel(ModelType.UNET, true, settings.checkpoint.unet);
-
-      let clipFound = false;
-      if (settings.checkpoint.clip) {
-        for (const clipMrn of settings.checkpoint.clip) {
-          if (await this.validateModel(ModelType.CLIP, false, clipMrn)) {
-            clipFound = true;
-          }
-        }
-      }
-      if (!clipFound) {
-        throw new Error('Missing CLIP model.');
-      }
-
-      await this.validateModel(ModelType.VAE, true, settings.checkpoint.vae);
-    } else {
+    if (settings.checkpoint.mode === 'simple') {
       await this.validateModel(
         ModelType.CHECKPOINT,
         true,
@@ -103,29 +86,39 @@ export class PromptTask extends BaseComfyTask<
   }
 
   async getCheckpoint(ctx: ComfySession) {
-    const data = this.settings.checkpoint;
-    if (data.mode === 'advanced') {
-      const clipPaths = await Promise.all(
-        data
-          .clip!.filter(mrn => !!mrn)
-          .map(mrn => Metastable.instance.resolve(mrn)),
-      );
+    let data = this.settings.checkpoint;
 
-      return await ctx.checkpoint.advanced({
-        type: Architecture.FLUX1,
-        unetPath: await Metastable.instance.resolve(data.unet!),
-        clipPaths,
-        vaePath: await Metastable.instance.resolve(data.vae!),
-        embeddingsPath: this.embeddingsPath,
-      });
-    } else {
-      return await ctx.checkpoint.load(
-        await Metastable.instance.resolve(data.model!),
-        this.embeddingsPath,
-        data.clipSkip ? -1 * data.clipSkip : undefined,
-        this.checkpointConfigPath,
-      );
+    if (data.mode === 'simple') {
+      // Ignore other selections in simple mode.
+      data = {
+        mode: 'simple',
+        model: data.model,
+      };
     }
+
+    const mainMrn = data.model || data.unet;
+    if (!mainMrn) {
+      throw new Error('Checkpoint loading error: missing UNET');
+    }
+
+    const mainModel = await Metastable.instance.model.get(mainMrn);
+    const type = mainModel.details?.architecture || Architecture.SD1;
+
+    const clipMrns = data.clip?.filter(mrn => !!mrn) || [];
+    const clipPaths = await Promise.all(
+      clipMrns.map(mrn => Metastable.instance.resolve(mrn)),
+    );
+
+    return await ctx.checkpoint.load({
+      type,
+      checkpointPath: await Metastable.instance.tryResolve(data.model),
+      unetPath: await Metastable.instance.tryResolve(data.unet),
+      clipPaths,
+      vaePath: await Metastable.instance.tryResolve(data.vae),
+      clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
+      embeddingsPath: this.embeddingsPath,
+      configPath: mainModel.configPath,
+    });
   }
 
   private async prepareImage(url: string, fit?: keyof FitEnum) {

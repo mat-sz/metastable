@@ -227,11 +227,11 @@ class PulidNamespace:
     
     @RPC.autoref
     @RPC.method("apply")
-    def apply(model, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
+    def apply(unet, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         
-        work_model = model.clone()
+        work_model = unet.clone()
         
         device = comfy.model_management.get_torch_device()
         dtype = comfy.model_management.unet_dtype()
@@ -345,7 +345,7 @@ class PulidNamespace:
         if not cond:
             # No faces detected, return the original model
             print("pulid warning: No faces detected in any of the given images, returning unmodified model.")
-            return (work_model,)
+            return work_model
         
         # average embeddings
         cond = torch.cat(cond).to(device, dtype=dtype)

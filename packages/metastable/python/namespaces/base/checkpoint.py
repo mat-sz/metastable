@@ -74,29 +74,15 @@ def model_set_circular(model, is_circular=False):
 class CheckpointNamespace:
     @RPC.autoref
     @RPC.method("load")
-    def load(path, embeddings_path=None, clip_layer=None, config_path=None):
-        (model, clip, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
-
-        if model == None:
-            raise Exception("Checkpoint loading error: missing model")
-        
-        if clip == None:
-            raise Exception("Checkpoint loading error: missing CLIP")
-        
-        if vae == None:
-            raise Exception("Checkpoint loading error: missing VAE")
-
-        if clip_layer == None or clip_layer == 0:
-            clip.clip_layer(None)
-        else:
-            clip.clip_layer(clip_layer)
+    def load(path, embeddings_path=None, config_path=None):
+        (unet, clip, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
 
         latent_type = "sd"
-        if model.model.model_type == ModelType.FLOW:
+        if unet.model.model_type == ModelType.FLOW:
             latent_type = "sd3"
         
         return {
-            "model": model,
+            "unet": unet,
             "clip": clip,
             "vae": vae,
             "latent_type": latent_type
@@ -104,11 +90,11 @@ class CheckpointNamespace:
     
     @RPC.autoref
     @RPC.method("sample")
-    def sample(model, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
-        model_set_circular(model, is_circular)
+    def sample(unet, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
+        model_set_circular(unet, is_circular)
 
         latent_image = latent["samples"]
-        latent_image = comfy.sample.fix_empty_latent_channels(model, latent_image)
+        latent_image = comfy.sample.fix_empty_latent_channels(unet, latent_image)
         noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
         noise_mask = None
@@ -119,20 +105,20 @@ class CheckpointNamespace:
         if preview is not None:
             taesd_decoder_path = None
             if preview["method"] == "taesd":
-                taesd_decoder_name = model.model.latent_format.taesd_decoder_name
+                taesd_decoder_name = unet.model.latent_format.taesd_decoder_name
                 if "taesd" in preview and taesd_decoder_name in preview["taesd"]:
                     taesd_decoder_path = preview["taesd"][taesd_decoder_name]
 
-            callback = latent_preview.prepare_callback(model, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
+            callback = latent_preview.prepare_callback(unet, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
         else:
-            callback = latent_preview.prepare_callback(model, "none", steps)
+            callback = latent_preview.prepare_callback(unet, "none", steps)
         
         sampler = comfy.samplers.sampler_object(sampler_name)
 
         custom_schedulers = custom.get_custom_schedulers()
         if scheduler_name not in custom_schedulers:
             return comfy.sample.sample(
-                model=model,
+                model=unet,
                 noise=noise,
                 steps=steps,
                 cfg=cfg,
@@ -149,9 +135,9 @@ class CheckpointNamespace:
             )
         else:
             scheduler = custom_schedulers[scheduler_name]
-            sigmas = scheduler(model, steps, denoise)
+            sigmas = scheduler(unet, steps, denoise)
             return comfy.sample.sample_custom(
-                model=model,
+                model=unet,
                 noise=noise,
                 cfg=cfg,
                 sampler=sampler,

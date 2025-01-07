@@ -16,7 +16,7 @@ export class ComfyCheckpoint {
   constructor(
     private session: ComfySession,
     public data: {
-      model: RPCRef;
+      unet: RPCRef;
       clip: RPCRef;
       vae: RPCRef;
       latent_type: string;
@@ -52,7 +52,7 @@ export class ComfyCheckpoint {
     preview?: ComfyPreviewSettings,
   ) {
     return (await this.session.invoke('checkpoint:sample', {
-      model: this.data.model,
+      unet: this.data.unet,
       latent,
       positive: conditioning.positive,
       negative: conditioning.negative,

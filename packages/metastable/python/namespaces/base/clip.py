@@ -25,3 +25,13 @@ class CLIPNamespace:
         tokens = clip.tokenize(text)
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
         return [[cond, {"pooled_output": pooled}]]
+    
+    @RPC.autoref
+    @RPC.method("set_layer")
+    def set_layer(clip, layer):
+        if layer == None or layer == 0:
+            clip.clip_layer(None)
+        else:
+            clip.clip_layer(layer)
+        
+        return clip

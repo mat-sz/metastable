@@ -10,10 +10,10 @@ class IPAdapterNamespace:
 
     @RPC.autoref
     @RPC.method("apply")
-    def ipadapter_apply(model, ipadapter, clip_vision, image, strength):
+    def ipadapter_apply(unet, ipadapter, clip_vision, image, strength):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         
         return {
-            "model": apply(ipadapter, model, strength, clip_vision, image)
+            "unet": apply(ipadapter, unet, strength, clip_vision, image)
         }

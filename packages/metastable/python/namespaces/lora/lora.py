@@ -11,9 +11,9 @@ class LORANamespace:
 
     @RPC.autoref
     @RPC.method("apply")
-    def apply(model, clip, lora, strength):
-        (model, clip) = comfy.sd.load_lora_for_models(model, clip, lora, strength, strength)
+    def apply(unet, clip, lora, strength):
+        (unet, clip) = comfy.sd.load_lora_for_models(unet, clip, lora, strength, strength)
         return {
-            "model": model,
+            "unet": unet,
             "clip": clip
         }

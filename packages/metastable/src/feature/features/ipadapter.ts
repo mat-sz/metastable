@@ -23,14 +23,14 @@ export class ComfyIPAdapter {
     image: RPCRef,
     strength: number,
   ) {
-    const { model } = (await this.session.invoke('ipadapter:apply', {
+    const { unet } = (await this.session.invoke('ipadapter:apply', {
       ipadapter: this.ref,
       clip_vision: clipVision.ref,
-      model: checkpoint.data.model,
+      unet: checkpoint.data.unet,
       image,
       strength,
-    })) as { model: RPCRef };
-    checkpoint.data.model = model;
+    })) as { unet: RPCRef };
+    checkpoint.data.unet = unet;
   }
 }
 

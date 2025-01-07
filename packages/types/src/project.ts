@@ -7,18 +7,14 @@ export interface BaseSettings {
 
 export interface ProjectSimpleSettings extends BaseSettings {
   version: number;
-  checkpoint:
-    | {
-        mode: 'simple';
-        model?: string;
-        clipSkip?: number;
-      }
-    | {
-        mode: 'advanced';
-        unet?: string;
-        clip?: string[];
-        vae?: string;
-      };
+  checkpoint: {
+    mode: 'simple' | 'advanced';
+    model?: string;
+    unet?: string;
+    clip?: string[];
+    vae?: string;
+    clipSkip?: number;
+  };
   input: {
     type: 'none' | 'image' | 'image_masked';
     image?: string;
