@@ -43,11 +43,7 @@ class SimpleProjectValidator {
   warnings: string[] = [];
 
   constructor(settings: ProjectSimpleSettings) {
-    if (settings.checkpoint.mode === 'advanced') {
-      this.validateModel(ModelType.UNET, settings.checkpoint.unet);
-      this.validateModel(ModelType.VAE, settings.checkpoint.vae);
-      this.validateModel(ModelType.CLIP, settings.checkpoint.clip?.[0]);
-    } else {
+    if (settings.checkpoint.mode === 'simple') {
       this.validateModel(ModelType.CHECKPOINT, settings.checkpoint.model);
     }
 
@@ -300,9 +296,7 @@ export class SimpleProject extends BaseProject<
     settings.output.width ||= 512;
     settings.output.batchSize ||= 1;
 
-    if (settings.checkpoint.mode === 'advanced') {
-      settings.checkpoint.unet ||= mainStore.defaultModelMrn(ModelType.UNET);
-    } else {
+    if (settings.checkpoint.mode === 'simple') {
       settings.checkpoint.model ||= mainStore.defaultModelMrn(
         ModelType.CHECKPOINT,
       );
@@ -369,6 +363,7 @@ export class SimpleProject extends BaseProject<
 
     if (settings.checkpoint.mode === 'advanced') {
       totalVram += [
+        settings.checkpoint.model,
         settings.checkpoint.unet,
         ...(settings.checkpoint.clip || []),
         settings.checkpoint.vae,

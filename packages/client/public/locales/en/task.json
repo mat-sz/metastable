@@ -1,5 +1,5 @@
 {
-  "task": {
+  "type": {
     "prompt": "Image generation",
     "postprocess": "Image postprocessing",
     "tag": "Tagging"

@@ -50,7 +50,25 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           ]}
           inline
         />
-        {project.settings.checkpoint.mode === 'advanced' ? (
+        <VarModel
+          path="checkpoint.model"
+          modelType={ModelType.CHECKPOINT}
+          label="Checkpoint"
+          onSelect={model => {
+            if (!model) {
+              return;
+            }
+
+            const samplerSettings = model.metadata?.samplerSettings;
+            if (samplerSettings) {
+              project.settings.sampler = {
+                ...project.settings.sampler,
+                ...samplerSettings,
+              };
+            }
+          }}
+        />
+        {project.settings.checkpoint.mode === 'advanced' && (
           <>
             <VarModel
               path="checkpoint.unet"
@@ -92,20 +110,6 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               )}
             </VarArray>
           </>
-        ) : (
-          <VarModel
-            path="checkpoint.model"
-            modelType={ModelType.CHECKPOINT}
-            onSelect={model => {
-              const samplerSettings = model.metadata?.samplerSettings;
-              if (samplerSettings) {
-                project.settings.sampler = {
-                  ...project.settings.sampler,
-                  ...samplerSettings,
-                };
-              }
-            }}
-          />
         )}
       </SettingsCategory>
       {showPrompt && (

@@ -5,6 +5,7 @@
 - Added a setting to reserve a certain amount of VRAM.
 - Added support for more than 2 CLIP models in advanced mode.
 - Added authorization for HuggingFace downloads.
+- Added support for loading checkpoints that don't contain VAE/CLIP/UNET (e.g. SD 3.x) and then supplying external models.
 
 ## Improvements
 
