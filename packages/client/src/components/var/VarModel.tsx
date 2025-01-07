@@ -12,10 +12,10 @@ import { useVarUIValue } from './common/VarUIContext';
 import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarModel.module.scss';
 
-export interface IVarModelProps extends IVarBaseInputProps<string> {
+export interface IVarModelProps extends IVarBaseInputProps<string | undefined> {
   modelType: ModelType;
   architecture?: Architecture;
-  onSelect?: (modelData: Model) => void;
+  onSelect?: (modelData: Model | undefined) => void;
 }
 
 export const VarModel = observer(
@@ -33,7 +33,9 @@ export const VarModel = observer(
     label = 'Model',
     architecture,
   }: IVarModelProps): JSX.Element => {
-    const [currentValue, setCurrentValue, currentError] = useVarUIValue({
+    const [currentValue, setCurrentValue, currentError] = useVarUIValue<
+      string | undefined
+    >({
       path,
       fallbackValue: value,
       onChange,
@@ -63,8 +65,9 @@ export const VarModel = observer(
               defaultParts={model?.file.parts}
               type={modelType}
               architecture={architecture}
+              allowReset
               onSelect={model => {
-                setCurrentValue(model.mrn);
+                setCurrentValue(model?.mrn);
                 onSelect?.(model);
                 setIsOpen(false);
               }}

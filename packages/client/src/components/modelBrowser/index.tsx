@@ -11,6 +11,7 @@ import {
   BsExclamationTriangleFill,
   BsFolder,
   BsFolderFill,
+  BsXLg,
 } from 'react-icons/bs';
 import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
@@ -32,7 +33,8 @@ import styles from './index.module.scss';
 interface Props {
   type: ModelType;
   defaultParts?: string[];
-  onSelect: (model: Model) => void;
+  allowReset?: boolean;
+  onSelect: (model: Model | undefined) => void;
   variant?: 'default' | 'small';
   architecture?: Architecture;
 }
@@ -80,7 +82,7 @@ interface ModelBrowserListProps {
   data: Model[];
   variant?: 'default' | 'small';
   setParts: React.Dispatch<React.SetStateAction<string[]>>;
-  onSelect: (model: Model) => void;
+  onSelect: (model: Model | undefined) => void;
 }
 
 export const ModelBrowserList: React.FC<ModelBrowserListProps> = observer(
@@ -199,6 +201,7 @@ export const ModelBrowser: React.FC<Props> = observer(
     defaultParts = [],
     variant = 'default',
     architecture,
+    allowReset,
   }) => {
     const [parts, setParts] = useState<string[]>(defaultParts);
     const [compatibleOnly, setCompatibleOnly] = useState(true);
@@ -249,6 +252,16 @@ export const ModelBrowser: React.FC<Props> = observer(
                 }}
               >
                 <BsFolderFill />
+              </IconButton>
+            )}
+            {allowReset && (
+              <IconButton
+                title="Reset"
+                onClick={() => {
+                  onSelect(undefined);
+                }}
+              >
+                <BsXLg />
               </IconButton>
             )}
           </div>

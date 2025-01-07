@@ -39,6 +39,10 @@ export const VarAddModel = ({
             type={modelType}
             architecture={architecture}
             onSelect={model => {
+              if (!model) {
+                return;
+              }
+
               onSelect?.(model);
               setIsOpen(false);
             }}
