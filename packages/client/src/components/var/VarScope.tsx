@@ -1,6 +1,6 @@
-import { clone, get, set } from 'radash';
 import React from 'react';
 
+import { clone, get, set } from '$utils/object';
 import { useVarUIValue, VarUIContext } from './common/VarUIContext';
 import { IVarBaseValueProps } from './VarBase';
 

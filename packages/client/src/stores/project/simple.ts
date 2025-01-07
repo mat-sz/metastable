@@ -22,7 +22,6 @@ import {
   runInAction,
   toJS,
 } from 'mobx';
-import { get, set } from 'radash';
 
 import { API } from '$api';
 import { recommendedResolutions, Resolution } from '$data/resolutions';
@@ -34,6 +33,7 @@ import { modelStore } from '$stores/ModelStore';
 import { randomSeed } from '$utils/comfy';
 import { EXTENSIONS, filesize } from '$utils/file';
 import { detectOrientation, fileToBase64 } from '$utils/image';
+import { get, set } from '$utils/object';
 import { isLocalUrl, resolveImage } from '$utils/url';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';

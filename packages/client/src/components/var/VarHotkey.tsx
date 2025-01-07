@@ -17,8 +17,10 @@ export const VarHotkey = ({
   className,
   error,
   errorPath,
-}: IVarBaseInputProps<string>): JSX.Element => {
-  const [currentValue, setCurrentValue, currentError] = useVarUIValue({
+}: IVarBaseInputProps<string | undefined>): JSX.Element => {
+  const [currentValue, setCurrentValue, currentError] = useVarUIValue<
+    string | undefined
+  >({
     path,
     fallbackValue: value,
     onChange,
@@ -60,7 +62,7 @@ export const VarHotkey = ({
         {!isRecording && !!currentValue && (
           <IconButton
             onClick={() => {
-              setCurrentValue('');
+              setCurrentValue(undefined);
             }}
             title="Unset"
           >

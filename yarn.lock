@@ -1311,7 +1311,6 @@ __metadata:
     mobx: "npm:^6.10.2"
     mobx-react-lite: "npm:^4.0.4"
     nanoid: "npm:^5.0.4"
-    radash: "npm:^12.1.0"
     react: "npm:^18.2.0"
     react-dnd: "npm:^16.0.1"
     react-dnd-html5-backend: "npm:^16.0.1"

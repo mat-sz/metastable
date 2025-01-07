@@ -1,6 +1,5 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { assign } from 'radash';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '$components/button';
@@ -19,6 +18,7 @@ import {
   ExternalSettings,
   loadSettingsFromFile,
 } from '$utils/externalSettings';
+import { assign } from '$utils/object';
 
 interface Props {
   project: SimpleProject;

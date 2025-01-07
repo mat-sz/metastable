@@ -1,6 +1,6 @@
-import { clone, get, set } from 'radash';
 import { ReactNode, useCallback, useMemo } from 'react';
 
+import { clone, get, set } from '$utils/object';
 import { VarUIContext } from './common/VarUIContext';
 
 export interface IVarUIProps<T extends object> {
