@@ -13,7 +13,9 @@ import { FileEntity, Metadata } from './common.js';
 import {
   CONFIG_EXTENSIONS,
   exists,
+  getAvailableName,
   IMAGE_EXTENSIONS,
+  JSONFile,
   removeFileExtension,
   testExtensions,
   tryUnlink,
@@ -341,6 +343,22 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
     await Promise.allSettled(models.map(model => model.loadMetamodel()));
 
     return models;
+  }
+
+  private async getAvailableEntityName(type: ModelType, name: string) {
+    return await getAvailableName(path.join(this.baseDir, type), name);
+  }
+
+  async createMetamodel(type: ModelType, name: string, ref: Metamodel['ref']) {
+    const data: Metamodel = {
+      version: 1,
+      type,
+      ref,
+    };
+    const finalName = await this.getAvailableEntityName(type, `${name}.msmeta`);
+    const file = new JSONFile(this.getEntityPath(type, finalName), data);
+    await file.writeJson(data);
+    return `mrn:model:${type}:${finalName}`;
   }
 
   async all(): Promise<ModelEntity[]> {

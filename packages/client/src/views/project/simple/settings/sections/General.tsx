@@ -1,4 +1,4 @@
-import { ModelType, ProjectFileType } from '@metastable/types';
+import { Metamodel, ModelType, ProjectFileType } from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -8,6 +8,7 @@ import { IconButton } from '$components/iconButton';
 import {
   VarAddModel,
   VarArray,
+  VarButton,
   VarImage,
   VarImageMode,
   VarInputType,
@@ -24,7 +25,9 @@ import {
   VarSwitch,
   VarToggle,
 } from '$components/var';
+import { ModelCreateMetamodel } from '$modals/model';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
@@ -109,6 +112,31 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                 />
               )}
             </VarArray>
+            <VarButton
+              buttonLabel="Create Metacheckpoint"
+              onClick={() => {
+                const checkpoint = project.settings.checkpoint;
+                const refData: Metamodel['ref'] = {
+                  model: checkpoint.model,
+                  unet: checkpoint.unet,
+                  clip: checkpoint.clip,
+                  vae: checkpoint.vae,
+                };
+                modalStore.show(
+                  <ModelCreateMetamodel
+                    refData={refData}
+                    onSave={mrn => {
+                      runInAction(() => {
+                        project.settings.checkpoint = {
+                          mode: 'simple',
+                          model: mrn,
+                        };
+                      });
+                    }}
+                  />,
+                );
+              }}
+            />
           </>
         )}
       </SettingsCategory>
