@@ -1,9 +1,25 @@
-import { DownloadSettings, ModelMetadata, ModelType } from '@metastable/types';
+import {
+  DownloadSettings,
+  Metamodel,
+  ModelMetadata,
+  ModelType,
+} from '@metastable/types';
+
+export enum DownloadableModelWarning {
+  HF_GATED = 'hfGated',
+  AUTHORIZATION_REQUIRED = 'authorizationRequired',
+}
 
 export interface DownloadableModel extends ModelMetadata {
   type: ModelType;
   downloads: DownloadSettings[];
   recommended?: boolean;
+  warnings?: DownloadableModelWarning[];
+  createMetamodel?: {
+    name: string;
+    metamodel: Metamodel;
+    metadata?: ModelMetadata;
+  };
 }
 
 export interface DownloadableModelGroup {

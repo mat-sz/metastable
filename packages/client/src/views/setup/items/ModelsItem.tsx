@@ -52,7 +52,10 @@ export const ModelsItem: React.FC = observer(() => {
       description={item.description}
       status={item.status}
     >
-      <ModelList beforeModel={model => <ModelCheckbox model={model} />} />
+      <ModelList
+        beforeModel={model => <ModelCheckbox model={model} />}
+        isSetup
+      />
     </Item>
   );
 });

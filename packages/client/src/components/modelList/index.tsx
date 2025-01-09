@@ -2,23 +2,52 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18not';
 import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
 
+import { Alert, Alerts } from '$components/alert';
 import { downloadable } from '$data/models';
-import { DownloadableModel } from '$types/model';
+import { DownloadableModel, DownloadableModelGroup } from '$types/model';
 import styles from './index.module.scss';
 import { IconButton } from '../iconButton';
 
 interface Props {
   beforeModel?: (model: DownloadableModel) => React.ReactNode;
   afterModel?: (model: DownloadableModel) => React.ReactNode;
+  isSetup?: boolean;
 }
 
-export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
+export const ModelList: React.FC<Props> = ({
+  beforeModel,
+  afterModel,
+  isSetup,
+}) => {
   const { t } = useTranslation('model');
   const [openGroup, setOpenGroup] = useState(0);
 
+  let items = [...downloadable];
+  if (isSetup) {
+    items = items
+      .map(group => {
+        if (!group.recommended) {
+          return undefined;
+        }
+
+        const models = group.models.filter(
+          model => model.recommended && !model.warnings?.length,
+        );
+        if (!models.length) {
+          return undefined;
+        }
+
+        return {
+          ...group,
+          models,
+        };
+      })
+      .filter(group => !!group) as DownloadableModelGroup[];
+  }
+
   return (
     <div className={styles.list}>
-      {downloadable.map((group, i) => (
+      {items.map((group, i) => (
         <div key={i} className={styles.group}>
           <div className={styles.header} onClick={() => setOpenGroup(i)}>
             <div className={styles.info}>
@@ -52,6 +81,15 @@ export const ModelList: React.FC<Props> = ({ beforeModel, afterModel }) => {
                       <div className={styles.description}>
                         {model.description}
                       </div>
+                    )}
+                    {!!model.warnings?.length && (
+                      <Alerts>
+                        {model.warnings?.map(warning => (
+                          <Alert variant="warning">
+                            {t(`model:warning.${warning}`)}
+                          </Alert>
+                        ))}
+                      </Alerts>
                     )}
                   </div>
                   {afterModel?.(model)}

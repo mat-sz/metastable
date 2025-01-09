@@ -16,5 +16,9 @@
     "unet": "UNET",
     "upscale_model": "Upscale model",
     "vae": "VAE"
+  },
+  "warning": {
+    "hfGated": "To download this model, you must navigate to the homepage and agree to the license.",
+    "authorizationRequired": "You must provide your token in settings to download this model."
   }
 }
