@@ -13,7 +13,7 @@ import { IVarBaseInputProps, VarBase } from './VarBase';
 import styles from './VarModel.module.scss';
 
 export interface IVarModelProps extends IVarBaseInputProps<string | undefined> {
-  modelType: ModelType;
+  modelType: ModelType | ModelType[];
   architecture?: Architecture;
   onSelect?: (modelData: Model | undefined) => void;
 }

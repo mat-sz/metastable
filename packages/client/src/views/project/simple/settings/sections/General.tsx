@@ -75,8 +75,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           <>
             <VarModel
               path="checkpoint.unet"
-              modelType={ModelType.UNET}
-              label="UNET"
+              modelType={[ModelType.UNET, ModelType.DIFFUSION_MODEL]}
+              label="Diffusion model"
             />
             <VarModel
               path="checkpoint.vae"
@@ -87,8 +87,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               path="checkpoint.clip"
               footer={({ append }) => (
                 <VarAddModel
-                  label="CLIP"
-                  modelType={ModelType.CLIP}
+                  label="Text encoder"
+                  modelType={[ModelType.CLIP, ModelType.TEXT_ENCODER]}
                   onSelect={model => {
                     append(model.mrn);
                   }}
@@ -98,10 +98,10 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               {({ remove }) => (
                 <VarModel
                   path=""
-                  modelType={ModelType.CLIP}
+                  modelType={[ModelType.CLIP, ModelType.TEXT_ENCODER]}
                   label={
                     <VarLabelActions
-                      label="CLIP"
+                      label="Text encoder"
                       actions={
                         <IconButton onClick={remove}>
                           <BsX />

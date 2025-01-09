@@ -9,7 +9,7 @@ import { VarBase } from './VarBase';
 
 export interface IVarAddModelProps {
   label: string;
-  modelType: ModelType;
+  modelType: ModelType | ModelType[];
   architecture?: Architecture;
   onSelect?: (modelData: Model) => void;
   disabled?: boolean;

@@ -31,7 +31,7 @@ import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 
 interface Props {
-  type: ModelType;
+  type: ModelType | ModelType[];
   defaultParts?: string[];
   allowReset?: boolean;
   onSelect: (model: Model | undefined) => void;
@@ -205,8 +205,9 @@ export const ModelBrowser: React.FC<Props> = observer(
   }) => {
     const [parts, setParts] = useState<string[]>(defaultParts);
     const [compatibleOnly, setCompatibleOnly] = useState(true);
+    const types = Array.isArray(type) ? type : [type];
 
-    let data = modelStore.type(type) || [];
+    let data = types.flatMap(type => modelStore.type(type) || []);
     if (architecture && compatibleOnly) {
       data = data.filter(item => item.details?.architecture === architecture);
     }
