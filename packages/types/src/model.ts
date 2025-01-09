@@ -30,6 +30,7 @@ export enum Architecture {
   STABLE_CASCADE = 'stable_cascade',
   PIXART = 'pixart',
   FLUX1 = 'flux1',
+  HUNYUAN_VIDEO = 'hunyuan_video',
 }
 
 export interface ModelMetadata {

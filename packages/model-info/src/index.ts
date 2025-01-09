@@ -10,6 +10,8 @@ export const SUPPORTED_MODEL_TYPES = [
   ModelType.LORA,
   ModelType.CONTROLNET,
   ModelType.UNET,
+  ModelType.DIFFUSION_MODEL,
+  ModelType.VAE,
 ];
 
 async function getDict(modelPath: string) {
@@ -30,6 +32,29 @@ interface StatePattern {
 
 const PATTERNS: StatePattern[] = [
   {
+    matchLists: [
+      ['txt_in.individual_token_refiner.blocks.0.norm1.weight'],
+      ['model.model.txt_in.individual_token_refiner.blocks.0.norm1.weight'],
+    ],
+    details: {
+      architecture: Architecture.HUNYUAN_VIDEO,
+      type: ModelType.DIFFUSION_MODEL,
+    },
+  },
+  {
+    matchLists: [
+      ['encoder.down.1.downsample.conv.conv.bias', 'post_quant_conv.bias'],
+      [
+        'encoder.down_blocks.1.downsamplers.0.conv.conv.bias',
+        'post_quant_conv.bias',
+      ],
+    ],
+    details: {
+      architecture: Architecture.HUNYUAN_VIDEO,
+      type: ModelType.VAE,
+    },
+  },
+  {
     matchLists: [['lora_unet_double_blocks_12_img_mod_lin.lora_down.weight']],
     details: {
       architecture: Architecture.FLUX1,
@@ -44,7 +69,7 @@ const PATTERNS: StatePattern[] = [
     },
   },
   {
-    matchLists: [['double_blocks.18.txt_mod.lin.weight']],
+    matchLists: [['double_blocks.0.img_attn.norm.key_norm.scale']],
     details: {
       architecture: Architecture.FLUX1,
       type: ModelType.UNET,

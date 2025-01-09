@@ -7,7 +7,14 @@ import { unpickle } from './pickle.js';
 export async function readPytorch(modelPath: string) {
   const stream = createReadStream(modelPath);
   const data = await locateData(stream);
-  return unpickle(data);
+  const json = unpickle(data);
+  if (!json['state_dict']) {
+    return {
+      state_dict: json['module'] || json,
+    };
+  }
+
+  return json;
 }
 
 function locateData(stream: ReadStream): Promise<Buffer> {
