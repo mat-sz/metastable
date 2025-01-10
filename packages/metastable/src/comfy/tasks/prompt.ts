@@ -221,7 +221,7 @@ export class PromptTask extends BaseComfyTask<
     this.step('input');
     switch (settings.input.type) {
       case 'none':
-        latent = await ctx.image.emptyLatent(
+        latent = await ctx.latent.empty(
           settings.output.width,
           settings.output.height,
           settings.output.batchSize || 1,

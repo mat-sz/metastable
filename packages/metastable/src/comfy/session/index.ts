@@ -110,22 +110,26 @@ class ComfySessionClipVision {
   }
 }
 
-class ComfySessionImage {
+class ComfySessionLatent {
   constructor(private session: ComfySession) {}
 
-  async emptyLatent(
+  async empty(
     width: number,
     height: number,
     batchSize?: number,
     latentType?: string,
   ) {
-    return (await this.session.invoke('image:latent.empty', {
+    return (await this.session.invoke('latent:empty', {
       width,
       height,
       batch_size: batchSize,
       latent_type: latentType,
     })) as ComfyLatent;
   }
+}
+
+class ComfySessionImage {
+  constructor(private session: ComfySession) {}
 
   async dump(image: RPCRef, format: string = 'png') {
     return (await this.session.invoke('image:dump', {
@@ -171,6 +175,7 @@ export class ComfySession extends EventEmitter<ComfySessionEvents> {
   clipVision = new ComfySessionClipVision(this);
   image = new ComfySessionImage(this);
   tag = new ComfySessionTag(this);
+  latent = new ComfySessionLatent(this);
 
   constructor(
     private comfy: Comfy,
