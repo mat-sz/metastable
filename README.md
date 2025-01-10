@@ -9,6 +9,9 @@
 </p>
 </h1>
 
+> [!NOTE]  
+> [Getting started with Metastable](https://docs.metastable.studio/guide/getting-started/quickstart.html)
+
 > [!WARNING]  
 > This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
 
