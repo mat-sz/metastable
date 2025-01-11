@@ -12,9 +12,7 @@ import { TaskView } from './TaskView';
 
 const Preview: React.FC = observer(() => {
   const project = useSimpleProject();
-  const task =
-    project.currentTask ||
-    (!project.currentOutput ? project.firstTask : undefined);
+  const task = project.viewTask;
 
   if (task) {
     return <TaskView task={task} />;

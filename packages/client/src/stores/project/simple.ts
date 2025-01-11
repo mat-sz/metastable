@@ -267,6 +267,7 @@ export class SimpleProject extends BaseProject<
       autoSizes: computed,
       beforeRequest: action,
       imageFiles: computed,
+      viewTask: computed,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectTaskData>) => {
@@ -540,6 +541,12 @@ export class SimpleProject extends BaseProject<
       const saved = this.availableStyles.find(item => item.id === style.id);
       this.settings.prompt.style = saved ? { ...saved } : undefined;
     }
+  }
+
+  get viewTask() {
+    return (
+      this.currentTask || (!this.currentOutput ? this.tasks[0] : undefined)
+    );
   }
 
   async request() {
