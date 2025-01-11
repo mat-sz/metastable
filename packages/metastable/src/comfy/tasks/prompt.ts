@@ -98,9 +98,14 @@ export class PromptTask extends BaseComfyTask<
         mode: 'simple',
         checkpoint: data.checkpoint,
       };
+    } else if (data.mode === 'advanced') {
+      data = {
+        ...data,
+        checkpoint: undefined,
+      };
     }
 
-    const mainMrn = data.checkpoint || data.diffusionModel;
+    const mainMrn = data.diffusionModel || data.checkpoint;
     if (!mainMrn) {
       throw new Error(
         'Checkpoint loading error: missing diffusion model/checkpoint',
@@ -132,12 +137,24 @@ export class PromptTask extends BaseComfyTask<
     }
 
     const paths: ComfyCheckpointPaths = {
-      checkpoint: await Metastable.instance.tryResolve(data.checkpoint),
-      diffusionModel: await Metastable.instance.tryResolve(data.diffusionModel),
       vae: await Metastable.instance.tryResolve(data.vae),
       embeddings: this.embeddingsPath,
       config: mainModel.configPath,
     };
+
+    if (data.diffusionModel) {
+      const diffusionModel = await Metastable.instance.model.get(
+        data.diffusionModel,
+      );
+      if (diffusionModel.type === ModelType.DIFFUSION_MODEL) {
+        paths.diffusionModel = diffusionModel.path;
+      } else if (diffusionModel.type === ModelType.CHECKPOINT) {
+        paths.checkpoint = diffusionModel.path;
+      }
+    } else if (data.checkpoint) {
+      paths.checkpoint = await Metastable.instance.tryResolve(data.checkpoint);
+    }
+
     const textEncoderMrns = data.textEncoders?.filter(mrn => !!mrn) || [];
     if (textEncoderMrns.length) {
       paths.textEncoders = await Promise.all(

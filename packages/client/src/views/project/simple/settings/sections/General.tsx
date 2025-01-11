@@ -53,30 +53,12 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           ]}
           inline
         />
-        <VarModel
-          path="checkpoint"
-          modelType={ModelType.CHECKPOINT}
-          label="Checkpoint"
-          onSelect={model => {
-            if (!model) {
-              return;
-            }
-
-            const samplerSettings = model.metadata?.samplerSettings;
-            if (samplerSettings) {
-              project.settings.sampler = {
-                ...project.settings.sampler,
-                ...samplerSettings,
-              };
-            }
-          }}
-        />
-        {project.settings.models.mode === 'advanced' && (
+        {project.settings.models.mode === 'advanced' ? (
           <>
             <VarModel
               path="diffusionModel"
-              modelType={ModelType.DIFFUSION_MODEL}
-              label="Diffusion model"
+              modelType={[ModelType.CHECKPOINT, ModelType.DIFFUSION_MODEL]}
+              label="Diffusion model / checkpoint"
             />
             <VarModel path="vae" modelType={ModelType.VAE} label="VAE" />
             <VarArray
@@ -134,6 +116,25 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               }}
             />
           </>
+        ) : (
+          <VarModel
+            path="checkpoint"
+            modelType={ModelType.CHECKPOINT}
+            label="Checkpoint"
+            onSelect={model => {
+              if (!model) {
+                return;
+              }
+
+              const samplerSettings = model.metadata?.samplerSettings;
+              if (samplerSettings) {
+                project.settings.sampler = {
+                  ...project.settings.sampler,
+                  ...samplerSettings,
+                };
+              }
+            }}
+          />
         )}
       </SettingsCategory>
       {showPrompt && (
