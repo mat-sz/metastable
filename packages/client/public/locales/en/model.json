@@ -1,10 +1,10 @@
 {
   "type": {
     "checkpoint": "Checkpoint",
-    "clip": "CLIP",
     "clip_vision": "CLIP Vision",
     "controlnet": "ControlNet",
     "diffuser": "Diffuser",
+    "diffusion_model": "Diffusion model",
     "embedding": "Embedding",
     "gligen": "GLIGEN",
     "hypernetwork": "HyperNetwork",
@@ -13,7 +13,7 @@
     "segment_anything": "Segment Anything",
     "style_model": "Style model",
     "tagger": "Tagger",
-    "unet": "UNET",
+    "text_encoder": "Text encoder",
     "upscale_model": "Upscale model",
     "vae": "VAE"
   },

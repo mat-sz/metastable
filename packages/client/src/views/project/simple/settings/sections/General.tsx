@@ -42,10 +42,10 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
 
   return (
     <>
-      <SettingsCategory label="Checkpoint" sectionId="checkpoint">
+      <SettingsCategory label="Checkpoint" path="models" sectionId="checkpoint">
         <VarSwitch
           label="Mode"
-          path="checkpoint.mode"
+          path="mode"
           defaultValue="simple"
           options={[
             { key: 'simple', label: 'Simple' },
@@ -54,7 +54,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           inline
         />
         <VarModel
-          path="checkpoint.model"
+          path="checkpoint"
           modelType={ModelType.CHECKPOINT}
           label="Checkpoint"
           onSelect={model => {
@@ -71,24 +71,20 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             }
           }}
         />
-        {project.settings.checkpoint.mode === 'advanced' && (
+        {project.settings.models.mode === 'advanced' && (
           <>
             <VarModel
-              path="checkpoint.unet"
-              modelType={[ModelType.UNET, ModelType.DIFFUSION_MODEL]}
+              path="diffusionModel"
+              modelType={ModelType.DIFFUSION_MODEL}
               label="Diffusion model"
             />
-            <VarModel
-              path="checkpoint.vae"
-              modelType={ModelType.VAE}
-              label="VAE"
-            />
+            <VarModel path="vae" modelType={ModelType.VAE} label="VAE" />
             <VarArray
-              path="checkpoint.clip"
+              path="textEncoders"
               footer={({ append }) => (
                 <VarAddModel
                   label="Text encoder"
-                  modelType={[ModelType.CLIP, ModelType.TEXT_ENCODER]}
+                  modelType={ModelType.TEXT_ENCODER}
                   onSelect={model => {
                     append(model.mrn);
                   }}
@@ -98,7 +94,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               {({ remove }) => (
                 <VarModel
                   path=""
-                  modelType={[ModelType.CLIP, ModelType.TEXT_ENCODER]}
+                  modelType={ModelType.TEXT_ENCODER}
                   label={
                     <VarLabelActions
                       label="Text encoder"
@@ -115,21 +111,21 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             <VarButton
               buttonLabel="Create Metacheckpoint"
               onClick={() => {
-                const checkpoint = project.settings.checkpoint;
-                const refData: Metamodel['ref'] = {
-                  model: checkpoint.model,
-                  unet: checkpoint.unet,
-                  clip: checkpoint.clip,
-                  vae: checkpoint.vae,
+                const projectModels = project.settings.models;
+                const models: Metamodel['models'] = {
+                  checkpoint: projectModels.checkpoint,
+                  diffusionModel: projectModels.diffusionModel,
+                  textEncoders: projectModels.textEncoders,
+                  vae: projectModels.vae,
                 };
                 modalStore.show(
                   <ModelCreateMetamodel
-                    refData={refData}
+                    models={models}
                     onSave={mrn => {
                       runInAction(() => {
-                        project.settings.checkpoint = {
+                        project.settings.models = {
                           mode: 'simple',
-                          model: mrn,
+                          checkpoint: mrn,
                         };
                       });
                     }}
@@ -325,7 +321,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         />
         <VarSlider
           label="CLIP skip last layers"
-          path="checkpoint.clipSkip"
+          path="models.clipSkip"
           min={0}
           max={12}
           step={1}

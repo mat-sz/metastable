@@ -2,7 +2,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { ReactNode } from 'react';
 
-import { VarCategory } from '$components/var';
+import { VarCategory, VarScope } from '$components/var';
 import { useSimpleProject } from '../../context';
 
 export interface Props {
@@ -15,6 +15,8 @@ export interface Props {
    * Additional class names on the wrapping div element.
    */
   className?: string;
+
+  path?: string;
 
   sectionId: string;
 
@@ -31,6 +33,7 @@ export const SettingsCategory = observer(
     label,
     className,
     children,
+    path,
     sectionId,
     defaultCollapsed = false,
   }: Props): JSX.Element => {
@@ -47,16 +50,22 @@ export const SettingsCategory = observer(
       });
     };
 
-    return (
-      <VarCategory
-        label={label}
-        className={className}
-        collapsed={collapsed}
-        onToggleCollapsed={onToggle}
-        collapsible
-      >
-        {children}
-      </VarCategory>
-    );
+    const props = {
+      label,
+      className,
+      collapsed,
+      onToggleCollapsed: onToggle,
+      collapsible: true,
+    };
+
+    if (path) {
+      return (
+        <VarScope path={path}>
+          <VarCategory {...props}>{children}</VarCategory>
+        </VarScope>
+      );
+    }
+
+    return <VarCategory {...props}>{children}</VarCategory>;
   },
 );

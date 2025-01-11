@@ -227,11 +227,11 @@ class PulidNamespace:
     
     @RPC.autoref
     @RPC.method("apply")
-    def apply(unet, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
+    def apply(diffusion_model, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         
-        work_model = unet.clone()
+        work_model = diffusion_model.clone()
         
         device = comfy.model_management.get_torch_device()
         dtype = comfy.model_management.unet_dtype()

@@ -2,7 +2,6 @@ import { ProjectSimpleSettings } from './project.js';
 
 export enum ModelType {
   CHECKPOINT = 'checkpoint',
-  CLIP = 'clip',
   CLIP_VISION = 'clip_vision',
   CONTROLNET = 'controlnet',
   DIFFUSER = 'diffuser',
@@ -16,7 +15,6 @@ export enum ModelType {
   STYLE_MODEL = 'style_model',
   TAGGER = 'tagger',
   TEXT_ENCODER = 'text_encoder',
-  UNET = 'unet',
   UPSCALE_MODEL = 'upscale_model',
   VAE = 'vae',
 }
@@ -69,10 +67,10 @@ export interface Model {
 export interface Metamodel {
   version: number;
   type: ModelType;
-  ref: {
-    model?: string;
-    unet?: string;
-    clip?: string[];
+  models: {
+    checkpoint?: string;
+    diffusionModel?: string;
+    textEncoders?: string[];
     vae?: string;
   };
 }

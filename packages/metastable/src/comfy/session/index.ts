@@ -5,6 +5,7 @@ import { Architecture } from '@metastable/types';
 import type { Comfy } from '../index.js';
 import { ComfyCheckpoint, ComfyCLIPVision, ComfyLatent } from './models.js';
 import {
+  ComfyCheckpointPaths,
   ComfySessionLogEvent,
   ComfySessionProgressEvent,
   RPCBytes,
@@ -21,76 +22,77 @@ class ComfySessionCheckpoint {
 
   async load({
     type,
-    checkpointPath,
-    unetPath,
-    clipPaths,
-    vaePath,
-    embeddingsPath,
+    paths,
     clipLayer,
-    configPath,
   }: {
     type: Architecture;
-    checkpointPath?: string;
-    unetPath?: string;
-    clipPaths?: string[];
-    vaePath?: string;
-    embeddingsPath?: string;
+    paths: ComfyCheckpointPaths;
     clipLayer?: number;
-    configPath?: string;
   }) {
     let refs: {
-      clip?: RPCRef;
-      unet?: RPCRef;
+      textEncoder?: RPCRef;
+      diffusionModel?: RPCRef;
       vae?: RPCRef;
-      latent_type: string;
+      latentType: string;
     } = {
-      latent_type: 'sd',
+      latentType: 'sd',
     };
 
-    if (checkpointPath) {
-      const data: any = await this.session.invoke('checkpoint:load', {
-        path: checkpointPath,
-        embeddings_path: embeddingsPath,
-        config_path: configPath,
-      });
-      refs = { ...refs, ...data };
+    if (paths.checkpoint) {
+      const data: {
+        diffusion_model: RPCRef;
+        text_encoder: RPCRef;
+        vae: RPCRef;
+        latent_type: string;
+      } = (await this.session.invoke('checkpoint:load', {
+        path: paths.checkpoint,
+        embeddings_path: paths.embeddings,
+        config_path: paths.config,
+      })) as any;
+      refs = {
+        ...refs,
+        diffusionModel: data.diffusion_model,
+        textEncoder: data.text_encoder,
+        vae: data.vae,
+        latentType: data.latent_type,
+      };
     }
 
-    if (unetPath) {
-      refs.unet = (await this.session.invoke('unet:load', {
-        path: unetPath,
+    if (paths.diffusionModel) {
+      refs.diffusionModel = (await this.session.invoke('diffusion_model:load', {
+        path: paths.diffusionModel,
       })) as any;
     }
 
-    if (clipPaths?.length) {
-      refs.clip = (await this.session.invoke('clip:load', {
-        paths: clipPaths,
+    if (paths.textEncoders?.length) {
+      refs.textEncoder = (await this.session.invoke('text_encoder:load', {
+        paths: paths.textEncoders,
         type,
-        embeddings_path: embeddingsPath,
+        embeddings_path: paths.embeddings,
       })) as any;
     }
 
-    if (vaePath) {
+    if (paths.vae) {
       refs.vae = (await this.session.invoke('vae:load', {
-        path: vaePath,
+        path: paths.vae,
       })) as any;
     }
 
-    if (!refs.unet) {
-      throw new Error('Checkpoint loading error: missing UNET');
+    if (!refs.diffusionModel) {
+      throw new Error('Checkpoint loading error: missing diffusion model');
     }
 
     if (!refs.vae) {
       throw new Error('Checkpoint loading error: missing VAE');
     }
 
-    if (!refs.clip) {
-      throw new Error('Checkpoint loading error: missing CLIP');
+    if (!refs.textEncoder) {
+      throw new Error('Checkpoint loading error: missing text encoder');
     }
 
     if (clipLayer) {
-      refs.clip = (await this.session.invoke('clip:set_layer', {
-        clip: refs.clip,
+      refs.textEncoder = (await this.session.invoke('text_encoder:set_layer', {
+        text_encoder: refs.textEncoder,
         layer: clipLayer,
       })) as any;
     }

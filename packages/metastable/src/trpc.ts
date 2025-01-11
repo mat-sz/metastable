@@ -281,12 +281,14 @@ export const router = t.router({
         z.object({
           name: z.string(),
           type: z.nativeEnum(ModelType),
-          ref: z.any(),
+          models: z.any(),
         }),
       )
-      .mutation(async ({ ctx: { metastable }, input: { name, type, ref } }) => {
-        return await metastable.model.createMetamodel(type, name, ref);
-      }),
+      .mutation(
+        async ({ ctx: { metastable }, input: { name, type, models } }) => {
+          return await metastable.model.createMetamodel(type, name, models);
+        },
+      ),
     delete: t.procedure
       .input(
         z.object({

@@ -75,26 +75,26 @@ class CheckpointNamespace:
     @RPC.autoref
     @RPC.method("load")
     def load(path, embeddings_path=None, config_path=None):
-        (unet, clip, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
+        (diffusion_model, text_encoder, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
 
         latent_type = "sd"
-        if unet.model.model_type == ModelType.FLOW:
+        if diffusion_model.model.model_type == ModelType.FLOW:
             latent_type = "sd3"
         
         return {
-            "unet": unet,
-            "clip": clip,
+            "diffusion_model": diffusion_model,
+            "text_encoder": text_encoder,
             "vae": vae,
             "latent_type": latent_type
         }
     
     @RPC.autoref
     @RPC.method("sample")
-    def sample(unet, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
-        model_set_circular(unet, is_circular)
+    def sample(diffusion_model, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
+        model_set_circular(diffusion_model, is_circular)
 
         latent_image = latent["samples"]
-        latent_image = comfy.sample.fix_empty_latent_channels(unet, latent_image)
+        latent_image = comfy.sample.fix_empty_latent_channels(diffusion_model, latent_image)
         noise = comfy.sample.prepare_noise(latent_image, seed, None)
 
         noise_mask = None
@@ -105,20 +105,20 @@ class CheckpointNamespace:
         if preview is not None:
             taesd_decoder_path = None
             if preview["method"] == "taesd":
-                taesd_decoder_name = unet.model.latent_format.taesd_decoder_name
+                taesd_decoder_name = diffusion_model.model.latent_format.taesd_decoder_name
                 if "taesd" in preview and taesd_decoder_name in preview["taesd"]:
                     taesd_decoder_path = preview["taesd"][taesd_decoder_name]
 
-            callback = latent_preview.prepare_callback(unet, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
+            callback = latent_preview.prepare_callback(diffusion_model, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
         else:
-            callback = latent_preview.prepare_callback(unet, "none", steps)
+            callback = latent_preview.prepare_callback(diffusion_model, "none", steps)
         
         sampler = comfy.samplers.sampler_object(sampler_name)
 
         custom_schedulers = custom.get_custom_schedulers()
         if scheduler_name not in custom_schedulers:
             return comfy.sample.sample(
-                model=unet,
+                model=diffusion_model,
                 noise=noise,
                 steps=steps,
                 cfg=cfg,
@@ -135,9 +135,9 @@ class CheckpointNamespace:
             )
         else:
             scheduler = custom_schedulers[scheduler_name]
-            sigmas = scheduler(unet, steps, denoise)
+            sigmas = scheduler(diffusion_model, steps, denoise)
             return comfy.sample.sample_custom(
-                model=unet,
+                model=diffusion_model,
                 noise=noise,
                 cfg=cfg,
                 sampler=sampler,

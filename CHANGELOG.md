@@ -1,5 +1,9 @@
 # 0.0.15 (Upcoming)
 
+> [!WARNING]  
+> Manual steps required to finish the update.  
+> If you have any CLIP or UNET models (in models/clip and models/unet), you will need to move them to models/text_encoder and models/diffusion_model respectively.
+
 ## Features
 
 - Added a setting to reserve a certain amount of VRAM.

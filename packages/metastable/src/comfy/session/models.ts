@@ -16,23 +16,23 @@ export class ComfyCheckpoint {
   constructor(
     private session: ComfySession,
     public data: {
-      unet: RPCRef;
-      clip: RPCRef;
+      diffusionModel: RPCRef;
+      textEncoder: RPCRef;
       vae: RPCRef;
-      latent_type: string;
+      latentType: string;
     },
   ) {}
 
   async conditioning(positiveText: string, negativeText: string) {
     return new ComfyConditioning(
-      await this.clipEncode(positiveText),
-      await this.clipEncode(negativeText),
+      await this.encodeText(positiveText),
+      await this.encodeText(negativeText),
     );
   }
 
-  async clipEncode(text: string) {
-    return (await this.session.invoke('clip:encode', {
-      clip: this.data.clip,
+  async encodeText(text: string) {
+    return (await this.session.invoke('text_encoder:encode', {
+      text_encoder: this.data.textEncoder,
       text,
     })) as RPCRef;
   }
@@ -52,7 +52,7 @@ export class ComfyCheckpoint {
     preview?: ComfyPreviewSettings,
   ) {
     return (await this.session.invoke('checkpoint:sample', {
-      unet: this.data.unet,
+      diffusion_model: this.data.diffusionModel,
       latent,
       positive: conditioning.positive,
       negative: conditioning.negative,

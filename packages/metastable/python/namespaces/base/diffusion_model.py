@@ -26,7 +26,7 @@ def load_unet_cached(path, model_options={}):
     last_unet = comfy.sd.load_diffusion_model(path, model_options=model_options)
     return last_unet
 
-class UNETNamespace:
+class DiffusionModelNamespace:
     @RPC.autoref
     @RPC.method("load")
     def load(path):

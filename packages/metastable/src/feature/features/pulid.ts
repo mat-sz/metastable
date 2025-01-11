@@ -21,15 +21,14 @@ class ComfyPulid {
     image: RPCRef,
     strength: number,
   ) {
-    const unet = (await this.session.invoke('pulid:apply', {
-      unet: checkpoint.data.unet,
+    checkpoint.data.diffusionModel = (await this.session.invoke('pulid:apply', {
+      diffusion_model: checkpoint.data.diffusionModel,
       pulid: this.ref,
       eva_clip: evaClip,
       face_analysis: faceAnalysis,
       image,
       strength,
     })) as RPCRef;
-    checkpoint.data.unet = unet;
   }
 }
 

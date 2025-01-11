@@ -104,21 +104,21 @@ export class ModelEntity extends FileEntity {
 
     try {
       const data = await this.metamodel.get();
-      const mainMrn = data.ref?.model || data.ref?.unet;
+      const mainMrn = data.models?.checkpoint || data.models?.diffusionModel;
       if (
         data.version !== 1 ||
         data.type !== ModelType.CHECKPOINT ||
-        !data.ref ||
+        !data.models ||
         !mainMrn
       ) {
         throw new Error('Invalid metamodel');
       }
 
       const mrns = [
-        data.ref.model,
-        data.ref.unet,
-        ...(data.ref.clip || []),
-        data.ref.vae,
+        data.models.checkpoint,
+        data.models.diffusionModel,
+        ...(data.models.textEncoders || []),
+        data.models.vae,
       ].filter(mrn => !!mrn) as string[];
       if (mrns.includes(this.mrn)) {
         throw new Error('Self-referencing meta model');
@@ -349,16 +349,49 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
     return await getAvailableName(path.join(this.baseDir, type), name);
   }
 
-  async createMetamodel(type: ModelType, name: string, ref: Metamodel['ref']) {
-    const data: Metamodel = {
-      version: 1,
-      type,
-      ref,
+  async createMetamodel(
+    type: ModelType,
+    name: string,
+    models: Metamodel['models'],
+  ) {
+    const write = async () => {
+      const data: Metamodel = {
+        version: 1,
+        type,
+        models,
+      };
+      const finalName = await this.getAvailableEntityName(
+        type,
+        `${name}.msmeta`,
+      );
+      const file = new JSONFile(this.getEntityPath(type, finalName), data);
+      await file.writeJson(data);
+      return `mrn:model:${type}:${finalName}`;
     };
-    const finalName = await this.getAvailableEntityName(type, `${name}.msmeta`);
-    const file = new JSONFile(this.getEntityPath(type, finalName), data);
-    await file.writeJson(data);
-    return `mrn:model:${type}:${finalName}`;
+
+    const checkRefs = async () => {
+      const mrns = [
+        models.checkpoint,
+        models.diffusionModel,
+        ...(models.textEncoders || []),
+        models.vae,
+      ].filter(mrn => !!mrn) as string[];
+      const all = await this.all();
+      return mrns.every(mrn => all.find(model => model.mrn === mrn));
+    };
+
+    if (await checkRefs()) {
+      return await write();
+    } else {
+      const onChange = async () => {
+        if (await checkRefs()) {
+          this.off('change', onChange);
+          await write();
+        }
+      };
+
+      this.on('change', onChange);
+    }
   }
 
   async all(): Promise<ModelEntity[]> {

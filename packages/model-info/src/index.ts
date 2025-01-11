@@ -9,7 +9,6 @@ export const SUPPORTED_MODEL_TYPES = [
   ModelType.CHECKPOINT,
   ModelType.LORA,
   ModelType.CONTROLNET,
-  ModelType.UNET,
   ModelType.DIFFUSION_MODEL,
   ModelType.VAE,
 ];
@@ -72,7 +71,7 @@ const PATTERNS: StatePattern[] = [
     matchLists: [['double_blocks.0.img_attn.norm.key_norm.scale']],
     details: {
       architecture: Architecture.FLUX1,
-      type: ModelType.UNET,
+      type: ModelType.DIFFUSION_MODEL,
     },
   },
   {

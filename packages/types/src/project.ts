@@ -7,11 +7,11 @@ export interface BaseSettings {
 
 export interface ProjectSimpleSettings extends BaseSettings {
   version: number;
-  checkpoint: {
+  models: {
     mode: 'simple' | 'advanced';
-    model?: string;
-    unet?: string;
-    clip?: string[];
+    checkpoint?: string;
+    diffusionModel?: string;
+    textEncoders?: string[];
     vae?: string;
     clipSkip?: number;
   };

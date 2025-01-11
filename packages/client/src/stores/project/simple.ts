@@ -43,8 +43,8 @@ class SimpleProjectValidator {
   warnings: string[] = [];
 
   constructor(settings: ProjectSimpleSettings) {
-    if (settings.checkpoint.mode === 'simple') {
-      this.validateModel(ModelType.CHECKPOINT, settings.checkpoint.model);
+    if (settings.models.mode === 'simple') {
+      this.validateModel(ModelType.CHECKPOINT, settings.models.checkpoint);
     }
 
     const input = settings.input;
@@ -103,21 +103,6 @@ function convertModelArray(type: ModelType, array?: any[]) {
   }
 }
 
-function convertModelKey(type: ModelType, object: any, key: string) {
-  if (!object?.[key]) {
-    return;
-  }
-
-  if (typeof object[key] !== 'string') {
-    if (typeof object[key].name === 'string') {
-      const model = modelStore.findByName(type, object[key].name);
-      object[key] = model?.mrn;
-    } else {
-      object[key] = undefined;
-    }
-  }
-}
-
 export function convertFeatureData(
   settings: any,
   inputPath: string,
@@ -142,25 +127,24 @@ export function convertSettings(
     newSettings.featureData = {};
   }
 
-  if (newSettings.checkpoint.mode === 'advanced') {
-    convertModelKey(ModelType.UNET, newSettings.checkpoint, 'unet');
-    convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip1');
-    convertModelKey(ModelType.CLIP, newSettings.checkpoint, 'clip2');
-    convertModelKey(ModelType.VAE, newSettings.checkpoint, 'vae');
-
-    if (!newSettings.checkpoint.clip) {
-      newSettings.checkpoint.clip = [];
-
-      if (newSettings.checkpoint.clip1) {
-        newSettings.checkpoint.clip.push(newSettings.checkpoint.clip1);
-      }
-
-      if (newSettings.checkpoint.clip2) {
-        newSettings.checkpoint.clip.push(newSettings.checkpoint.clip2);
-      }
+  if (newSettings.checkpoint) {
+    if (newSettings.checkpoint.mode === 'advanced') {
+      newSettings.models = {
+        mode: 'advanced',
+      };
+    } else {
+      convertModelItem(ModelType.CHECKPOINT, newSettings.checkpoint);
+      newSettings.models = {
+        mode: 'simple',
+        checkpoint: newSettings.checkpoint.model,
+      };
     }
-  } else {
-    convertModelItem(ModelType.CHECKPOINT, newSettings.checkpoint);
+
+    if (newSettings.checkpoint.clipSkip) {
+      newSettings.models.clipSkip = newSettings.checkpoint.clipSkip;
+    }
+
+    newSettings.checkpoint = undefined;
   }
 
   convertModelArray(ModelType.LORA, newSettings.featureData.lora);
@@ -196,9 +180,9 @@ export function defaultSettings(): ProjectSimpleSettings {
       batchSize: 1,
       format: 'png',
     },
-    checkpoint: {
+    models: {
       mode: 'simple',
-      model: checkpoint?.mrn,
+      checkpoint: checkpoint?.mrn,
     },
     prompt: {
       positive: 'an image of a banana',
@@ -297,8 +281,8 @@ export class SimpleProject extends BaseProject<
     settings.output.width ||= 512;
     settings.output.batchSize ||= 1;
 
-    if (settings.checkpoint.mode === 'simple') {
-      settings.checkpoint.model ||= mainStore.defaultModelMrn(
+    if (settings.models.mode === 'simple') {
+      settings.models.checkpoint ||= mainStore.defaultModelMrn(
         ModelType.CHECKPOINT,
       );
     }
@@ -350,11 +334,11 @@ export class SimpleProject extends BaseProject<
   }
 
   get architecture(): Architecture | undefined {
-    const data = this.settings.checkpoint;
+    const data = this.settings.models;
     const model =
-      data.mode === 'advanced'
-        ? modelStore.find(data.unet)
-        : modelStore.find(data.model);
+      data.mode === 'advanced' && data.diffusionModel
+        ? modelStore.find(data.diffusionModel)
+        : modelStore.find(data.checkpoint);
     return model?.details?.architecture;
   }
 
@@ -362,15 +346,15 @@ export class SimpleProject extends BaseProject<
     const settings = this.settings;
     let totalVram = 0;
 
-    if (settings.checkpoint.mode === 'advanced') {
+    if (settings.models.mode === 'advanced') {
       totalVram += [
-        settings.checkpoint.model,
-        settings.checkpoint.unet,
-        ...(settings.checkpoint.clip || []),
-        settings.checkpoint.vae,
+        settings.models.checkpoint,
+        settings.models.diffusionModel,
+        ...(settings.models.textEncoders || []),
+        settings.models.vae,
       ].reduce((size, current) => size + modelStore.size(current), 0);
     } else {
-      totalVram += modelStore.size(settings.checkpoint.model);
+      totalVram += modelStore.size(settings.models.checkpoint);
     }
 
     this.recurseFields((parent, key, field) => {

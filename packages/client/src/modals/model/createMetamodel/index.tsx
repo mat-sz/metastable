@@ -16,19 +16,19 @@ import {
 } from '$components/var';
 
 interface Props {
-  refData?: Metamodel['ref'];
+  models?: Metamodel['models'];
   onSave?: (mrn: string) => void;
 }
 
 export const ModelCreateMetamodel: React.FC<Props> = ({
-  refData = {},
+  models = {},
   onSave,
 }) => {
   const { close } = useModal();
   const [data, setData] = useState<{
     name: string;
-    ref: Metamodel['ref'];
-  }>({ name: '', ref: refData });
+    models: Metamodel['models'];
+  }>({ name: '', models });
 
   return (
     <Modal title="Create metamodel" size="small">
@@ -36,18 +36,22 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
         <VarUI onChange={setData} values={data}>
           <VarString path="name" label="Filename" />
           <VarModel
-            path="ref.model"
+            path="models.checkpoint"
             modelType={ModelType.CHECKPOINT}
             label="Checkpoint"
           />
-          <VarModel path="ref.unet" modelType={ModelType.UNET} label="UNET" />
-          <VarModel path="ref.vae" modelType={ModelType.VAE} label="VAE" />
+          <VarModel
+            path="models.diffusionModel"
+            modelType={ModelType.DIFFUSION_MODEL}
+            label="Diffusion model"
+          />
+          <VarModel path="models.vae" modelType={ModelType.VAE} label="VAE" />
           <VarArray
-            path="ref.clip"
+            path="models.textEncoders"
             footer={({ append }) => (
               <VarAddModel
-                label="CLIP"
-                modelType={ModelType.CLIP}
+                label="Text encoder"
+                modelType={ModelType.TEXT_ENCODER}
                 onSelect={model => {
                   append(model.mrn);
                 }}
@@ -57,10 +61,10 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
             {({ remove }) => (
               <VarModel
                 path=""
-                modelType={ModelType.CLIP}
+                modelType={ModelType.TEXT_ENCODER}
                 label={
                   <VarLabelActions
-                    label="CLIP"
+                    label="Text encoder"
                     actions={
                       <IconButton onClick={remove}>
                         <BsX />
@@ -80,6 +84,7 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
         <Button
           variant="primary"
           onClick={async () => {
+            data.name = data.name.trim();
             if (!data.name) {
               return;
             }
@@ -89,7 +94,10 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
               type: ModelType.CHECKPOINT,
             });
             close();
-            onSave?.(modelMrn);
+
+            if (modelMrn) {
+              onSave?.(modelMrn);
+            }
           }}
         >
           Create

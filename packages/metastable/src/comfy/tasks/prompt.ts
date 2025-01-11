@@ -21,7 +21,11 @@ import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
 import { ComfyCheckpoint, ComfyConditioning } from '../session/models.js';
-import { ComfyPreviewSettings, RPCRef } from '../session/types.js';
+import {
+  ComfyCheckpointPaths,
+  ComfyPreviewSettings,
+  RPCRef,
+} from '../session/types.js';
 
 type PromptTaskHandlers = BaseComfyTaskHandlers & {
   postprocess: () => Promise<void> | void;
@@ -54,11 +58,11 @@ export class PromptTask extends BaseComfyTask<
       throw new Error("Image is required if input type is not 'none'.");
     }
 
-    if (settings.checkpoint.mode === 'simple') {
+    if (settings.models.mode === 'simple') {
       await this.validateModel(
         ModelType.CHECKPOINT,
         true,
-        settings.checkpoint.model,
+        settings.models.checkpoint,
       );
     }
 
@@ -86,38 +90,40 @@ export class PromptTask extends BaseComfyTask<
   }
 
   async getCheckpoint(ctx: ComfySession) {
-    let data = this.settings.checkpoint;
+    let data = this.settings.models;
 
     if (data.mode === 'simple') {
       // Ignore other selections in simple mode.
       data = {
         mode: 'simple',
-        model: data.model,
+        checkpoint: data.checkpoint,
       };
     }
 
-    const mainMrn = data.model || data.unet;
+    const mainMrn = data.checkpoint || data.diffusionModel;
     if (!mainMrn) {
-      throw new Error('Checkpoint loading error: missing UNET');
+      throw new Error(
+        'Checkpoint loading error: missing diffusion model/checkpoint',
+      );
     }
 
     const mainModel = await Metastable.instance.model.get(mainMrn);
     const type = mainModel.details?.architecture || Architecture.SD1;
 
     if (mainModel.isMetamodel) {
-      const { clip, unet, vae } = data;
+      const { textEncoders, diffusionModel, vae } = data;
       data = {
         mode: 'advanced',
-        model: undefined,
-        ...mainModel.metamodel?.json?.ref,
+        checkpoint: undefined,
+        ...mainModel.metamodel?.json?.models,
       };
 
-      if (clip?.length) {
-        data.clip = clip;
+      if (textEncoders?.length) {
+        data.textEncoders = textEncoders;
       }
 
-      if (unet) {
-        data.unet = unet;
+      if (diffusionModel) {
+        data.diffusionModel = diffusionModel;
       }
 
       if (vae) {
@@ -125,20 +131,24 @@ export class PromptTask extends BaseComfyTask<
       }
     }
 
-    const clipMrns = data.clip?.filter(mrn => !!mrn) || [];
-    const clipPaths = await Promise.all(
-      clipMrns.map(mrn => Metastable.instance.resolve(mrn)),
-    );
+    const paths: ComfyCheckpointPaths = {
+      checkpoint: await Metastable.instance.tryResolve(data.checkpoint),
+      diffusionModel: await Metastable.instance.tryResolve(data.diffusionModel),
+      vae: await Metastable.instance.tryResolve(data.vae),
+      embeddings: this.embeddingsPath,
+      config: mainModel.configPath,
+    };
+    const textEncoderMrns = data.textEncoders?.filter(mrn => !!mrn) || [];
+    if (textEncoderMrns.length) {
+      paths.textEncoders = await Promise.all(
+        textEncoderMrns.map(mrn => Metastable.instance.resolve(mrn)),
+      );
+    }
 
     return await ctx.checkpoint.load({
       type,
-      checkpointPath: await Metastable.instance.tryResolve(data.model),
-      unetPath: await Metastable.instance.tryResolve(data.unet),
-      clipPaths,
-      vaePath: await Metastable.instance.tryResolve(data.vae),
+      paths,
       clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
-      embeddingsPath: this.embeddingsPath,
-      configPath: mainModel.configPath,
     });
   }
 
@@ -225,7 +235,7 @@ export class PromptTask extends BaseComfyTask<
           settings.output.width,
           settings.output.height,
           settings.output.batchSize || 1,
-          this.checkpoint.data.latent_type,
+          this.checkpoint.data.latentType,
         );
         break;
       case 'image':
