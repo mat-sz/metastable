@@ -13,6 +13,10 @@ const TAESD_NAMES = [
   'taesd_encoder',
   'taesdxl_decoder',
   'taesdxl_encoder',
+  'taesd3_decoder',
+  'taesd3_encoder',
+  'taef1_decoder',
+  'taef1_encoder',
 ];
 const TAESD_BASE_URL = 'https://github.com/madebyollin/taesd/raw/main/';
 
@@ -20,7 +24,7 @@ export class FeatureTaesd extends FeatureBase {
   readonly id = 'taesd';
   readonly name = 'TAESD';
   readonly description =
-    'Enables use of TAESD for generation previews. (SD1.5/SDXL)';
+    'Enables use of TAESD for generation previews. (SD1.5/SDXL/SD3.x/FLUX.1)';
 
   private getDirPath() {
     return path.join(Metastable.instance.internalPath, 'models', 'taesd');

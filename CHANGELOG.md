@@ -20,7 +20,8 @@
 - Added support for DirectML on Intel Arc GPUs on Windows.
 - Improved error messages during checkpoint loading (e.g. if a checkpoint with missing CLIP/VAE is used).
 - ZLUDA is now automatically enabled during setup if compatible HIP SDK is installed.
-- Added SD 3/3.5 and FLUX.1 to downloadable models.
+- Added SD 3.x and FLUX.1 to downloadable models.
+- Added TAESD support for SD 3.x and FLUX.1.
 
 ## Bug fixes
 
