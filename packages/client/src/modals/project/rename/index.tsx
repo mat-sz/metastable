@@ -18,16 +18,14 @@ export const ProjectRename: React.FC<Props> = observer(
 
     return (
       <Modal title="Rename project" size="small">
-        <p>Choose a new name for the project.</p>
-        <p>
-          <Label label="New name" required>
-            <input
-              type="text"
-              value={projectName}
-              onChange={e => setProjectName(e.target.value)}
-            />
-          </Label>
-        </p>
+        <div>Choose a new name for the project.</div>
+        <Label label="New name" required>
+          <input
+            type="text"
+            value={projectName}
+            onChange={e => setProjectName(e.target.value)}
+          />
+        </Label>
         <ModalActions>
           <Button variant="secondary" onClick={() => close()}>
             Cancel

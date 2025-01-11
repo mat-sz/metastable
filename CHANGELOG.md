@@ -30,6 +30,7 @@
 - Fixed setup error display (during extraction step).
 - Fixed issues with saving/renaming projects on Windows.
 - Fixed issues with inpainting masks not being correctly loaded.
+- Fixed parenthesis logic in prompt text fields.
 
 # 0.0.14 (2024-11-27)
 

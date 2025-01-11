@@ -65,4 +65,30 @@
       }
     }
   }
+
+  .warnings {
+    color: var(--yellow-900);
+    font-size: 1.2rem;
+    position: relative;
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    .warningsList {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 100%;
+      width: 300px;
+      z-index: 999999;
+      transform: translate(-100%, 0);
+    }
+
+    &:hover {
+      .warningsList {
+        display: block;
+      }
+    }
+  }
 }

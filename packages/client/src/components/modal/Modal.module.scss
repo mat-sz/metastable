@@ -11,6 +11,7 @@
   justify-content: center;
   align-items: center;
   user-select: none;
+  color: var(--grey-900);
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.4);
@@ -20,7 +21,6 @@
 .modal {
   background: var(--grey-200);
   position: absolute;
-  color: var(--grey-900);
   overflow: hidden;
   display: flex;
   flex-direction: column;

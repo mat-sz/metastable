@@ -83,7 +83,10 @@ export const VarPrompt = ({
     const textStart = el.selectionStart;
     const textEnd = el.selectionEnd;
 
-    if (e.key === '(') {
+    if (
+      e.key === '(' &&
+      (el.value[textStart] === ' ' || !el.value[textStart])
+    ) {
       e.stopPropagation();
       e.preventDefault();
 

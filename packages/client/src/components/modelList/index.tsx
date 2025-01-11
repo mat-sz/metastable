@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18not';
-import { BsArrowUpRightSquare, BsStarFill } from 'react-icons/bs';
+import {
+  BsArrowUpRightSquare,
+  BsExclamationTriangle,
+  BsStarFill,
+} from 'react-icons/bs';
 
 import { Alert, Alerts } from '$components/alert';
 import { downloadable } from '$data/models';
@@ -82,17 +86,20 @@ export const ModelList: React.FC<Props> = ({
                         {model.description}
                       </div>
                     )}
-                    {!!model.warnings?.length && (
-                      <Alerts>
+                  </div>
+                  {afterModel?.(model)}
+                  {!!model.warnings?.length && (
+                    <div className={styles.warnings}>
+                      <BsExclamationTriangle />
+                      <Alerts className={styles.warningsList}>
                         {model.warnings?.map(warning => (
-                          <Alert variant="warning">
+                          <Alert variant="warning" key={warning}>
                             {t(`model:warning.${warning}`)}
                           </Alert>
                         ))}
                       </Alerts>
-                    )}
-                  </div>
-                  {afterModel?.(model)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

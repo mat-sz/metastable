@@ -19,6 +19,6 @@
   },
   "warning": {
     "hfGated": "To download this model, you must navigate to the homepage and agree to the license.",
-    "authorizationRequired": "You must provide your token in settings to download this model."
+    "authorizationRequired": "You must provide your HuggingFace token in settings."
   }
 }
