@@ -80,7 +80,7 @@ const autoUpdaterProcedure = t.procedure.use(opts => {
   });
 });
 
-const versionEndpointUrl = 'https://update.metastable.studio/version';
+const versionEndpointUrl = 'https://update.metastable.studio/version.json';
 
 export const router = t.router({
   download: {
