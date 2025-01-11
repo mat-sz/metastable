@@ -1,59 +1,72 @@
-const { HttpPublisher } = require('electron-publish');
-const { httpExecutor } = require('builder-util/out/nodeHttpExecutor');
-const { configureRequestOptions } = require('builder-util-runtime');
+const { Publisher } = require('electron-publish');
+const { S3Client } = require('@aws-sdk/client-s3');
+const { Upload } = require('@aws-sdk/lib-storage');
+const { readFile } = require('fs/promises');
 const { basename } = require('path');
-const mime = require('mime');
 
-class CustomPublisher extends HttpPublisher {
+const REQUIRED_ENV = [
+  'PUBLISH_S3_ENDPOINT',
+  'PUBLISH_S3_ACCESS_ID',
+  'PUBLISH_S3_ACCESS_KEY',
+  'PUBLISH_S3_BUCKET',
+];
+
+class CustomPublisher extends Publisher {
+  s3;
+
   constructor(context, info) {
     super(context);
 
-    let token = process.env.PUBLISH_TOKEN ?? info.token;
-    if (!token?.trim()) {
-      throw new Error(
-        `Publish API auth token is not set, try setting env variable "PUBLISH_TOKEN"`,
-      );
+    for (const name of REQUIRED_ENV) {
+      if (!process.env[name]?.trim()) {
+        throw new Error(`Publish - Required env variable missing - ${name}`);
+      }
     }
 
-    let url = process.env.PUBLISH_URL ?? info.url;
-    if (!url?.trim()) {
-      throw new Error(
-        `Publish URL is not set, try setting env variable "PUBLISH_URL"`,
-      );
-    }
-
-    this.token = token;
-    this.url = url;
+    this.s3 = new S3Client({
+      region: 'auto',
+      endpoint: process.env.PUBLISH_S3_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.PUBLISH_S3_ACCESS_ID,
+        secretAccessKey: process.env.PUBLISH_S3_ACCESS_KEY,
+      },
+    });
   }
 
   get providerName() {
-    return 'Metastable Admin API';
+    return 'S3 custom publisher';
   }
 
   toString() {
-    return `Metastable Admin API @ ${this.url}`;
+    return this.providerName;
   }
 
-  async doUpload(fileName, arch, dataLength, requestProcessor, file, os) {
-    const url = new URL(this.url);
+  async upload(task) {
+    const fileName =
+      (this.useSafeArtifactName ? task.safeArtifactName : null) ||
+      basename(task.file);
+    const fileContent = task.fileContent || (await readFile(task.file));
+    const fileSize = fileContent.byteLength;
 
-    return await httpExecutor.doApiRequest(
-      configureRequestOptions({
-        hostname: url.hostname,
-        protocol: url.protocol,
-        port: url.port,
-        path: url.pathname,
-        method: 'POST',
-        headers: {
-          Authorization: this.token,
-          'X-File-Name': file ? basename(file) : fileName,
-          'Content-Type': mime.getType(fileName) || 'application/octet-stream',
-          'Content-Length': dataLength,
-        },
-      }),
-      this.context.cancellationToken,
-      requestProcessor,
-    );
+    const prefix = process.env.PUBLISH_S3_PREFIX;
+    const upload = new Upload({
+      params: {
+        Bucket: process.env.PUBLISH_S3_BUCKET,
+        Key: prefix ? `${prefix}${fileName}` : fileName,
+        Body: fileContent,
+      },
+      client: this.s3,
+      queueSize: 3,
+    });
+
+    const bar = this.createProgressBar(fileName, fileSize);
+    if (bar) {
+      upload.on('httpUploadProgress', progress => {
+        bar.update((progress.loaded || 0) / (progress.total || 1));
+      });
+    }
+
+    return await upload.done();
   }
 }
 module.exports = CustomPublisher;
