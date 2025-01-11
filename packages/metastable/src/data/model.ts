@@ -5,7 +5,13 @@ import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
 import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
-import { Metamodel, Model, ModelDetails, ModelType } from '@metastable/types';
+import {
+  Metamodel,
+  Model,
+  ModelDetails,
+  ModelMetadata,
+  ModelType,
+} from '@metastable/types';
 import chokidar from 'chokidar';
 
 import { Metastable } from '#metastable';
@@ -353,6 +359,7 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
     type: ModelType,
     name: string,
     models: Metamodel['models'],
+    metadata?: ModelMetadata,
   ) {
     const write = async () => {
       const data: Metamodel = {
@@ -364,8 +371,16 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
         type,
         `${name}.msmeta`,
       );
-      const file = new JSONFile(this.getEntityPath(type, finalName), data);
+      const filePath = this.getEntityPath(type, finalName);
+      const file = new JSONFile(filePath, data);
       await file.writeJson(data);
+      if (metadata) {
+        const entity: ModelEntity = (await ModelEntity.fromPath(
+          filePath,
+        )) as any;
+        entity.metadata.set(metadata);
+      }
+
       return `mrn:model:${type}:${finalName}`;
     };
 

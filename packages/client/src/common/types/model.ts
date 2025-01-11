@@ -10,14 +10,23 @@ export enum DownloadableModelWarning {
   AUTHORIZATION_REQUIRED = 'authorizationRequired',
 }
 
-export interface DownloadableModel extends ModelMetadata {
+export interface DownloadableModelDownloadSettings extends DownloadSettings {
+  ignoreParentMetadata?: boolean;
+}
+
+export interface DownloadableModel {
+  name: string;
+  source?: string;
+  homepage?: string;
+  description?: string;
   type: ModelType;
-  downloads: DownloadSettings[];
+  downloads: DownloadableModelDownloadSettings[];
   recommended?: boolean;
   warnings?: DownloadableModelWarning[];
   createMetamodel?: {
     name: string;
-    metamodel: Metamodel;
+    type: ModelType;
+    models: Metamodel['models'];
     metadata?: ModelMetadata;
   };
 }

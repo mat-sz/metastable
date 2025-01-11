@@ -95,7 +95,6 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
               onClick={() => {
                 const projectModels = project.settings.models;
                 const models: Metamodel['models'] = {
-                  checkpoint: projectModels.checkpoint,
                   diffusionModel: projectModels.diffusionModel,
                   textEncoders: projectModels.textEncoders,
                   vae: projectModels.vae,

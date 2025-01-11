@@ -27,7 +27,6 @@ export const downloadable: DownloadableModelGroup[] = [
         recommended: true,
         homepage:
           'https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5',
-        baseModel: 'SD 1.5',
       },
       {
         name: 'SD 2.1 512x',
@@ -45,7 +44,6 @@ export const downloadable: DownloadableModelGroup[] = [
           'A newer version of Stable Diffusion with some censorship around artist names.',
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-2-1-base',
-        baseModel: 'SD 2.1',
       },
       {
         name: 'SD 2.1 768x',
@@ -61,7 +59,6 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         description: 'A version of SD 2.1 made for 768x768 image generation.',
         homepage: 'https://huggingface.co/stabilityai/stable-diffusion-2-1',
-        baseModel: 'SD 2.1 768',
       },
     ],
   },
@@ -73,7 +70,7 @@ export const downloadable: DownloadableModelGroup[] = [
       'Stable Diffusion checkpoint model built for high resolution image generation.',
     models: [
       {
-        name: 'SDXL 1.0 - Base',
+        name: 'SDXL 1.0',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         recommended: true,
@@ -87,7 +84,6 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0',
-        baseModel: 'SDXL 1.0',
       },
     ],
   },
@@ -108,15 +104,16 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'sd_xl_turbo_1.0_fp16.safetensors',
             url: 'https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors',
             size: 6938081905,
+            metadata: {
+              samplerSettings: {
+                steps: 1,
+                cfg: 1,
+                schedulerName: 'turbo',
+              },
+            },
           },
         ],
         homepage: 'https://huggingface.co/stabilityai/sdxl-turbo',
-        samplerSettings: {
-          steps: 1,
-          cfg: 1,
-          schedulerName: 'turbo',
-        },
-        baseModel: 'SDXL Turbo',
       },
     ],
   },
@@ -126,7 +123,7 @@ export const downloadable: DownloadableModelGroup[] = [
     description: 'Latest Stable Diffusion models.',
     models: [
       {
-        name: 'SD 3 - medium',
+        name: 'SD 3 Medium',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -141,30 +138,44 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/text_encoders/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 'clip_g.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/text_encoders/clip_g.safetensors',
             size: 1389382176,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/text_encoders/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-3-medium',
-        baseModel: 'SD 3',
         warnings: [
           DownloadableModelWarning.HF_GATED,
           DownloadableModelWarning.AUTHORIZATION_REQUIRED,
         ],
+        createMetamodel: {
+          name: 'sd3_medium',
+          type: ModelType.CHECKPOINT,
+          models: {
+            checkpoint: 'mrn:model:checkpoint:sd3_medium.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:clip_g.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+            ],
+          },
+        },
       },
       {
-        name: 'SD 3.5 - medium',
+        name: 'SD 3.5 Mdium',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -179,30 +190,44 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/resolve/main/text_encoders/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 'clip_g.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/resolve/main/text_encoders/clip_g.safetensors',
             size: 1389382176,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/resolve/main/text_encoders/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-3-medium',
-        baseModel: 'SD 3',
         warnings: [
           DownloadableModelWarning.HF_GATED,
           DownloadableModelWarning.AUTHORIZATION_REQUIRED,
         ],
+        createMetamodel: {
+          name: 'sd35_medium',
+          type: ModelType.CHECKPOINT,
+          models: {
+            checkpoint: 'mrn:model:checkpoint:sd3.5_medium.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:clip_g.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+            ],
+          },
+        },
       },
       {
-        name: 'SD 3.5 - large turbo',
+        name: 'SD 3.5 Large Turbo',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -217,30 +242,44 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large-turbo/resolve/main/text_encoders/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 'clip_g.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large-turbo/resolve/main/text_encoders/clip_g.safetensors',
             size: 1389382176,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large-turbo/resolve/main/text_encoders/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-3-medium',
-        baseModel: 'SD 3',
         warnings: [
           DownloadableModelWarning.HF_GATED,
           DownloadableModelWarning.AUTHORIZATION_REQUIRED,
         ],
+        createMetamodel: {
+          name: 'sd35_large_turbo',
+          type: ModelType.CHECKPOINT,
+          models: {
+            checkpoint: 'mrn:model:checkpoint:sd3.5_large_turbo.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:clip_g.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+            ],
+          },
+        },
       },
       {
-        name: 'SD 3.5 - large',
+        name: 'SD 3.5 Large',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -255,38 +294,53 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 'clip_g.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/clip_g.safetensors',
             size: 1389382176,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/text_encoders/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-3-medium',
-        baseModel: 'SD 3',
         warnings: [
           DownloadableModelWarning.HF_GATED,
           DownloadableModelWarning.AUTHORIZATION_REQUIRED,
         ],
+        createMetamodel: {
+          name: 'sd35_large',
+          type: ModelType.CHECKPOINT,
+          models: {
+            checkpoint: 'mrn:model:checkpoint:sd3.5_large.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:clip_g.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+            ],
+          },
+        },
       },
     ],
   },
   {
     name: 'FLUX.1',
     type: ModelType.CHECKPOINT,
-    description: '.',
+    description:
+      'FLUX.1 is a text-to-image model developed by Black Forest Labs.',
     recommended: true,
     models: [
       {
-        name: 'FLUX.1 - Schnell',
+        name: 'FLUX.1 Schnell',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         recommended: true,
@@ -302,25 +356,43 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.VAE,
             name: 'flux_vae.safetensors',
             url: 'https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors',
             size: 335304388,
+            ignoreParentMetadata: true,
+            metadata: {
+              name: 'FLUX VAE',
+            },
           },
         ],
         homepage: 'https://huggingface.co/black-forest-labs/FLUX.1-schnell',
-        baseModel: 'FLUX.1',
+        createMetamodel: {
+          name: 'flux1_schnell',
+          type: ModelType.CHECKPOINT,
+          models: {
+            diffusionModel:
+              'mrn:model:diffusion_model:flux1-schnell.safetensors',
+            vae: 'mrn:model:vae:flux_vae.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+            ],
+          },
+        },
       },
       {
-        name: 'FLUX.1 - Dev',
+        name: 'FLUX.1 Dev',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -335,26 +407,43 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'clip_l.safetensors',
             url: 'https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors',
             size: 246144152,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
             name: 't5xxl_fp16.safetensors',
             url: 'https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors',
             size: 9787841024,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.VAE,
             name: 'flux_vae.safetensors',
             url: 'https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/ae.safetensors',
             size: 335304388,
+            ignoreParentMetadata: true,
+            metadata: {
+              name: 'FLUX VAE',
+            },
           },
         ],
         homepage: 'https://huggingface.co/black-forest-labs/FLUX.1-dev',
-        baseModel: 'FLUX.1',
         warnings: [
           DownloadableModelWarning.HF_GATED,
           DownloadableModelWarning.AUTHORIZATION_REQUIRED,
         ],
+        createMetamodel: {
+          name: 'flux1_dev',
+          type: ModelType.CHECKPOINT,
+          models: {
+            diffusionModel: 'mrn:model:diffusion_model:flux1-dev.safetensors',
+            vae: 'mrn:model:vae:flux_vae.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:t5xxl_fp16.safetensors',
+              'mrn:model:text_encoder:clip_l.safetensors',
+            ],
+          },
+        },
       },
     ],
   },
@@ -376,7 +465,6 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/runwayml/stable-diffusion-inpainting',
-        baseModel: 'SD 1.5',
       },
       {
         name: 'SD 2.0 Inpainting',
@@ -392,7 +480,6 @@ export const downloadable: DownloadableModelGroup[] = [
         ],
         homepage:
           'https://huggingface.co/stabilityai/stable-diffusion-2-inpainting',
-        baseModel: 'SD 2.0',
       },
     ],
   },
@@ -415,7 +502,6 @@ export const downloadable: DownloadableModelGroup[] = [
   //       ],
   //       homepage:
   //         'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
-  //       baseModel: 'SVD',
   //     },
   //     {
   //       name: 'Stable Video Diffusion XT',
@@ -432,7 +518,6 @@ export const downloadable: DownloadableModelGroup[] = [
   //       ],
   //       homepage:
   //         'https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt',
-  //       baseModel: 'SVD XT',
   //     },
   //   ],
   // },
@@ -542,7 +627,6 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
-        baseModel: 'SD 1.5',
       },
       {
         name: 'QRCode ControlNet - SD 2.1',
@@ -557,7 +641,6 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/DionTimmer/controlnet_qrcode',
-        baseModel: 'SD 2.1',
       },
     ],
   },
@@ -578,7 +661,6 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/h94/IP-Adapter',
-        baseModel: 'SD 1.5',
       },
       {
         name: 'IPAdapter Plus - SDXL 1.0 (ViT-H)',
@@ -593,7 +675,6 @@ export const downloadable: DownloadableModelGroup[] = [
           },
         ],
         homepage: 'https://huggingface.co/h94/IP-Adapter',
-        baseModel: 'SDXL 1.0',
       },
       {
         name: 'IPAdapter CLIP Vision - ViT-H',

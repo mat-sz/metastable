@@ -9,6 +9,7 @@ import { filesize } from '$utils/file';
 
 interface DownloadButtonProps {
   files: DownloadSettings[];
+  onClick?: () => void;
 }
 
 interface DownloadFileState {
@@ -20,7 +21,7 @@ interface DownloadFileState {
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
-  ({ files }) => {
+  ({ files, onClick }) => {
     const fileState: DownloadFileState[] = files.map(file => {
       const model = modelStore.findByName(file.type, file.name);
       if (model) {
@@ -155,6 +156,8 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
           for (const file of toDownload) {
             mainStore.tasks.download(file.settings);
           }
+
+          onClick?.();
         }}
       >
         <BsDownload />
