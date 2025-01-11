@@ -1,4 +1,4 @@
-# 0.0.15 (Upcoming)
+# 0.0.15 (2025-01-11)
 
 > [!WARNING]  
 > Manual steps required to finish the update.  
