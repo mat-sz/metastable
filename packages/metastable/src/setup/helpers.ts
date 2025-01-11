@@ -4,8 +4,6 @@ import os from 'os';
 import { SetupOS } from '@metastable/types';
 import semver from 'semver';
 
-import { GithubRelease } from './types.js';
-
 export async function isGNULibc() {
   try {
     const text = await fs.readFile('/usr/bin/ldd', { encoding: 'utf8' });
@@ -134,18 +132,17 @@ export async function getPlatform(simple = false) {
   throw new Error(`Unsupported platform: ${platform} ${os.arch()}`);
 }
 
-export async function getLatestReleaseInfo(repository: string) {
+export async function getBundleInfo(bundleName: string, fileName: string) {
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${repository}/releases?per_page=5`,
+      `https://bundles.metastable.studio/${bundleName}/version.json`,
     );
-    const json = (await res.json()) as GithubRelease[];
-    const release = json.find(release => !release.draft && !release.prerelease);
-    if (!release) {
-      throw new Error('No release data available.');
-    }
-    return release;
+    const info = (await res.json()) as { version: string };
+    return {
+      ...info,
+      url: `https://bundles.metastable.studio/${bundleName}/${info.version}/${fileName}`,
+    };
   } catch (e) {
-    throw new Error(`Unable to retrieve ${repository} from GitHub, ${e}`);
+    throw new Error(`Unable to information for bundle ${bundleName}, ${e}`);
   }
 }

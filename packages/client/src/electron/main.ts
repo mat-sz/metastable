@@ -46,10 +46,12 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
-autoUpdater.setFeedURL({
-  provider: 'generic',
-  url: __ELECTRON_UPDATER_BASE_URL__,
-});
+if (__ELECTRON_UPDATER_BASE_URL__) {
+  autoUpdater.setFeedURL({
+    provider: 'generic',
+    url: __ELECTRON_UPDATER_BASE_URL__,
+  });
+}
 
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;

@@ -11,10 +11,10 @@ import {
 
 import { exists } from '#helpers/fs.js';
 import { Metastable } from '#metastable';
-import { getLatestReleaseInfo, getOS } from './helpers.js';
+import { getBundleInfo, getOS } from './helpers.js';
 import { DownloadModelsTask } from './tasks/downloadModels.js';
 import { ExtractTask } from './tasks/extract.js';
-import { MultiDownloadTask } from '../downloader/index.js';
+import { BaseDownloadTask } from '../downloader/index.js';
 import * as disk from '../sysinfo/disk.js';
 import { gpu } from '../sysinfo/gpu.js';
 import { CleanupTask } from './tasks/cleanup.js';
@@ -157,37 +157,24 @@ export class Setup extends EventEmitter<SetupEvents> {
 
   async enqueueBundle(
     name: string,
-    sourceRepo: string,
+    fileName: string,
     destination: string,
-    versionPrefix: string,
     isBase = false,
   ) {
     const setupQueue = Metastable.instance.tasks.queues.setup;
-    const release = await getLatestReleaseInfo(sourceRepo);
+    const info = await getBundleInfo(name, fileName);
     if (isBase) {
-      this._bundleVersion = release.name;
+      this._bundleVersion = info.version;
     }
 
-    const assets = release.assets.filter(item =>
-      item.name.startsWith(versionPrefix),
-    );
-
+    const savePath = path.join(Metastable.instance.dataRoot, fileName);
     setupQueue.add(
-      new MultiDownloadTask(
-        `download.${name}`,
-        assets.map(asset => ({
-          url: asset.browser_download_url,
-          savePath: path.join(Metastable.instance.dataRoot, asset.name),
-        })),
-      ),
+      new BaseDownloadTask(`download.${name}`, info.url, savePath),
     );
 
-    const parts = assets.map(asset =>
-      path.join(Metastable.instance.dataRoot, asset.name),
-    );
     setupQueue.add(
       new ExtractTask(`extract.${name}`, {
-        parts,
+        parts: [savePath],
         destination: destination,
       }),
     );
@@ -219,9 +206,8 @@ export class Setup extends EventEmitter<SetupEvents> {
     const torchMode = this.settings?.torchMode || 'cpu';
     await this.enqueueBundle(
       'torch',
-      'metastable-studio/bundle-torch',
+      `${os.platform()}-${os.arch()}-${torchMode}.tar.br`,
       targetPath,
-      `${os.platform()}-${os.arch()}-${torchMode}`,
       true,
     );
 
@@ -232,9 +218,8 @@ export class Setup extends EventEmitter<SetupEvents> {
         const variant = `rocm${sdkVersion.split('.')[0]}`;
         await this.enqueueBundle(
           'zluda',
-          'metastable-studio/bundle-zluda',
+          `${os.platform()}-${os.arch()}-${variant}.tar.br`,
           targetPath,
-          `${os.platform()}-${os.arch()}-${variant}`,
         );
       }
     }

@@ -1,5 +1,9 @@
 # 0.0.16 (Upcoming)
 
+## Improvements
+
+- Moved bundles to a faster CDN to improve installation speed.
+
 ## Bug fixes
 
 - Fixed auto update.
