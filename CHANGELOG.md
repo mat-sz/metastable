@@ -1,3 +1,9 @@
+# 0.0.16 (Upcoming)
+
+## Bug fixes
+
+- Fixed auto update.
+
 # 0.0.15 (2025-01-11)
 
 > [!WARNING]  

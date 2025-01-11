@@ -46,6 +46,13 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
+console.log(__ELECTRON_UPDATER_BASE_URL__);
+
+autoUpdater.setFeedURL({
+  provider: 'generic',
+  url: __ELECTRON_UPDATER_BASE_URL__,
+});
+
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.autoDownload = true;
 autoUpdater.autoRunAppAfterInstall = true;

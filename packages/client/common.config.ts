@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 import info from './package.json';
 
 export const define = {
+  __ELECTRON_UPDATER_BASE_URL__: JSON.stringify(
+    process.env.ELECTRON_UPDATER_BASE_URL,
+  ),
   __APP_VERSION__: JSON.stringify(info.version),
   __APP_NAME__: JSON.stringify(info.displayName),
 };

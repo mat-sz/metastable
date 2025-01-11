@@ -132,6 +132,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'sd3_medium.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/sd3_medium.safetensors',
             size: 4337667306,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
@@ -175,7 +176,7 @@ export const downloadable: DownloadableModelGroup[] = [
         },
       },
       {
-        name: 'SD 3.5 Mdium',
+        name: 'SD 3.5 Medium',
         source: 'huggingface',
         type: ModelType.CHECKPOINT,
         downloads: [
@@ -184,6 +185,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'sd3.5_medium.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/resolve/main/sd3.5_medium.safetensors',
             size: 5107104286,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
@@ -236,6 +238,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'sd3.5_large_turbo.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large-turbo/resolve/main/sd3.5_large_turbo.safetensors',
             size: 16460374454,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
@@ -288,6 +291,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'sd3.5_large.safetensors',
             url: 'https://huggingface.co/stabilityai/stable-diffusion-3.5-large/resolve/main/sd3.5_large.safetensors',
             size: 16460379262,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
@@ -350,6 +354,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'flux1-schnell.safetensors',
             url: 'https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors',
             size: 23782506688,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
@@ -401,6 +406,7 @@ export const downloadable: DownloadableModelGroup[] = [
             name: 'flux1-dev.safetensors',
             url: 'https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors',
             size: 23802932552,
+            ignoreParentMetadata: true,
           },
           {
             type: ModelType.TEXT_ENCODER,
