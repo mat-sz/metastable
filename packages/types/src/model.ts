@@ -31,6 +31,11 @@ export enum Architecture {
   HUNYUAN_VIDEO = 'hunyuan_video',
 }
 
+export enum ModelOutputType {
+  IMAGE = 'image',
+  VIDEO = 'video',
+}
+
 export interface ModelMetadata {
   name?: string;
   description?: string;
@@ -46,6 +51,7 @@ export interface ModelDetails {
   corrupt?: boolean;
   architecture?: Architecture;
   type?: ModelType;
+  outputType?: ModelOutputType;
 }
 
 export interface Model {

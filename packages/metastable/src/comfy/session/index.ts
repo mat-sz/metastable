@@ -59,9 +59,14 @@ class ComfySessionCheckpoint {
     }
 
     if (paths.diffusionModel) {
-      refs.diffusionModel = (await this.session.invoke('diffusion_model:load', {
-        path: paths.diffusionModel,
-      })) as any;
+      const { diffusion_model, latent_type } = (await this.session.invoke(
+        'diffusion_model:load',
+        {
+          path: paths.diffusionModel,
+        },
+      )) as { diffusion_model: RPCRef; latent_type: string };
+      refs.diffusionModel = diffusion_model;
+      refs.latentType = latent_type;
     }
 
     if (paths.textEncoders?.length) {
@@ -118,12 +123,14 @@ class ComfySessionLatent {
   async empty(
     width: number,
     height: number,
+    length?: number,
     batchSize?: number,
     latentType?: string,
   ) {
     return (await this.session.invoke('latent:empty', {
       width,
       height,
+      length,
       batch_size: batchSize,
       latent_type: latentType,
     })) as ComfyLatent;
@@ -172,12 +179,36 @@ class ComfySessionTag {
   }
 }
 
+class ComfySessionSampling {
+  constructor(private session: ComfySession) {}
+
+  async getFluxGuidance(conditioning: RPCRef, guidance: number) {
+    return (await this.session.invoke('sampling:flux_guidance', {
+      conditioning,
+      guidance,
+    })) as RPCRef;
+  }
+
+  async getSampler(samplerName: string) {
+    return (await this.session.invoke('sampling:get_sampler', {
+      sampler_name: samplerName,
+    })) as RPCRef;
+  }
+
+  async randomNoise(seed: number) {
+    return (await this.session.invoke('sampling:random_noise', {
+      seed,
+    })) as RPCRef;
+  }
+}
+
 export class ComfySession extends EventEmitter<ComfySessionEvents> {
   checkpoint = new ComfySessionCheckpoint(this);
   clipVision = new ComfySessionClipVision(this);
   image = new ComfySessionImage(this);
   tag = new ComfySessionTag(this);
   latent = new ComfySessionLatent(this);
+  sampling = new ComfySessionSampling(this);
 
   constructor(
     private comfy: Comfy,

@@ -4,6 +4,8 @@ import {
   Architecture,
   FieldType,
   ImageFile,
+  ModelDetails,
+  ModelOutputType,
   ModelType,
   PostprocessSettings,
   ProjectFileType,
@@ -243,6 +245,8 @@ export class SimpleProject extends BaseProject<
       currentTask: observable,
       selectOutput: action,
       selectTask: action,
+      outputType: computed,
+      modelDetails: computed,
       architecture: computed,
       lastOutputName: observable,
       availableStyles: computed,
@@ -275,6 +279,7 @@ export class SimpleProject extends BaseProject<
   }
 
   setSettings(settings: ProjectSimpleSettings) {
+    const previousOutputType = this.outputType;
     settings = convertSettings(settings);
 
     settings.output.height ||= 512;
@@ -308,6 +313,15 @@ export class SimpleProject extends BaseProject<
     }
 
     this.settings = settings;
+
+    if (previousOutputType !== this.outputType) {
+      if (this.outputType === ModelOutputType.VIDEO) {
+        // TODO: Update this when support for better video formats is added.
+        this.settings.output.format = 'png';
+      } else {
+        this.settings.output.format = 'png';
+      }
+    }
   }
 
   get imageFiles(): ImageFile[] {
@@ -333,13 +347,21 @@ export class SimpleProject extends BaseProject<
     return sizes;
   }
 
-  get architecture(): Architecture | undefined {
+  get modelDetails(): ModelDetails | undefined {
     const data = this.settings.models;
     const model =
       data.mode === 'advanced' && data.diffusionModel
         ? modelStore.find(data.diffusionModel)
         : modelStore.find(data.checkpoint);
-    return model?.details?.architecture;
+    return model?.details;
+  }
+
+  get outputType(): ModelOutputType {
+    return this.modelDetails?.outputType || ModelOutputType.IMAGE;
+  }
+
+  get architecture(): Architecture | undefined {
+    return this.modelDetails?.architecture;
   }
 
   get memoryUsage() {

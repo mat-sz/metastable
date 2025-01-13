@@ -1,5 +1,10 @@
 # 0.0.16 (Upcoming)
 
+## Features
+
+- Added support for generating video using Hunyuan Video models.
+- Added support for APNG outputs.
+
 ## Improvements
 
 - Moved bundles to a faster CDN to improve installation speed.

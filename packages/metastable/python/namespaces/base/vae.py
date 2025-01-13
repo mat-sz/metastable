@@ -76,17 +76,13 @@ class VAENamespace:
     @RPC.autoref
     @RPC.method("decode")
     def decode(vae, samples, is_circular=False):
-        decoded = None
-        if is_circular:
-            decoded = vae_decode_circular(vae, samples)
-        else:
-            decoded = vae.decode(samples)
+        images = vae.decode(samples) if not is_circular else vae_decode_circular(vae, samples)
         
-        if len(decoded.shape) == 5: #Combine batches
-            decoded = decoded.reshape(-1, decoded.shape[-3], decoded.shape[-2], decoded.shape[-1])
+        if len(images.shape) == 5: #Combine batches
+            images = images.reshape(-1, images.shape[-3], images.shape[-2], images.shape[-1])
         
         # So we can iterate over this.
-        return [value for value in decoded]
+        return [value for value in images]
 
     @RPC.autoref
     @RPC.method("encode")
@@ -99,3 +95,24 @@ class VAENamespace:
             return vae_encode_inpaint(vae, image, mask)
 
         return vae_encode(vae, image)
+    
+    @RPC.autoref
+    @RPC.method("decode_tiled")
+    def decode_tiled(vae, samples, tile_size, overlap, temporal_size, temporal_overlap):
+        if tile_size < overlap * 4:
+            overlap = tile_size // 4
+        if temporal_size < temporal_overlap * 2:
+            temporal_overlap = temporal_overlap // 2
+        temporal_compression = vae.temporal_compression_decode()
+        if temporal_compression is not None:
+            temporal_size = max(2, temporal_size // temporal_compression)
+            temporal_overlap = max(1, min(temporal_size // 2, temporal_overlap // temporal_compression))
+        else:
+            temporal_size = None
+            temporal_overlap = None
+
+        compression = vae.spacial_compression_decode()
+        images = vae.decode_tiled(samples, tile_x=tile_size // compression, tile_y=tile_size // compression, overlap=overlap // compression, tile_t=temporal_size, overlap_t=temporal_overlap)
+        if len(images.shape) == 5: #Combine batches
+            images = images.reshape(-1, images.shape[-3], images.shape[-2], images.shape[-1])
+        return [value for value in images]

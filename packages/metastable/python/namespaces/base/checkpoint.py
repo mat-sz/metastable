@@ -1,4 +1,3 @@
-import torch
 import yaml
 
 import comfy.sd
@@ -8,8 +7,7 @@ import comfy.controlnet
 import comfy.clip_vision
 import comfy.utils
 import comfy.model_management
-from .utils import custom, latent_preview
-from comfy.model_base import ModelType
+from .utils.checkpoint import get_latent_type
 
 from rpc import RPC
 
@@ -67,86 +65,15 @@ def load_checkpoint_cached(path, embeddings_path=None, config_path=None):
     last_checkpoint = load_checkpoint(path, embeddings_path, config_path)
     return last_checkpoint
 
-def model_set_circular(model, is_circular=False):
-    if isinstance(model, torch.nn.Conv2d):
-        model.padding_mode = "circular" if is_circular else "zeros"
-
 class CheckpointNamespace:
     @RPC.autoref
     @RPC.method("load")
     def load(path, embeddings_path=None, config_path=None):
         (diffusion_model, text_encoder, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
 
-        latent_type = "sd"
-        if diffusion_model.model.model_type == ModelType.FLOW:
-            latent_type = "sd3"
-        
         return {
             "diffusion_model": diffusion_model,
             "text_encoder": text_encoder,
             "vae": vae,
-            "latent_type": latent_type
+            "latent_type": get_latent_type(diffusion_model)
         }
-    
-    @RPC.autoref
-    @RPC.method("sample")
-    def sample(diffusion_model, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
-        model_set_circular(diffusion_model, is_circular)
-
-        latent_image = latent["samples"]
-        latent_image = comfy.sample.fix_empty_latent_channels(diffusion_model, latent_image)
-        noise = comfy.sample.prepare_noise(latent_image, seed, None)
-
-        noise_mask = None
-        if "noise_mask" in latent:
-            noise_mask = latent["noise_mask"]
-
-        callback = None
-        if preview is not None:
-            taesd_decoder_path = None
-            if preview["method"] == "taesd":
-                taesd_decoder_name = diffusion_model.model.latent_format.taesd_decoder_name
-                if "taesd" in preview and taesd_decoder_name in preview["taesd"]:
-                    taesd_decoder_path = preview["taesd"][taesd_decoder_name]
-
-            callback = latent_preview.prepare_callback(diffusion_model, preview["method"], steps, taesd_decoder_path=taesd_decoder_path)
-        else:
-            callback = latent_preview.prepare_callback(diffusion_model, "none", steps)
-        
-        sampler = comfy.samplers.sampler_object(sampler_name)
-
-        custom_schedulers = custom.get_custom_schedulers()
-        if scheduler_name not in custom_schedulers:
-            return comfy.sample.sample(
-                model=diffusion_model,
-                noise=noise,
-                steps=steps,
-                cfg=cfg,
-                sampler_name=sampler,
-                scheduler=scheduler_name,
-                positive=positive,
-                negative=negative,
-                latent_image=latent_image,
-                noise_mask=noise_mask,
-                callback=callback,
-                disable_pbar=True,
-                denoise=denoise,
-                seed=seed
-            )
-        else:
-            scheduler = custom_schedulers[scheduler_name]
-            sigmas = scheduler(diffusion_model, steps, denoise)
-            return comfy.sample.sample_custom(
-                model=diffusion_model,
-                noise=noise,
-                cfg=cfg,
-                sampler=sampler,
-                sigmas=sigmas,
-                positive=positive,
-                negative=negative,
-                latent_image=latent_image,
-                noise_mask=noise_mask,
-                callback=callback,
-                disable_pbar=True,
-                seed=seed
-            )

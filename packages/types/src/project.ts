@@ -30,6 +30,7 @@ export interface ProjectSimpleSettings extends BaseSettings {
     height: number;
     batchSize: number;
     format?: string;
+    frames?: number;
   };
   prompt: {
     positive: string;

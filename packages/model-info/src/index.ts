@@ -1,4 +1,9 @@
-import { Architecture, ModelDetails, ModelType } from '@metastable/types';
+import {
+  Architecture,
+  ModelDetails,
+  ModelOutputType,
+  ModelType,
+} from '@metastable/types';
 
 import { readPytorch } from './pytorch.js';
 import { readSafetensors } from './safetensors.js';
@@ -38,6 +43,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.HUNYUAN_VIDEO,
       type: ModelType.DIFFUSION_MODEL,
+      outputType: ModelOutputType.VIDEO,
     },
   },
   {
@@ -72,6 +78,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.FLUX1,
       type: ModelType.DIFFUSION_MODEL,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -119,6 +126,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.PIXART,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -128,6 +136,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.SVD,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -137,6 +146,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.SD3,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -148,6 +158,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.SDXL,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -157,6 +168,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.SD2,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
   {
@@ -174,6 +186,7 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.SD1,
       type: ModelType.CHECKPOINT,
+      outputType: ModelOutputType.IMAGE,
     },
   },
 ];

@@ -11,6 +11,7 @@ import {
 } from '@metastable/types';
 import PNG from 'meta-png';
 import sharp, { FitEnum } from 'sharp';
+import apng from 'sharp-apng';
 
 import { Metastable } from '#metastable';
 import { BaseComfyTask, BaseComfyTaskHandlers } from './base.js';
@@ -20,7 +21,11 @@ import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
 import type { ComfySession } from '../session/index.js';
-import { ComfyCheckpoint, ComfyConditioning } from '../session/models.js';
+import {
+  ComfyCheckpoint,
+  ComfyConditioning,
+  ComfyLatent,
+} from '../session/models.js';
 import {
   ComfyCheckpointPaths,
   ComfyPreviewSettings,
@@ -37,15 +42,18 @@ export class PromptTask extends BaseComfyTask<
   PromptTaskHandlers,
   ProjectSimpleSettings
 > {
+  private architecture?: Architecture;
   private embeddingsPath?: string;
   public preview: ComfyPreviewSettings = {
     method: 'auto',
   };
   private storeMetadata = false;
+  public latent?: ComfyLatent;
   public session?: ComfySession;
   public checkpoint?: ComfyCheckpoint;
   public conditioning?: ComfyConditioning;
   public images?: RPCRef[];
+  public isCircular = false;
 
   constructor(project: ProjectEntity, settings: ProjectSimpleSettings) {
     super('prompt', project, settings);
@@ -119,6 +127,7 @@ export class PromptTask extends BaseComfyTask<
 
     const mainModel = await Metastable.instance.model.get(mainMrn);
     const type = mainModel.details?.architecture || Architecture.SD1;
+    this.architecture = type;
 
     if (mainModel.isMetamodel) {
       const { textEncoders, diffusionModel, vae } = data;
@@ -221,6 +230,50 @@ export class PromptTask extends BaseComfyTask<
     );
   }
 
+  private async sample() {
+    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+      const { cfg, samplerName, schedulerName, steps, denoise, seed } =
+        this.settings.sampler;
+      const conditioning = await this.session!.sampling.getFluxGuidance(
+        this.conditioning!.positive,
+        cfg,
+      );
+      const guider = await this.checkpoint!.getGuider(conditioning);
+
+      return await guider.sample(
+        {
+          noise: await this.session!.sampling.randomNoise(seed),
+          sampler: await this.session!.sampling.getSampler(samplerName),
+          sigmas: await this.checkpoint!.getSigmas(
+            schedulerName,
+            steps,
+            denoise,
+          ),
+          latent: this.latent!,
+        },
+        this.preview,
+      );
+    } else {
+      return await this.checkpoint!.sample(
+        this.latent!,
+        this.conditioning!,
+        {
+          ...this.settings.sampler,
+          isCircular: this.isCircular,
+        },
+        this.preview,
+      );
+    }
+  }
+
+  private async decode(samples: RPCRef) {
+    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+      return await this.checkpoint!.decodeTiled(samples, 256, 64, 64, 8);
+    } else {
+      return await this.checkpoint!.decode(samples, this.isCircular);
+    }
+  }
+
   protected async process() {
     const ctx = this.session!;
 
@@ -246,16 +299,15 @@ export class PromptTask extends BaseComfyTask<
 
     await this.executeHandlers('conditioning');
 
-    const isCircular = !!settings.sampler.tiling;
-
-    let latent = undefined;
+    this.isCircular = !!settings.sampler.tiling;
 
     this.step('input');
     switch (settings.input.type) {
       case 'none':
-        latent = await ctx.latent.empty(
+        this.latent = await ctx.latent.empty(
           settings.output.width,
           settings.output.height,
+          settings.output.frames,
           settings.output.batchSize || 1,
           this.checkpoint.data.latentType,
         );
@@ -266,7 +318,7 @@ export class PromptTask extends BaseComfyTask<
             settings.input.image!,
             settings.input.imageMode,
           );
-          latent = await this.checkpoint.encode(image);
+          this.latent = await this.checkpoint.encode(image);
         }
         break;
       case 'image_masked':
@@ -276,7 +328,7 @@ export class PromptTask extends BaseComfyTask<
             settings.input.imageMode,
             settings.input.mask,
           );
-          latent = await this.checkpoint.encode(image, mask);
+          this.latent = await this.checkpoint.encode(image, mask);
         }
         break;
     }
@@ -285,50 +337,70 @@ export class PromptTask extends BaseComfyTask<
       settings.sampler.denoise = 1;
     }
 
-    if (!latent) {
+    if (!this.latent) {
       return;
     }
 
     this.step('sample');
-    const samples = await this.checkpoint.sample(
-      latent,
-      this.conditioning,
-      {
-        ...settings.sampler,
-        isCircular,
-      },
-      this.preview,
-    );
-    this.images = await this.checkpoint.decode(samples, isCircular);
-    const outputDir = this.project!.files.output.path;
+    const samples = await this.sample();
+
+    this.step('decode');
+    this.images = await this.decode(samples);
 
     await this.executeHandlers('postprocess');
 
     this.step('save');
     const ext = settings.output?.format || 'png';
     const outputs: ImageFile[] = [];
+    const outputDir = this.project!.files.output.path;
 
-    for (const image of this.images) {
-      const bytes = await ctx.image.dump(image, ext);
-      let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+      const buffers: Uint8Array[] = [];
+      const frameDelay = 1000 / 24;
 
-      if (this.storeMetadata && ext === 'png') {
+      for (const image of this.images) {
+        const bytes = await ctx.image.dump(image, ext);
+        let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
         buffer = buffer.slice(
           buffer.byteOffset,
           buffer.byteOffset + buffer.byteLength,
         );
-        buffer = PNG.addMetadata(
-          buffer,
-          'metastable',
-          JSON.stringify(settings),
-        );
+        buffers.push(buffer);
       }
 
       const filename = await getNextFilename(outputDir, ext);
-      await fs.writeFile(path.join(outputDir, filename), buffer);
+      const outputPath = path.join(outputDir, filename);
+      const sharpImages = buffers.map(buffer => sharp(buffer));
+      await apng.framesToApng(sharpImages, outputPath, {
+        delay: frameDelay,
+      });
+
       const output = await this.project!.files.output.get(filename);
       await output.metadata.set(settings);
       outputs.push(await output.json());
+    } else {
+      for (const image of this.images) {
+        const bytes = await ctx.image.dump(image, ext);
+        let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+
+        if (this.storeMetadata && ext === 'png') {
+          buffer = buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          );
+          buffer = PNG.addMetadata(
+            buffer,
+            'metastable',
+            JSON.stringify(settings),
+          );
+        }
+
+        const filename = await getNextFilename(outputDir, ext);
+        await fs.writeFile(path.join(outputDir, filename), buffer);
+        const output = await this.project!.files.output.get(filename);
+        await output.metadata.set(settings);
+        outputs.push(await output.json());
+      }
     }
 
     this.data = {

@@ -1,4 +1,9 @@
-import { Metamodel, ModelType, ProjectFileType } from '@metastable/types';
+import {
+  Metamodel,
+  ModelOutputType,
+  ModelType,
+  ProjectFileType,
+} from '@metastable/types';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -6,6 +11,7 @@ import { BsX } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import {
+  IVarSelectOption,
   VarAddModel,
   VarArray,
   VarButton,
@@ -39,6 +45,14 @@ interface Props {
 
 export const General: React.FC<Props> = observer(({ showPrompt }) => {
   const project = useSimpleProject();
+  let outputOptions: IVarSelectOption[] = [
+    { key: 'png', label: 'PNG' },
+    { key: 'jpg', label: 'JPEG' },
+  ];
+
+  if (project.outputType === ModelOutputType.VIDEO) {
+    outputOptions = [{ key: 'png', label: 'APNG' }];
+  }
 
   return (
     <>
@@ -237,6 +251,17 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
             />
           </>
         )}
+        {project.outputType === ModelOutputType.VIDEO && (
+          <VarNumber
+            label="Frames"
+            path="output.frames"
+            min={1}
+            max={150}
+            step={1}
+            defaultValue={1}
+            inline
+          />
+        )}
         <VarNumber
           label="Batch size"
           path="output.batchSize"
@@ -312,11 +337,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         <VarSwitch
           label="Format"
           path="output.format"
-          defaultValue="png"
-          options={[
-            { key: 'png', label: 'PNG' },
-            { key: 'jpg', label: 'JPEG' },
-          ]}
+          defaultValue={outputOptions[0].key}
+          options={outputOptions}
           inline
         />
         <VarSlider

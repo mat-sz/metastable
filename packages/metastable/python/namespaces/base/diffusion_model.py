@@ -5,6 +5,7 @@ import comfy.controlnet
 import comfy.clip_vision
 import comfy.utils
 import comfy.model_management
+from .utils.checkpoint import get_latent_type
 
 from rpc import RPC
 
@@ -30,4 +31,9 @@ class DiffusionModelNamespace:
     @RPC.autoref
     @RPC.method("load")
     def load(path):
-        return load_unet_cached(path)
+        diffusion_model = load_unet_cached(path)
+
+        return {
+            "diffusion_model": diffusion_model,
+            "latent_type": get_latent_type(diffusion_model)
+        }

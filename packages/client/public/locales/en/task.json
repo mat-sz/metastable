@@ -12,6 +12,7 @@
     "ipadapter": "Loading IPAdapter...",
     "input": "Preparing input...",
     "sample": "Sampling...",
+    "decode": "Decoding...",
     "upscale": "Upscaling...",
     "save": "Saving...",
     "pulid": "Loading PuLID...",

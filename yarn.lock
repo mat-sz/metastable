@@ -2073,6 +2073,7 @@ __metadata:
     radash: "npm:^12.1.0"
     semver: "npm:^7.6.2"
     sharp: "npm:^0.33.2"
+    sharp-apng: "npm:^0.1.5"
     tar-stream: "npm:^3.1.7"
     typescript: "npm:^5.3.2"
     which: "npm:^4.0.0"
@@ -6587,6 +6588,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"gifenc@npm:*":
+  version: 1.0.3
+  resolution: "gifenc@npm:1.0.3"
+  checksum: 10c0/34fc6b2c66c305fc556cd2f475154ce2ad68384a52ceb8253b901c8c7d9c63f2c0a5d109ceb3cb46e44c2c6155009920a286cf08a621105863aa43468e345229
+  languageName: node
+  linkType: hard
+
 "glob-parent@npm:^5.1.2, glob-parent@npm:~5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
@@ -8584,6 +8592,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pako@npm:^1.0.5":
+  version: 1.0.11
+  resolution: "pako@npm:1.0.11"
+  checksum: 10c0/86dd99d8b34c3930345b8bbeb5e1cd8a05f608eeb40967b293f72fe469d0e9c88b783a8777e4cc7dc7c91ce54c5e93d88ff4b4f060e6ff18408fd21030d9ffbe
+  languageName: node
+  linkType: hard
+
 "parent-module@npm:^1.0.0":
   version: 1.0.1
   resolution: "parent-module@npm:1.0.1"
@@ -9807,7 +9822,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sharp@npm:^0.33.2":
+"sharp-apng@npm:^0.1.5":
+  version: 0.1.5
+  resolution: "sharp-apng@npm:0.1.5"
+  dependencies:
+    gifenc: "npm:*"
+    sharp: "npm:*"
+    upng-js: "npm:*"
+  checksum: 10c0/cd4156a015f87e12d8f1e062143e7d0ae22a347c65a9ce87ebc8a1b2b16c5e995a86ef0f441b62922932b09fd9faeaf8c57802415552ed26e3067d4c6a9dd961
+  languageName: node
+  linkType: hard
+
+"sharp@npm:*, sharp@npm:^0.33.2":
   version: 0.33.5
   resolution: "sharp@npm:0.33.5"
   dependencies:
@@ -10873,6 +10899,15 @@ __metadata:
   bin:
     update-browserslist-db: cli.js
   checksum: 10c0/a7452de47785842736fb71547651c5bbe5b4dc1e3722ccf48a704b7b34e4dcf633991eaa8e4a6a517ffb738b3252eede3773bef673ef9021baa26b056d63a5b9
+  languageName: node
+  linkType: hard
+
+"upng-js@npm:*":
+  version: 2.1.0
+  resolution: "upng-js@npm:2.1.0"
+  dependencies:
+    pako: "npm:^1.0.5"
+  checksum: 10c0/ee66db26339af1ae2bb4784680978435fab2f6010cd828502dbaecdf167e509a26b203af9e098b23c665711e3b76e1d47028f1cab233b85f6977daa50cb69784
   languageName: node
   linkType: hard
 
