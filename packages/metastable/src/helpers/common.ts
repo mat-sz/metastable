@@ -50,3 +50,16 @@ export async function allResolved<T extends readonly unknown[] | []>(
     result.status === 'fulfilled' ? result.value : undefined,
   ) as any;
 }
+
+export function errorToString(e: any) {
+  if (typeof e === 'object' && 'errors' in e) {
+    return (e.errors as any[]).reduce(
+      (output, error) => `${output}${errorToString(error)}\n`,
+      '',
+    );
+  } else if ('stack' in e) {
+    return e.stack;
+  } else {
+    return String(e);
+  }
+}

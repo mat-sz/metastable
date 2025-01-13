@@ -12,6 +12,11 @@ import {
   Utilization,
 } from '@metastable/types';
 
+import { CircularBuffer } from '#helpers/buffer.js';
+import { getBundleTorchMode } from '#helpers/bundle.js';
+import { errorToString } from '#helpers/common.js';
+import { resolveConfigPath, rmdir } from '#helpers/fs.js';
+import { parseArgString } from '#helpers/shell.js';
 import { Comfy } from './comfy/index.js';
 import { Config } from './config/index.js';
 import { ModelRepository } from './data/model.js';
@@ -19,10 +24,6 @@ import { ProjectRepository } from './data/project.js';
 import { DownloadModelTask } from './downloader/index.js';
 import { FeaturePython } from './feature/base.js';
 import { FeatureManager } from './feature/index.js';
-import { CircularBuffer } from './helpers/buffer.js';
-import { getBundleTorchMode } from './helpers/bundle.js';
-import { resolveConfigPath, rmdir } from './helpers/fs.js';
-import { parseArgString } from './helpers/shell.js';
 import { PythonInstance } from './python/index.js';
 import { Setup } from './setup/index.js';
 import * as cpu from './sysinfo/cpu.js';
@@ -314,7 +315,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       this.comfy = comfy;
     } catch (e) {
       this.logBuffer.push({
-        text: e instanceof Error ? e.stack || e.toString() : `${e}`,
+        text: errorToString(e),
         timestamp: Date.now(),
         type: 'stderr',
       });

@@ -10,6 +10,7 @@ import {
   TaskUpdateEvent,
 } from '@metastable/types';
 
+import { errorToString } from '#helpers/common.js';
 import { BaseTask } from './task.js';
 
 export type QueueTaskEvents = {
@@ -117,13 +118,7 @@ export class BaseQueue<T = any>
         }
       } catch (e: any) {
         failed = true;
-        if (typeof e === 'object' && 'errors' in e) {
-          for (const error of e.errors) {
-            current.appendLog(`${String(error)}\n${error.stack}`);
-          }
-        } else {
-          current.appendLog(String(e));
-        }
+        current.appendLog(errorToString(e));
 
         current.stopped(TaskState.FAILED);
       }
