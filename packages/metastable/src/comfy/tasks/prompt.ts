@@ -86,7 +86,12 @@ export class PromptTask extends BaseComfyTask<
 
     settings.sampler.tiling = !!settings.sampler.tiling;
 
-    return await super.init();
+    const baseData = await super.init();
+    return {
+      ...baseData,
+      width: settings.output.width,
+      height: settings.output.height,
+    };
   }
 
   async getCheckpoint(ctx: ComfySession) {

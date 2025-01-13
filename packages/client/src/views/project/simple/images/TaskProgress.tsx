@@ -7,15 +7,18 @@ import styles from './TaskProgress.module.scss';
 
 interface TaskProgressProps {
   task: Task<ProjectTaskData>;
-  aspectRatio?: number;
 }
 
-export const TaskProgress: React.FC<TaskProgressProps> = ({
-  task,
-  aspectRatio = 1,
-}) => {
+export const TaskProgress: React.FC<TaskProgressProps> = ({ task }) => {
   const { t } = useTranslation('task');
-  const { step = 'default', stepValue, stepMax, preview } = task.data;
+  const {
+    step = 'default',
+    stepValue,
+    stepMax,
+    preview,
+    width = 0,
+    height = 0,
+  } = task.data;
 
   const stepName = t(`task:step.${step}`);
   const stepProgress =
@@ -24,14 +27,14 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({
 
   return (
     <div className={styles.preview}>
-      <div className={styles.progressPreview}>
-        <div className={styles.imageContainer}>
-          {preview ? (
-            <img src={preview} />
-          ) : (
-            <div className={styles.placeholder} style={{ aspectRatio }} />
-          )}
-        </div>
+      <div
+        className={styles.progressPreview}
+        style={{ aspectRatio: width / height }}
+      >
+        <div
+          className={styles.imageContainer}
+          style={{ backgroundImage: `url(${preview})` }}
+        />
         <div className={styles.stepInfo}>
           <ProgressCircle value={task.progress || 0} max={1} hideText />
           <div>{stepInfo}</div>

@@ -125,6 +125,8 @@ export interface ProjectTaskData {
   stepMax?: number;
   stepTime?: Record<string, number>;
   outputs?: ImageFile[];
+  width?: number;
+  height?: number;
 }
 
 export enum ProjectFileType {
