@@ -41,7 +41,7 @@ export function deduplicateInfo(devices: GPUInfo[]) {
   for (const busAddress of Object.keys(map)) {
     const items = map[busAddress];
     newDevices.push(
-      items.reduce((previous, current) => ({ ...previous, ...current })),
+      items.reduce((previous, current) => ({ ...current, ...previous })),
     );
   }
 

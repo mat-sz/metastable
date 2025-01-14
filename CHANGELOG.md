@@ -12,6 +12,7 @@
 ## Bug fixes
 
 - Fixed auto update.
+- Fixed GPU detection logic.
 
 # 0.0.15 (2025-01-11)
 
