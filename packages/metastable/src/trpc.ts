@@ -238,7 +238,7 @@ export const router = t.router({
       signal,
       ctx: { metastable },
     }) {
-      const iter = on(metastable.model, 'change', { signal });
+      const iter = on(metastable, 'model.change', { signal });
 
       while (true) {
         await iter.next();
@@ -554,7 +554,7 @@ export const router = t.router({
           ctx: { metastable },
           input: { projectId },
         }) {
-          for await (const [id, type] of on(metastable.model, 'change', {
+          for await (const [id, type] of on(metastable, 'project.fileChange', {
             signal,
           })) {
             if (id === projectId) {

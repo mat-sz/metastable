@@ -160,7 +160,6 @@ function createMenu() {
 }
 
 async function createWindow() {
-  const dataRoot = path.join(app.getPath('userData'), 'data');
   const comfyMainPath = path.join(
     app.isPackaged
       ? path.join(path.dirname(app.getPath('exe')), IS_MAC ? '..' : '.')
@@ -168,11 +167,12 @@ async function createWindow() {
     'python',
     'main.py',
   );
-  const metastable = new Metastable(dataRoot, {
+  const metastable = await Metastable.initialize({
+    dataConfigPath: path.join(app.getPath('userData'), 'data.json'),
+    dataRoot: path.join(app.getPath('userData'), 'data'),
     comfyMainPath,
     version: __APP_VERSION__,
   });
-  await metastable.init();
 
   let flagQuit = false;
   app.on('before-quit', async e => {

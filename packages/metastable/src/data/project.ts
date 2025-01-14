@@ -128,7 +128,7 @@ export class ProjectEntity extends DirectoryEntity {
 
 type ProjectRepositoryEvents = {
   change: [];
-  projectChange: [id: string, type: ProjectFileType];
+  fileChange: [id: string, type: ProjectFileType];
 };
 export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
   private cache: ProjectEntity[] | undefined = undefined;
@@ -178,7 +178,7 @@ export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
 
               clearTimeout(timeoutProject[project.id]);
               timeoutProject[project.id] = setTimeout(() => {
-                this.emit('projectChange', project.id, type as ProjectFileType);
+                this.emit('fileChange', project.id, type as ProjectFileType);
               }, 250);
             }
           } catch {}

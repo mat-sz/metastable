@@ -9,13 +9,14 @@ import {
   DownloadSettings,
   LogItem,
   ModelType,
+  ProjectFileType,
   Utilization,
 } from '@metastable/types';
 
 import { CircularBuffer } from '#helpers/buffer.js';
 import { getBundleTorchMode } from '#helpers/bundle.js';
 import { errorToString } from '#helpers/common.js';
-import { resolveConfigPath, rmdir } from '#helpers/fs.js';
+import { JSONFile, resolveConfigPath, rmdir } from '#helpers/fs.js';
 import { parseArgString } from '#helpers/shell.js';
 import { Comfy } from './comfy/index.js';
 import { Config } from './config/index.js';
@@ -37,36 +38,41 @@ interface MetastableEvents {
   utilization: [data: Utilization];
   backendStatus: [status: BackendStatus];
   infoUpdate: [];
+  'project.fileChange': [id: string, type: ProjectFileType];
+  'model.change': [];
+}
+
+export interface MetastableInstanceConfig {
+  dataConfigPath?: string;
+  dataRoot: string;
+  comfyMainPath?: string;
+  skipPythonSetup?: boolean;
+  comfyArgs?: string[];
+  version?: string;
 }
 
 export class Metastable extends EventEmitter<MetastableEvents> {
   private static _instance: Metastable;
 
-  config;
+  dataConfig?: JSONFile<{ dataRoot?: string }>;
+  config!: Config;
   python?: PythonInstance;
   comfy?: Comfy;
   setup = new Setup();
   tasks = new Tasks();
   feature = new FeatureManager();
-  project;
-  model;
+  project!: ProjectRepository;
+  model!: ModelRepository;
   vram = 0;
-  internalPath;
+  internalPath!: string;
 
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(25);
   enabledFeatures: string[] = [];
   enabledNamespaceGroups: string[] = [];
+  private _dataRoot!: string;
 
-  constructor(
-    public readonly dataRoot: string,
-    public readonly settings: {
-      comfyMainPath?: string;
-      skipPythonSetup?: boolean;
-      comfyArgs?: string[];
-      version?: string;
-    } = {},
-  ) {
+  constructor(public readonly settings: MetastableInstanceConfig) {
     super();
     if (Metastable._instance) {
       throw new Error(
@@ -75,19 +81,64 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }
     Metastable._instance = this;
 
+    if (settings.dataConfigPath) {
+      this.dataConfig = new JSONFile(settings.dataConfigPath, {});
+    }
+
     this.setup.skipPythonSetup = !!settings.skipPythonSetup;
-    this.config = new Config(path.join(dataRoot, 'config.json'));
-    this.internalPath = path.join(dataRoot, 'internal');
+  }
+
+  static async initialize(settings: MetastableInstanceConfig) {
+    const metastable = new Metastable(settings);
+    if (metastable.dataConfig) {
+      const json = await metastable.dataConfig.readJson();
+      if (json.dataRoot) {
+        settings.dataRoot = json.dataRoot;
+      }
+    }
+
+    await metastable.setDataRoot(settings.dataRoot);
+    metastable.updateVram();
+
+    setTimeout(() => {
+      metastable.refreshUtilization();
+    }, 2000);
+
+    return metastable;
+  }
+
+  async setDataRoot(dataRoot: string) {
+    if (this.project) {
+      await this.project.cleanup();
+      this.project.removeAllListeners();
+    }
+
+    if (this.model) {
+      await this.model.cleanup();
+      this.model.removeAllListeners();
+    }
+
+    this._dataRoot = dataRoot;
+    this.config = new Config(path.join(this.dataRoot, 'config.json'));
+    this.internalPath = path.join(this.dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
 
-    setTimeout(() => {
-      this.refreshUtilization();
-    }, 2000);
+    this.project.on('fileChange', (id, type) =>
+      this.emit('project.fileChange', id, type),
+    );
+    this.model.on('change', () => this.emit('model.change'));
+
+    await mkdir(this.internalPath, { recursive: true });
+    await this.reload();
   }
 
   static get instance() {
     return this._instance;
+  }
+
+  get dataRoot() {
+    return this._dataRoot;
   }
 
   async refreshUtilization() {
@@ -98,24 +149,28 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       return;
     }
 
-    const [load, free, usage] = await Promise.all([
-      cpu.load(),
-      ram.free(),
-      disk.usage(this.dataRoot),
-    ]);
+    try {
+      // TODO: replace with allSettled
+      const [load, free, usage] = await Promise.all([
+        cpu.load(),
+        ram.free(),
+        disk.usage(this.dataRoot),
+      ]);
 
-    const gpu = await gpuUtilization();
-    this.emit('utilization', {
-      cpuUsage: load,
-      hddTotal: usage.size,
-      hddUsed: usage.used,
-      ramTotal: free.total,
-      ramUsed: free.used,
-      gpuTemperature: gpu?.temperature,
-      gpuUsage: gpu?.utilization,
-      vramTotal: gpu?.vram,
-      vramUsed: gpu?.vramUsed,
-    });
+      const gpu = await gpuUtilization();
+      this.emit('utilization', {
+        cpuUsage: load,
+        hddTotal: usage.size,
+        hddUsed: usage.used,
+        ramTotal: free.total,
+        ramUsed: free.used,
+        gpuTemperature: gpu?.temperature,
+        gpuUsage: gpu?.utilization,
+        vramTotal: gpu?.vram,
+        vramUsed: gpu?.vramUsed,
+      });
+    } catch {}
+
     setTimeout(() => {
       this.refreshUtilization();
     }, 1000);
@@ -127,12 +182,6 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     await this.project.cleanup();
     console.log('Bye!');
     process.exit(0);
-  }
-
-  async init() {
-    await mkdir(this.internalPath, { recursive: true });
-    this.updateVram();
-    await this.reload();
   }
 
   private resolvePath(value: string | undefined) {

@@ -3,7 +3,8 @@ import path from 'path';
 
 import { Metastable } from '../src/index.js';
 
-const metastable = new Metastable(path.join(os.tmpdir(), 'metastable_test'), {
+const metastable = await Metastable.initialize({
+  dataRoot: path.join(os.tmpdir(), 'metastable_test'),
   skipPythonSetup: true,
   comfyArgs: ['--cpu'],
 });
@@ -15,7 +16,6 @@ beforeAll(() => {
         resolve();
       }
     });
-    metastable.init();
   });
 }, 60000);
 

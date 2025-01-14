@@ -23,11 +23,11 @@ import {
 const req = createRequire(import.meta.url);
 const info = req('../../client/package.json');
 
-const metastable = new Metastable(dataRoot, {
+const metastable = await Metastable.initialize({
+  dataRoot,
   skipPythonSetup,
   version: info.version,
 });
-await metastable.init();
 
 const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });
 
