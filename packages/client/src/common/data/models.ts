@@ -454,6 +454,63 @@ export const downloadable: DownloadableModelGroup[] = [
     ],
   },
   {
+    name: 'Hunyuan Video',
+    type: ModelType.CHECKPOINT,
+    description: 'Hunyuan Video is a text-to-video model developed by Tencent.',
+    models: [
+      {
+        name: 'Hunyuan Video 720p',
+        source: 'huggingface',
+        type: ModelType.CHECKPOINT,
+        recommended: true,
+        downloads: [
+          {
+            type: ModelType.DIFFUSION_MODEL,
+            name: 'hunyuan_video_t2v_720p_bf16.safetensors',
+            url: 'https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors',
+            size: 25642131432,
+            ignoreParentMetadata: true,
+          },
+          {
+            type: ModelType.TEXT_ENCODER,
+            name: 'clip_l.safetensors',
+            url: 'https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors',
+            size: 246144152,
+            ignoreParentMetadata: true,
+          },
+          {
+            type: ModelType.TEXT_ENCODER,
+            name: 'llava_llama3_fp16.safetensors',
+            url: 'https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors',
+            size: 16070690787,
+            ignoreParentMetadata: true,
+          },
+          {
+            type: ModelType.VAE,
+            name: 'hunyuan_video_vae_bf16.safetensors',
+            url: 'https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors',
+            size: 492984198,
+            ignoreParentMetadata: true,
+          },
+        ],
+        homepage: 'https://huggingface.co/tencent/HunyuanVideo',
+        createMetamodel: {
+          name: 'hunyuan_video_720p',
+          type: ModelType.CHECKPOINT,
+          models: {
+            diffusionModel:
+              'mrn:model:diffusion_model:hunyuan_video_t2v_720p_bf16.safetensors',
+            vae: 'mrn:model:vae:hunyuan_video_vae_bf16.safetensors',
+            textEncoders: [
+              'mrn:model:text_encoder:clip_l.safetensors',
+              'mrn:model:text_encoder:llava_llama3_fp16.safetensors',
+            ],
+          },
+        },
+      },
+    ],
+  },
+  {
     name: 'Stable Diffusion Inpainting',
     type: ModelType.CHECKPOINT,
     description: 'Checkpoint models built for use with inpainting.',
