@@ -61,7 +61,14 @@ class SamplingNamespace:
                 return (torch.FloatTensor([]),)
             total_steps = int(steps/denoise)
 
-        sigmas = comfy.samplers.calculate_sigmas(diffusion_model.get_model_object("model_sampling"), scheduler_name, total_steps).cpu()
+        custom_schedulers = custom.get_custom_schedulers()
+        sigmas = None
+        if scheduler_name not in custom_schedulers:
+            sigmas = comfy.samplers.calculate_sigmas(diffusion_model.get_model_object("model_sampling"), scheduler_name, total_steps).cpu()
+        else:
+            scheduler = custom_schedulers[scheduler_name]
+            sigmas = scheduler(diffusion_model, steps, denoise)
+        
         sigmas = sigmas[-(steps + 1):]
         return sigmas
     
