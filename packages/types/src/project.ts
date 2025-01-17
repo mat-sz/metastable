@@ -1,5 +1,6 @@
 import { ImageFile } from './file.js';
 import { PromptStyleWithSource } from './instance.js';
+import { ModelInputType } from './model.js';
 
 export interface BaseSettings {
   featureData?: any;
@@ -16,7 +17,7 @@ export interface ProjectSimpleSettings extends BaseSettings {
     clipSkip?: number;
   };
   input: {
-    type: 'none' | 'image' | 'image_masked';
+    type: ModelInputType;
     image?: string;
     imageMode?: ProjectImageMode;
     mask?: string;

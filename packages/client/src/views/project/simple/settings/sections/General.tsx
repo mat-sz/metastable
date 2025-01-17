@@ -1,5 +1,6 @@
 import {
   Metamodel,
+  ModelInputType,
   ModelOutputType,
   ModelType,
   ProjectFileType,
@@ -53,6 +54,10 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
   if (project.outputType === ModelOutputType.VIDEO) {
     outputOptions = [{ key: 'png', label: 'APNG' }];
   }
+
+  const showInputSection =
+    project.inputTypes.length > 1 ||
+    project.inputTypes[0] !== ModelInputType.NONE;
 
   return (
     <>
@@ -154,72 +159,80 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         <SettingsCategory label="Prompt" sectionId="prompt">
           <StyleSelect />
           <VarString label="Positive" path="prompt.positive" multiline />
-          <VarString label="Negative" path="prompt.negative" multiline />
+          {project.showNegativePrompt && (
+            <VarString label="Negative" path="prompt.negative" multiline />
+          )}
         </SettingsCategory>
       )}
-      <SettingsCategory label="Input" sectionId="input">
-        <VarInputType
-          label="Type"
-          path="input.type"
-          onChange={value => {
-            if (value !== 'none' && !project.settings.input.imageMode) {
-              project.settings.input.imageMode = 'stretch';
-            }
-          }}
-        />
-        {project.settings.input.type !== 'none' && (
-          <>
-            <VarImage
-              label="Image"
-              path="input.image"
-              onChange={() => {
-                runInAction(() => {
-                  project.settings.input.mask = undefined;
-                });
-              }}
-              imageBrowserProps={{
-                files: project.imageFiles,
-                showBreadcrumbs: true,
-              }}
-            />
-            <VarImageMode label="Image mode" path="input.imageMode" />
-            {project.settings.input.type === 'image_masked' && (
-              <>
-                <VarMask
-                  label="Mask"
-                  path="input.mask"
-                  imagePath="input.image"
-                  imageBrowserProps={{
-                    defaultParts: [ProjectFileType.MASK],
-                    files: project.imageFiles,
-                  }}
-                />
-                <VarSlider
-                  label="Pad edges"
-                  path="input.padEdges"
-                  min={0}
-                  max={512}
-                  step={1}
-                  defaultValue={0}
-                  showInput
-                  unit="px"
-                />
-              </>
-            )}
-            {project.settings.input.type === 'image' && (
-              <VarSlider
-                label="Strength"
-                path="sampler.denoise"
-                min={0}
-                max={1}
-                step={0.01}
-                defaultValue={1}
-                showInput
+      {showInputSection && (
+        <SettingsCategory label="Input" sectionId="input">
+          <VarInputType
+            label="Type"
+            path="input.type"
+            onChange={value => {
+              if (
+                value !== ModelInputType.NONE &&
+                !project.settings.input.imageMode
+              ) {
+                project.settings.input.imageMode = 'stretch';
+              }
+            }}
+            supportedTypes={project.inputTypes}
+          />
+          {project.settings.input.type !== ModelInputType.NONE && (
+            <>
+              <VarImage
+                label="Image"
+                path="input.image"
+                onChange={() => {
+                  runInAction(() => {
+                    project.settings.input.mask = undefined;
+                  });
+                }}
+                imageBrowserProps={{
+                  files: project.imageFiles,
+                  showBreadcrumbs: true,
+                }}
               />
-            )}
-          </>
-        )}
-      </SettingsCategory>
+              <VarImageMode label="Image mode" path="input.imageMode" />
+              {project.settings.input.type === ModelInputType.IMAGE_MASKED && (
+                <>
+                  <VarMask
+                    label="Mask"
+                    path="input.mask"
+                    imagePath="input.image"
+                    imageBrowserProps={{
+                      defaultParts: [ProjectFileType.MASK],
+                      files: project.imageFiles,
+                    }}
+                  />
+                  <VarSlider
+                    label="Pad edges"
+                    path="input.padEdges"
+                    min={0}
+                    max={512}
+                    step={1}
+                    defaultValue={0}
+                    showInput
+                    unit="px"
+                  />
+                </>
+              )}
+              {project.settings.input.type === ModelInputType.IMAGE && (
+                <VarSlider
+                  label="Strength"
+                  path="sampler.denoise"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  defaultValue={1}
+                  showInput
+                />
+              )}
+            </>
+          )}
+        </SettingsCategory>
+      )}
       <SettingsCategory label="Output" sectionId="output">
         <VarSwitch
           label="Size"

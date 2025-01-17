@@ -5,6 +5,7 @@ import { preprocessPrompt } from '@metastable/common';
 import {
   Architecture,
   ImageFile,
+  ModelInputType,
   ModelType,
   ProjectImageMode,
   ProjectSimpleSettings,
@@ -62,7 +63,7 @@ export class PromptTask extends BaseComfyTask<
   async init() {
     const settings = this.settings;
 
-    if (settings.input.type !== 'none' && !settings.input.image) {
+    if (settings.input.type !== ModelInputType.NONE && !settings.input.image) {
       throw new Error("Image is required if input type is not 'none'.");
     }
 
@@ -88,7 +89,7 @@ export class PromptTask extends BaseComfyTask<
       this.storeMetadata = true;
     }
 
-    if (settings.input.type !== 'image_masked') {
+    if (settings.input.type !== ModelInputType.IMAGE_MASKED) {
       settings.input.padEdges = undefined;
     }
 
@@ -303,7 +304,7 @@ export class PromptTask extends BaseComfyTask<
 
     this.step('input');
     switch (settings.input.type) {
-      case 'none':
+      case ModelInputType.NONE:
         this.latent = await ctx.latent.empty(
           settings.output.width,
           settings.output.height,
@@ -312,7 +313,7 @@ export class PromptTask extends BaseComfyTask<
           this.checkpoint.data.latentType,
         );
         break;
-      case 'image':
+      case ModelInputType.IMAGE:
         {
           const { image } = await this.loadInput(
             settings.input.image!,
@@ -321,7 +322,7 @@ export class PromptTask extends BaseComfyTask<
           this.latent = await this.checkpoint.encode(image);
         }
         break;
-      case 'image_masked':
+      case ModelInputType.IMAGE_MASKED:
         {
           const { image, mask } = await this.loadInput(
             settings.input.image!,
@@ -333,7 +334,7 @@ export class PromptTask extends BaseComfyTask<
         break;
     }
 
-    if (settings.input.type !== 'image') {
+    if (settings.input.type !== ModelInputType.IMAGE) {
       settings.sampler.denoise = 1;
     }
 

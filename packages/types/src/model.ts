@@ -36,6 +36,12 @@ export enum ModelOutputType {
   VIDEO = 'video',
 }
 
+export enum ModelInputType {
+  NONE = 'none',
+  IMAGE = 'image',
+  IMAGE_MASKED = 'image_masked',
+}
+
 export interface ModelMetadata {
   name?: string;
   description?: string;
@@ -51,6 +57,8 @@ export interface ModelDetails {
   corrupt?: boolean;
   architecture?: Architecture;
   type?: ModelType;
+  inputTypes?: ModelInputType[];
+  supportsNegativePrompt?: boolean;
   outputType?: ModelOutputType;
 }
 

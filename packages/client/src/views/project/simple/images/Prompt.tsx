@@ -62,7 +62,9 @@ export const Prompt: React.FC = observer(() => {
       >
         <div className={styles.inputs}>
           <VarPrompt label="Positive" path="prompt.positive" />
-          <VarPrompt label="Negative" path="prompt.negative" />
+          {project.showNegativePrompt && (
+            <VarPrompt label="Negative" path="prompt.negative" />
+          )}
         </div>
       </VarCategory>
       <div className={styles.actions}>

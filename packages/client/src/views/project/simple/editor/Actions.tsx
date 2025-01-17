@@ -1,3 +1,4 @@
+import { ModelInputType } from '@metastable/types';
 import React from 'react';
 
 import { Button } from '$components/button';
@@ -15,7 +16,7 @@ export const Actions: React.FC = () => {
           const { url, width, height } = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
           project.settings.input = {
-            type: 'image',
+            type: ModelInputType.IMAGE,
             image: url,
           };
           project.settings.output = {
@@ -34,7 +35,7 @@ export const Actions: React.FC = () => {
           const { url, width, height } = editor.renderSelection();
           project.addOutputToEditor = editor.selection.offset;
           project.settings.input = {
-            type: 'image_masked',
+            type: ModelInputType.IMAGE_MASKED,
             image: url,
           };
           project.settings.output = {

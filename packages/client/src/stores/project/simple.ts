@@ -5,6 +5,7 @@ import {
   FieldType,
   ImageFile,
   ModelDetails,
+  ModelInputType,
   ModelOutputType,
   ModelType,
   PostprocessSettings,
@@ -50,7 +51,7 @@ class SimpleProjectValidator {
     }
 
     const input = settings.input;
-    if (input.type !== 'none' && !input.image) {
+    if (input.type !== ModelInputType.NONE && !input.image) {
       this.errors.push('No input image selected.');
     }
   }
@@ -172,7 +173,7 @@ export function defaultSettings(): ProjectSimpleSettings {
 
   return {
     version: 1,
-    input: { type: 'none' },
+    input: { type: ModelInputType.NONE },
     output: {
       sizeMode: 'auto',
       orientation: 'square',
@@ -245,6 +246,8 @@ export class SimpleProject extends BaseProject<
       currentTask: observable,
       selectOutput: action,
       selectTask: action,
+      showNegativePrompt: computed,
+      inputTypes: computed,
       outputType: computed,
       modelDetails: computed,
       architecture: computed,
@@ -268,11 +271,10 @@ export class SimpleProject extends BaseProject<
   async useInputImage(url: string) {
     const settings = this.settings;
 
-    if (settings.input.type === 'none') {
-      settings.input.type = 'image';
-    } else {
-      settings.input.mask = undefined;
+    if (settings.input.type === ModelInputType.NONE) {
+      settings.input.type = ModelInputType.IMAGE;
     }
+    settings.input.mask = undefined;
     settings.input.image = url;
 
     this.setSettings(settings);
@@ -322,6 +324,10 @@ export class SimpleProject extends BaseProject<
         this.settings.output.format = 'png';
       }
     }
+
+    if (!this.inputTypes.includes(this.settings.input.type)) {
+      this.settings.input.type = this.inputTypes[0];
+    }
   }
 
   get imageFiles(): ImageFile[] {
@@ -354,6 +360,19 @@ export class SimpleProject extends BaseProject<
         ? modelStore.find(data.diffusionModel)
         : modelStore.find(data.checkpoint);
     return model?.details;
+  }
+
+  get showNegativePrompt(): boolean {
+    return this.modelDetails?.supportsNegativePrompt ?? true;
+  }
+
+  get inputTypes(): ModelInputType[] {
+    return (
+      this.modelDetails?.inputTypes || [
+        ModelInputType.NONE,
+        ModelInputType.IMAGE_MASKED,
+      ]
+    );
   }
 
   get outputType(): ModelOutputType {

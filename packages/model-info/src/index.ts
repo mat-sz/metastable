@@ -1,6 +1,7 @@
 import {
   Architecture,
   ModelDetails,
+  ModelInputType,
   ModelOutputType,
   ModelType,
 } from '@metastable/types';
@@ -43,6 +44,8 @@ const PATTERNS: StatePattern[] = [
     details: {
       architecture: Architecture.HUNYUAN_VIDEO,
       type: ModelType.DIFFUSION_MODEL,
+      inputTypes: [ModelInputType.NONE],
+      supportsNegativePrompt: false,
       outputType: ModelOutputType.VIDEO,
     },
   },

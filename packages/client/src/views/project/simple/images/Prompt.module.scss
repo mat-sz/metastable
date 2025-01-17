@@ -22,14 +22,14 @@
   }
 
   .inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     flex: 1;
 
     [varui-label] {
       margin: 1rem;
       display: flex;
       flex-direction: column;
+      flex: 1;
 
       [varui-label-body] {
         flex: 1;
