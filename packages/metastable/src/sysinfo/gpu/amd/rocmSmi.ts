@@ -36,25 +36,26 @@ interface RocmSmiShow {
 
 type RocmSmiRow<TShow extends RocmSmiShow> = (TShow['meminfoVram'] extends true
   ? {
-      'VRAM Total Memory (B)'?: string;
-      'VRAM Total Used Memory (B)'?: string;
+      'vram total memory (b)'?: string;
+      'vram total used memory (b)'?: string;
     }
   : {}) &
   (TShow['id'] extends true
-    ? { 'Device ID'?: string; 'Device Rev'?: string }
+    ? { 'device id'?: string; 'device rev'?: string }
     : {}) &
-  (TShow['bus'] extends true ? { 'PCI Bus'?: string } : {}) &
+  (TShow['bus'] extends true ? { 'pci bus'?: string } : {}) &
   (TShow['use'] extends true
-    ? { 'GPU use (%)'?: string; 'GFX Activity'?: string }
+    ? { 'gpu use (%)'?: string; 'gfx activity'?: string }
     : {}) &
   (TShow['temp'] extends true
     ? {
-        'Temperature (Sensor junction) (C)'?: string;
-        'Temperature (Sensor memory) (C)'?: string;
+        'temperature (sensor junction) (c)'?: string;
+        'temperature (sensor memory) (c)'?: string;
+        'temperature (sensor edge) (c)'?: string;
       }
     : {}) &
   (TShow['maxPower'] extends true
-    ? { 'Max Graphics Package Power (W)'?: string }
+    ? { 'max graphics package power (w)'?: string }
     : {}) &
   (TShow['clocks'] extends true
     ? {
@@ -70,14 +71,14 @@ type RocmSmiRow<TShow extends RocmSmiShow> = (TShow['meminfoVram'] extends true
     : {}) &
   (TShow['gpuClocks'] extends true ? { 'sclk clock level'?: string } : {}) &
   (TShow['power'] extends true
-    ? { 'Current Socket Graphics Package Power (W)'?: string }
+    ? { 'current socket graphics package power (w)'?: string }
     : {}) &
   (TShow['productName'] extends true
     ? {
-        'Card series'?: string;
-        'Card model'?: string;
-        'Card vendor'?: string;
-        'Card SKU'?: string;
+        'card series'?: string;
+        'card model'?: string;
+        'card vendor'?: string;
+        'card sku'?: string;
       }
     : {});
 
@@ -104,7 +105,12 @@ async function rocmSmi<TShow extends RocmSmiShow>(
   }
 
   const output = await stdout(rocmSmiPath, args);
-  return Object.values(JSON.parse(output)) as any[];
+  const cards = Object.values(JSON.parse(output)) as any[];
+  return cards.map(card =>
+    Object.fromEntries(
+      Object.entries(card).map(([key, value]) => [key.toLowerCase(), value]),
+    ),
+  );
 }
 
 const provider: GPUInfoProvider = {
@@ -119,12 +125,12 @@ const provider: GPUInfoProvider = {
     });
 
     return gpus.map(gpu => {
-      const vram = parseNumber(gpu['VRAM Total Memory (B)']) || 0;
+      const vram = parseNumber(gpu['vram total memory (b)']) || 0;
       return {
         source: PROVIDER_ID,
-        name: gpu['Card model'],
-        vendor: getVendor(gpu['Card vendor']),
-        busAddress: normalizeBusAddress(gpu['PCI Bus']),
+        name: gpu['card model'],
+        vendor: getVendor(gpu['card vendor']),
+        busAddress: normalizeBusAddress(gpu['pci bus']),
         vram,
       };
     });
@@ -139,15 +145,19 @@ const provider: GPUInfoProvider = {
     });
 
     return gpus.map(gpu => {
-      const vram = parseNumber(gpu['VRAM Total Memory (B)']) || 0;
+      const vram = parseNumber(gpu['vram total memory (b)']) || 0;
       return {
         source: PROVIDER_ID,
-        vendor: getVendor(gpu['Card vendor']),
-        busAddress: normalizeBusAddress(gpu['PCI Bus']),
+        vendor: getVendor(gpu['card vendor']),
+        busAddress: normalizeBusAddress(gpu['pci bus']),
         vram,
-        vramUsed: parseNumber(gpu['VRAM Total Used Memory (B)']),
-        utilization: parseNumber(gpu['GPU use (%)']),
-        temperature: parseNumber(gpu['Temperature (Sensor junction) (C)']),
+        vramUsed: parseNumber(gpu['vram total used memory (b)']),
+        utilization: parseNumber(gpu['gpu use (%)']),
+        temperature: parseNumber(
+          gpu['temperature (sensor junction) (c)'] ||
+            gpu['temperature (sensor memory) (c)'] ||
+            gpu['temperature (sensor edge) (c)'],
+        ),
       };
     });
   },

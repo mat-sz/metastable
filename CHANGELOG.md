@@ -12,7 +12,7 @@
 ## Bug fixes
 
 - Fixed auto update.
-- Fixed GPU detection logic.
+- Fixed issues with GPU detection using `rocm-smi` on Linux.
 
 # 0.0.15 (2025-01-11)
 

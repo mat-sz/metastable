@@ -33,7 +33,7 @@ export async function gpu(): Promise<GPUInfo[]> {
   }
 
   const data = await allResolved(providers.map(provider => provider.devices()));
-  return deduplicateInfo(sortGpus(flattenGpus(data)));
+  return sortGpus(deduplicateInfo(flattenGpus(data)));
 }
 
 export async function gpuUtilization() {
