@@ -27,3 +27,4 @@ cache.json
 /temp
 
 *.local
+data.json

@@ -12,6 +12,7 @@ import {
 import Fastify from 'fastify';
 
 import {
+  dataConfigPath,
   dataRoot,
   host,
   port,
@@ -27,6 +28,7 @@ const metastable = await Metastable.initialize({
   dataRoot,
   skipPythonSetup,
   version: info.version,
+  dataConfigPath,
 });
 
 const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });

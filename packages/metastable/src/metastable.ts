@@ -93,7 +93,11 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     if (metastable.dataConfig) {
       const json = await metastable.dataConfig.readJson();
       if (json.dataRoot) {
-        settings.dataRoot = json.dataRoot;
+        settings.dataRoot = path.resolve(
+          settings.dataRoot,
+          '..',
+          json.dataRoot,
+        );
       }
     }
 

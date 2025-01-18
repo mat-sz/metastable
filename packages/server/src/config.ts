@@ -11,3 +11,7 @@ export const staticRoot = path.resolve(
 export const dataRoot = path.resolve(
   process.env.SERVER_DATA_ROOT || '../../data',
 );
+
+export const dataConfigPath = path.resolve(
+  process.env.SERVER_DATA_CONFIG_PATH || '../../data.json',
+);
