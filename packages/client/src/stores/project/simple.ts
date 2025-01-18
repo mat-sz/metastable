@@ -370,6 +370,7 @@ export class SimpleProject extends BaseProject<
     return (
       this.modelDetails?.inputTypes || [
         ModelInputType.NONE,
+        ModelInputType.IMAGE,
         ModelInputType.IMAGE_MASKED,
       ]
     );

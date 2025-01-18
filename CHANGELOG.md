@@ -8,6 +8,7 @@
 ## Improvements
 
 - Moved bundles to a faster CDN to improve installation speed.
+- Improved word wrapping in prompt fields.
 
 ## Bug fixes
 
