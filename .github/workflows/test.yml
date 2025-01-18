@@ -7,46 +7,12 @@ on:
     branches: [main]
 
 jobs:
-  test-linux:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'yarn'
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-      - run: yarn install
-      - run: yarn setup:other
-      - run: yarn build
-      - run: yarn test
-
-  test-windows:
-    timeout-minutes: 15
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'yarn'
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-      - run: python -V
-      - run: yarn install
-      - run: yarn setup:other
-      - run: yarn build
-      - run: yarn test
-
-  test-macos:
-    timeout-minutes: 15
-    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
