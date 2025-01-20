@@ -2,6 +2,8 @@ import { Dirent } from 'fs';
 import fs, { mkdir, unlink } from 'fs/promises';
 import path from 'path';
 
+import { DirentType } from '@metastable/types';
+
 export const IMAGE_EXTENSIONS = [
   'png',
   'jpeg',
@@ -87,7 +89,7 @@ export async function walk(currentPath: string) {
 
       output.push(file);
     } else if (file.isDirectory()) {
-      output.push(...(await walk(path.join(file.path, file.name))));
+      output.push(...(await walk(path.join(file.parentPath, file.name))));
     }
   }
 
@@ -268,4 +270,24 @@ export async function getNextFilename(dir: string, ext: string) {
 
 export async function rmdir(dir: string) {
   await fs.rm(dir, { force: true, recursive: true });
+}
+
+export function direntType(item: Dirent) {
+  if (item.isFile()) {
+    return DirentType.FILE;
+  } else if (item.isDirectory()) {
+    return DirentType.DIRECTORY;
+  } else if (item.isSymbolicLink()) {
+    return DirentType.SYMLINK;
+  } else if (item.isBlockDevice()) {
+    return DirentType.BLOCK_DEVICE;
+  } else if (item.isCharacterDevice()) {
+    return DirentType.CHARACTER_DEVICE;
+  } else if (item.isFIFO()) {
+    return DirentType.FIFO;
+  } else if (item.isSocket()) {
+    return DirentType.SOCKET;
+  }
+
+  return undefined;
 }

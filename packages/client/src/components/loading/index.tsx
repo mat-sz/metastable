@@ -1,10 +1,15 @@
+import clsx from 'clsx';
 import React from 'react';
 
 import styles from './index.module.scss';
 
-export const Loading: React.FC = () => {
+interface LoadingProps {
+  className?: string;
+}
+
+export const Loading: React.FC<LoadingProps> = ({ className }) => {
   return (
-    <div className={styles.loading}>
+    <div className={clsx(styles.loading, className)}>
       <div></div>
       <div></div>
       <div></div>

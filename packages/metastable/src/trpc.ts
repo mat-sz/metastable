@@ -1,5 +1,6 @@
 import { on } from 'events';
 import fs from 'fs/promises';
+import path from 'path';
 
 import {
   BackendStatus,
@@ -27,7 +28,7 @@ import { z } from 'zod';
 import { PostprocessTask } from './comfy/tasks/postprocess.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
 import { TagTask } from './comfy/tasks/tag.js';
-import { exists, getNextFilename } from './helpers/fs.js';
+import { direntType, exists, getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
 import * as disk from './sysinfo/disk.js';
 
@@ -235,6 +236,47 @@ export const router = t.router({
         }
 
         return true;
+      }),
+    listFiles: t.procedure.input(z.string()).query(async ({ input }) => {
+      const dir = await fs.readdir(input, { withFileTypes: true });
+      const resolved = path.resolve(input);
+      const parsed = path.parse(resolved);
+      const rootless = parsed.dir.replace(parsed.root, '');
+      const segments: { name: string; path: string }[] = [];
+
+      segments.push({
+        path: parsed.root,
+        name: parsed.root.replaceAll(path.sep, '') || path.sep,
+      });
+
+      let current = parsed.root;
+      const split = rootless.split(path.sep);
+      if (parsed.base) {
+        split.push(parsed.base);
+      }
+
+      for (const segmentName of split) {
+        current = path.join(current, segmentName);
+        segments.push({ path: current, name: segmentName });
+      }
+
+      return {
+        path: resolved,
+        segments,
+        parentPath: parsed.dir,
+        items: dir.map(item => ({
+          path: path.resolve(item.parentPath, item.name),
+          name: item.name,
+          type: direntType(item),
+        })),
+      };
+    }),
+    createFolder: t.procedure
+      .input(z.object({ path: z.string(), name: z.string() }))
+      .mutation(async ({ input }) => {
+        const folderPath = path.join(input.path, input.name);
+        await fs.mkdir(folderPath, { recursive: true });
+        return folderPath;
       }),
   },
   model: {

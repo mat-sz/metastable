@@ -6,7 +6,6 @@ import { ImageFile, PostprocessSettings } from '@metastable/types';
 import { BaseComfyTask, BaseComfyTaskHandlers } from './base.js';
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
-import type { ComfySession } from '../session/index.js';
 import { RPCRef } from '../session/types.js';
 
 type PostprocessTaskHandlers = BaseComfyTaskHandlers & {
@@ -17,7 +16,6 @@ export class PostprocessTask extends BaseComfyTask<
   PostprocessTaskHandlers,
   PostprocessSettings
 > {
-  public session?: ComfySession;
   public images?: RPCRef[];
 
   constructor(project: ProjectEntity, settings: PostprocessSettings) {

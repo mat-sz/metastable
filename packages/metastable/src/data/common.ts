@@ -103,7 +103,7 @@ export class BaseEntity {
     this: EntityClass<T>,
     dirent: Dirent,
   ): Promise<T> {
-    return await this.fromPath(path.join(dirent.path, dirent.name));
+    return await this.fromPath(path.join(dirent.parentPath, dirent.name));
   }
 
   static async fromPath<T extends BaseEntity>(

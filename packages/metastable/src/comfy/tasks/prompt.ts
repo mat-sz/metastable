@@ -21,7 +21,6 @@ import { getNextFilename } from '../../helpers/fs.js';
 import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
 import { bufferToRpcBytes } from '../session/helpers.js';
-import type { ComfySession } from '../session/index.js';
 import {
   ComfyCheckpoint,
   ComfyConditioning,
@@ -50,7 +49,6 @@ export class PromptTask extends BaseComfyTask<
   };
   private storeMetadata = false;
   public latent?: ComfyLatent;
-  public session?: ComfySession;
   public checkpoint?: ComfyCheckpoint;
   public conditioning?: ComfyConditioning;
   public images?: RPCRef[];
@@ -103,7 +101,7 @@ export class PromptTask extends BaseComfyTask<
     };
   }
 
-  async getCheckpoint(ctx: ComfySession) {
+  async getCheckpoint() {
     let data = this.settings.models;
 
     if (data.mode === 'simple') {
@@ -177,7 +175,7 @@ export class PromptTask extends BaseComfyTask<
       );
     }
 
-    return await ctx.checkpoint.load({
+    return await this.session!.checkpoint.load({
       type,
       paths,
       clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
@@ -280,7 +278,7 @@ export class PromptTask extends BaseComfyTask<
 
     this.step('checkpoint');
     const settings = this.settings;
-    this.checkpoint = await this.getCheckpoint(ctx);
+    this.checkpoint = await this.getCheckpoint();
 
     await this.executeHandlers('checkpoint');
 

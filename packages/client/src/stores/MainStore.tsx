@@ -31,6 +31,7 @@ class MainStore {
     schedulers: [],
     vram: 0,
     dataRoot: '/',
+    defaultDirectory: '/',
     features: [],
   };
   backendLog: LogItem[] = [];
