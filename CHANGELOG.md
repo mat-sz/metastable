@@ -4,6 +4,7 @@
 
 - Added support for generating video using Hunyuan Video models.
 - Added support for APNG outputs.
+- Added an option to change the installation directory during setup.
 
 ## Improvements
 

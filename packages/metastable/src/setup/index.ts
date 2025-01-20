@@ -68,7 +68,6 @@ export class Setup extends EventEmitter<SetupEvents> {
   async details(): Promise<SetupDetails> {
     const controllers = await gpu();
     const dataRoot = Metastable.instance.dataRoot;
-    const usage = await disk.usage(dataRoot);
     const platform = os.platform();
 
     return {
@@ -118,12 +117,7 @@ export class Setup extends EventEmitter<SetupEvents> {
             potentialTorchModes,
           };
         }),
-      storage: {
-        dataRoot,
-        diskPath: usage.diskPath,
-        free: usage.free,
-        total: usage.size,
-      },
+      storage: await disk.usage(dataRoot),
     };
   }
 
@@ -183,6 +177,10 @@ export class Setup extends EventEmitter<SetupEvents> {
   async start(settings: SetupSettings) {
     if (this.settings) {
       return;
+    }
+
+    if (settings.dataRoot !== Metastable.instance.dataRoot) {
+      await Metastable.instance.setDataRoot(settings.dataRoot, true);
     }
 
     this.settings = settings;

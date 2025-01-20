@@ -229,7 +229,7 @@ async function createWindow() {
     router,
     windows: [win],
     createContext: async () => {
-      return { metastable, win, autoUpdater };
+      return { metastable, win, autoUpdater, app };
     },
   });
 

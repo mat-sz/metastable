@@ -3,15 +3,17 @@ import React from 'react';
 import { BsHddFill } from 'react-icons/bs';
 
 import { AvailableStorage } from '$components/availableStorage';
+import { PathInput } from '$components/pathInput';
+import { mainStore } from '$stores/MainStore';
 import { setupStore } from '$stores/SetupStore';
 import { filesize } from '$utils/file';
 import styles from './StorageItem.module.scss';
 import { Item } from '../components/Item';
 
 export const StorageItem: React.FC = observer(() => {
+  const storage = setupStore.details?.storage;
   const item = setupStore.storage;
 
-  const storage = setupStore.details?.storage;
   const predicted = setupStore.predictedStorage;
   const entries = Object.entries(predicted.breakdown);
 
@@ -23,12 +25,14 @@ export const StorageItem: React.FC = observer(() => {
       description={item.description}
       status={item.status}
     >
+      <PathInput
+        value={storage?.path || mainStore.info.defaultDirectory}
+        onChange={value => {
+          setupStore.setDataRoot(value);
+        }}
+      />
       {storage && (
-        <AvailableStorage
-          free={storage.free}
-          total={storage.total}
-          path={storage.diskPath}
-        />
+        <AvailableStorage free={storage.free} total={storage.total} />
       )}
       <div className={styles.predicted}>
         <div className={styles.info}>

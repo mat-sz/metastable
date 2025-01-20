@@ -1,4 +1,5 @@
 import { on } from 'events';
+import fs from 'fs/promises';
 
 import {
   BackendStatus,
@@ -16,7 +17,7 @@ import {
   Utilization,
 } from '@metastable/types';
 import { initTRPC, TRPCError } from '@trpc/server';
-import { type BrowserWindow } from 'electron';
+import { type App, type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
 import { nanoid } from 'nanoid';
@@ -28,11 +29,13 @@ import { PromptTask } from './comfy/tasks/prompt.js';
 import { TagTask } from './comfy/tasks/tag.js';
 import { exists, getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
+import * as disk from './sysinfo/disk.js';
 
 export interface TRPCContext {
   metastable: Metastable;
   win?: BrowserWindow;
   autoUpdater?: AppUpdater;
+  app?: App;
 }
 
 const transformer = {
@@ -149,7 +152,7 @@ export const router = t.router({
         await iter.next();
       }
     }),
-    info: t.procedure.query(async ({ ctx: { metastable } }) => {
+    info: t.procedure.query(async ({ ctx: { metastable, app } }) => {
       const info = (await metastable.comfy?.info()) || {
         schedulers: [],
         samplers: [],
@@ -166,6 +169,7 @@ export const router = t.router({
         vram,
         dataRoot: metastable.dataRoot,
         features: await metastable.feature.all(),
+        defaultDirectory: app?.getPath('documents') || metastable.dataRoot,
       };
     }),
     updateInfo: t.procedure.query(
@@ -323,6 +327,12 @@ export const router = t.router({
     details: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.details();
     }),
+    prepareDataRoot: t.procedure
+      .input(z.string())
+      .mutation(async ({ input }) => {
+        await fs.mkdir(input, { recursive: true });
+        return await disk.usage(input);
+      }),
     start: t.procedure
       .input(
         z.object({
@@ -330,6 +340,7 @@ export const router = t.router({
             z.object({ name: z.string(), type: z.string(), url: z.string() }),
           ),
           torchMode: z.string(),
+          dataRoot: z.string(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input }) => {
@@ -696,6 +707,16 @@ export const router = t.router({
             input = await metastable.resolve(input);
           }
           await shell.openPath(input);
+        }),
+      selectDirectory: electronProcedure
+        .input(z.string())
+        .mutation(async ({ ctx: { win }, input }) => {
+          const { dialog } = await import('electron');
+          const result = await dialog.showOpenDialog(win, {
+            defaultPath: input,
+            properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
+          });
+          return result.filePaths[0];
         }),
     },
     autoUpdater: {

@@ -53,6 +53,15 @@ class SetupStore {
     this.torchMode = this.gpu?.torchModes[0] || 'cpu';
   }
 
+  async setDataRoot(dataRoot: string) {
+    const storage = await API.setup.prepareDataRoot.mutate(dataRoot);
+    if (storage) {
+      runInAction(() => {
+        this.details = { ...this.details!, storage };
+      });
+    }
+  }
+
   async refresh() {
     const status = await API.setup.status.query();
 
@@ -73,6 +82,7 @@ class SetupStore {
     API.setup.start.mutate({
       downloads: toJS(this.downloads),
       torchMode: this.torchMode,
+      dataRoot: this.details!.storage.path,
     });
   }
 

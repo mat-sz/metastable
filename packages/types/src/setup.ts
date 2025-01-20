@@ -36,9 +36,9 @@ export interface SetupGPU {
 }
 
 export interface SetupStorage {
-  dataRoot: string;
-  diskPath: string;
+  path: string;
   free: number;
+  used: number;
   total: number;
 }
 
@@ -51,4 +51,5 @@ export interface SetupDetails {
 export interface SetupSettings {
   downloads: DownloadSettings[];
   torchMode: TorchMode;
+  dataRoot: string;
 }

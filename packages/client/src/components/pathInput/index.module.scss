@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  input {
+    flex: 1;
+    border: none;
+    margin-right: 0.4rem;
+    border: 1px solid var(--grey-200);
+  }
+}

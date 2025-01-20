@@ -111,7 +111,11 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     return metastable;
   }
 
-  async setDataRoot(dataRoot: string) {
+  async setDataRoot(dataRoot: string, persist = false) {
+    if (persist && this.dataConfig) {
+      await this.dataConfig.writeJson({ dataRoot });
+    }
+
     if (this.project) {
       await this.project.cleanup();
       this.project.removeAllListeners();
@@ -127,6 +131,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     this.internalPath = path.join(this.dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
+    this.infoUpdated();
 
     this.project.on('fileChange', (id, type) =>
       this.emit('project.fileChange', id, type),
@@ -164,7 +169,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       const gpu = await gpuUtilization();
       this.emit('utilization', {
         cpuUsage: load,
-        hddTotal: usage.size,
+        hddTotal: usage.total,
         hddUsed: usage.used,
         ramTotal: free.total,
         ramUsed: free.used,
