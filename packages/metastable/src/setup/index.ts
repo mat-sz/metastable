@@ -204,7 +204,7 @@ export class Setup extends EventEmitter<SetupEvents> {
     const torchMode = this.settings?.torchMode || 'cpu';
     await this.enqueueBundle(
       'torch',
-      `${os.platform()}-${os.arch()}-${torchMode}.tar.br`,
+      `${os.platform()}-${os.arch()}-${torchMode}.tar.zst`,
       targetPath,
       true,
     );
@@ -216,7 +216,7 @@ export class Setup extends EventEmitter<SetupEvents> {
         const variant = `rocm${sdkVersion.split('.')[0]}`;
         await this.enqueueBundle(
           'zluda',
-          `${os.platform()}-${os.arch()}-${variant}.tar.br`,
+          `${os.platform()}-${os.arch()}-${variant}.tar.zst`,
           targetPath,
         );
       }

@@ -16,7 +16,7 @@ export default defineConfig(env => {
         },
         rollupOptions: {
           input: 'src/electron/main.ts',
-          external: ['sharp', 'chokidar'],
+          external: ['sharp', 'chokidar', '@metastable/cppzst'],
         },
       },
       define,

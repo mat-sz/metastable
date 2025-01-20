@@ -44,7 +44,7 @@ export class ExtractTask extends BaseTask {
       this.#size += (await stat(part)).size;
     }
 
-    const { createBrotliDecompress } = await import('zlib');
+    const { decompressStream } = await import('@metastable/cppzst');
 
     const wrapped = new WrappedPromise<TaskState>();
     const extract = tarStream.extract();
@@ -80,9 +80,7 @@ export class ExtractTask extends BaseTask {
       this.appendLog('Done.');
     });
 
-    const decompressor = createBrotliDecompress({
-      chunkSize: 131072,
-    });
+    const decompressor = decompressStream();
     decompressor.pipe(extract);
 
     const next = () => {

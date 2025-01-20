@@ -2052,11 +2052,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@metastable/cppzst@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@metastable/cppzst@npm:2.2.1"
+  dependencies:
+    node-addon-api: "npm:^8.3.0"
+    node-gyp: "npm:latest"
+    node-gyp-build: "npm:^4.8.4"
+  checksum: 10c0/2a8f75fcabbe6ca6684c58e76567a8d6f478e4d5fe1edb00a73d2232789f94eaadb8241677c6cd669526c968cd3b280ea8ed894988e58dd155b7a40961cf9678
+  languageName: node
+  linkType: hard
+
 "@metastable/metastable@workspace:^, @metastable/metastable@workspace:packages/metastable":
   version: 0.0.0-use.local
   resolution: "@metastable/metastable@workspace:packages/metastable"
   dependencies:
     "@metastable/common": "workspace:^"
+    "@metastable/cppzst": "npm:^2.2.1"
     "@metastable/model-info": "workspace:^"
     "@metastable/types": "workspace:^"
     "@trpc/server": "npm:11.0.0-rc.682"
@@ -8282,12 +8294,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-addon-api@npm:^8.3.0":
+  version: 8.3.0
+  resolution: "node-addon-api@npm:8.3.0"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10c0/0ed4206cb68921b33fc637c6f7ffcb91fcde85aea88ea60fadb7b0537bf177226a5600584eac9db2aff93600041d42796fb20576b3299b9be6ff7539592b2180
+  languageName: node
+  linkType: hard
+
 "node-api-version@npm:^0.2.0":
   version: 0.2.0
   resolution: "node-api-version@npm:0.2.0"
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10c0/a5bdc7559237d2acebadc9ac0f29dd1279726e4226a8b3256ea605f6ad4a5c48528a2b6684d09237d33f0b714a95573d7f14a2a628642d31e05c79395e2c7873
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:^4.8.4":
+  version: 4.8.4
+  resolution: "node-gyp-build@npm:4.8.4"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 10c0/444e189907ece2081fe60e75368784f7782cfddb554b60123743dfb89509df89f1f29c03bbfa16b3a3e0be3f48799a4783f487da6203245fa5bed239ba7407e1
   languageName: node
   linkType: hard
 

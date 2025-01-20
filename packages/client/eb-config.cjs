@@ -49,11 +49,13 @@ const config = {
     asarUnpack: [
       '**/node_modules/sharp/**/*',
       '**/node_modules/@img/*-win32-*/**/*',
+      '**/node_modules/@metastable/cppzst/prebuilds/win32-*/**/*',
     ],
     files: [
       ...globalFiles,
       '!**/node_modules/@img/*-{darwin,linux}-*/**/*',
       '!**/node_modules/@img/*-arm64/**/*',
+      '!**/node_modules/@metastable/cppzst/prebuilds/{darwin,linux}-*/**/*',
     ],
   },
   nsis: {
@@ -74,8 +76,13 @@ const config = {
     asarUnpack: [
       '**/node_modules/sharp/**/*',
       '**/node_modules/@img/*-darwin-*/**/*',
+      '**/node_modules/@metastable/cppzst/prebuilds/darwin-*/**/*',
     ],
-    files: [...globalFiles, '!**/node_modules/@img/*-{win32,linux}-*/**/*'],
+    files: [
+      ...globalFiles,
+      '!**/node_modules/@img/*-{win32,linux}-*/**/*',
+      '!**/node_modules/@metastable/cppzst/prebuilds/{win32,linux}-*/**/*',
+    ],
   },
 
   // Linux
@@ -89,11 +96,13 @@ const config = {
     asarUnpack: [
       '**/node_modules/sharp/**/*',
       '**/node_modules/@img/*-linux-*/**/*',
+      '**/node_modules/@metastable/cppzst/prebuilds/linux-*/**/*',
     ],
     files: [
       ...globalFiles,
       '!**/node_modules/@img/*-{win32,darwin}-*/**/*',
       '!**/node_modules/@img/*-arm64/**/*',
+      '!**/node_modules/@metastable/cppzst/prebuilds/{win32,darwin}-*/**/*',
     ],
   },
 
