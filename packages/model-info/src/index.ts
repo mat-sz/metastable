@@ -6,6 +6,7 @@ import {
   ModelType,
 } from '@metastable/types';
 
+import { readGguf } from './gguf.js';
 import { readPytorch } from './pytorch.js';
 import { readSafetensors } from './safetensors.js';
 
@@ -25,6 +26,8 @@ async function getDict(modelPath: string) {
     return await readPytorch(modelPath);
   } else if (SAFETENSORS_EXTENSIONS.includes(ext)) {
     return await readSafetensors(modelPath);
+  } else if (ext === 'gguf') {
+    return await readGguf(modelPath);
   } else {
     throw new Error(`Unsupported model format ${ext}`);
   }
@@ -32,6 +35,7 @@ async function getDict(modelPath: string) {
 
 interface StatePattern {
   matchLists: string[][];
+  ggufArch?: string;
   details: ModelDetails;
 }
 
@@ -41,6 +45,7 @@ const PATTERNS: StatePattern[] = [
       ['txt_in.individual_token_refiner.blocks.0.norm1.weight'],
       ['model.model.txt_in.individual_token_refiner.blocks.0.norm1.weight'],
     ],
+    ggufArch: 'hyvid',
     details: {
       architecture: Architecture.HUNYUAN_VIDEO,
       type: ModelType.DIFFUSION_MODEL,
@@ -78,6 +83,7 @@ const PATTERNS: StatePattern[] = [
   },
   {
     matchLists: [['double_blocks.0.img_attn.norm.key_norm.scale']],
+    ggufArch: 'flux',
     details: {
       architecture: Architecture.FLUX1,
       type: ModelType.DIFFUSION_MODEL,
@@ -146,6 +152,7 @@ const PATTERNS: StatePattern[] = [
     matchLists: [
       ['model.diffusion_model.joint_blocks.9.x_block.mlp.fc2.weight'],
     ],
+    ggufArch: 'sd3',
     details: {
       architecture: Architecture.SD3,
       type: ModelType.CHECKPOINT,
@@ -158,6 +165,7 @@ const PATTERNS: StatePattern[] = [
         'conditioner.embedders.1.model.transformer.resblocks.21.attn.out_proj.bias',
       ],
     ],
+    ggufArch: 'sdxl',
     details: {
       architecture: Architecture.SDXL,
       type: ModelType.CHECKPOINT,
@@ -186,6 +194,7 @@ const PATTERNS: StatePattern[] = [
         'model.diffusion_model.output_blocks.8.2.conv.weight',
       ],
     ],
+    ggufArch: 'sd1',
     details: {
       architecture: Architecture.SD1,
       type: ModelType.CHECKPOINT,
@@ -205,6 +214,15 @@ export async function getModelDetails(
 
     for (const pattern of PATTERNS) {
       if (pattern.matchLists.some(list => list.every(key => !!state[key]))) {
+        details = { ...details, ...pattern.details };
+        break;
+      }
+    }
+  }
+
+  if (dict['general.architecture']) {
+    for (const pattern of PATTERNS) {
+      if (pattern.ggufArch === dict['general.architecture']) {
         details = { ...details, ...pattern.details };
         break;
       }

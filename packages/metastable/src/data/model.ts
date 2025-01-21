@@ -38,6 +38,7 @@ const MODEL_EXTENSIONS = [
   'onnx',
   'st',
   'sft',
+  'gguf',
   'msmeta',
 ];
 

@@ -15,6 +15,14 @@ class TextEncoderNamespace:
     @RPC.method("load")
     def load(paths, type, embeddings_path=None):
         text_encoder_type = TYPE_MAP[type] if type in TYPE_MAP else comfy.sd.CLIPType.STABLE_DIFFUSION
+
+        if any(path.endswith('.gguf') for path in paths):
+            try:
+                from .utils.gguf import load_text_encoder
+                return load_text_encoder(paths, text_encoder_type, embeddings_path)
+            except ImportError as e:
+                raise ValueError(f"Missing GGUF support.")
+        
         return comfy.sd.load_clip(ckpt_paths=paths, embedding_directory=embeddings_path, clip_type=text_encoder_type)
     
     @RPC.autoref

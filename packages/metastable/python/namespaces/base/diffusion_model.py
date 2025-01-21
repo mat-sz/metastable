@@ -24,7 +24,16 @@ def load_unet_cached(path, model_options={}):
     comfy.model_management.cleanup_models()
     
     last_unet_path = path
-    last_unet = comfy.sd.load_diffusion_model(path, model_options=model_options)
+
+    if path.endswith('.gguf'):
+        try:
+            from .utils.gguf import load_diffusion_model
+            last_unet = load_diffusion_model(path)
+        except ImportError as e:
+            raise ValueError(f"Missing GGUF support.")
+    else:
+        last_unet = comfy.sd.load_diffusion_model(path, model_options=model_options)
+    
     return last_unet
 
 class DiffusionModelNamespace:

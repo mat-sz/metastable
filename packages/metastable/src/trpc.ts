@@ -250,14 +250,15 @@ export const router = t.router({
       });
 
       let current = parsed.root;
-      const split = rootless.split(path.sep);
-      if (parsed.base) {
-        split.push(parsed.base);
-      }
+      const split = [...rootless.split(path.sep), parsed.base];
 
-      for (const segmentName of split) {
-        current = path.join(current, segmentName);
-        segments.push({ path: current, name: segmentName });
+      for (const name of split) {
+        if (!name) {
+          continue;
+        }
+
+        current = path.join(current, name);
+        segments.push({ path: current, name });
       }
 
       return {
