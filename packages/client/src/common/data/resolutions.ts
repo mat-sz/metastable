@@ -55,4 +55,20 @@ export const recommendedResolutions: Partial<
     landscape: [[1536, 1024]],
     portrait: [[1024, 1536]],
   },
+  [Architecture.HUNYUAN_VIDEO]: {
+    square: [
+      [960, 960],
+      [720, 720],
+    ],
+    landscape: [
+      [1024, 576],
+      [1280, 720],
+      [960, 544],
+    ],
+    portrait: [
+      [576, 1024],
+      [720, 1280],
+      [544, 960],
+    ],
+  },
 };
