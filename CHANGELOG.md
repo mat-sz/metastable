@@ -10,6 +10,7 @@
 
 - Moved bundles to a faster CDN to improve installation speed.
 - Improved word wrapping in prompt fields.
+- Added the new file picker to path fields in settings.
 
 ## Bug fixes
 

@@ -14,6 +14,7 @@ export * from './VarMask';
 export * from './VarModel';
 export * from './VarNumber';
 export * from './VarOrientation';
+export * from './VarPath';
 export * from './VarPrompt';
 export * from './VarRandomNumber';
 export * from './VarScope';

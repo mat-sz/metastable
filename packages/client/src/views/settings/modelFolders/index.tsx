@@ -10,6 +10,7 @@ import {
   VarArrayWithModal,
   VarButton,
   VarCategory,
+  VarPath,
   VarScope,
   VarString,
 } from '$components/var';
@@ -54,9 +55,9 @@ const ModelFoldersList: React.FC<ModelFoldersListProps> = ({ title, type }) => {
           return data;
         }}
         modalChildren={
-          <VarCategory label="Model folder" forceBorder>
+          <VarCategory label="Model folder">
             <VarString path="name" label="Name" />
-            <VarString path="path" label="Path" />
+            <VarPath path="path" label="Path" />
           </VarCategory>
         }
       >

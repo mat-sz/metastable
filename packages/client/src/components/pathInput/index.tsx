@@ -5,12 +5,13 @@ import React from 'react';
 import { API } from '$api';
 import { Button } from '$components/button';
 import { InstanceSelectPath } from '$modals/instance';
+import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 
 export interface PathInputProps {
-  value: string;
+  value?: string;
   onChange?: (value: string) => void;
   className?: string;
   type?: DirentType;
@@ -27,15 +28,17 @@ export const PathInput: React.FC<PathInputProps> = ({
       <input type="text" readOnly value={value} />
       <Button
         onClick={() => {
+          const current = value || mainStore.info.defaultDirectory;
+
           if (IS_ELECTRON) {
             API.electron.shell.selectDirectory
-              .mutate(value)
+              .mutate(current)
               .then(value => onChange?.(value))
               .catch(() => {});
           } else {
             modalStore.show(
               <InstanceSelectPath
-                value={value}
+                value={current}
                 onChange={onChange}
                 type={type}
               />,
