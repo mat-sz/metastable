@@ -22,6 +22,9 @@ const CONFIG_DEFAULTS: ConfigType = {
     autoUpdate: true,
     hideWelcome: false,
   },
+  downloader: {
+    apiKeys: {},
+  },
   styles: [],
   modelFolders: {},
 };
@@ -36,9 +39,30 @@ export class Config {
     );
   }
 
+  private upgrade(config: any): ConfigType {
+    if (config.civitai?.apiKey) {
+      if (!config.downloader.apiKeys['civitai']) {
+        config.downloader.apiKeys['civitai'] = config.civitai?.apiKey;
+      }
+
+      delete config['civitai'];
+    }
+
+    if (config.huggingface?.apiKey) {
+      if (!config.downloader.apiKeys['huggingface']) {
+        config.downloader.apiKeys['huggingface'] = config.huggingface?.apiKey;
+      }
+
+      delete config['huggingface'];
+    }
+
+    return config;
+  }
+
   async all(): Promise<ConfigType> {
     const data = await this.configFile.readJson();
-    return assign({ ...CONFIG_DEFAULTS }, { ...data }) as ConfigType;
+    const config = assign({ ...CONFIG_DEFAULTS }, { ...data }) as any;
+    return this.upgrade(config);
   }
 
   async store(config: Partial<ConfigType>): Promise<void> {

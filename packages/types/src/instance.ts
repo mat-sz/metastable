@@ -62,11 +62,8 @@ export interface ConfigType {
     extraArgs?: string;
     env?: Record<string, string>;
   };
-  civitai?: {
-    apiKey?: string;
-  };
-  huggingface?: {
-    apiKey?: string;
+  downloader?: {
+    apiKeys?: Record<string, string>;
   };
   ui?: {
     fuzzySearch?: boolean;

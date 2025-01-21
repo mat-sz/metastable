@@ -16,3 +16,28 @@ export async function download(url: string, filePath: string) {
   const data = await res.arrayBuffer();
   await fs.writeFile(filePath, new Uint8Array(data));
 }
+
+const AUTHORIZATION_STRATEGIES: {
+  id: string;
+  match: (hostname: string) => boolean;
+  strategy: 'bearer';
+}[] = [
+  {
+    id: 'huggingface',
+    match: (hostname: string) => hostname.includes('huggingface.co'),
+    strategy: 'bearer',
+  },
+  {
+    id: 'civitai',
+    match: (hostname: string) => hostname.includes('civitai.com'),
+    strategy: 'bearer',
+  },
+];
+
+export function getAuthorizationStrategy(hostname: string) {
+  for (const strategy of AUTHORIZATION_STRATEGIES) {
+    if (strategy.match(hostname)) {
+      return strategy;
+    }
+  }
+}

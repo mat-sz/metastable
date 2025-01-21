@@ -26,6 +26,7 @@ export * from './VarToggle';
 
 // Other
 export * from './VarCategory';
+export * from './VarCategoryScope';
 
 // Utility
 export { useVarUIValue } from './common/VarUIContext';

@@ -2,7 +2,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { ReactNode } from 'react';
 
-import { VarCategory, VarScope } from '$components/var';
+import { VarCategoryScope } from '$components/var';
 import { useSimpleProject } from '../../context';
 
 export interface Props {
@@ -29,14 +29,7 @@ export interface Props {
  * Category component for grouping inputs.
  */
 export const SettingsCategory = observer(
-  ({
-    label,
-    className,
-    children,
-    path,
-    sectionId,
-    defaultCollapsed = false,
-  }: Props): JSX.Element => {
+  ({ sectionId, defaultCollapsed = false, ...props }: Props): JSX.Element => {
     const project = useSimpleProject();
 
     const collapsed = project.ui?.collapsed?.[sectionId] ?? defaultCollapsed;
@@ -50,22 +43,13 @@ export const SettingsCategory = observer(
       });
     };
 
-    const props = {
-      label,
-      className,
-      collapsed,
-      onToggleCollapsed: onToggle,
-      collapsible: true,
-    };
-
-    if (path) {
-      return (
-        <VarScope path={path}>
-          <VarCategory {...props}>{children}</VarCategory>
-        </VarScope>
-      );
-    }
-
-    return <VarCategory {...props}>{children}</VarCategory>;
+    return (
+      <VarCategoryScope
+        {...props}
+        collapsed={collapsed}
+        onToggleCollapsed={onToggle}
+        collapsible
+      />
+    );
   },
 );

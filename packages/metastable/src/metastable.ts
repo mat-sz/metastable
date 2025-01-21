@@ -16,6 +16,7 @@ import {
 import { CircularBuffer } from '#helpers/buffer.js';
 import { getBundleTorchMode } from '#helpers/bundle.js';
 import { errorToString } from '#helpers/common.js';
+import { getAuthorizationStrategy } from '#helpers/download.js';
 import { JSONFile, resolveConfigPath, rmdir } from '#helpers/fs.js';
 import { parseArgString } from '#helpers/shell.js';
 import { Comfy } from './comfy/index.js';
@@ -401,20 +402,18 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       return;
     }
 
+    const config = await this.config.get('downloader');
+    const apiKeys = config?.apiKeys || {};
+    const strategy = getAuthorizationStrategy(url.hostname);
     const headers: Record<string, string> = {};
-    if (url.hostname.includes('civitai.com')) {
-      const settings = await this.config.get('civitai');
-      const apiKey = settings?.apiKey?.trim();
-      if (apiKey) {
-        headers['Authorization'] = `Bearer ${apiKey}`;
-      }
-    }
 
-    if (url.hostname.includes('huggingface.co')) {
-      const settings = await this.config.get('huggingface');
-      const apiKey = settings?.apiKey?.trim();
-      if (apiKey) {
-        headers['Authorization'] = `Bearer ${apiKey}`;
+    switch (strategy?.strategy) {
+      case 'bearer': {
+        const apiKey = apiKeys[strategy.id]?.trim();
+        if (apiKey) {
+          headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+        break;
       }
     }
 
