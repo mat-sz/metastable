@@ -1,3 +1,6 @@
+import output
+output.configure(3)
+
 import sys
 import os
 import cli_args
@@ -20,7 +23,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 import comfy.samplers
 from rpc import RPC
-import output
 import importlib.util
 
 if os.name == "nt":

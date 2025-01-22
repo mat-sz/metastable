@@ -1,7 +1,11 @@
 import json
 import os
 
-out = os.fdopen(3, 'bw')
+out = None
+
+def configure(fd):
+    global out
+    out = os.fdopen(fd, 'bw')
 
 def write(data):
     global out
