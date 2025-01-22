@@ -25,7 +25,6 @@ try:
     from apex.normalization import FusedLayerNorm
 except:
     FusedLayerNorm = LayerNorm
-    print("Nvidia APEX normalization not installed, using PyTorch LayerNorm")
 
 try:
     import xformers.ops as xops

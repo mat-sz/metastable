@@ -1,3 +1,4 @@
+from typing import TypedDict
 import comfy.sd
 import comfy.sample
 import comfy.samplers
@@ -36,10 +37,14 @@ def load_unet_cached(path, model_options={}):
     
     return last_unet
 
+class DiffusionModelLoadResult(TypedDict):
+    diffusion_model: comfy.model_patcher.ModelPatcher
+    latent_type: str
+
 class DiffusionModelNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str) -> DiffusionModelLoadResult:
         diffusion_model = load_unet_cached(path)
 
         return {

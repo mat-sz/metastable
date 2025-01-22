@@ -50,7 +50,7 @@ class ImageLoadingPrepDataset(torch.utils.data.Dataset):
 
 class TaggerNamespace:
     @RPC.autoref
-    @RPC.method("tag")
+    @RPC.method
     def tag(ctx, model_path, images, general_threshold, character_threshold, remove_underscore=True, undesired_tags=[], caption_separator=", ", csv_path=None):
         csv_path = csv_path if csv_path is not None else model_path + '.csv'
 

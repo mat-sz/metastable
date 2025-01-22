@@ -4,6 +4,6 @@ from rpc import RPC
 
 class CLIPVisionNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str) -> comfy.clip_vision.ClipVisionModel:
         return comfy.clip_vision.load(path)

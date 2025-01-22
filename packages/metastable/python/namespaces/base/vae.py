@@ -3,6 +3,7 @@ import math
 
 import comfy.sd
 import comfy.utils
+from .utils.types import Latent
 
 from rpc import RPC
 
@@ -68,14 +69,14 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
 
 class VAENamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str) -> comfy.sd.VAE:
         sd = comfy.utils.load_torch_file(path)
         return comfy.sd.VAE(sd=sd)
     
     @RPC.autoref
-    @RPC.method("decode")
-    def decode(vae, samples, is_circular=False):
+    @RPC.method
+    def decode(vae: comfy.sd.VAE, samples: torch.Tensor, is_circular: bool = False) -> list[torch.Tensor]:
         images = vae.decode(samples) if not is_circular else vae_decode_circular(vae, samples)
         
         if len(images.shape) == 5: #Combine batches
@@ -85,8 +86,8 @@ class VAENamespace:
         return [value for value in images]
 
     @RPC.autoref
-    @RPC.method("encode")
-    def encode(vae, image, mask=None):
+    @RPC.method
+    def encode(vae: comfy.sd.VAE, image: torch.Tensor, mask=None) -> Latent:
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
 
@@ -97,8 +98,8 @@ class VAENamespace:
         return vae_encode(vae, image)
     
     @RPC.autoref
-    @RPC.method("decode_tiled")
-    def decode_tiled(vae, samples, tile_size, overlap, temporal_size, temporal_overlap):
+    @RPC.method
+    def decode_tiled(vae: comfy.sd.VAE, samples: torch.Tensor, tile_size: int, overlap: int, temporal_size: int, temporal_overlap: int) -> list[torch.Tensor]:
         if tile_size < overlap * 4:
             overlap = tile_size // 4
         if temporal_size < temporal_overlap * 2:

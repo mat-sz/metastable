@@ -183,8 +183,8 @@ def to_gray(img):
 
 class PulidNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str):
         model = comfy.utils.load_torch_file(path, safe_load=True)
 
         if path.lower().endswith(".safetensors"):
@@ -200,8 +200,8 @@ class PulidNamespace:
         return PulidModel(model)
 
     @RPC.autoref
-    @RPC.method("load_insightface")
-    def load_insightface(root):
+    @RPC.method
+    def load_insightface(root: str):
         snapshot_download('DIAMONIK7777/antelopev2', local_dir=os.path.join(root, 'models', 'antelopev2'))
         # "provider": (["CPU", "CUDA", "ROCM", "CoreML"], ),
         model = FaceAnalysis(name="antelopev2", root=root, providers=["CUDA" + 'ExecutionProvider',]) # alternative to buffalo_l
@@ -209,7 +209,7 @@ class PulidNamespace:
         return model
 
     @RPC.autoref
-    @RPC.method("load_eva_clip")
+    @RPC.method
     def load_eva_clip():
         from .eva_clip.factory import create_model_and_transforms
 
@@ -226,8 +226,8 @@ class PulidNamespace:
         return model
     
     @RPC.autoref
-    @RPC.method("apply")
-    def apply(diffusion_model, pulid, eva_clip, face_analysis, image, projection="ortho_v2", strength=1.0, fidelity=8, noise=0.0, start_at=0.0, end_at=1.0, attn_mask=None):
+    @RPC.method
+    def apply(diffusion_model, pulid, eva_clip, face_analysis, image, projection: str = "ortho_v2", strength: float = 1.0, fidelity: int = 8, noise: float = 0.0, start_at: float = 0.0, end_at: float = 1.0, attn_mask=None):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         

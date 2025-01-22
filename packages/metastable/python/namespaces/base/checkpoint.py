@@ -1,5 +1,7 @@
+from typing import NotRequired, TypedDict
 import yaml
 
+import comfy.model_patcher
 import comfy.sd
 import comfy.sample
 import comfy.samplers
@@ -65,10 +67,16 @@ def load_checkpoint_cached(path, embeddings_path=None, config_path=None):
     last_checkpoint = load_checkpoint(path, embeddings_path, config_path)
     return last_checkpoint
 
+class CheckpointLoadResult(TypedDict):
+    diffusion_model: comfy.model_patcher.ModelPatcher
+    text_encoder: NotRequired[comfy.sd.CLIP]
+    vae: NotRequired[comfy.sd.VAE]
+    latent_type: str
+
 class CheckpointNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path, embeddings_path=None, config_path=None):
+    @RPC.method
+    def load(path: str, embeddings_path: str = None, config_path: str = None) -> CheckpointLoadResult:
         (diffusion_model, text_encoder, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
 
         return {

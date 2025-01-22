@@ -10,8 +10,8 @@ script_directory = os.path.dirname(os.path.abspath(__file__))
 
 class SegmentNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str):
         model_mapping = {
             "2.0": {
                 "base": "sam2_hiera_b+.yaml",
@@ -37,7 +37,7 @@ class SegmentNamespace:
         return load_model(path, model_cfg_path, "automaskgenerator", torch.float32, "cpu")
 
     @RPC.autoref
-    @RPC.method("segment")
+    @RPC.method
     def segment(model, image):
         offload_device = mm.unet_offload_device()
         device = "cpu"

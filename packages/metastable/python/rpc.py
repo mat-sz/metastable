@@ -105,10 +105,18 @@ class RPCSession:
             return self.autoexpand(obj)
 
 class RPC:
-    def method(name):
+    def method(name_or_function = None):
         def decorator(func):
-            func._rpc_name = name
+            if name_or_function:
+                func._rpc_name = name_or_function
+            else:
+                func._rpc_name = func.__name__
             return func
+        
+        if callable(name_or_function):
+            name_or_function._rpc_name = name_or_function.__name__
+            return name_or_function
+
         return decorator
 
     def autoref(func):

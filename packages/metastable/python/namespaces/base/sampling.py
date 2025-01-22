@@ -1,8 +1,10 @@
+import comfy.model_patcher
 import comfy.samplers
 import comfy.sample
 import torch
 import node_helpers
 from .utils import custom, latent_preview
+from .utils.types import Latent
 
 from rpc import RPC
 
@@ -48,13 +50,13 @@ class Guider_Basic(comfy.samplers.CFGGuider):
 
 class SamplingNamespace:
     @RPC.autoref
-    @RPC.method("get_sampler")
-    def get_sampler(sampler_name):
+    @RPC.method
+    def get_sampler(sampler_name: str):
         return comfy.samplers.sampler_object(sampler_name)
     
     @RPC.autoref
-    @RPC.method("get_sigmas")
-    def get_sigmas(diffusion_model, scheduler_name, steps, denoise = 1):
+    @RPC.method
+    def get_sigmas(diffusion_model, scheduler_name: str, steps: int, denoise: float = 1):
         total_steps = steps
         if denoise < 1.0:
             if denoise <= 0.0:
@@ -73,20 +75,20 @@ class SamplingNamespace:
         return sigmas
     
     @RPC.autoref
-    @RPC.method("flux_guidance")
-    def flux_guidance(conditioning, guidance):
+    @RPC.method
+    def flux_guidance(conditioning, guidance: float):
         return node_helpers.conditioning_set_values(conditioning, {"guidance": guidance})
     
     @RPC.autoref
-    @RPC.method("basic_guider")
-    def basic_guider(diffusion_model, conditioning):
+    @RPC.method
+    def basic_guider(diffusion_model: comfy.model_patcher.ModelPatcher, conditioning) -> comfy.samplers.CFGGuider:
         guider = Guider_Basic(diffusion_model)
         guider.set_conds(conditioning)
         return guider
     
     @RPC.autoref
-    @RPC.method("sample")
-    def sample(diffusion_model, latent, positive, negative, sampler_name, scheduler_name, steps, denoise, cfg, seed, is_circular=False, preview=None):
+    @RPC.method
+    def sample(diffusion_model: comfy.model_patcher.ModelPatcher, latent: Latent, positive, negative, sampler_name: str, scheduler_name: str, steps: int, denoise: float, cfg: float, seed: int, is_circular: bool = False, preview = None):
         model_set_circular(diffusion_model, is_circular)
 
         latent_image = comfy.sample.fix_empty_latent_channels(diffusion_model, latent["samples"])
@@ -140,13 +142,13 @@ class SamplingNamespace:
             )
     
     @RPC.autoref
-    @RPC.method("random_noise")
-    def random_noise(seed):
+    @RPC.method
+    def random_noise(seed: int):
         return Noise_RandomNoise(seed)
 
     @RPC.autoref
-    @RPC.method("sample_custom")
-    def sample_custom(noise, guider, sampler, sigmas, latent, preview=None):
+    @RPC.method
+    def sample_custom(noise, guider, sampler, sigmas, latent: Latent, preview=None):
         latent["samples"] = comfy.sample.fix_empty_latent_channels(guider.model_patcher, latent["samples"])
 
         noise_mask = None

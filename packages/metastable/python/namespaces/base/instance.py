@@ -1,3 +1,4 @@
+from typing import NotRequired, TypedDict
 import psutil
 import torch
 
@@ -7,7 +8,13 @@ from .utils import custom
 
 from rpc import RPC
 
-def get_torch_device_info(device):
+class TorchDeviceInfo(TypedDict):
+    type: str
+    index: NotRequired[int]
+    name: str
+    allocator_backend: NotRequired[str]
+
+def get_torch_device_info(device) -> TorchDeviceInfo:
     if hasattr(device, 'type'):
         if device.type == "cuda":
             try:
@@ -36,7 +43,19 @@ def get_torch_device_info(device):
             "name": torch.cuda.get_device_name(device)
         }
 
-def get_torch_info():
+class TorchVaeInfo(TypedDict):
+    dtype: str
+
+class TorchMemoryInfo(TypedDict):
+    vram: int
+    ram: int
+
+class TorchInfo(TypedDict):
+    memory: TorchMemoryInfo
+    device: TorchDeviceInfo
+    vae: TorchVaeInfo
+
+def get_torch_info() -> TorchInfo:
     device = get_torch_device()
 
     return {
@@ -50,9 +69,15 @@ def get_torch_info():
         }
     }
 
+
+class InstanceInfo(TypedDict):
+    torch: TorchInfo
+    samplers: list[str]
+    schedulers: list[str]
+
 class InstanceNamespace:
-    @RPC.method("info")
-    def info():
+    @RPC.method
+    def info() -> InstanceInfo:
         return {
             "torch": get_torch_info(),
             "samplers": comfy.samplers.KSampler.SAMPLERS,

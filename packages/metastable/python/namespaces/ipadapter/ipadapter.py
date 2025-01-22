@@ -4,13 +4,13 @@ from rpc import RPC
 
 class IPAdapterNamespace:
     @RPC.autoref
-    @RPC.method("load")
-    def load(path):
+    @RPC.method
+    def load(path: str):
         return load(path)
 
     @RPC.autoref
-    @RPC.method("apply")
-    def ipadapter_apply(diffusion_model, ipadapter, clip_vision, image, strength):
+    @RPC.method
+    def ipadapter_apply(diffusion_model, ipadapter, clip_vision, image, strength: float):
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         
