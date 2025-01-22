@@ -51,6 +51,7 @@ const PATTERNS: StatePattern[] = [
       type: ModelType.DIFFUSION_MODEL,
       inputTypes: [ModelInputType.NONE],
       supportsNegativePrompt: false,
+      guidanceMode: 'flux',
       outputType: ModelOutputType.VIDEO,
     },
   },
@@ -88,6 +89,8 @@ const PATTERNS: StatePattern[] = [
       architecture: Architecture.FLUX1,
       type: ModelType.DIFFUSION_MODEL,
       outputType: ModelOutputType.IMAGE,
+      supportsNegativePrompt: false,
+      guidanceMode: 'flux',
     },
   },
   {

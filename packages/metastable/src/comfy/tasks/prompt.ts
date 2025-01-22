@@ -5,6 +5,7 @@ import { preprocessPrompt } from '@metastable/common';
 import {
   Architecture,
   ImageFile,
+  ModelDetails,
   ModelInputType,
   ModelType,
   ProjectImageMode,
@@ -42,7 +43,7 @@ export class PromptTask extends BaseComfyTask<
   PromptTaskHandlers,
   ProjectSimpleSettings
 > {
-  private architecture?: Architecture;
+  private details?: ModelDetails;
   private embeddingsPath?: string;
   public preview: ComfyPreviewSettings = {
     method: 'auto',
@@ -125,8 +126,9 @@ export class PromptTask extends BaseComfyTask<
     }
 
     const mainModel = await Metastable.instance.model.get(mainMrn);
-    const type = mainModel.details?.architecture || Architecture.SD1;
-    this.architecture = type;
+    this.details = mainModel.details || {
+      architecture: Architecture.SD1,
+    };
 
     if (mainModel.isMetamodel) {
       const { textEncoders, diffusionModel, vae } = data;
@@ -176,7 +178,7 @@ export class PromptTask extends BaseComfyTask<
     }
 
     return await this.session!.checkpoint.load({
-      type,
+      type: this.details.architecture!,
       paths,
       clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
     });
@@ -230,14 +232,14 @@ export class PromptTask extends BaseComfyTask<
   }
 
   private async sample() {
-    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+    if (this.details?.guidanceMode === 'flux') {
       const { cfg, samplerName, schedulerName, steps, denoise, seed } =
         this.settings.sampler;
       const conditioning = await this.session!.sampling.getFluxGuidance(
         this.conditioning!.positive,
         cfg,
       );
-      const guider = await this.checkpoint!.getGuider(conditioning);
+      const guider = await this.checkpoint!.getBasicGuider(conditioning);
 
       return await guider.sample(
         {
@@ -266,7 +268,7 @@ export class PromptTask extends BaseComfyTask<
   }
 
   private async decode(samples: RPCRef) {
-    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+    if (this.details?.architecture === Architecture.HUNYUAN_VIDEO) {
       return await this.checkpoint!.decodeTiled(samples, 256, 64, 64, 8);
     } else {
       return await this.checkpoint!.decode(samples, this.isCircular);
@@ -353,7 +355,7 @@ export class PromptTask extends BaseComfyTask<
     const outputs: ImageFile[] = [];
     const outputDir = this.project!.files.output.path;
 
-    if (this.architecture === Architecture.HUNYUAN_VIDEO) {
+    if (this.details?.architecture === Architecture.HUNYUAN_VIDEO) {
       const buffers: Uint8Array[] = [];
       const frameDelay = 1000 / 24;
 

@@ -59,6 +59,7 @@ export interface ModelDetails {
   type?: ModelType;
   inputTypes?: ModelInputType[];
   supportsNegativePrompt?: boolean;
+  guidanceMode?: 'cfg' | 'flux';
   outputType?: ModelOutputType;
 }
 

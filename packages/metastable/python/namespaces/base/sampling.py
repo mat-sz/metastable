@@ -88,6 +88,14 @@ class SamplingNamespace:
     
     @RPC.autoref
     @RPC.method
+    def cfg_guider(diffusion_model: comfy.model_patcher.ModelPatcher, positive, negative, cfg: float):
+        guider = comfy.samplers.CFGGuider(diffusion_model)
+        guider.set_conds(positive, negative)
+        guider.set_cfg(cfg)
+        return guider
+    
+    @RPC.autoref
+    @RPC.method
     def sample(diffusion_model: comfy.model_patcher.ModelPatcher, latent: Latent, positive, negative, sampler_name: str, scheduler_name: str, steps: int, denoise: float, cfg: float, seed: int, is_circular: bool = False, preview = None):
         model_set_circular(diffusion_model, is_circular)
 

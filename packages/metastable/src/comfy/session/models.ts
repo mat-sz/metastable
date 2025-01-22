@@ -131,8 +131,16 @@ export class ComfyCheckpoint {
     })) as ComfyLatent;
   }
 
-  async getGuider(conditioning: RPCRef) {
+  async getBasicGuider(conditioning: RPCRef) {
     const ref = (await this.session.invoke('sampling:basic_guider', {
+      diffusion_model: this.data.diffusionModel,
+      conditioning,
+    })) as RPCRef;
+    return new ComfyGuider(this.session, ref);
+  }
+
+  async getCfgGuider(conditioning: RPCRef) {
+    const ref = (await this.session.invoke('sampling:cfg_guider', {
       diffusion_model: this.data.diffusionModel,
       conditioning,
     })) as RPCRef;
