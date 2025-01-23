@@ -1,3 +1,4 @@
+import inspect
 from io import BytesIO
 from types import UnionType
 from typing import NotRequired, get_origin, get_args, is_typeddict
@@ -37,6 +38,8 @@ def annotation_to_js_type(annotation):
         return { "type": "boolean" }
     elif annotation == BytesIO:
         return { "type": "bytes" }
+    elif annotation is None:
+        return { "type": "null" }
     elif is_typeddict(annotation):
         type_def = {
             "type": "object",
@@ -87,6 +90,12 @@ def annotation_to_js_type(annotation):
             "anyOf": [annotation_to_js_type(arg) for arg in annotation.__args__]
         }
 
+    if annotation is not inspect._empty:
+        return {
+            "type": "ref",
+            "tag": annotation.__name__
+        }
+
     return { "type": "any" }
 
 namespace_defs = {}
@@ -95,7 +104,7 @@ for namespace_name, namespace in rpc.namespaces.items():
     
     for method_name, method in namespace.methods.items():
         full_name = f'{namespace_name}:{method_name}'
-        sig = signature(method)
+        sig = signature(method.func)
 
         params_schema = {
             "type": "object",
@@ -104,14 +113,18 @@ for namespace_name, namespace in rpc.namespaces.items():
         }
 
         for param in sig.parameters.values():
+            if param.name.startswith("_"):
+                continue
+
             if param.default is param.empty:
                 params_schema["required"].append(param.name)
             
             params_schema["properties"][param.name] = annotation_to_js_type(param.annotation)
-
+        
         method_defs[method_name] = {
             "parameters": params_schema,
             "returns": annotation_to_js_type(sig.return_annotation),
+            "is_autoref": method.is_autoref,
         }
 
     namespace_defs[namespace_name] = {

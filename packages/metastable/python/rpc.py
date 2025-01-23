@@ -14,56 +14,21 @@ def is_key(obj, key, type):
     return key in obj and isinstance(obj[key], type)
 
 class RPCContext:
-    def __init__(self, request_id, session_id):
+    request_id: str
+    session_id: str | None
+    
+    def __init__(self, request_id, session_id, rpc):
         self.request_id = request_id
         self.session_id = session_id
+        self.rpc = rpc
 
     def progress(self, value, total):
-        output.write_event("rpc.progress", { "requestId": self.request_id, "sessionId": self.session_id, "value": value, "max": total })
-class RPCNamespace:
-    def __init__(self, obj):
-        self.object = obj
-        self.methods = {}
-        self.is_autoref = {}
-
-        for func_name in dir(obj):
-            func = getattr(obj, func_name)
-            if callable(func):
-                method_name = getattr(func, "_rpc_name", None)
-                if method_name is not None:
-                    self.methods[method_name] = func
-
-                    method_autoref = getattr(func, "_rpc_autoref", False)
-                    self.is_autoref[method_name] = method_autoref
-
-    def invoke(self, method_name, params, context=None, session=None):
-        if method_name not in self.methods:
-            raise Exception("Method not found")
-
-        is_autoref = self.is_autoref[method_name]
-        if is_autoref:
-            if session is None:
-                raise Exception("Method requires a session to be open")
-
-            params = session.autoexpand(params)
-        
-        result = None
-        method = self.methods[method_name]
-        args = inspect.getfullargspec(method)
-        
-        with torch.inference_mode():
-            if isinstance(params, dict):
-                if "ctx" in args[0]:
-                    params["ctx"] = context
-                
-                result = method(**params)
-            else:
-                result = method(*params)
-
-        if is_autoref:
-            result = session.autoalloc(result)
-
-        return result
+        output.write_event("rpc.progress", {
+            "requestId": self.request_id,
+            "sessionId": self.session_id,
+            "value": value,
+            "max": total
+        })
 
 class RPCSession:
     def __init__(self):
@@ -104,7 +69,60 @@ class RPCSession:
         else:
             return self.autoexpand(obj)
 
+class RPCMethod:
+    func: callable
+    is_autoref: bool
+    args: inspect.FullArgSpec
+    
+    def __init__(self, func):
+        self.func = func
+        self.is_autoref = getattr(func, "_rpc_autoref", False)
+        self.args = inspect.getfullargspec(func)
+
+    def invoke(self, params: dict, context: RPCContext = None, session: RPCSession = None):
+        if self.is_autoref:
+            if session is None:
+                raise Exception("Method requires a session to be open")
+
+            params = session.autoexpand(params)
+        
+        result = None
+        
+        with torch.inference_mode():
+            if "_ctx" in self.args[0]:
+                params["_ctx"] = context
+            
+            result = self.func(**params)
+
+        if self.is_autoref:
+            result = session.autoalloc(result)
+
+        return result
+
+class RPCNamespace:
+    methods: dict[str, RPCMethod]
+
+    def __init__(self, obj):
+        self.object = obj
+        self.methods = {}
+
+        for func_name in dir(obj):
+            func = getattr(obj, func_name)
+            if callable(func):
+                method_name = getattr(func, "_rpc_name", None)
+                if method_name is not None:
+                    self.methods[method_name] = RPCMethod(func)
+    
+    def get_method(self, method_name: str):
+        if method_name not in self.methods:
+            raise Exception("Method not found")
+        
+        return self.methods[method_name]
+
 class RPC:
+    sessions: dict[str, RPCSession]
+    namespaces: dict[str, RPCNamespace]
+
     def method(name_or_function = None):
         def decorator(func):
             if name_or_function:
@@ -127,6 +145,8 @@ class RPC:
         self.sessions = {}
         self.namespaces = {}
 
+        self.add_namespace("session", SessionNamespace)
+
     def add_namespace(self, name, obj):
         self.namespaces[name] = RPCNamespace(obj)
 
@@ -142,43 +162,31 @@ class RPC:
             session_id = request["session"] if "session" in request else None
             session = None
 
-            if session_id is not None:
-                if method == "session:start":
-                    comfy.model_management.interrupt_current_processing(False)
-                    self.sessions[session_id] = RPCSession()
-
-                    return {
-                        "type": "rpc",
-                        "id": request_id,
-                        "result": session_id
-                    }
-                elif method == "session:destroy":
-                    comfy.model_management.interrupt_current_processing(True)
-                    del self.sessions[session_id]
-
-                    return {
-                        "type": "rpc",
-                        "id": request_id,
-                    }
-                
-                if session_id not in self.sessions:
-                    raise Exception("Session not found")
-                
-                session = self.sessions[session_id]
-
             method_namespace, method_name = method.split(":")
             
             if method_namespace not in self.namespaces:
                 raise Exception("Namespace not found")
+
+            if session_id is not None:
+                if session_id in self.sessions:
+                    session = self.sessions[session_id]
+                elif method_namespace != 'session':
+                    raise Exception("Session not found")
                 
             namespace = self.namespaces[method_namespace]
+            params = {}
             
-            params = []
             if "params" in request:
                 params = request["params"]
 
             with rpc_hook.use(request_id, session_id):
-                result = namespace.invoke(method_name, params, RPCContext(request_id, session_id), session)
+                ctx = RPCContext(
+                    request_id=request_id,
+                    session_id=session_id,
+                    rpc=self
+                )
+                method = namespace.get_method(method_name)
+                result = method.invoke(params, ctx, session)
 
             return {
                 "type": "rpc",
@@ -193,4 +201,15 @@ class RPC:
                     "message": traceback.format_exc(),
                 }
             }
-        
+
+class SessionNamespace:
+    @RPC.method
+    def start(_ctx: RPCContext) -> str:
+        comfy.model_management.interrupt_current_processing(False)
+        _ctx.rpc.sessions[_ctx.session_id] = RPCSession()
+        return _ctx.session_id
+    
+    @RPC.method
+    def destroy(_ctx: RPCContext) -> None:
+        comfy.model_management.interrupt_current_processing(True)
+        del _ctx.rpc.sessions[_ctx.session_id]
