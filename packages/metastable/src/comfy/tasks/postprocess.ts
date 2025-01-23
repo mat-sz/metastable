@@ -6,7 +6,7 @@ import { ImageFile, PostprocessSettings } from '@metastable/types';
 import { BaseComfyTask, BaseComfyTaskHandlers } from './base.js';
 import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
-import { RPCRef } from '../session/types.js';
+import { RPCRef } from '../rpc/types.js';
 
 type PostprocessTaskHandlers = BaseComfyTaskHandlers & {
   postprocess: () => Promise<void> | void;
@@ -16,7 +16,7 @@ export class PostprocessTask extends BaseComfyTask<
   PostprocessTaskHandlers,
   PostprocessSettings
 > {
-  public images?: RPCRef[];
+  public images?: RPCRef<'ImageTensor'>[];
 
   constructor(project: ProjectEntity, settings: PostprocessSettings) {
     super('postprocess', project, settings);
@@ -48,9 +48,10 @@ export class PostprocessTask extends BaseComfyTask<
     const outputs: ImageFile[] = [];
 
     for (const image of this.images) {
-      const bytes = await ctx.image.dump(image, ext);
-      const buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
-
+      const buffer: Uint8Array = await ctx.api.image.dump({
+        image,
+        format: ext,
+      });
       const filename = await getNextFilename(outputDir, ext);
       await fs.writeFile(path.join(outputDir, filename), buffer);
       const output = await this.project!.files.output.get(filename);

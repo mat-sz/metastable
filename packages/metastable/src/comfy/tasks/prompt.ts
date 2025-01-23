@@ -21,7 +21,8 @@ import { ProjectEntity } from '../../data/project.js';
 import { getNextFilename } from '../../helpers/fs.js';
 import { SHARP_FIT_MAP } from '../../helpers/image.js';
 import { applyStyleToPrompt } from '../../helpers/prompt.js';
-import { bufferToRpcBytes } from '../session/helpers.js';
+import { RPCRef } from '../rpc/types.js';
+import { loadCheckpoint } from '../session/index.js';
 import {
   ComfyCheckpoint,
   ComfyConditioning,
@@ -30,7 +31,6 @@ import {
 import {
   ComfyCheckpointPaths,
   ComfyPreviewSettings,
-  RPCRef,
 } from '../session/types.js';
 
 type PromptTaskHandlers = BaseComfyTaskHandlers & {
@@ -52,7 +52,7 @@ export class PromptTask extends BaseComfyTask<
   public latent?: ComfyLatent;
   public checkpoint?: ComfyCheckpoint;
   public conditioning?: ComfyConditioning;
-  public images?: RPCRef[];
+  public images?: RPCRef<'ImageTensor'>[];
   public isCircular = false;
 
   constructor(project: ProjectEntity, settings: ProjectSimpleSettings) {
@@ -177,7 +177,7 @@ export class PromptTask extends BaseComfyTask<
       );
     }
 
-    return await this.session!.checkpoint.load({
+    return await loadCheckpoint(this.session!, {
       type: this.details.architecture!,
       paths,
       clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
@@ -226,25 +226,23 @@ export class PromptTask extends BaseComfyTask<
       ]);
     }
 
-    return await this.session!.image.load(
-      bufferToRpcBytes(await image.png().toBuffer()),
-    );
+    return await this.loadInputRaw(await image.png().toBuffer());
   }
 
   private async sample() {
     if (this.details?.guidanceMode === 'flux') {
       const { cfg, samplerName, schedulerName, steps, denoise, seed } =
         this.settings.sampler;
-      const conditioning = await this.session!.sampling.getFluxGuidance(
-        this.conditioning!.positive,
-        cfg,
-      );
+      const conditioning = await this.session!.api.sampling.fluxGuidance({
+        conditioning: this.conditioning!.positive,
+        guidance: cfg,
+      });
       const guider = await this.checkpoint!.getBasicGuider(conditioning);
 
       return await guider.sample(
         {
-          noise: await this.session!.sampling.randomNoise(seed),
-          sampler: await this.session!.sampling.getSampler(samplerName),
+          noise: await this.session!.api.sampling.randomNoise({ seed }),
+          sampler: await this.session!.api.sampling.getSampler({ samplerName }),
           sigmas: await this.checkpoint!.getSigmas(
             schedulerName,
             steps,
@@ -267,7 +265,7 @@ export class PromptTask extends BaseComfyTask<
     }
   }
 
-  private async decode(samples: RPCRef) {
+  private async decode(samples: RPCRef<'LatentTensor'>) {
     if (this.details?.architecture === Architecture.HUNYUAN_VIDEO) {
       return await this.checkpoint!.decodeTiled(samples, 256, 64, 64, 8);
     } else {
@@ -305,13 +303,13 @@ export class PromptTask extends BaseComfyTask<
     this.step('input');
     switch (settings.input.type) {
       case ModelInputType.NONE:
-        this.latent = await ctx.latent.empty(
-          settings.output.width,
-          settings.output.height,
-          settings.output.frames,
-          settings.output.batchSize || 1,
-          this.checkpoint.data.latentType,
-        );
+        this.latent = await ctx.api.latent.empty({
+          width: settings.output.width,
+          height: settings.output.height,
+          length: settings.output.frames,
+          batchSize: settings.output.batchSize || 1,
+          latentType: this.checkpoint.data.latentType,
+        });
         break;
       case ModelInputType.IMAGE:
         {
@@ -360,8 +358,10 @@ export class PromptTask extends BaseComfyTask<
       const frameDelay = 1000 / 24;
 
       for (const image of this.images) {
-        const bytes = await ctx.image.dump(image, ext);
-        let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+        let buffer: Uint8Array = await ctx.api.image.dump({
+          image,
+          format: ext,
+        });
         buffer = buffer.slice(
           buffer.byteOffset,
           buffer.byteOffset + buffer.byteLength,
@@ -381,8 +381,10 @@ export class PromptTask extends BaseComfyTask<
       outputs.push(await output.json());
     } else {
       for (const image of this.images) {
-        const bytes = await ctx.image.dump(image, ext);
-        let buffer: Uint8Array = Buffer.from(bytes.$bytes, 'base64');
+        let buffer: Uint8Array = await ctx.api.image.dump({
+          image,
+          format: ext,
+        });
 
         if (this.storeMetadata && ext === 'png') {
           buffer = buffer.slice(

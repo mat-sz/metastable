@@ -1,26 +1,10 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
-import { RPCRef } from '../../comfy/session/types.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PostprocessTask } from '../../comfy/tasks/postprocess.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
-
-export class ComfySegmentModel {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(image: RPCRef) {
-    return (await this.session.invoke('segment:segment', {
-      model: this.ref,
-      image: image,
-    })) as RPCRef;
-  }
-}
 
 const field = {
   type: FieldType.CATEGORY,
@@ -45,13 +29,6 @@ export class FeatureSegment extends FeaturePython {
     segment: field,
   };
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('segment:load', {
-      path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
-    return new ComfySegmentModel(session, data);
-  }
-
   async onTask(task: BaseComfyTask) {
     if (!(task instanceof PromptTask) && !(task instanceof PostprocessTask)) {
       return;
@@ -65,8 +42,13 @@ export class FeatureSegment extends FeaturePython {
       }
 
       task.step('segment');
-      const model = await this.load(session, segmentSettings.model);
-      task.images![0] = await model.applyTo(images[0]);
+      const model = await session.api.segment.load({
+        path: await Metastable.instance.resolve(segmentSettings.model),
+      });
+      task.images![0] = await await session.api.segment.segment({
+        model,
+        image: images[0],
+      });
     });
   }
 }

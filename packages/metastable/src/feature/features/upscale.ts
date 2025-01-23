@@ -1,8 +1,8 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
-import { RPCRef } from '../../comfy/session/types.js';
+import { RPCSession } from '../../comfy/rpc/session.js';
+import { RPCRef } from '../../comfy/rpc/types.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PostprocessTask } from '../../comfy/tasks/postprocess.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
@@ -10,15 +10,15 @@ import { FeaturePython } from '../base.js';
 
 export class ComfyUpscaleModel {
   constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
+    private session: RPCSession,
+    private ref: RPCRef<'UpscaleModel'>,
   ) {}
 
-  async applyTo(images: RPCRef[]) {
-    return (await this.session.invoke('upscale_model:apply', {
-      upscale_model: this.ref,
+  async applyTo(images: RPCRef<'ImageTensor'>[]) {
+    return await this.session.api.upscaleModel.apply({
+      upscaleModel: this.ref,
       images: images,
-    })) as RPCRef[];
+    });
   }
 }
 
@@ -47,10 +47,10 @@ export class FeatureUpscale extends FeaturePython {
     upscale: field,
   };
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('upscale_model:load', {
+  private async load(session: RPCSession, mrn: string) {
+    const data = await session.api.upscaleModel.load({
       path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
+    });
     return new ComfyUpscaleModel(session, data);
   }
 

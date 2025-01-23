@@ -1,38 +1,9 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
-import { ComfyConditioning } from '../../comfy/session/models.js';
-import { RPCRef } from '../../comfy/session/types.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
-
-export class ComfyControlnet {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    conditioning: ComfyConditioning,
-    image: RPCRef,
-    strength: number,
-  ) {
-    const { positive, negative } = (await this.session.invoke(
-      'controlnet:apply',
-      {
-        controlnet: this.ref,
-        positive: conditioning.positive,
-        negative: conditioning.negative,
-        image,
-        strength,
-      },
-    )) as { positive: RPCRef; negative: RPCRef };
-    conditioning.positive = positive;
-    conditioning.negative = negative;
-  }
-}
 
 const field = {
   type: FieldType.ARRAY,
@@ -76,13 +47,6 @@ export class FeatureControlnet extends FeaturePython {
   readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'controlnet';
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('controlnet:load', {
-      path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
-    return new ComfyControlnet(session, data);
-  }
-
   async onTask(task: BaseComfyTask) {
     if (!(task instanceof PromptTask)) {
       return;
@@ -102,12 +66,18 @@ export class FeatureControlnet extends FeaturePython {
             controlnetSettings.image!,
             (controlnetSettings as any).imageMode,
           );
-          const controlnet = await this.load(session, controlnetSettings.model);
-          await controlnet.applyTo(
-            conditioning,
+          const controlnet = await session.api.controlnet.load({
+            path: await Metastable.instance.resolve(controlnetSettings.model),
+          });
+          const { positive, negative } = await session.api.controlnet.apply({
+            controlnet,
+            positive: conditioning.positive,
+            negative: conditioning.negative,
             image,
-            controlnetSettings.strength,
-          );
+            strength: controlnetSettings.strength,
+          });
+          conditioning.positive = positive;
+          conditioning.negative = negative;
         }
       }
     });

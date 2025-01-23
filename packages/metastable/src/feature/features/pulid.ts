@@ -1,36 +1,10 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
-import { ComfyCheckpoint } from '../../comfy/session/models.js';
-import { RPCRef } from '../../comfy/session/types.js';
+import { RPCSession } from '../../comfy/rpc/session.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
-
-class ComfyPulid {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    checkpoint: ComfyCheckpoint,
-    evaClip: RPCRef,
-    faceAnalysis: RPCRef,
-    image: RPCRef,
-    strength: number,
-  ) {
-    checkpoint.data.diffusionModel = (await this.session.invoke('pulid:apply', {
-      diffusion_model: checkpoint.data.diffusionModel,
-      pulid: this.ref,
-      eva_clip: evaClip,
-      face_analysis: faceAnalysis,
-      image,
-      strength,
-    })) as RPCRef;
-  }
-}
 
 const field = {
   type: FieldType.CATEGORY,
@@ -77,21 +51,14 @@ export class FeaturePulid extends FeaturePython {
     pulid: field,
   };
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('pulid:load', {
-      path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
-    return new ComfyPulid(session, data);
+  private async loadEvaClip(session: RPCSession) {
+    return await session.api.pulid.loadEvaClip();
   }
 
-  private async loadEvaClip(session: ComfySession) {
-    return (await session.invoke('pulid:load_eva_clip')) as RPCRef;
-  }
-
-  private async loadInsightface(session: ComfySession, root: string) {
-    return (await session.invoke('pulid:load_insightface', {
+  private async loadInsightface(session: RPCSession, root: string) {
+    return await session.api.pulid.loadInsightface({
       root,
-    })) as RPCRef;
+    });
   }
 
   async onTask(task: BaseComfyTask) {
@@ -107,20 +74,23 @@ export class FeaturePulid extends FeaturePython {
       }
 
       task.step('pulid');
-      const pulid = await this.load(session, pulidSettings.model);
-      const insightface = await this.loadInsightface(
+      const pulid = await session.api.pulid.load({
+        path: await Metastable.instance.resolve(pulidSettings.model),
+      });
+      const faceAnalysis = await this.loadInsightface(
         session,
         Metastable.instance.internalPath,
       );
       const evaClip = await this.loadEvaClip(session);
       const { image } = await task.loadInputRaw(pulidSettings.image!);
-      await pulid.applyTo(
-        checkpoint,
+      checkpoint.data.diffusionModel = await session.api.pulid.apply({
+        diffusionModel: checkpoint.data.diffusionModel,
+        pulid,
         evaClip,
-        insightface,
+        faceAnalysis,
         image,
-        pulidSettings.strength,
-      );
+        strength: pulidSettings.strength,
+      });
     });
   }
 }

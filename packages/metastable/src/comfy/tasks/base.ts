@@ -18,8 +18,7 @@ import {
 import { Metastable } from '#metastable';
 import { ProjectEntity } from '../../data/project.js';
 import { BaseTask } from '../../tasks/task.js';
-import { bufferToRpcBytes } from '../session/helpers.js';
-import type { ComfySession } from '../session/index.js';
+import { RPCSession } from '../rpc/session.js';
 
 type TaskHandlers = { [key: string]: (...args: any[]) => Promise<void> | void };
 
@@ -31,7 +30,7 @@ export class BaseComfyTask<
   THandlers extends TaskHandlers = any,
   TSettings extends BaseSettings = BaseSettings,
 > extends BaseTask<ProjectTaskData> {
-  public session?: ComfySession;
+  public session?: RPCSession;
   private features: Feature[] = [];
 
   constructor(
@@ -157,28 +156,34 @@ export class BaseComfyTask<
     this.state = TaskState.CANCELLING;
   }
 
-  async inputAsBuffer(url: string): Promise<Buffer> {
-    if (url.startsWith('data:')) {
-      return Buffer.from(url.split(',')[1], 'base64');
-    }
+  async inputAsBuffer(url: string | Buffer): Promise<Buffer> {
+    if (url instanceof Buffer) {
+      return url;
+    } else if (typeof url === 'string') {
+      if (url.startsWith('data:')) {
+        return Buffer.from(url.split(',')[1], 'base64');
+      }
 
-    if (url.startsWith('mrn:')) {
-      return await fs.readFile(await Metastable.instance.resolve(url));
+      if (url.startsWith('mrn:')) {
+        return await fs.readFile(await Metastable.instance.resolve(url));
+      }
     }
 
     throw new Error('Unable to load input');
   }
 
-  async loadInputRaw(url: string) {
-    const buffer = await this.inputAsBuffer(url);
-    return await this.session!.image.load(bufferToRpcBytes(buffer));
+  async loadInputRaw(url: string | Buffer) {
+    const data = await this.inputAsBuffer(url);
+    return await this.session!.api.image.load({
+      data,
+    });
   }
 
   protected async process() {}
 
   async execute() {
     try {
-      await Metastable.instance.comfy!.session(async ctx => {
+      await Metastable.instance.comfy!.rpc.session(async ctx => {
         ctx.on('progress', e => {
           this.progress = e.value / e.max;
           this.data = {

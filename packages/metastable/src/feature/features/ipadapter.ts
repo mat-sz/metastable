@@ -1,40 +1,9 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
-import {
-  ComfyCheckpoint,
-  ComfyCLIPVision,
-} from '../../comfy/session/models.js';
-import { RPCRef } from '../../comfy/session/types.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
-
-export class ComfyIPAdapter {
-  constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
-  ) {}
-
-  async applyTo(
-    checkpoint: ComfyCheckpoint,
-    clipVision: ComfyCLIPVision,
-    image: RPCRef,
-    strength: number,
-  ) {
-    checkpoint.data.diffusionModel = (await this.session.invoke(
-      'ipadapter:apply',
-      {
-        ipadapter: this.ref,
-        clip_vision: clipVision.ref,
-        diffusion_model: checkpoint.data.diffusionModel,
-        image,
-        strength,
-      },
-    )) as RPCRef;
-  }
-}
 
 const field = {
   type: FieldType.ARRAY,
@@ -82,13 +51,6 @@ export class FeatureIpAdapter extends FeaturePython {
   readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'ipadapter';
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('ipadapter:load', {
-      path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
-    return new ComfyIPAdapter(session, data);
-  }
-
   async onTask(task: BaseComfyTask) {
     if (!(task instanceof PromptTask)) {
       return;
@@ -108,16 +70,23 @@ export class FeatureIpAdapter extends FeaturePython {
             ipadapterSettings.image!,
             (ipadapterSettings as any).imageMode,
           );
-          const ipadapter = await this.load(session, ipadapterSettings.model);
-          const clipVision = await session.clipVision.load(
-            await Metastable.instance.resolve(ipadapterSettings.clipVision!),
-          );
-          await ipadapter.applyTo(
-            checkpoint,
+
+          const ipadapter = await session.api.ipadapter.load({
+            path: await Metastable.instance.resolve(ipadapterSettings.model),
+          });
+          const clipVision = await session.api.clipVision.load({
+            path: await Metastable.instance.resolve(
+              ipadapterSettings.clipVision!,
+            ),
+          });
+
+          checkpoint.data.diffusionModel = await session.api.ipadapter.apply({
+            ipadapter,
             clipVision,
+            diffusionModel: checkpoint.data.diffusionModel,
             image,
-            ipadapterSettings.strength,
-          );
+            strength: ipadapterSettings.strength,
+          });
         }
       }
     });

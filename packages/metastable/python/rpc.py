@@ -4,6 +4,7 @@ import torch
 import inspect
 import output
 import traceback
+from uuid import uuid4
 
 import rpc_hook
 import comfy.model_management
@@ -205,9 +206,10 @@ class RPC:
 class SessionNamespace:
     @RPC.method
     def start(_ctx: RPCContext) -> str:
+        session_id = str(uuid4())
         comfy.model_management.interrupt_current_processing(False)
-        _ctx.rpc.sessions[_ctx.session_id] = RPCSession()
-        return _ctx.session_id
+        _ctx.rpc.sessions[session_id] = RPCSession()
+        return session_id
     
     @RPC.method
     def destroy(_ctx: RPCContext) -> None:

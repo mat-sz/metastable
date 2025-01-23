@@ -24,13 +24,15 @@ export class TagTask extends BaseComfyTask<
       path.join(this.project.files.input.path, input),
     );
     const threshold = this.settings.threshold || 0.35;
-    const result = await ctx.tag.run(
-      await Metastable.instance.resolve(this.settings.tagger),
-      images,
-      threshold,
-      threshold,
-      this.settings.removeUnderscore,
-    );
+    const result = await ctx.api.tagger.tag({
+      modelPath: await Metastable.instance.resolve(this.settings.tagger),
+      images: images,
+      generalThreshold: threshold,
+      characterThreshold: threshold,
+      removeUnderscore: this.settings.removeUnderscore,
+      undesiredTags: [],
+      captionSeparator: ',',
+    });
 
     for (const [imagePath, caption] of Object.entries(result)) {
       try {

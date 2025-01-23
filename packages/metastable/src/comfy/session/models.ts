@@ -1,21 +1,22 @@
-import type { ComfySession } from './index.js';
-import type { ComfyPreviewSettings, RPCRef } from './types.js';
+import type { ComfyPreviewSettings } from './types.js';
+import { RPCSession } from '../rpc/session.js';
+import { RPCRef } from '../rpc/types.js';
 
 export interface ComfyLatent {
-  samples: RPCRef;
+  samples: RPCRef<'LatentTensor'>;
 }
 
 export class ComfyConditioning {
   constructor(
-    public positive: RPCRef,
-    public negative: RPCRef,
+    public positive: RPCRef<'Conditioning'>,
+    public negative: RPCRef<'Conditioning'>,
   ) {}
 }
 
 export class ComfyGuider {
   constructor(
-    private session: ComfySession,
-    public ref: RPCRef,
+    private session: RPCSession,
+    public ref: RPCRef<'Guider'>,
   ) {}
 
   async sample(
@@ -25,31 +26,31 @@ export class ComfyGuider {
       sigmas,
       latent,
     }: {
-      noise: RPCRef;
-      sampler: RPCRef;
-      sigmas: RPCRef;
+      noise: RPCRef<'Noise'>;
+      sampler: RPCRef<'Sampler'>;
+      sigmas: RPCRef<'Sigmas'>;
       latent: ComfyLatent;
     },
     preview?: ComfyPreviewSettings,
   ) {
-    return (await this.session.invoke('sampling:sample_custom', {
+    return await this.session.api.sampling.sampleCustom({
       noise,
       guider: this.ref,
       sampler,
       sigmas,
       latent,
       preview,
-    })) as RPCRef;
+    });
   }
 }
 
 export class ComfyCheckpoint {
   constructor(
-    private session: ComfySession,
+    private session: RPCSession,
     public data: {
-      diffusionModel: RPCRef;
-      textEncoder: RPCRef;
-      vae: RPCRef;
+      diffusionModel: RPCRef<'DiffusionModel'>;
+      textEncoder: RPCRef<'TextEncoder'>;
+      vae: RPCRef<'VAE'>;
       latentType: string;
     },
   ) {}
@@ -62,10 +63,10 @@ export class ComfyCheckpoint {
   }
 
   async encodeText(text: string) {
-    return (await this.session.invoke('text_encoder:encode', {
-      text_encoder: this.data.textEncoder,
+    return await this.session.api.textEncoder.encode({
+      textEncoder: this.data.textEncoder,
       text,
-    })) as RPCRef;
+    });
   }
 
   async sample(
@@ -82,81 +83,79 @@ export class ComfyCheckpoint {
     },
     preview?: ComfyPreviewSettings,
   ) {
-    return (await this.session.invoke('sampling:sample', {
-      diffusion_model: this.data.diffusionModel,
+    return await this.session.api.sampling.sample({
+      diffusionModel: this.data.diffusionModel,
       latent,
       positive: conditioning.positive,
       negative: conditioning.negative,
-      sampler_name: settings.samplerName,
-      scheduler_name: settings.schedulerName,
+      samplerName: settings.samplerName,
+      schedulerName: settings.schedulerName,
       steps: settings.steps,
       denoise: settings.denoise,
       cfg: settings.cfg,
       seed: settings.seed,
-      is_circular: settings.isCircular,
+      isCircular: settings.isCircular,
       preview,
-    })) as RPCRef;
+    });
   }
 
-  async decode(samples: RPCRef, isCircular?: boolean) {
-    return (await this.session.invoke('vae:decode', {
+  async decode(samples: RPCRef<'LatentTensor'>, isCircular?: boolean) {
+    return await this.session.api.vae.decode({
       vae: this.data.vae,
       samples,
-      is_circular: isCircular,
-    })) as RPCRef[];
+      isCircular,
+    });
   }
 
   async decodeTiled(
-    samples: RPCRef,
+    samples: RPCRef<'LatentTensor'>,
     tileSize: number,
     overlap: number,
     temporalSize: number,
     temporalOverlap: number,
   ) {
-    return (await this.session.invoke('vae:decode_tiled', {
+    return await this.session.api.vae.decodeTiled({
       vae: this.data.vae,
       samples,
-      tile_size: tileSize,
+      tileSize: tileSize,
       overlap,
-      temporal_size: temporalSize,
-      temporal_overlap: temporalOverlap,
-    })) as RPCRef[];
+      temporalSize: temporalSize,
+      temporalOverlap: temporalOverlap,
+    });
   }
 
-  async encode(image: RPCRef, mask?: RPCRef) {
-    return (await this.session.invoke('vae:encode', {
+  async encode(image: RPCRef<'ImageTensor'>, mask?: RPCRef<'ImageTensor'>) {
+    return (await this.session.api.vae.encode({
       vae: this.data.vae,
       image,
       mask,
     })) as ComfyLatent;
   }
 
-  async getBasicGuider(conditioning: RPCRef) {
-    const ref = (await this.session.invoke('sampling:basic_guider', {
-      diffusion_model: this.data.diffusionModel,
+  async getBasicGuider(conditioning: RPCRef<'Conditioning'>) {
+    const ref = await this.session.api.sampling.basicGuider({
+      diffusionModel: this.data.diffusionModel,
       conditioning,
-    })) as RPCRef;
+    });
     return new ComfyGuider(this.session, ref);
   }
 
-  async getCfgGuider(conditioning: RPCRef) {
-    const ref = (await this.session.invoke('sampling:cfg_guider', {
-      diffusion_model: this.data.diffusionModel,
-      conditioning,
-    })) as RPCRef;
+  async getCfgGuider(conditioning: ComfyConditioning, cfg: number) {
+    const ref = await this.session.api.sampling.cfgGuider({
+      diffusionModel: this.data.diffusionModel,
+      positive: conditioning.positive,
+      negative: conditioning.negative,
+      cfg,
+    });
     return new ComfyGuider(this.session, ref);
   }
 
   async getSigmas(schedulerName: string, steps: number, denoise: number) {
-    return (await this.session.invoke('sampling:get_sigmas', {
-      diffusion_model: this.data.diffusionModel,
-      scheduler_name: schedulerName,
+    return await this.session.api.sampling.getSigmas({
+      diffusionModel: this.data.diffusionModel,
+      schedulerName: schedulerName,
       steps,
       denoise,
-    })) as RPCRef;
+    });
   }
-}
-
-export class ComfyCLIPVision {
-  constructor(public ref: RPCRef) {}
 }

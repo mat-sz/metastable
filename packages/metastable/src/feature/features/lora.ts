@@ -1,29 +1,28 @@
 import { FieldToType, FieldType, ModelType } from '@metastable/types';
 
 import { Metastable } from '#metastable';
-import { ComfySession } from '../../comfy/session/index.js';
+import { RPCSession } from '../../comfy/rpc/session.js';
+import { RPCRef } from '../../comfy/rpc/types.js';
 import { ComfyCheckpoint } from '../../comfy/session/models.js';
-import { RPCRef } from '../../comfy/session/types.js';
 import { BaseComfyTask } from '../../comfy/tasks/base.js';
 import { PromptTask } from '../../comfy/tasks/prompt.js';
 import { FeaturePython } from '../base.js';
 
 export class ComfyLORA {
   constructor(
-    private session: ComfySession,
-    private ref: RPCRef,
+    private session: RPCSession,
+    private ref: RPCRef<'LORA'>,
   ) {}
 
   async applyTo(checkpoint: ComfyCheckpoint, strength: number) {
-    const { diffusion_model, text_encoder } = (await this.session.invoke(
-      'lora:apply',
+    const { diffusion_model, text_encoder } = await this.session.api.lora.apply(
       {
         lora: this.ref,
-        diffusion_model: checkpoint.data.diffusionModel,
-        text_encoder: checkpoint.data.textEncoder,
+        diffusionModel: checkpoint.data.diffusionModel,
+        textEncoder: checkpoint.data.textEncoder,
         strength,
       },
-    )) as { diffusion_model: RPCRef; text_encoder: RPCRef };
+    );
     checkpoint.data.diffusionModel = diffusion_model;
     checkpoint.data.textEncoder = text_encoder;
   }
@@ -66,10 +65,10 @@ export class FeatureLora extends FeaturePython {
   readonly tags = ['simple'];
   readonly pythonNamespaceGroup = 'lora';
 
-  private async load(session: ComfySession, mrn: string) {
-    const data = (await session.invoke('lora:load', {
+  private async load(session: RPCSession, mrn: string) {
+    const data = await session.api.lora.load({
       path: await Metastable.instance.resolve(mrn),
-    })) as RPCRef;
+    });
     return new ComfyLORA(session, data);
   }
 

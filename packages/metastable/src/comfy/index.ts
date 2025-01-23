@@ -4,12 +4,10 @@ import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
 
-import { BackendStatus, InstanceInfo, LogItem } from '@metastable/types';
-import es from 'event-stream';
-import { nanoid } from 'nanoid/non-secure';
+import { BackendStatus, LogItem } from '@metastable/types';
 
-import { ComfySession } from './session/index.js';
 import type { PythonInstance } from '../python/index.js';
+import { RPC } from './rpc/rpc.js';
 
 const baseDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -23,37 +21,10 @@ type BackendEvents = {
   status: [status: BackendStatus];
 };
 
-interface RPCRequest {
-  type: 'rpc';
-  method: string;
-  params?: Record<string, any>;
-  id: string;
-  session: string;
-}
-
-interface RPCResponse {
-  type: 'rpc';
-  result?: any;
-  error?: {
-    message: string;
-    data?: any;
-  };
-  id: string;
-}
-
 export class Comfy extends EventEmitter<BackendEvents> {
   process?: ChildProcessWithoutNullStreams;
-
-  sessions: Record<string, ComfySession> = {};
   connected = false;
-
-  rpcCallbacks: Map<
-    string,
-    {
-      resolve: (result: unknown) => void;
-      reject: (error: any) => void;
-    }
-  > = new Map();
+  rpc = new RPC();
 
   constructor(
     public python: PythonInstance,
@@ -63,6 +34,12 @@ export class Comfy extends EventEmitter<BackendEvents> {
   ) {
     super();
 
+    this.rpc.on('ready', () => {
+      this.setStatus('ready');
+    });
+    this.rpc.on('log', ({ type, text }) => {
+      this.log(type, text);
+    });
     this.start();
   }
 
@@ -71,86 +48,7 @@ export class Comfy extends EventEmitter<BackendEvents> {
       return undefined;
     }
 
-    return (await this.invoke(undefined, 'instance:info')) as InstanceInfo;
-  }
-
-  invoke(
-    sessionId: string | undefined,
-    method: string,
-    params?: unknown,
-  ): Promise<unknown> {
-    const id = nanoid();
-    this.write({
-      type: 'rpc',
-      method,
-      params,
-      id,
-      session: sessionId,
-    } as RPCRequest);
-
-    return new Promise((resolve, reject) => {
-      this.rpcCallbacks.set(id, { resolve, reject });
-    });
-  }
-
-  handleRPC(response: RPCResponse) {
-    const callbacks = this.rpcCallbacks.get(response.id);
-    if (!callbacks) {
-      console.log('Unhandled RPC response', response);
-      return;
-    }
-
-    if (response.error) {
-      callbacks.reject(new Error(response.error.message));
-    } else {
-      callbacks.resolve(response.result);
-    }
-    this.rpcCallbacks.delete(response.id);
-  }
-
-  async session<T>(
-    callback:
-      | ((session: ComfySession) => Promise<T>)
-      | ((session: ComfySession) => T),
-  ): Promise<T> {
-    const sessionId = nanoid();
-    await this.invoke(sessionId, 'session:start');
-    const session = new ComfySession(this, sessionId);
-    this.sessions[sessionId] = session;
-
-    const result = await callback(session);
-
-    await session.destroy();
-    delete this.sessions[sessionId];
-
-    return result;
-  }
-
-  handleJson(e: any) {
-    if (e.type === 'rpc') {
-      this.handleRPC(e);
-      return;
-    }
-
-    switch (e.event) {
-      case 'ready':
-        this.setStatus('ready');
-        break;
-      case 'rpc.progress':
-        this.sessions[e.data.sessionId]?.emit('progress', {
-          max: e.data.max,
-          value: e.data.value,
-          preview: e.data.preview,
-        });
-        break;
-      case 'rpc.log':
-        this.log(e.data.type, e.data.text);
-        this.sessions[e.data.sessionId]?.emit('log', {
-          type: e.data.type,
-          text: e.data.text,
-        });
-        break;
-    }
+    return await this.rpc.api.instance.info();
   }
 
   async start() {
@@ -163,8 +61,6 @@ export class Comfy extends EventEmitter<BackendEvents> {
       ...this.env,
       PYTORCH_MPS_HIGH_WATERMARK_RATIO: '0.0',
     });
-
-    proc.stdin.setDefaultEncoding('utf-8');
 
     proc.on('spawn', () => this.setStatus('starting'));
     proc.on('exit', () => this.setStatus('error'));
@@ -179,14 +75,8 @@ export class Comfy extends EventEmitter<BackendEvents> {
       this.log('stderr', data);
     });
 
-    const jsonOut = proc.stdio[3] as Readable;
-    jsonOut.setEncoding('utf-8');
-    jsonOut.pipe(es.split('\x1e')).on('data', data => {
-      try {
-        this.handleJson(JSON.parse(data));
-      } catch {}
-    });
-
+    this.rpc.readable = proc.stdio[3] as Readable;
+    this.rpc.writable = proc.stdin;
     this.process = proc;
   }
 
@@ -206,10 +96,7 @@ export class Comfy extends EventEmitter<BackendEvents> {
   }
 
   reset() {
-    for (const callbacks of this.rpcCallbacks.values()) {
-      callbacks.reject(new Error('Backend abruptly shut down.'));
-    }
-    this.rpcCallbacks.clear();
+    this.rpc.reset(new Error('Backend shutting down.'));
     this.emit('reset');
   }
 
@@ -220,9 +107,5 @@ export class Comfy extends EventEmitter<BackendEvents> {
     }
 
     this.emit('status', status);
-  }
-
-  write(data: any) {
-    this.process?.stdin.write(JSON.stringify(data) + '\n');
   }
 }

@@ -5,7 +5,12 @@ import ts from 'typescript';
 import { stdout } from '../src/helpers/spawn.js';
 
 interface JSONSchemaPrimitive {
-  type: 'number' | 'string' | 'boolean' | 'bytes';
+  type: 'number' | 'string' | 'boolean' | 'bytes' | 'null';
+}
+
+interface JSONSchemaRef {
+  type: 'ref';
+  tag: string;
 }
 
 interface JSONSchemaObject {
@@ -35,11 +40,13 @@ type JSONSchema =
   | JSONSchemaObject
   | JSONSchemaArray
   | JSONSchemaAny
-  | JSONSchemaUnion;
+  | JSONSchemaUnion
+  | JSONSchemaRef;
 
 interface RPCMethod {
   parameters: JSONSchemaObject;
   returns: JSONSchema;
+  is_autoref: boolean;
 }
 
 interface RPCNamespace {
@@ -50,7 +57,9 @@ interface RPCSchema {
   namespaces: Record<string, RPCNamespace>;
 }
 
-const data = await stdout('python', [path.resolve('./python/rpc_types.py')]);
+const data = await stdout('python', [
+  path.resolve('./python/rpc_generate_types.py'),
+]);
 const schema = JSON.parse(data) as RPCSchema;
 
 function upperFirst(str: string) {
@@ -68,6 +77,10 @@ function toCamelCase(str: string) {
     .join('');
 }
 
+const questionToken = ts.factory.createToken(ts.SyntaxKind.QuestionToken);
+const refTypeIdentifier = ts.factory.createIdentifier('RPCRef');
+const bytesArgType = ts.factory.createTypeReferenceNode('Buffer');
+
 function schemaToType(
   schema: JSONSchema,
   identifierTransform: (str: string) => string = str => str,
@@ -79,6 +92,10 @@ function schemaToType(
       return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
     case 'string':
       return ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+    case 'bytes':
+      return bytesArgType;
+    case 'null':
+      return ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword);
     case 'object': {
       const elements: ts.TypeElement[] = [];
       if (schema.properties) {
@@ -87,7 +104,7 @@ function schemaToType(
             ts.factory.createPropertySignature(
               undefined,
               identifierTransform(name),
-              undefined,
+              schema.required?.includes(name) ? undefined : questionToken,
               schemaToType(value, identifierTransform),
             ),
           );
@@ -115,120 +132,181 @@ function schemaToType(
       }
       return ts.factory.createTypeLiteralNode(elements);
     }
+    case 'array':
+      if (schema.items) {
+        return ts.factory.createArrayTypeNode(schemaToType(schema.items));
+      }
+      // TODO: Support tuples (prefixItems)
+      break;
+    case 'ref':
+      return ts.factory.createTypeReferenceNode(refTypeIdentifier, [
+        ts.factory.createLiteralTypeNode(
+          ts.factory.createStringLiteral(schema.tag),
+        ),
+      ]);
     default:
       return ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
   }
 }
 
 const anyType = ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
-const rpcClassIdentifier = ts.factory.createIdentifier('ComfySession');
-const rpcIdentifier = ts.factory.createIdentifier('session');
-const invokeAccessExpression = ts.factory.createPropertyAccessExpression(
-  rpcIdentifier,
-  'invoke',
-);
 const argsIdentifier = ts.factory.createIdentifier('args');
-const nodes: ts.ObjectLiteralElementLike[] = [];
+const undefinedIdentifier = ts.factory.createIdentifier('undefined');
 
-for (const [namespaceName, namespace] of Object.entries(schema.namespaces)) {
-  const members: ts.ObjectLiteralElementLike[] = [];
+function buildApiFunction({
+  functionName,
+  namespaces,
+  rpcIdentifier,
+  rpcClassIdentifier,
+  isSession,
+}: {
+  functionName: string;
+  namespaces: Record<string, RPCNamespace>;
+  rpcIdentifier: ts.Identifier;
+  rpcClassIdentifier: ts.Identifier;
+  isSession: boolean;
+}) {
+  const invokeExpression = ts.factory.createPropertyAccessExpression(
+    rpcIdentifier,
+    'invoke',
+  );
+  const nodes: ts.ObjectLiteralElementLike[] = [];
 
-  for (const [methodName, method] of Object.entries(namespace.methods)) {
-    const parameters: ts.ParameterDeclaration[] = [];
+  for (const [namespaceName, namespace] of Object.entries(namespaces)) {
+    const members: ts.ObjectLiteralElementLike[] = [];
 
-    if (Object.keys(method.parameters.properties!).length) {
-      parameters.push(
-        ts.factory.createParameterDeclaration(
+    for (const [methodName, method] of Object.entries(namespace.methods)) {
+      if (!isSession && method.is_autoref) {
+        continue;
+      }
+
+      const parameters: ts.ParameterDeclaration[] = [];
+
+      const rpcArgs: ts.Expression[] = [];
+
+      if (!isSession) {
+        rpcArgs.push(undefinedIdentifier);
+      }
+
+      rpcArgs.push(
+        ts.factory.createStringLiteral(`${namespaceName}:${methodName}`),
+      );
+
+      if (Object.keys(method.parameters.properties!).length) {
+        rpcArgs.push(
+          ts.factory.createObjectLiteralExpression(
+            Object.entries(method.parameters.properties!).map(([name]) =>
+              ts.factory.createPropertyAssignment(
+                name,
+                ts.factory.createPropertyAccessExpression(
+                  argsIdentifier,
+                  toCamelCase(name),
+                ),
+              ),
+            ),
+            true,
+          ),
+        );
+        parameters.push(
+          ts.factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            argsIdentifier,
+            undefined,
+            schemaToType(method.parameters, toCamelCase),
+            undefined,
+          ),
+        );
+      }
+
+      members.push(
+        ts.factory.createMethodDeclaration(
           undefined,
           undefined,
-          argsIdentifier,
+          toCamelCase(methodName),
           undefined,
-          schemaToType(method.parameters, toCamelCase),
           undefined,
+          parameters,
+          ts.factory.createTypeReferenceNode('Promise', [
+            method.returns.type === 'null'
+              ? ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword)
+              : schemaToType(method.returns),
+          ]),
+          ts.factory.createBlock(
+            [
+              ts.factory.createReturnStatement(
+                ts.factory.createAsExpression(
+                  ts.factory.createCallExpression(
+                    invokeExpression,
+                    undefined,
+                    rpcArgs,
+                  ),
+                  anyType,
+                ),
+              ),
+            ],
+            true,
+          ),
         ),
       );
     }
 
-    members.push(
-      ts.factory.createMethodDeclaration(
-        undefined,
-        undefined,
-        toCamelCase(methodName),
-        undefined,
-        undefined,
-        parameters,
-        ts.factory.createTypeReferenceNode('Promise', [
-          schemaToType(method.returns),
-        ]),
-        ts.factory.createBlock(
-          [
-            ts.factory.createReturnStatement(
-              ts.factory.createAsExpression(
-                ts.factory.createCallExpression(
-                  invokeAccessExpression,
-                  undefined,
-                  [
-                    ts.factory.createStringLiteral(
-                      `${namespaceName}:${methodName}`,
-                    ),
-                    ts.factory.createObjectLiteralExpression(
-                      Object.entries(method.parameters.properties!).map(
-                        ([name]) =>
-                          ts.factory.createPropertyAssignment(
-                            name,
-                            ts.factory.createPropertyAccessExpression(
-                              argsIdentifier,
-                              toCamelCase(name),
-                            ),
-                          ),
-                      ),
-                      true,
-                    ),
-                  ],
-                ),
-                anyType,
-              ),
-            ),
-          ],
-          true,
+    if (members.length) {
+      nodes.push(
+        ts.factory.createPropertyAssignment(
+          toCamelCase(namespaceName),
+          ts.factory.createObjectLiteralExpression(members, true),
         ),
-      ),
-    );
+      );
+    }
   }
 
-  nodes.push(
-    ts.factory.createPropertyAssignment(
-      toCamelCase(namespaceName),
-      ts.factory.createObjectLiteralExpression(members, true),
+  return ts.factory.createFunctionDeclaration(
+    [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    undefined,
+    functionName,
+    undefined,
+    [
+      ts.factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        rpcIdentifier,
+        undefined,
+        ts.factory.createTypeReferenceNode(rpcClassIdentifier),
+        undefined,
+      ),
+    ],
+    undefined,
+    ts.factory.createBlock(
+      [
+        ts.factory.createReturnStatement(
+          ts.factory.createObjectLiteralExpression(nodes, true),
+        ),
+      ],
+      true,
     ),
   );
 }
 
-const getApiFunction = ts.factory.createFunctionDeclaration(
-  [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-  undefined,
-  'getApi',
-  undefined,
-  [
-    ts.factory.createParameterDeclaration(
+function importXFromY(x: ts.Identifier[], y: string) {
+  return ts.factory.createImportDeclaration(
+    undefined,
+    ts.factory.createImportClause(
+      false,
       undefined,
-      undefined,
-      rpcIdentifier,
-      undefined,
-      ts.factory.createTypeReferenceNode(rpcClassIdentifier),
-      undefined,
-    ),
-  ],
-  undefined,
-  ts.factory.createBlock(
-    [
-      ts.factory.createReturnStatement(
-        ts.factory.createObjectLiteralExpression(nodes, true),
+      ts.factory.createNamedImports(
+        x.map(identifier =>
+          ts.factory.createImportSpecifier(true, undefined, identifier),
+        ),
       ),
-    ],
-    true,
-  ),
-);
+    ),
+    ts.factory.createStringLiteral(y),
+    undefined,
+  );
+}
+
+const rpcClassIdentifier = ts.factory.createIdentifier('RPC');
+const sessionClassIdentifier = ts.factory.createIdentifier('RPCSession');
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 const resultFile = ts.createSourceFile(
@@ -239,22 +317,27 @@ const resultFile = ts.createSourceFile(
   ts.ScriptKind.TS,
 );
 
-const importNode = ts.factory.createImportDeclaration(
-  undefined,
-  ts.factory.createImportClause(
-    false,
-    undefined,
-    ts.factory.createNamedImports([
-      ts.factory.createImportSpecifier(false, undefined, rpcClassIdentifier),
-    ]),
-  ),
-  ts.factory.createStringLiteral('./index.js'),
-  undefined,
-);
-
 const source = printer.printList(
   ts.ListFormat.MultiLine,
-  ts.factory.createNodeArray([importNode, getApiFunction]),
+  ts.factory.createNodeArray([
+    importXFromY([rpcClassIdentifier], './rpc.js'),
+    importXFromY([sessionClassIdentifier], './session.js'),
+    importXFromY([refTypeIdentifier], './types.js'),
+    buildApiFunction({
+      functionName: 'getApi',
+      namespaces: schema.namespaces,
+      rpcIdentifier: ts.factory.createIdentifier('rpc'),
+      rpcClassIdentifier: rpcClassIdentifier,
+      isSession: false,
+    }),
+    buildApiFunction({
+      functionName: 'getSessionApi',
+      namespaces: schema.namespaces,
+      rpcIdentifier: ts.factory.createIdentifier('session'),
+      rpcClassIdentifier: sessionClassIdentifier,
+      isSession: true,
+    }),
+  ]),
   resultFile,
 );
 
