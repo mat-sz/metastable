@@ -9,6 +9,7 @@ import comfy.model_management
 from .utils.checkpoint import get_latent_type
 
 from rpc import RPC
+import rpc_types
 
 last_unet_path = None
 last_unet = None
@@ -38,7 +39,7 @@ def load_unet_cached(path, model_options={}):
     return last_unet
 
 class DiffusionModelLoadResult(TypedDict):
-    diffusion_model: comfy.model_patcher.ModelPatcher
+    diffusion_model: rpc_types.DiffusionModel
     latent_type: str
 
 class DiffusionModelNamespace:

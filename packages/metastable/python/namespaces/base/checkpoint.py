@@ -12,6 +12,7 @@ import comfy.model_management
 from .utils.checkpoint import get_latent_type
 
 from rpc import RPC
+import rpc_types
 
 last_checkpoint_path = None
 last_checkpoint = None
@@ -68,9 +69,9 @@ def load_checkpoint_cached(path, embeddings_path=None, config_path=None):
     return last_checkpoint
 
 class CheckpointLoadResult(TypedDict):
-    diffusion_model: comfy.model_patcher.ModelPatcher
-    text_encoder: NotRequired[comfy.sd.CLIP]
-    vae: NotRequired[comfy.sd.VAE]
+    diffusion_model: rpc_types.DiffusionModel
+    text_encoder: NotRequired[rpc_types.TextEncoder]
+    vae: NotRequired[rpc_types.VAE]
     latent_type: str
 
 class CheckpointNamespace:

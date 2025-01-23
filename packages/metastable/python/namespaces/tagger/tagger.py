@@ -5,7 +5,7 @@ from PIL import Image
 import onnx
 import onnxruntime as ort
 
-from rpc import RPC
+from rpc import RPC, RPCContext
 
 IMAGE_SIZE = 448
 
@@ -51,7 +51,7 @@ class ImageLoadingPrepDataset(torch.utils.data.Dataset):
 class TaggerNamespace:
     @RPC.autoref
     @RPC.method
-    def tag(ctx, model_path, images, general_threshold, character_threshold, remove_underscore=True, undesired_tags=[], caption_separator=", ", csv_path=None):
+    def tag(_ctx: RPCContext, model_path, images, general_threshold, character_threshold, remove_underscore=True, undesired_tags=[], caption_separator=", ", csv_path=None) -> dict[str, str]:
         csv_path = csv_path if csv_path is not None else model_path + '.csv'
 
         batch_size = 1
@@ -134,7 +134,7 @@ class TaggerNamespace:
         b_imgs = []
         progress = 0
         
-        ctx.progress(0, len(image_paths))
+        _ctx.progress(0, len(image_paths))
         for image_path in image_paths:
             try:
                 image = Image.open(image_path)
@@ -148,7 +148,7 @@ class TaggerNamespace:
                     b_imgs = [(str(image_path), image) for image_path, image in b_imgs]  # Convert image_path to string
                     run_batch(b_imgs)
                     progress += len(b_imgs)
-                    ctx.progress(progress, len(image_paths))
+                    _ctx.progress(progress, len(image_paths))
                     b_imgs.clear()
             except:
                 continue
@@ -157,6 +157,6 @@ class TaggerNamespace:
             b_imgs = [(str(image_path), image) for image_path, image in b_imgs]  # Convert image_path to string
             run_batch(b_imgs)
             progress += len(b_imgs)
-            ctx.progress(progress, len(image_paths))
+            _ctx.progress(progress, len(image_paths))
 
         return result

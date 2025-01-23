@@ -5,10 +5,11 @@ import torch
 from io import BytesIO
 
 from rpc import RPC
+import rpc_types
 
 class ImageLoadResult(TypedDict):
-    image: torch.Tensor
-    mask: torch.Tensor
+    image: rpc_types.ImageTensor
+    mask: rpc_types.ImageTensor
 
 class ImageNamespace:
     @RPC.autoref
@@ -33,7 +34,7 @@ class ImageNamespace:
 
     @RPC.autoref
     @RPC.method
-    def dump(image: torch.Tensor, format: str = "PNG") -> BytesIO:
+    def dump(image: rpc_types.ImageTensor, format: str = "PNG") -> BytesIO:
         i = 255. * image.cpu().detach().numpy()
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
         buf = BytesIO()

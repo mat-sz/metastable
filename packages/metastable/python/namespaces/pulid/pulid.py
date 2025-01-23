@@ -9,8 +9,10 @@ from insightface.app import FaceAnalysis
 from facexlib.parsing import init_parsing_model
 from facexlib.utils.face_restoration_helper import FaceRestoreHelper
 from comfy.ldm.modules.attention import optimized_attention
-from rpc import RPC
 from huggingface_hub import snapshot_download
+
+from rpc import RPC
+import rpc_types
 
 from .eva_clip.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 
@@ -184,7 +186,7 @@ def to_gray(img):
 class PulidNamespace:
     @RPC.autoref
     @RPC.method
-    def load(path: str):
+    def load(path: str) -> rpc_types.PULID:
         model = comfy.utils.load_torch_file(path, safe_load=True)
 
         if path.lower().endswith(".safetensors"):
@@ -201,7 +203,7 @@ class PulidNamespace:
 
     @RPC.autoref
     @RPC.method
-    def load_insightface(root: str):
+    def load_insightface(root: str) -> rpc_types.FaceAnalysis:
         snapshot_download('DIAMONIK7777/antelopev2', local_dir=os.path.join(root, 'models', 'antelopev2'))
         # "provider": (["CPU", "CUDA", "ROCM", "CoreML"], ),
         model = FaceAnalysis(name="antelopev2", root=root, providers=["CUDA" + 'ExecutionProvider',]) # alternative to buffalo_l
@@ -210,7 +212,7 @@ class PulidNamespace:
 
     @RPC.autoref
     @RPC.method
-    def load_eva_clip():
+    def load_eva_clip() -> rpc_types.EvaClip:
         from .eva_clip.factory import create_model_and_transforms
 
         model, _, _ = create_model_and_transforms('EVA02-CLIP-L-14-336', 'eva_clip', force_custom_clip=True)
@@ -227,7 +229,7 @@ class PulidNamespace:
     
     @RPC.autoref
     @RPC.method
-    def apply(diffusion_model, pulid, eva_clip, face_analysis, image, projection: str = "ortho_v2", strength: float = 1.0, fidelity: int = 8, noise: float = 0.0, start_at: float = 0.0, end_at: float = 1.0, attn_mask=None):
+    def apply(diffusion_model: rpc_types.DiffusionModel, pulid: rpc_types.PULID, eva_clip: rpc_types.EvaClip, face_analysis: rpc_types.FaceAnalysis, image: rpc_types.ImageTensor, projection: str = "ortho_v2", strength: float = 1.0, fidelity: int = 8, noise: float = 0.0, start_at: float = 0.0, end_at: float = 1.0, attn_mask=None) -> rpc_types.DiffusionModel:
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         

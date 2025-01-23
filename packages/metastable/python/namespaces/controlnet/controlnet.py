@@ -1,17 +1,17 @@
-import torch
 import comfy.controlnet
+import rpc_types
 
 from rpc import RPC
 
 class ControlnetNamespace:
     @RPC.autoref
     @RPC.method
-    def load(path: str) -> comfy.controlnet.ControlNet:
+    def load(path: str) -> rpc_types.ControlNet:
         return comfy.controlnet.load_controlnet(path)
     
     @RPC.autoref
     @RPC.method
-    def apply(controlnet: comfy.controlnet.ControlNet, positive, negative, image: torch.Tensor, strength: float):
+    def apply(controlnet: rpc_types.ControlNet, positive: rpc_types.Conditioning, negative: rpc_types.Conditioning, image: rpc_types.ImageTensor, strength: float) -> rpc_types.ConditioningPair:
         # TODO: Refactor when types are added.
         image = image.unsqueeze(0)
         

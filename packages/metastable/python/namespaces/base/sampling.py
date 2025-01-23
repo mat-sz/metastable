@@ -4,9 +4,9 @@ import comfy.sample
 import torch
 import node_helpers
 from .utils import custom, latent_preview
-from .utils.types import Latent
 
 from rpc import RPC
+import rpc_types
 
 def model_set_circular(model, is_circular=False):
     if isinstance(model, torch.nn.Conv2d):
@@ -51,12 +51,12 @@ class Guider_Basic(comfy.samplers.CFGGuider):
 class SamplingNamespace:
     @RPC.autoref
     @RPC.method
-    def get_sampler(sampler_name: str):
+    def get_sampler(sampler_name: str) -> rpc_types.Sampler:
         return comfy.samplers.sampler_object(sampler_name)
     
     @RPC.autoref
     @RPC.method
-    def get_sigmas(diffusion_model, scheduler_name: str, steps: int, denoise: float = 1):
+    def get_sigmas(diffusion_model: rpc_types.DiffusionModel, scheduler_name: str, steps: int, denoise: float = 1) -> rpc_types.Sigmas:
         total_steps = steps
         if denoise < 1.0:
             if denoise <= 0.0:
@@ -76,19 +76,19 @@ class SamplingNamespace:
     
     @RPC.autoref
     @RPC.method
-    def flux_guidance(conditioning, guidance: float):
+    def flux_guidance(conditioning: rpc_types.Conditioning, guidance: float) -> rpc_types.Conditioning:
         return node_helpers.conditioning_set_values(conditioning, {"guidance": guidance})
     
     @RPC.autoref
     @RPC.method
-    def basic_guider(diffusion_model: comfy.model_patcher.ModelPatcher, conditioning) -> comfy.samplers.CFGGuider:
+    def basic_guider(diffusion_model: rpc_types.DiffusionModel, conditioning: rpc_types.Conditioning) -> rpc_types.Guider:
         guider = Guider_Basic(diffusion_model)
         guider.set_conds(conditioning)
         return guider
     
     @RPC.autoref
     @RPC.method
-    def cfg_guider(diffusion_model: comfy.model_patcher.ModelPatcher, positive, negative, cfg: float):
+    def cfg_guider(diffusion_model: rpc_types.DiffusionModel, positive: rpc_types.Conditioning, negative: rpc_types.Conditioning, cfg: float) -> rpc_types.Guider:
         guider = comfy.samplers.CFGGuider(diffusion_model)
         guider.set_conds(positive, negative)
         guider.set_cfg(cfg)
@@ -96,7 +96,7 @@ class SamplingNamespace:
     
     @RPC.autoref
     @RPC.method
-    def sample(diffusion_model: comfy.model_patcher.ModelPatcher, latent: Latent, positive, negative, sampler_name: str, scheduler_name: str, steps: int, denoise: float, cfg: float, seed: int, is_circular: bool = False, preview = None):
+    def sample(diffusion_model: rpc_types.DiffusionModel, latent: rpc_types.Latent, positive: rpc_types.Conditioning, negative: rpc_types.Conditioning, sampler_name: str, scheduler_name: str, steps: int, denoise: float, cfg: float, seed: int, is_circular: bool = False, preview = None) -> rpc_types.LatentTensor:
         model_set_circular(diffusion_model, is_circular)
 
         latent_image = comfy.sample.fix_empty_latent_channels(diffusion_model, latent["samples"])
@@ -151,12 +151,12 @@ class SamplingNamespace:
     
     @RPC.autoref
     @RPC.method
-    def random_noise(seed: int):
+    def random_noise(seed: int) -> rpc_types.Noise:
         return Noise_RandomNoise(seed)
 
     @RPC.autoref
     @RPC.method
-    def sample_custom(noise, guider, sampler, sigmas, latent: Latent, preview=None):
+    def sample_custom(noise: rpc_types.Noise, guider: rpc_types.Guider, sampler: rpc_types.Sampler, sigmas: rpc_types.Sigmas, latent: rpc_types.Latent, preview=None) -> rpc_types.LatentTensor:
         latent["samples"] = comfy.sample.fix_empty_latent_channels(guider.model_patcher, latent["samples"])
 
         noise_mask = None

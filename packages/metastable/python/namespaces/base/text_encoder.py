@@ -1,6 +1,7 @@
 import comfy.sd
 
 from rpc import RPC
+import rpc_types
 
 TYPE_MAP = {
     "stable_cascade": comfy.sd.CLIPType.STABLE_CASCADE,
@@ -13,7 +14,7 @@ TYPE_MAP = {
 class TextEncoderNamespace:
     @RPC.autoref
     @RPC.method
-    def load(paths: list[str], type: str, embeddings_path: str = None) -> comfy.sd.CLIP:
+    def load(paths: list[str], type: str, embeddings_path: str = None) -> rpc_types.TextEncoder:
         text_encoder_type = TYPE_MAP[type] if type in TYPE_MAP else comfy.sd.CLIPType.STABLE_DIFFUSION
 
         if any(path.endswith('.gguf') for path in paths):
@@ -27,14 +28,14 @@ class TextEncoderNamespace:
     
     @RPC.autoref
     @RPC.method
-    def encode(text_encoder: comfy.sd.CLIP, text: str):
+    def encode(text_encoder: rpc_types.TextEncoder, text: str) -> rpc_types.Conditioning:
         tokens = text_encoder.tokenize(text)
         cond, pooled = text_encoder.encode_from_tokens(tokens, return_pooled=True)
         return [[cond, {"pooled_output": pooled}]]
     
     @RPC.autoref
     @RPC.method
-    def set_layer(text_encoder: comfy.sd.CLIP, layer: int) -> comfy.sd.CLIP:
+    def set_layer(text_encoder: rpc_types.TextEncoder, layer: int) -> rpc_types.TextEncoder:
         if layer == None or layer == 0:
             text_encoder.clip_layer(None)
         else:

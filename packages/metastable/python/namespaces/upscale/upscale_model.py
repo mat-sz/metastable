@@ -5,11 +5,12 @@ import comfy.model_management
 from spandrel import ModelLoader, ImageModelDescriptor
 
 from rpc import RPC
+import rpc_types
 
 class UpscaleModelNamespace:
     @RPC.autoref
     @RPC.method
-    def load(path: str):
+    def load(path: str) -> rpc_types.UpscaleModel:
         sd = comfy.utils.load_torch_file(path, safe_load=True)
         if "module.layers.0.residual_group.blocks.0.norm1.weight" in sd:
             sd = comfy.utils.state_dict_prefix_replace(sd, {"module.":""})
@@ -22,7 +23,7 @@ class UpscaleModelNamespace:
 
     @RPC.autoref
     @RPC.method
-    def apply(upscale_model, images: list[torch.Tensor]):
+    def apply(upscale_model: rpc_types.UpscaleModel, images: list[rpc_types.ImageTensor]) -> list[rpc_types.ImageTensor]:
         device = comfy.model_management.get_torch_device()
         upscale_model.to(device)
         images = torch.stack(images)

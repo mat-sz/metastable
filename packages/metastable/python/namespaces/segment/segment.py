@@ -1,4 +1,3 @@
-from rpc import RPC
 from .load_model import load_model
 import comfy.model_management as mm
 import torch
@@ -6,12 +5,15 @@ import numpy as np
 import random
 import os
 
+from rpc import RPC
+import rpc_types
+
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
 class SegmentNamespace:
     @RPC.autoref
     @RPC.method
-    def load(path: str):
+    def load(path: str) -> rpc_types.SegmentModel:
         model_mapping = {
             "2.0": {
                 "base": "sam2_hiera_b+.yaml",
@@ -38,7 +40,7 @@ class SegmentNamespace:
 
     @RPC.autoref
     @RPC.method
-    def segment(model, image):
+    def segment(model: rpc_types.SegmentModel, image: rpc_types.ImageTensor) -> rpc_types.ImageTensor:
         offload_device = mm.unet_offload_device()
         device = "cpu"
         dtype = torch.float32
