@@ -22,3 +22,7 @@
     }
   }
 }
+
+.prompt [varui-label-body] > div > div {
+  min-height: 8rem;
+}

@@ -10,6 +10,7 @@ import {
   VarArrayWithModal,
   VarButton,
   VarCategory,
+  VarPrompt,
   VarSelect,
   VarString,
 } from '$components/var';
@@ -47,8 +48,16 @@ export const SettingsStyles: React.FC = observer(() => {
                   ...MAPPED_ARCHITECTURES,
                 ]}
               />
-              <VarString path="positive" label="Positive prompt" multiline />
-              <VarString path="negative" label="Negative prompt" multiline />
+              <VarPrompt
+                className={styles.prompt}
+                path="positive"
+                label="Positive prompt"
+              />
+              <VarPrompt
+                className={styles.prompt}
+                path="negative"
+                label="Negative prompt"
+              />
             </VarCategory>
             <div className={styles.hint}>
               <strong>Hint:</strong> Use {'{prompt}'} if you'd like for the
