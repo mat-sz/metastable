@@ -1,8 +1,8 @@
+import { semverCompare } from '@metastable/common';
 import { TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsArrowClockwise } from 'react-icons/bs';
-import semverGte from 'semver/functions/gte';
 
 import { API } from '$api';
 import { Alert } from '$components/alert';
@@ -14,7 +14,7 @@ import styles from './index.module.scss';
 
 export const SettingsFeatures: React.FC = observer(() => {
   const bundleVersion = mainStore.config.data?.python.bundleVersion || '0.0.0';
-  const available = semverGte(bundleVersion, '0.1.3');
+  const available = semverCompare(bundleVersion, '0.1.3') >= 0;
   const features = available ? mainStore.info.features : [];
 
   return (

@@ -2,6 +2,7 @@ import { on } from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 
+import { semverCompare } from '@metastable/common';
 import {
   BackendStatus,
   LogItem,
@@ -22,8 +23,15 @@ import { type App, type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import { Base64 } from 'js-base64';
 import { nanoid } from 'nanoid';
-import { gte } from 'semver';
-import { z } from 'zod';
+import {
+  any,
+  array,
+  boolean,
+  enums,
+  optional,
+  string,
+  type,
+} from 'superstruct';
 
 import { PostprocessTask } from './comfy/tasks/postprocess.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
@@ -90,14 +98,14 @@ export const router = t.router({
   download: {
     create: t.procedure
       .input(
-        z.object({
-          url: z.string(),
-          type: z.nativeEnum(ModelType),
-          name: z.string(),
-          imageUrl: z.string().optional(),
-          configUrl: z.string().optional(),
-          configType: z.string().optional(),
-          metadata: z.any().optional(),
+        type({
+          url: string(),
+          type: enums(Object.values(ModelType)),
+          name: string(),
+          imageUrl: optional(string()),
+          configUrl: optional(string()),
+          configType: optional(string()),
+          metadata: optional(any()),
         }),
       )
       .mutation(async ({ input, ctx: { metastable } }) => {
@@ -184,7 +192,8 @@ export const router = t.router({
           if (typeof json.version === 'string') {
             latestVersion = json.version;
             if (metastable.settings.version) {
-              isUpToDate = gte(metastable.settings.version, json.version);
+              isUpToDate =
+                semverCompare(metastable.settings.version, json.version) === 0;
             }
           }
         } catch (e) {
@@ -200,7 +209,7 @@ export const router = t.router({
       },
     ),
     installFeature: t.procedure
-      .input(z.object({ featureId: z.string() }))
+      .input(type({ featureId: string() }))
       .mutation(async ({ ctx: { metastable }, input: { featureId } }) => {
         metastable.feature.install(featureId);
       }),
@@ -211,7 +220,7 @@ export const router = t.router({
       await metastable.resetSettings();
     }),
     resetBundle: t.procedure
-      .input(z.object({ resetAll: z.boolean().optional() }))
+      .input(type({ resetAll: optional(boolean()) }))
       .mutation(async ({ ctx: { metastable }, input: { resetAll } }) => {
         await metastable.setup.resetBundle(resetAll);
       }),
@@ -220,7 +229,7 @@ export const router = t.router({
         return await metastable.config.all();
       }),
       set: t.procedure
-        .input(z.any())
+        .input(any())
         .mutation(async ({ ctx: { metastable }, input }) => {
           if (typeof input === 'object') {
             await metastable.config.store(input);
@@ -228,16 +237,14 @@ export const router = t.router({
           return await metastable.config.all();
         }),
     },
-    validateModelPath: t.procedure
-      .input(z.string())
-      .query(async ({ input }) => {
-        if (!(await exists(input))) {
-          throw new Error('Directory not found.');
-        }
+    validateModelPath: t.procedure.input(string()).query(async ({ input }) => {
+      if (!(await exists(input))) {
+        throw new Error('Directory not found.');
+      }
 
-        return true;
-      }),
-    listFiles: t.procedure.input(z.string()).query(async ({ input }) => {
+      return true;
+    }),
+    listFiles: t.procedure.input(string()).query(async ({ input }) => {
       const dir = await fs.readdir(input, { withFileTypes: true });
       const resolved = path.resolve(input);
       const parsed = path.parse(resolved);
@@ -273,7 +280,7 @@ export const router = t.router({
       };
     }),
     createFolder: t.procedure
-      .input(z.object({ path: z.string(), name: z.string() }))
+      .input(type({ path: string(), name: string() }))
       .mutation(async ({ input }) => {
         const folderPath = path.join(input.path, input.name);
         await fs.mkdir(folderPath, { recursive: true });
@@ -306,16 +313,16 @@ export const router = t.router({
       return map;
     }),
     get: t.procedure
-      .input(z.object({ mrn: z.string() }))
+      .input(type({ mrn: string() }))
       .query(async ({ ctx: { metastable }, input: { mrn } }) => {
         const model = await metastable.model.get(mrn);
         return await model.json();
       }),
     update: t.procedure
       .input(
-        z.object({
-          mrn: z.string(),
-          metadata: z.any(),
+        type({
+          mrn: string(),
+          metadata: any(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input: { mrn, metadata } }) => {
@@ -325,11 +332,11 @@ export const router = t.router({
       }),
     createMetamodel: t.procedure
       .input(
-        z.object({
-          name: z.string(),
-          type: z.nativeEnum(ModelType),
-          models: z.any(),
-          metadata: z.any(),
+        type({
+          name: string(),
+          type: enums(Object.values(ModelType)),
+          models: any(),
+          metadata: any(),
         }),
       )
       .mutation(
@@ -347,8 +354,8 @@ export const router = t.router({
       ),
     delete: t.procedure
       .input(
-        z.object({
-          mrn: z.string(),
+        type({
+          mrn: string(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input: { mrn } }) => {
@@ -370,20 +377,18 @@ export const router = t.router({
     details: t.procedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.details();
     }),
-    prepareDataRoot: t.procedure
-      .input(z.string())
-      .mutation(async ({ input }) => {
-        await fs.mkdir(input, { recursive: true });
-        return await disk.usage(input);
-      }),
+    prepareDataRoot: t.procedure.input(string()).mutation(async ({ input }) => {
+      await fs.mkdir(input, { recursive: true });
+      return await disk.usage(input);
+    }),
     start: t.procedure
       .input(
-        z.object({
-          downloads: z.array(
-            z.object({ name: z.string(), type: z.string(), url: z.string() }),
+        type({
+          downloads: array(
+            type({ name: string(), type: string(), url: string() }),
           ),
-          torchMode: z.string(),
-          dataRoot: z.string(),
+          torchMode: string(),
+          dataRoot: string(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input }) => {
@@ -403,12 +408,12 @@ export const router = t.router({
     }),
     create: t.procedure
       .input(
-        z.object({
-          name: z.string(),
-          type: z.nativeEnum(ProjectType),
-          settings: z.any(),
-          ui: z.any().optional(),
-          draft: z.boolean().optional(),
+        type({
+          name: string(),
+          type: enums(Object.values(ProjectType)),
+          settings: any(),
+          ui: optional(any()),
+          draft: optional(boolean()),
         }),
       )
       .mutation(
@@ -431,20 +436,20 @@ export const router = t.router({
         },
       ),
     get: t.procedure
-      .input(z.object({ projectId: z.string() }))
+      .input(type({ projectId: string() }))
       .query(async ({ ctx: { metastable }, input: { projectId } }) => {
         const project = await metastable.project.get(projectId);
         return await project.json(true);
       }),
     update: t.procedure
       .input(
-        z.object({
-          projectId: z.string(),
-          name: z.string().optional(),
-          type: z.nativeEnum(ProjectType).optional(),
-          settings: z.any().optional(),
-          ui: z.any().optional(),
-          draft: z.boolean().optional(),
+        type({
+          projectId: string(),
+          name: optional(string()),
+          type: optional(enums(Object.values(ProjectType))),
+          settings: optional(any()),
+          ui: optional(any()),
+          draft: optional(boolean()),
         }),
       )
       .mutation(
@@ -471,8 +476,8 @@ export const router = t.router({
       ),
     delete: t.procedure
       .input(
-        z.object({
-          projectId: z.string(),
+        type({
+          projectId: string(),
         }),
       )
       .mutation(async ({ ctx: { metastable }, input: { projectId } }) => {
@@ -480,7 +485,7 @@ export const router = t.router({
         await project.delete();
       }),
     prompt: t.procedure
-      .input(z.object({ projectId: z.string(), settings: z.any() }))
+      .input(type({ projectId: string(), settings: any() }))
       .mutation(
         async ({ ctx: { metastable }, input: { projectId, settings } }) => {
           if (metastable.status !== 'ready') {
@@ -495,7 +500,7 @@ export const router = t.router({
         },
       ),
     postprocess: t.procedure
-      .input(z.object({ projectId: z.string(), settings: z.any() }))
+      .input(type({ projectId: string(), settings: any() }))
       .mutation(
         async ({ ctx: { metastable }, input: { projectId, settings } }) => {
           if (metastable.status !== 'ready') {
@@ -512,9 +517,9 @@ export const router = t.router({
     file: {
       all: t.procedure
         .input(
-          z.object({
-            type: z.nativeEnum(ProjectFileType),
-            projectId: z.string(),
+          type({
+            type: enums(Object.values(ProjectFileType)),
+            projectId: string(),
           }),
         )
         .query(async ({ ctx: { metastable }, input: { type, projectId } }) => {
@@ -524,10 +529,10 @@ export const router = t.router({
         }),
       get: t.procedure
         .input(
-          z.object({
-            type: z.nativeEnum(ProjectFileType),
-            projectId: z.string(),
-            name: z.string(),
+          type({
+            type: enums(Object.values(ProjectFileType)),
+            projectId: string(),
+            name: string(),
           }),
         )
         .query(
@@ -539,12 +544,12 @@ export const router = t.router({
         ),
       create: t.procedure
         .input(
-          z.object({
-            type: z.nativeEnum(ProjectFileType),
-            projectId: z.string(),
-            data: z.string(),
-            name: z.string().optional(),
-            ext: z.string(),
+          type({
+            type: enums(Object.values(ProjectFileType)),
+            projectId: string(),
+            data: string(),
+            name: optional(string()),
+            ext: string(),
           }),
         )
         .mutation(
@@ -564,12 +569,12 @@ export const router = t.router({
         ),
       update: t.procedure
         .input(
-          z.object({
-            type: z.nativeEnum(ProjectFileType),
-            projectId: z.string(),
-            name: z.string(),
-            newName: z.string().optional(),
-            metadata: z.any().optional(),
+          type({
+            type: enums(Object.values(ProjectFileType)),
+            projectId: string(),
+            name: string(),
+            newName: optional(string()),
+            metadata: optional(any()),
           }),
         )
         .mutation(
@@ -585,10 +590,10 @@ export const router = t.router({
         ),
       delete: t.procedure
         .input(
-          z.object({
-            type: z.nativeEnum(ProjectFileType),
-            projectId: z.string(),
-            name: z.string(),
+          type({
+            type: enums(Object.values(ProjectFileType)),
+            projectId: string(),
+            name: string(),
           }),
         )
         .mutation(
@@ -599,8 +604,8 @@ export const router = t.router({
         ),
       onChange: t.procedure
         .input(
-          z.object({
-            projectId: z.string(),
+          type({
+            projectId: string(),
           }),
         )
         .subscription(async function* ({
@@ -619,7 +624,7 @@ export const router = t.router({
     },
     tagger: {
       start: t.procedure
-        .input(z.object({ projectId: z.string(), settings: z.any() }))
+        .input(type({ projectId: string(), settings: any() }))
         .mutation(
           async ({ ctx: { metastable }, input: { projectId, settings } }) => {
             if (metastable.status !== 'ready') {
@@ -672,17 +677,17 @@ export const router = t.router({
       return metastable.tasks.all();
     }),
     queue: t.procedure
-      .input(z.object({ queueId: z.string() }))
+      .input(type({ queueId: string() }))
       .query(({ ctx: { metastable }, input: { queueId } }) => {
         metastable.tasks.queue(queueId);
       }),
     cancel: t.procedure
-      .input(z.object({ queueId: z.string(), taskId: z.string() }))
+      .input(type({ queueId: string(), taskId: string() }))
       .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
         metastable.tasks.cancel(queueId, taskId);
       }),
     dismiss: t.procedure
-      .input(z.object({ queueId: z.string(), taskId: z.string() }))
+      .input(type({ queueId: string(), taskId: string() }))
       .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
         metastable.tasks.dismiss(queueId, taskId);
       }),
@@ -734,7 +739,7 @@ export const router = t.router({
     },
     shell: {
       showItemInFolder: electronProcedure
-        .input(z.string())
+        .input(string())
         .mutation(async ({ input, ctx: { metastable } }) => {
           const { shell } = await import('electron');
           if (input.startsWith('mrn:')) {
@@ -743,7 +748,7 @@ export const router = t.router({
           shell.showItemInFolder(input);
         }),
       openPath: electronProcedure
-        .input(z.string())
+        .input(string())
         .mutation(async ({ input, ctx: { metastable } }) => {
           const { shell } = await import('electron');
           if (input.startsWith('mrn:')) {
@@ -752,7 +757,7 @@ export const router = t.router({
           await shell.openPath(input);
         }),
       selectDirectory: electronProcedure
-        .input(z.string())
+        .input(string())
         .mutation(async ({ ctx: { win }, input }) => {
           const { dialog } = await import('electron');
           const result = await dialog.showOpenDialog(win, {

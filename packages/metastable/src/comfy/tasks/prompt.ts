@@ -12,8 +12,7 @@ import {
   ProjectSimpleSettings,
 } from '@metastable/types';
 import PNG from 'meta-png';
-import sharp, { FitEnum } from 'sharp';
-import apng from 'sharp-apng';
+import type { FitEnum } from 'sharp';
 
 import { Metastable } from '#metastable';
 import { BaseComfyTask, BaseComfyTaskHandlers } from './base.js';
@@ -186,6 +185,7 @@ export class PromptTask extends BaseComfyTask<
 
   private async prepareImage(url: string, fit?: keyof FitEnum) {
     const buffer = await this.inputAsBuffer(url);
+    const { default: sharp } = await import('sharp');
     const image = sharp(buffer);
 
     const { padEdges } = this.settings.input;
@@ -371,6 +371,9 @@ export class PromptTask extends BaseComfyTask<
 
       const filename = await getNextFilename(outputDir, ext);
       const outputPath = path.join(outputDir, filename);
+
+      const { default: sharp } = await import('sharp');
+      const { default: apng } = await import('sharp-apng');
       const sharpImages = buffers.map(buffer => sharp(buffer));
       await apng.framesToApng(sharpImages, outputPath, {
         delay: frameDelay,

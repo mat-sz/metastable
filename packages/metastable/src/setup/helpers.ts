@@ -1,8 +1,8 @@
 import fs from 'fs/promises';
 import os from 'os';
 
+import { semverCompare } from '@metastable/common';
 import { SetupOS } from '@metastable/types';
-import semver from 'semver';
 
 export async function isGNULibc() {
   try {
@@ -32,12 +32,12 @@ export async function getOS(): Promise<SetupOS> {
       break;
     case 'darwin':
       platformCompatible = true;
-      versionCompatible = semver.satisfies(os.release(), '>=10.9');
+      versionCompatible = semverCompare(os.release(), '10.9') !== -1;
       supportedArchitectures = ['x64', 'arm64'];
       break;
     case 'win32':
       platformCompatible = true;
-      versionCompatible = semver.satisfies(os.release(), '>=10.0');
+      versionCompatible = semverCompare(os.release(), '10.0') !== -1;
       supportedArchitectures = ['x64'];
       break;
   }

@@ -13,15 +13,12 @@ import {
   shell,
   WindowOpenHandlerResponse,
 } from 'electron';
-import contextMenu from 'electron-context-menu';
-import settings from 'electron-settings';
-import { autoUpdater } from 'electron-updater';
 import { createIPCHandler } from 'trpc-electron/main';
 
-contextMenu({
-  showSearchWithGoogle: false,
-  showSaveImageAs: true,
-});
+import contextMenu from './helpers/contextMenu';
+import type { AppUpdater } from 'electron-updater';
+
+contextMenu();
 
 process.env.DIST = path.join(import.meta.dirname, '../dist');
 process.env.PUBLIC = app.isPackaged
@@ -46,16 +43,21 @@ app.on('web-contents-created', (_, wc) => {
   });
 });
 
-if (__ELECTRON_UPDATER_BASE_URL__) {
-  autoUpdater.setFeedURL({
-    provider: 'generic',
-    url: __ELECTRON_UPDATER_BASE_URL__,
-  });
-}
+let updater: AppUpdater;
+async function loadAppUpdater() {
+  const { autoUpdater } = await import('electron-updater');
+  updater = autoUpdater;
+  if (__ELECTRON_UPDATER_BASE_URL__) {
+    autoUpdater.setFeedURL({
+      provider: 'generic',
+      url: __ELECTRON_UPDATER_BASE_URL__,
+    });
+  }
 
-autoUpdater.autoInstallOnAppQuit = true;
-autoUpdater.autoDownload = true;
-autoUpdater.autoRunAppAfterInstall = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoRunAppAfterInstall = true;
+}
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 800;
@@ -70,22 +72,20 @@ interface WindowState {
 
 const windowStateKeeper = async (windowName: string) => {
   let window: BrowserWindow, windowState: WindowState;
-  const settingsKey = `windowState.${windowName}`;
+
+  const uiConfig = Metastable.instance.uiConfig;
 
   const setBounds = async () => {
-    if (await settings.has(settingsKey)) {
-      windowState = (await settings.get(settingsKey)) as any;
-      return windowState;
-    }
-
-    windowState = {
-      x: undefined,
-      y: undefined,
-      width: DEFAULT_WIDTH,
-      height: DEFAULT_HEIGHT,
-    };
-
-    return windowState;
+    const data = await uiConfig.readJson();
+    const state = data?.windowState?.[windowName];
+    return (
+      state ?? {
+        x: undefined,
+        y: undefined,
+        width: DEFAULT_WIDTH,
+        height: DEFAULT_HEIGHT,
+      }
+    );
   };
 
   let saveTimeout: any = undefined;
@@ -103,7 +103,17 @@ const windowStateKeeper = async (windowName: string) => {
   };
 
   const saveState = async () => {
-    await settings.set(settingsKey, windowState as any);
+    let data = await uiConfig.readJson();
+    if (!data) {
+      data = {};
+    }
+
+    if (!data.windowState) {
+      data.windowState = {};
+    }
+
+    data.windowState[windowName] = windowState;
+    await uiConfig.writeJson(data);
   };
 
   const track = async (win: BrowserWindow) => {
@@ -184,17 +194,6 @@ async function createWindow() {
     }
   });
 
-  async function checkForUpdates() {
-    const config = await metastable.config.get('app');
-
-    if (config?.autoUpdate) {
-      autoUpdater.checkForUpdates();
-    }
-  }
-
-  checkForUpdates();
-  setInterval(checkForUpdates, 15 * 60 * 1000);
-
   const mainWindowStateKeeper = await windowStateKeeper('main');
 
   const win = new BrowserWindow({
@@ -205,17 +204,12 @@ async function createWindow() {
     y: mainWindowStateKeeper.y,
     width: mainWindowStateKeeper.width,
     height: mainWindowStateKeeper.height,
-    resizable: true,
     titleBarStyle: 'hidden',
     frame: false,
     trafficLightPosition: { x: 16, y: 16 },
     backgroundColor: '#11111a',
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.cjs'),
-      nodeIntegration: false,
-      contextIsolation: true,
-      devTools: true,
-      webSecurity: false,
     },
   });
 
@@ -229,7 +223,7 @@ async function createWindow() {
     router,
     windows: [win],
     createContext: async () => {
-      return { metastable, win, autoUpdater, app };
+      return { metastable, win, autoUpdater: updater, app };
     },
   });
 
@@ -300,4 +294,15 @@ async function createWindow() {
       win.setProgressBar(-1);
     }
   });
+
+  async function checkForUpdates() {
+    const config = await metastable.config.get('app');
+
+    if (config?.autoUpdate) {
+      updater?.checkForUpdates();
+    }
+  }
+
+  loadAppUpdater().then(checkForUpdates);
+  setInterval(checkForUpdates, 15 * 60 * 1000);
 }

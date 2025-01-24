@@ -57,6 +57,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
   dataConfig?: JSONFile<{ dataRoot?: string }>;
   config!: Config;
+  uiConfig!: JSONFile<any>;
   python?: PythonInstance;
   comfy?: Comfy;
   setup = new Setup();
@@ -129,6 +130,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
     this._dataRoot = dataRoot;
     this.config = new Config(path.join(this.dataRoot, 'config.json'));
+    this.uiConfig = new JSONFile(path.join(this.dataRoot, 'ui.json'), {});
     this.internalPath = path.join(this.dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));

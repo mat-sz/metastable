@@ -1,7 +1,7 @@
 import path from 'path';
 
 import { ProjectImageMode } from '@metastable/types';
-import sharp, { FitEnum } from 'sharp';
+import type { FitEnum } from 'sharp';
 
 import { exists, getMetadataDirectory, tryMkdir } from './fs.js';
 
@@ -31,6 +31,7 @@ export async function generateThumbnail(filePath: string) {
       return;
     }
 
+    const { default: sharp } = await import('sharp');
     await sharp(filePath)
       .resize(250, 250, { fit: 'inside' })
       .webp()
