@@ -25,7 +25,7 @@ interface SetupItemState {
 }
 
 class SetupStore {
-  status: SetupStatus = 'required';
+  status?: SetupStatus;
   details: SetupDetails | undefined = undefined;
   selected: string | undefined = undefined;
 
@@ -35,7 +35,6 @@ class SetupStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.init();
   }
 
   async init() {

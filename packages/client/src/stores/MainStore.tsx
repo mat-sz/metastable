@@ -25,23 +25,16 @@ import { updateStore } from './UpdateStore';
 
 class MainStore {
   projects = new ProjectStore();
-  connected = false;
-  info: InstanceInfo = {
-    samplers: [],
-    schedulers: [],
-    vram: 0,
-    dataRoot: '/',
-    defaultDirectory: '/',
-    features: [],
-  };
+  info!: InstanceInfo;
   backendLog: LogItem[] = [];
 
   backendStatus: BackendStatus = 'starting';
-  infoReady = false;
 
   tasks = new TaskStore();
   config = new ConfigStore();
 
+  connected = false;
+  ready = false;
   forceExit = false;
 
   constructor() {
@@ -104,10 +97,6 @@ class MainStore {
     });
 
     this.init();
-  }
-
-  get ready() {
-    return this.infoReady && setupStore.status;
   }
 
   get deviceName() {
@@ -195,10 +184,19 @@ class MainStore {
 
   async init() {
     updateStore.refresh();
-    await this.refresh();
+    await Promise.all([
+      this.refresh(),
+      this.config.refresh(),
+      setupStore.init(),
+    ]);
+    postMessage({ payload: 'removeLoading' }, '*');
     runInAction(() => {
-      this.infoReady = true;
+      this.ready = true;
     });
+  }
+
+  get isConfigured() {
+    return this.ready && setupStore.status === 'done';
   }
 
   async refresh() {

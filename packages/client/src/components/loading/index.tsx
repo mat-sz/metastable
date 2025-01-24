@@ -11,9 +11,6 @@ export const Loading: React.FC<LoadingProps> = ({ className }) => {
   return (
     <div className={clsx(styles.loading, className)}>
       <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
     </div>
   );
 };

@@ -8,14 +8,7 @@
   }
 
   .loading {
-    position: absolute;
     inset: -1rem;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    background: var(--grey-300-transparent);
   }
 }
 

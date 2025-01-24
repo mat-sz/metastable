@@ -25,8 +25,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>,
 );
 
-postMessage({ payload: 'removeLoading' }, '*');
-
 // Prevent zoom.
 document.addEventListener(
   'touchmove',

@@ -47,9 +47,9 @@ function loading() {
   --c:no-repeat repeating-linear-gradient(90deg,#77f 0 calc(100%/7),#77f0 0 calc(200%/7));
   background: var(--c),var(--c),var(--c),var(--c);
   background-size: 140% 26%;
-  animation: l26 .75s infinite linear;
+  animation: ${className} .75s infinite linear;
 }
-@keyframes l26 {
+@keyframes ${className} {
  0%,
  5%   {background-position:0    calc(0*100%/3),0    calc(1*100%/3),0    calc(2*100%/3),0    calc(3*100%/3)}
  20%  {background-position:50%  calc(0*100%/3),0    calc(1*100%/3),0    calc(2*100%/3),0    calc(3*100%/3)}
@@ -87,8 +87,17 @@ function loading() {
       safeDOM.append(document.body, oDiv);
     },
     removeLoading() {
-      safeDOM.remove(document.head, oStyle);
-      safeDOM.remove(document.body, oDiv);
+      oDiv.style.pointerEvents = 'none';
+      oDiv
+        .animate([{}, { opacity: 0 }], {
+          duration: 200,
+          delay: 0,
+          fill: 'forwards',
+        })
+        .addEventListener('finish', () => {
+          safeDOM.remove(document.head, oStyle);
+          safeDOM.remove(document.body, oDiv);
+        });
     },
   };
 }

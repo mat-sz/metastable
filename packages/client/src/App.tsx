@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { UIWrapper } from '$components/ui';
-import { mainStore } from '$stores/MainStore';
 import { setupStore } from '$stores/SetupStore';
 import { uiStore } from '$stores/UIStore';
 import './index.scss';
@@ -14,6 +13,10 @@ import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 
 const View: React.FC = observer(() => {
+  if (setupStore?.status !== 'done') {
+    return <Setup />;
+  }
+
   switch (uiStore.view) {
     case 'project':
       return <Project />;
@@ -26,26 +29,12 @@ const View: React.FC = observer(() => {
   }
 });
 
-export const App: React.FC = observer(() => {
-  if (!mainStore.ready) {
-    return <div className="app">Loading...</div>;
-  }
-
-  if (setupStore?.status !== 'done') {
-    return (
-      <UIWrapper>
-        <Main>
-          <Setup />
-        </Main>
-      </UIWrapper>
-    );
-  }
-
+export const App: React.FC = () => {
   return (
     <UIWrapper>
-      <Main isReady>
+      <Main>
         <View />
       </Main>
     </UIWrapper>
   );
-});
+};

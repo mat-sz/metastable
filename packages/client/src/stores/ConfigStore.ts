@@ -8,7 +8,6 @@ export class ConfigStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.refresh();
   }
 
   private _autosaveTimeout: number | undefined = undefined;

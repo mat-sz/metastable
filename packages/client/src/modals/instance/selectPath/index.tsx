@@ -12,7 +12,7 @@ import { TRPC } from '$api';
 import { Alert } from '$components/alert';
 import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
-import { Loading } from '$components/loading';
+import { LoadingOverlay } from '$components/loadingOverlay';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
@@ -43,11 +43,7 @@ export const InstanceSelectPath: React.FC<Props> = ({
   return (
     <Modal title="Choose path" size="small">
       <div className={styles.picker}>
-        {isLoading && (
-          <div className={styles.loading}>
-            <Loading />
-          </div>
-        )}
+        {isLoading && <LoadingOverlay className={styles.loading} />}
         <div className={styles.current}>
           {!!data && (
             <>
