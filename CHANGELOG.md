@@ -6,6 +6,7 @@
 - Added support for APNG outputs.
 - Added an option to change the installation directory during setup.
 - Added support for GGUF model files. (Requires the "GGUF" optional feature to be installed.)
+- Added an option to change the default prompt.
 
 ## Improvements
 

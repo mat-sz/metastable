@@ -13,6 +13,10 @@ const CONFIG_DEFAULTS: ConfigType = {
     preview: true,
     imageMetadata: true,
     memoryWarnings: true,
+    defaultPrompt: {
+      positive: 'an image of a banana',
+      negative: 'bad quality',
+    },
   },
   ui: {
     fuzzySearch: true,

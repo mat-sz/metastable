@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { TabPanel } from '$components/tabs';
-import { VarCategory, VarToggle } from '$components/var';
+import { VarCategoryScope, VarPrompt, VarToggle } from '$components/var';
 import { uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
 
@@ -10,11 +10,11 @@ export const SettingsGeneral: React.FC = observer(() => {
   return (
     <TabPanel id="general">
       <h2>General</h2>
-      <VarCategory label="User interface">
-        <VarToggle path="ui.fuzzySearch" label="Use fuzzy search" />
+      <VarCategoryScope path="ui" label="User interface">
+        <VarToggle path="fuzzySearch" label="Use fuzzy search" />
         {uiStore.notificationPermission !== 'denied' ? (
           <VarToggle
-            path="ui.notifications"
+            path="notifications"
             label="Enable notifications"
             onChange={value => {
               if (value) {
@@ -33,18 +33,25 @@ export const SettingsGeneral: React.FC = observer(() => {
             </div>
           </>
         )}
-      </VarCategory>
-      <VarCategory label="Generation">
-        <VarToggle path="generation.preview" label="Enable previews" />
+      </VarCategoryScope>
+      <VarCategoryScope path="generation" label="Generation">
+        <VarToggle path="preview" label="Enable previews" />
         <VarToggle
-          path="generation.imageMetadata"
+          path="imageMetadata"
           label="Store metadata in output image files"
         />
-        <VarToggle
-          path="generation.memoryWarnings"
-          label="Enable memory warnings"
+        <VarToggle path="memoryWarnings" label="Enable memory warnings" />
+        <VarPrompt
+          className={styles.prompt}
+          path="defaultPrompt.positive"
+          label="Default positive prompt"
         />
-      </VarCategory>
+        <VarPrompt
+          className={styles.prompt}
+          path="defaultPrompt.negative"
+          label="Default negative prompt"
+        />
+      </VarCategoryScope>
     </TabPanel>
   );
 });

@@ -73,6 +73,10 @@ export interface ConfigType {
     preview?: boolean;
     imageMetadata?: boolean;
     memoryWarnings?: boolean;
+    defaultPrompt?: {
+      positive?: string;
+      negative?: string;
+    };
   };
   app?: {
     autoUpdate?: boolean;

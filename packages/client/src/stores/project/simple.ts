@@ -170,6 +170,8 @@ export function convertSettings(
 
 export function defaultSettings(): ProjectSimpleSettings {
   const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
+  const generationSettings = mainStore.config.data?.generation || {};
+  const { defaultPrompt } = generationSettings;
 
   return {
     version: 1,
@@ -188,8 +190,8 @@ export function defaultSettings(): ProjectSimpleSettings {
       checkpoint: checkpoint?.mrn,
     },
     prompt: {
-      positive: 'an image of a banana',
-      negative: 'bad quality',
+      positive: defaultPrompt?.positive || '',
+      negative: defaultPrompt?.negative || '',
     },
     sampler: {
       quality: 'medium',
