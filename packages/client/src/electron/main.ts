@@ -206,7 +206,7 @@ async function createWindow() {
     height: mainWindowStateKeeper.height,
     titleBarStyle: 'hidden',
     frame: false,
-    trafficLightPosition: { x: 16, y: 16 },
+    trafficLightPosition: { x: 16, y: 18 },
     backgroundColor: '#11111a',
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.cjs'),
