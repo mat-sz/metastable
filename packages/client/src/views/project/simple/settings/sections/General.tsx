@@ -307,7 +307,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           isRandomizedPath="client.randomizeSeed"
         />
         <VarSlider
-          label="CFG"
+          label="Guidance"
           path="sampler.cfg"
           min={0}
           max={30}
