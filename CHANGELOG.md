@@ -8,6 +8,7 @@
 - Added support for GGUF model files. (Requires the "GGUF" optional feature to be installed.)
 - Added an option to change the default prompt.
 - Added an option to use light theme.
+- Added an option to always run VAE on CPU.
 
 ## Improvements
 

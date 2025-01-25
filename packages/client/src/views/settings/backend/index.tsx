@@ -2,7 +2,14 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { TabPanel } from '$components/tabs';
-import { VarCategory, VarSlider, VarString, VarSwitch } from '$components/var';
+import {
+  VarCategory,
+  VarCategoryScope,
+  VarSlider,
+  VarString,
+  VarSwitch,
+  VarToggle,
+} from '$components/var';
 import { mainStore } from '$stores/MainStore';
 import { Compatibility } from './compatibility';
 import { General } from './general';
@@ -19,10 +26,10 @@ export const SettingsBackend: React.FC = observer(() => {
   return (
     <TabPanel id="backend">
       <h2>Backend</h2>
-      <VarCategory label="Arguments">
+      <VarCategoryScope path="comfy" label="Arguments">
         <VarSwitch
           label="VRAM usage"
-          path="comfy.vramMode"
+          path="vramMode"
           defaultValue="auto"
           options={[
             { key: 'auto', label: 'Automatic' },
@@ -36,7 +43,7 @@ export const SettingsBackend: React.FC = observer(() => {
         />
         <VarSlider
           label="Reserve VRAM"
-          path="comfy.reserveVram"
+          path="reserveVram"
           defaultValue={0}
           min={0}
           max={vram}
@@ -44,12 +51,9 @@ export const SettingsBackend: React.FC = observer(() => {
           unit="GB"
           showInput
         />
-        <VarString
-          label="Extra arguments"
-          path="comfy.extraArgs"
-          defaultValue=""
-        />
-      </VarCategory>
+        <VarToggle label="Run VAE on CPU" path="cpuVae" defaultValue={false} />
+        <VarString label="Extra arguments" path="extraArgs" defaultValue="" />
+      </VarCategoryScope>
       <VarCategory label="Status">
         <General />
       </VarCategory>

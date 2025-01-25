@@ -61,6 +61,7 @@ export interface ConfigType {
     reserveVram?: number;
     extraArgs?: string;
     env?: Record<string, string>;
+    cpuVae?: boolean;
   };
   downloader: {
     apiKeys: Record<string, string>;
