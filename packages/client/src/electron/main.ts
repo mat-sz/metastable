@@ -216,7 +216,7 @@ async function createWindow() {
     titleBarStyle: 'hidden',
     frame: false,
     trafficLightPosition: { x: 16, y: 18 },
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#11111a' : '#ffffff',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0f0f17' : '#ffffff',
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.cjs'),
     },

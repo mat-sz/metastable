@@ -24,7 +24,7 @@ export class ProjectStore {
   }
 
   get draft() {
-    return this.projects.filter(project => project.draft);
+    return this.projects.filter(project => project.draft && project.changed);
   }
 
   get current() {

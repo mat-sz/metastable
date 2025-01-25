@@ -15,6 +15,7 @@
 - Improved word wrapping in prompt fields.
 - Added the new file picker to path fields in settings.
 - In CivitAI downloader, model rating was replaced by thumbs up/down count.
+- The "Draft project" dialog is now only shown if the project has been changed.
 
 ## Bug fixes
 

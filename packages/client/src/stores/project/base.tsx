@@ -32,6 +32,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   ui: TUI;
   filesSubscription;
   uploadQueue: Record<ProjectFileType, UploadQueueStore>;
+  changed = false;
 
   constructor(data: APIProject) {
     this.settings = data.settings;
@@ -60,7 +61,9 @@ export class BaseProject<TSettings = any, TUI = any> {
       type: observable,
       draft: observable,
       settings: observable,
+      setSettings: action,
       ui: observable,
+      changed: observable,
       save: action,
       tasks: computed,
       firstTask: computed,
@@ -173,8 +176,13 @@ export class BaseProject<TSettings = any, TUI = any> {
     mainStore.projects.refresh();
   }
 
+  setSettings(settings: TSettings) {
+    this.changed = true;
+    this.settings = settings;
+  }
+
   async close(force = false) {
-    if (!force && this.draft) {
+    if (!force && this.draft && this.changed) {
       modalStore.show(<ProjectDraft project={this} />);
       return;
     }
@@ -214,6 +222,8 @@ export class BaseProject<TSettings = any, TUI = any> {
       runInAction(() => {
         this.id = json.id;
         this.name = json.name;
+        this.changed = false;
+
         if (mainStore.projects.currentId === id && id !== json.id) {
           mainStore.projects.select(json.id);
         }

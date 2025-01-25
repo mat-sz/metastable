@@ -69,7 +69,7 @@ function loading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #11111a;
+  background: #0f0f17;
   z-index: 9;
 }
 

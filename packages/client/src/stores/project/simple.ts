@@ -242,7 +242,6 @@ export class SimpleProject extends BaseProject<
     makeObservable(this, {
       editor: observable,
       request: action,
-      setSettings: action,
       onTaskDone: action,
       stepTime: observable,
       currentTask: observable,
@@ -316,7 +315,7 @@ export class SimpleProject extends BaseProject<
       }
     }
 
-    this.settings = settings;
+    super.setSettings(settings);
 
     if (previousOutputType !== this.outputType) {
       if (this.outputType === ModelOutputType.VIDEO) {
