@@ -559,6 +559,8 @@ export class SimpleProject extends BaseProject<
   }
 
   beforeRequest() {
+    this.changed = true;
+
     if (this.settings.client.randomizeSeed) {
       this.settings.sampler.seed = randomSeed();
     }
