@@ -41,6 +41,8 @@ export interface CivitAIModelVersion {
     downloadCount: number;
     ratingCount: number;
     rating: number;
+    thumbsUpCount: number;
+    thumbsDownCount: number;
   };
 }
 
@@ -71,6 +73,8 @@ export interface CivitAIModel {
     favoriteCount: number;
     commentCount: number;
     ratingCount: number;
+    thumbsUpCount: number;
+    thumbsDownCount: number;
     rating: number;
   };
   modelVersions: CivitAIModelVersion[];

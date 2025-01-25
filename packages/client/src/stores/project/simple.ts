@@ -170,8 +170,8 @@ export function convertSettings(
 
 export function defaultSettings(): ProjectSimpleSettings {
   const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
-  const generationSettings = mainStore.config.data?.generation || {};
-  const { defaultPrompt } = generationSettings;
+  const generationSettings = mainStore.config.data?.generation;
+  const { defaultPrompt } = generationSettings ?? {};
 
   return {
     version: 1,

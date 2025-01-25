@@ -11,7 +11,6 @@ import { LogSimple } from '$components/log';
 import { ProgressBar } from '$components/progressBar';
 import { ProgressButton } from '$components/progressButton';
 import { ProgressCircle } from '$components/progressCircle';
-import { Rating } from '$components/rating';
 import { Search } from '$components/search';
 import { Switch, SwitchOption } from '$components/switch';
 import { TabPanel } from '$components/tabs';
@@ -86,15 +85,6 @@ export const SettingsComponents: React.FC = () => {
         <ProgressCircle value={10} max={20} />
         <ProgressCircle value={0} max={20} />
         <ProgressCircle value={20} max={20} />
-      </div>
-      <div>
-        <h3>Rating</h3>
-        <div>
-          <Rating value={4} />
-        </div>
-        <div>
-          <Rating value={4} small />
-        </div>
       </div>
       <div>
         <h3>Search</h3>

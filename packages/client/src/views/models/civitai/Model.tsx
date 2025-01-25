@@ -3,12 +3,12 @@ import {
   BsArrowLeft,
   BsArrowUpRightSquare,
   BsDownload,
-  BsHeartFill,
+  BsHandThumbsDownFill,
+  BsHandThumbsUpFill,
 } from 'react-icons/bs';
 
 import { Carousel } from '$components/carousel';
 import { IconButton } from '$components/iconButton';
-import { Rating } from '$components/rating';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import styles from './Model.module.scss';
 import { CivitAIModel, CivitAIModelVersion, CivitAITypeMap } from './types';
@@ -64,11 +64,10 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
             <div>Base model: {version.baseModel}</div>
             <div>Downloads: {version.stats.downloadCount}</div>
             <div>
-              Rating: {version.stats.rating} out of 5 (
-              {version.stats.ratingCount} ratings)
+              Votes: +{version.stats.thumbsUpCount}/-
+              {version.stats.thumbsDownCount}
             </div>
           </div>
-          <Rating value={version.stats.rating} />
         </div>
       </div>
       <Carousel>
@@ -102,18 +101,20 @@ export const Model: React.FC<ModelProps> = ({ model, onClose }) => {
         </IconButton>
       </div>
       <div className={styles.stats}>
-        <div>{model.type}</div>
         <div>
-          <Rating value={model.stats.rating} />
-          <span>({model.stats.ratingCount})</span>
+          <span>{model.type}</span>
+        </div>
+        <div>
+          <BsHandThumbsUpFill />
+          <span>{model.stats.thumbsUpCount}</span>
+        </div>
+        <div>
+          <BsHandThumbsDownFill />
+          <span>{model.stats.thumbsDownCount}</span>
         </div>
         <div>
           <BsDownload />
-          <span>({model.stats.downloadCount})</span>
-        </div>
-        <div>
-          <BsHeartFill />
-          <span>({model.stats.favoriteCount})</span>
+          <span>{model.stats.downloadCount}</span>
         </div>
       </div>
       <TabView defaultTab={0}>

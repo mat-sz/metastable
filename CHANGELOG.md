@@ -14,6 +14,7 @@
 - Moved bundles to a faster CDN to improve installation speed.
 - Improved word wrapping in prompt fields.
 - Added the new file picker to path fields in settings.
+- In CivitAI downloader, model rating was replaced by thumbs up/down count.
 
 ## Bug fixes
 

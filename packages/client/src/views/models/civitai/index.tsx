@@ -2,14 +2,18 @@ import { useQuery } from '@tanstack/react-query';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import { BsDownload, BsHeartFill, BsSearch } from 'react-icons/bs';
+import {
+  BsDownload,
+  BsHandThumbsDownFill,
+  BsHandThumbsUpFill,
+  BsSearch,
+} from 'react-icons/bs';
 import { MdNoPhotography } from 'react-icons/md';
 
 import { IconButton } from '$components/iconButton';
 import { Label } from '$components/label';
 import { Card, CardTag, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
-import { Rating } from '$components/rating';
 import { Toggle } from '$components/toggle';
 import { CivitAIArgs, uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
@@ -102,6 +106,7 @@ export const CivitAI: React.FC = observer(() => {
       args.cursor,
       args.nsfw,
       args.baseModels,
+      args.sort,
     ],
     queryFn: () => fetchCivitAI(args),
   });
@@ -230,18 +235,14 @@ export const CivitAI: React.FC = observer(() => {
                     icon={<MdNoPhotography />}
                   >
                     <CardTags>
-                      <CardTag
-                        icon={<Rating value={item.stats.rating} small />}
-                      >
-                        ({item.stats.ratingCount})
+                      <CardTag icon={<BsHandThumbsUpFill />}>
+                        {item.stats.thumbsUpCount}
                       </CardTag>
-                    </CardTags>
-                    <CardTags>
+                      <CardTag icon={<BsHandThumbsDownFill />}>
+                        {item.stats.thumbsDownCount}
+                      </CardTag>
                       <CardTag icon={<BsDownload />}>
-                        ({item.stats.downloadCount})
-                      </CardTag>
-                      <CardTag icon={<BsHeartFill />}>
-                        ({item.stats.favoriteCount})
+                        {item.stats.downloadCount}
                       </CardTag>
                     </CardTags>
                   </Card>
