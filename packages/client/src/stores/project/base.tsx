@@ -182,8 +182,12 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   async close(force = false) {
-    if (!force && this.draft && this.changed) {
-      modalStore.show(<ProjectDraft project={this} />);
+    if (!force && this.draft) {
+      if (this.changed) {
+        modalStore.show(<ProjectDraft project={this} />);
+      } else {
+        this.delete();
+      }
       return;
     }
 
@@ -222,7 +226,6 @@ export class BaseProject<TSettings = any, TUI = any> {
       runInAction(() => {
         this.id = json.id;
         this.name = json.name;
-        this.changed = false;
 
         if (mainStore.projects.currentId === id && id !== json.id) {
           mainStore.projects.select(json.id);

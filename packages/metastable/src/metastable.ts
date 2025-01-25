@@ -120,13 +120,13 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }
 
     if (this.project) {
-      await this.project.cleanup();
       this.project.removeAllListeners();
+      await this.project.cleanup();
     }
 
     if (this.model) {
-      await this.model.cleanup();
       this.model.removeAllListeners();
+      await this.model.cleanup();
     }
 
     this.config?.removeAllListeners();
@@ -138,6 +138,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
     this.infoUpdated();
+    await this.project.deleteDrafts();
 
     this.project.on('fileChange', (id, type) =>
       this.emit('project.fileChange', id, type),

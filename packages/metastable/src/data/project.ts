@@ -187,7 +187,11 @@ export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
   }
 
   async cleanup() {
+    await this.deleteDrafts();
     await this.watcher?.close();
+  }
+
+  async deleteDrafts() {
     const projects = await this.refresh();
     for (const project of projects) {
       try {
