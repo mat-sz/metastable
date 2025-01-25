@@ -97,6 +97,11 @@ export const SettingsComponents: React.FC = () => {
           <SwitchOption value="test2">test 2</SwitchOption>
           <SwitchOption value="test3">test 3</SwitchOption>
         </Switch>
+        <Switch value="test1" onChange={() => {}} variant="small">
+          <SwitchOption value="test1">test 1</SwitchOption>
+          <SwitchOption value="test2">test 2</SwitchOption>
+          <SwitchOption value="test3">test 3</SwitchOption>
+        </Switch>
       </div>
       <div>
         <h3>Toggle</h3>

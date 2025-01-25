@@ -7,7 +7,6 @@
   font-size: 0;
   margin: 1rem 0;
   background: var(--grey-300);
-  border: 1px solid var(--grey-400);
   border-radius: 5px;
   --icon-size: 1rem;
 
@@ -52,17 +51,13 @@
 
 .alerts {
   margin: 1rem 0;
-  border: 1px solid var(--grey-400);
-  border-radius: 5px;
-  overflow: hidden;
 
   & > div {
     margin: 0;
     border: none;
-    border-radius: 0;
 
     &:not(:last-child) {
-      border-bottom: 1px solid var(--grey-400);
+      margin-bottom: 1px;
     }
   }
 }

@@ -1,24 +1,20 @@
 .switch {
   display: flex;
   align-items: stretch;
-  background: var(--grey-400);
-  border: 1px solid var(--grey-600);
+  background: var(--grey-300);
   border-radius: 5px;
   overflow: hidden;
-  padding: 0.25rem;
+  padding: 0;
 
   .option {
     background: none;
     border: none;
     border-radius: 5px;
     padding: 0.5rem 1rem;
+    color: var(--grey-800);
 
     &:not(:last-child) {
       margin-right: 0.2rem;
-    }
-
-    &.active {
-      background: var(--grey-600);
     }
 
     &.details {
@@ -42,8 +38,19 @@
 
       .description {
         font-weight: 400;
-        color: var(--grey-800);
+        color: var(--grey-700);
         font-size: 0.7rem;
+        transition: 0.2s ease-in-out;
+      }
+    }
+
+    &.active,
+    &:hover {
+      background: var(--grey-500);
+      color: var(--grey-900);
+
+      .description {
+        color: var(--grey-800);
       }
     }
   }
@@ -52,7 +59,7 @@
     border: none;
 
     .option {
-      padding: 0.25rem 0.5rem;
+      padding: 0.4rem 0.75rem;
     }
   }
 }

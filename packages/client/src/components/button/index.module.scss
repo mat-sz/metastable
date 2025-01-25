@@ -4,11 +4,10 @@
   justify-content: center;
   background-color: var(--grey-400);
   color: var(--grey-900);
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.2rem;
   font-size: 0.8rem;
-  border-radius: 5px;
+  border-radius: 3px;
   transition: 0.2s ease-in-out all;
-  border: 1px solid var(--grey-600);
   font-weight: 600;
   text-shadow: none;
   text-decoration: none;
@@ -22,7 +21,6 @@
     cursor: not-allowed;
     opacity: 0.5;
     background-color: var(--grey-600) !important;
-    border: 1px solid var(--grey-700) !important;
     color: var(--grey-900) !important;
 
     &:hover {
@@ -36,7 +34,6 @@
 
   &.danger {
     background: var(--red-700);
-    border: 1px solid var(--red-800);
     color: white;
 
     &:hover {
@@ -46,7 +43,6 @@
 
   &.primary {
     background: var(--accent-800);
-    border: 1px solid var(--accent-900);
     color: white;
 
     &:hover {

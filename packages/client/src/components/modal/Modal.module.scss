@@ -47,7 +47,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--grey-200);
   margin-top: 1rem;
   padding: 0 1rem;
   padding-bottom: 0;
@@ -90,5 +89,15 @@
 
   & > * {
     margin-left: 0.5rem;
+  }
+}
+
+[data-theme='light'] {
+  .modal {
+    background: var(--grey-100);
+  }
+
+  .actions {
+    background: var(--grey-200);
   }
 }

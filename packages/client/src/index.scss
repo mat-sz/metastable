@@ -26,13 +26,13 @@
 
 :root {
   --grey-050: #0a0a0f;
-  --grey-100: #11111a;
+  --grey-100: #0f0f17;
   --grey-200: #17171f;
   --grey-200-transparent: #17171fdd;
   --grey-300: #22222a;
   --grey-300-transparent: #22222add;
   --grey-400: #2b2b35;
-  --grey-500: #35353b;
+  --grey-500: #363641;
   --grey-600: #454556;
   --grey-700: #575760;
   --grey-800: #aaa;
@@ -72,15 +72,15 @@
 [data-theme='light'] {
   --grey-050: #ffffff;
   --grey-100: #ffffff;
-  --grey-200: #f1f1f1;
-  --grey-200-transparent: #f1f1f1dd;
+  --grey-200: #f6f6f6;
+  --grey-200-transparent: #f6f6f6dd;
   --grey-300: #eaeaea;
   --grey-300-transparent: #eaeaeadd;
   --grey-400: #e0e0e0;
   --grey-500: #d9d9d9;
   --grey-600: #d3d3d3;
-  --grey-700: #9e9e9e;
-  --grey-800: #303030;
+  --grey-700: #585858;
+  --grey-800: #424242;
   --grey-900: #1f1f1f;
 
   --accent-500: #5151ff;
@@ -260,11 +260,11 @@ button {
   justify-content: center;
   background-color: var(--grey-400);
   color: var(--grey-900);
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.2rem;
   font-size: 0.8rem;
-  border-radius: 5px;
+  border-radius: 3px;
   transition: 0.2s ease-in-out all;
-  border: 1px solid var(--grey-600);
+  border: none;
   font-weight: 600;
   text-shadow: none;
 
