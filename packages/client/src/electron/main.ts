@@ -8,6 +8,7 @@ import {
   app,
   BrowserWindow,
   Menu,
+  nativeTheme,
   net,
   protocol,
   shell,
@@ -184,6 +185,14 @@ async function createWindow() {
     version: __APP_VERSION__,
   });
 
+  async function updateTheme() {
+    const { theme } = await metastable.config.get('ui');
+    nativeTheme.themeSource = theme;
+  }
+
+  await updateTheme();
+  metastable.on('config.change', updateTheme);
+
   let flagQuit = false;
   app.on('before-quit', async e => {
     if (!flagQuit) {
@@ -207,7 +216,7 @@ async function createWindow() {
     titleBarStyle: 'hidden',
     frame: false,
     trafficLightPosition: { x: 16, y: 18 },
-    backgroundColor: '#11111a',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#11111a' : '#ffffff',
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.cjs'),
     },
@@ -257,8 +266,6 @@ async function createWindow() {
   } else {
     win.loadFile(path.join(process.env.DIST!, 'index.html'));
   }
-
-  win.setBackgroundColor('#11111a');
 
   win.webContents.setWindowOpenHandler(details => {
     if (details.url?.startsWith('http')) {

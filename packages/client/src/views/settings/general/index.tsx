@@ -2,7 +2,12 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { TabPanel } from '$components/tabs';
-import { VarCategoryScope, VarPrompt, VarToggle } from '$components/var';
+import {
+  VarCategoryScope,
+  VarPrompt,
+  VarSwitch,
+  VarToggle,
+} from '$components/var';
 import { uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
 
@@ -11,6 +16,16 @@ export const SettingsGeneral: React.FC = observer(() => {
     <TabPanel id="general">
       <h2>General</h2>
       <VarCategoryScope path="ui" label="User interface">
+        <VarSwitch
+          path="theme"
+          label="Theme"
+          options={[
+            { key: 'dark', label: 'Dark' },
+            { key: 'light', label: 'Light' },
+            { key: 'system', label: 'System' },
+          ]}
+          inline
+        />
         <VarToggle path="fuzzySearch" label="Use fuzzy search" />
         {uiStore.notificationPermission !== 'denied' ? (
           <VarToggle

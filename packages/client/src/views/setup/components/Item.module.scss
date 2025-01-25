@@ -1,5 +1,5 @@
 .item {
-  background: var(--grey-300);
+  background: var(--grey-200);
   border-bottom: 1px solid var(--grey-100);
   transition: 0.2s ease-in-out all;
   height: 5.5rem;
@@ -17,12 +17,16 @@
   }
 
   &.darken {
+    opacity: 0.5;
+  }
+
+  &.darken:hover {
     opacity: 0.75;
   }
 
   &:hover,
   &.open {
-    background: var(--grey-400);
+    background: var(--grey-300);
   }
 
   .body {
@@ -73,14 +77,14 @@
   .icon {
     width: 2.5rem;
     height: 2.5rem;
-    background: var(--grey-200);
+    background: var(--grey-100);
   }
 
   .status {
     width: 2rem;
     height: 2rem;
     font-size: 1.2rem;
-    color: white;
+    color: var(--grey-900);
 
     &.ok {
       color: var(--green-100);

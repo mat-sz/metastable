@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { useContextMenu } from 'use-context-menu';
 
+import { ThumbnailDisplay } from '$components/thumbnailDisplay';
 import styles from './index.module.scss';
 
 interface CardProps {
@@ -42,26 +43,14 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
         }
       }}
     >
-      {imageUrl ? (
-        <div className={styles.image}>
-          {isVideo ? (
-            <video
-              crossOrigin="anonymous"
-              src={imageUrl}
-              autoPlay
-              muted
-              playsInline
-              loop
-            />
-          ) : (
-            <img crossOrigin="anonymous" src={imageUrl} />
-          )}
-        </div>
-      ) : (
-        <div className={styles.icon}>
-          <div style={{ backgroundColor: color }}>{!imageUrl && icon}</div>
-        </div>
-      )}
+      <ThumbnailDisplay
+        className={styles.thumbnail}
+        imageClassName={styles.image}
+        color={color}
+        icon={icon}
+        imageUrl={imageUrl}
+        isVideo={isVideo}
+      />
       <div className={styles.details}>
         <div className={styles.info}>{children}</div>
         <div className={styles.name}>{name}</div>

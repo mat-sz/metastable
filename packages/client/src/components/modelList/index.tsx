@@ -55,7 +55,7 @@ export const ModelList: React.FC<Props> = ({
         <div key={i} className={styles.group}>
           <div className={styles.header} onClick={() => setOpenGroup(i)}>
             <div className={styles.info}>
-              {group.recommended && <BsStarFill />}
+              {!isSetup && group.recommended && <BsStarFill />}
               <div className={styles.title}>{group.name}</div>
               <div className={styles.type}>{t(`model:type.${group.type}`)}</div>
             </div>
@@ -70,7 +70,7 @@ export const ModelList: React.FC<Props> = ({
                   {beforeModel?.(model)}
                   <div className={styles.modelInfo}>
                     <div className={styles.modelName}>
-                      {model.recommended && <BsStarFill />}
+                      {!isSetup && model.recommended && <BsStarFill />}
                       <span>{model.name}</span>
                       <div className={styles.type}>
                         {t(`model:type.${group.type}`)}

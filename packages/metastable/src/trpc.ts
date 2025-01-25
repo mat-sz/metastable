@@ -236,6 +236,17 @@ export const router = t.router({
           }
           return await metastable.config.all();
         }),
+      onChange: t.procedure.subscription(async function* ({
+        signal,
+        ctx: { metastable },
+      }) {
+        const iter = on(metastable, 'config.change', { signal });
+
+        while (true) {
+          await iter.next();
+          yield;
+        }
+      }),
     },
     validateModelPath: t.procedure.input(string()).query(async ({ input }) => {
       if (!(await exists(input))) {

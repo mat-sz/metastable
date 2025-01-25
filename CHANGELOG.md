@@ -7,6 +7,7 @@
 - Added an option to change the installation directory during setup.
 - Added support for GGUF model files. (Requires the "GGUF" optional feature to be installed.)
 - Added an option to change the default prompt.
+- Added an option to use light theme.
 
 ## Improvements
 

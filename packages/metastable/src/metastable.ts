@@ -41,6 +41,7 @@ interface MetastableEvents {
   infoUpdate: [];
   'project.fileChange': [id: string, type: ProjectFileType];
   'model.change': [];
+  'config.change': [];
 }
 
 export interface MetastableInstanceConfig {
@@ -128,6 +129,8 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       this.model.removeAllListeners();
     }
 
+    this.config?.removeAllListeners();
+
     this._dataRoot = dataRoot;
     this.config = new Config(path.join(this.dataRoot, 'config.json'));
     this.uiConfig = new JSONFile(path.join(this.dataRoot, 'ui.json'), {});
@@ -140,6 +143,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       this.emit('project.fileChange', id, type),
     );
     this.model.on('change', () => this.emit('model.change'));
+    this.config.on('change', () => this.emit('config.change'));
 
     await mkdir(this.internalPath, { recursive: true });
     await this.reload();
@@ -404,14 +408,13 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       return;
     }
 
-    const config = await this.config.get('downloader');
-    const apiKeys = config?.apiKeys || {};
-    const strategy = getAuthorizationStrategy(url.hostname);
+    const { apiKeys } = await this.config.get('downloader');
+    const result = getAuthorizationStrategy(url.hostname);
     const headers: Record<string, string> = {};
 
-    switch (strategy?.strategy) {
+    switch (result?.strategy) {
       case 'bearer': {
-        const apiKey = apiKeys[strategy.id]?.trim();
+        const apiKey = apiKeys[result.id]?.trim();
         if (apiKey) {
           headers['Authorization'] = `Bearer ${apiKey}`;
         }

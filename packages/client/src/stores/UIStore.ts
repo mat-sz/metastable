@@ -30,8 +30,16 @@ class UIStore {
     nsfw: false,
   };
 
+  systemTheme: 'dark' | 'light';
+
   constructor() {
     makeAutoObservable(this);
+
+    const themeMatch = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemTheme = themeMatch.matches ? 'dark' : 'light';
+    themeMatch.addEventListener('change', e => {
+      this.systemTheme = e.matches ? 'dark' : 'light';
+    });
 
     if (IS_ELECTRON) {
       API.electron.window.onResize.subscribe(undefined, {

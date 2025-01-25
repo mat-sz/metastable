@@ -1,3 +1,5 @@
+import EventEmitter from 'events';
+
 import { ConfigType } from '@metastable/types';
 import { assign } from 'radash';
 
@@ -21,6 +23,7 @@ const CONFIG_DEFAULTS: ConfigType = {
   ui: {
     fuzzySearch: true,
     notifications: false,
+    theme: 'dark',
   },
   app: {
     autoUpdate: true,
@@ -33,10 +36,15 @@ const CONFIG_DEFAULTS: ConfigType = {
   modelFolders: {},
 };
 
-export class Config {
+type ConfigEvents = {
+  change: [];
+};
+
+export class Config extends EventEmitter<ConfigEvents> {
   private configFile;
 
   constructor(configPath: string) {
+    super();
     this.configFile = new JSONFile<Partial<ConfigType>>(
       configPath,
       CONFIG_DEFAULTS,
@@ -70,6 +78,7 @@ export class Config {
   }
 
   async store(config: Partial<ConfigType>): Promise<void> {
+    this.emit('change');
     await this.configFile.writeJson({ ...config });
   }
 

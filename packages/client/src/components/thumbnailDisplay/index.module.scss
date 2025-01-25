@@ -1,0 +1,34 @@
+.noImage {
+  position: relative;
+
+  & > * {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.noImage,
+.image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: var(--grey-800);
+  overflow: hidden;
+  border-radius: 5px;
+  height: 100%;
+}
+
+.image > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

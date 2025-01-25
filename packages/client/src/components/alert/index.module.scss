@@ -34,10 +34,27 @@
   }
 }
 
+[data-theme='light'] {
+  .alert {
+    &.error {
+      background: var(--red-100);
+    }
+
+    &.warning {
+      background: var(--yellow-100);
+    }
+
+    &.ok {
+      background: var(--green-100);
+    }
+  }
+}
+
 .alerts {
   margin: 1rem 0;
   border: 1px solid var(--grey-400);
   border-radius: 5px;
+  overflow: hidden;
 
   & > div {
     margin: 0;

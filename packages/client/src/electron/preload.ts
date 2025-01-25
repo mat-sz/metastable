@@ -72,6 +72,12 @@ function loading() {
   background: #11111a;
   z-index: 9;
 }
+
+@media (prefers-color-scheme: light) {
+  .app-loading-wrap {
+    background: #ffffff;
+  }
+}
     `;
   const oStyle = document.createElement('style');
   const oDiv = document.createElement('div');

@@ -62,28 +62,29 @@ export interface ConfigType {
     extraArgs?: string;
     env?: Record<string, string>;
   };
-  downloader?: {
-    apiKeys?: Record<string, string>;
+  downloader: {
+    apiKeys: Record<string, string>;
   };
-  ui?: {
-    fuzzySearch?: boolean;
-    notifications?: boolean;
+  ui: {
+    fuzzySearch: boolean;
+    notifications: boolean;
+    theme: 'dark' | 'light' | 'system';
   };
-  generation?: {
-    preview?: boolean;
-    imageMetadata?: boolean;
-    memoryWarnings?: boolean;
-    defaultPrompt?: {
-      positive?: string;
-      negative?: string;
+  generation: {
+    preview: boolean;
+    imageMetadata: boolean;
+    memoryWarnings: boolean;
+    defaultPrompt: {
+      positive: string;
+      negative: string;
     };
   };
-  app?: {
-    autoUpdate?: boolean;
-    hideWelcome?: boolean;
+  app: {
+    autoUpdate: boolean;
+    hideWelcome: boolean;
     hotkeys?: Record<string, string>;
   };
-  styles?: PromptStyle[];
+  styles: PromptStyle[];
   modelFolders: {
     [K in ModelType]?: ExtraModelFolder[];
   };

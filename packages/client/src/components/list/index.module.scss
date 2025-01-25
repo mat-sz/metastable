@@ -14,24 +14,6 @@
     transition: 0.2s ease-in-out background;
     background: transparent;
 
-    .icon,
-    .image {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      color: var(--grey-800);
-      overflow: hidden;
-      border-radius: 5px;
-      height: 100%;
-    }
-
-    .image > * {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
     .details {
       padding: 0.25rem;
       font-size: 0.8rem;
@@ -57,28 +39,16 @@
 
       .name {
         font-weight: 600;
-        color: white;
+        color: var(--always-white);
         font-size: 0.8rem;
         margin: 0.25rem;
         overflow-wrap: break-word;
       }
 
-      .image,
-      .image > * {
+      .thumbnail {
         position: absolute;
         inset: 0;
-      }
-
-      .icon {
         font-size: 3rem;
-
-        & > div {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
       }
 
       .image > * {
@@ -91,7 +61,7 @@
       &:hover {
         .image > * {
           filter: grayscale(0);
-          transform: scale(1.2);
+          transform: scale(1.05);
         }
       }
 
@@ -100,14 +70,7 @@
         inset: 0;
         flex-direction: column;
 
-        background: linear-gradient(
-          180deg,
-          rgba(0, 0, 0, 0) 0%,
-          rgba(0, 0, 0, 0) 50%,
-          rgba(0, 0, 0, 0.2) 70%,
-          rgba(0, 0, 0, 0.5) 90%,
-          rgba(0, 0, 0, 0.75) 100%
-        );
+        background: var(--card-gradient);
       }
 
       .tag {
@@ -120,6 +83,7 @@
         right: 0;
         z-index: 1;
         border: none;
+        color: var(--always-white);
 
         &:hover {
           background: none !important;
@@ -131,7 +95,9 @@
   &.view_list,
   &.view_details {
     .card {
+      display: grid;
       padding: 0.25rem;
+      align-items: center;
 
       &:hover,
       &[aria-selected='true'] {
@@ -147,7 +113,7 @@
 
       .name {
         font-weight: 600;
-        color: white;
+        color: var(--grey-900);
         font-size: 0.9rem;
         margin: 0.25rem;
         grid-column: 1 / 2;
@@ -169,22 +135,12 @@
 
   &.view_list {
     .card {
-      display: grid;
       grid-template-columns: 50px 1fr 50px;
 
-      .icon > div {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      .thumbnail {
         width: 50px;
         height: 50px;
         border-radius: 5px;
-      }
-
-      .image > * {
-        aspect-ratio: 1;
-        border-radius: 5px;
-        width: 50px;
       }
     }
 
@@ -194,8 +150,7 @@
         padding: 0 0.25rem;
       }
 
-      .image > *,
-      .icon > div {
+      .thumbnail {
         width: 25px;
         height: 25px;
       }
@@ -204,11 +159,9 @@
 
   &.view_details {
     .card {
-      display: grid;
       grid-template-columns: 1fr 50px;
 
-      .image,
-      .icon {
+      .thumbnail {
         display: none;
       }
     }
@@ -232,6 +185,15 @@
   & > div:not(:first-child) {
     margin-left: 0.5rem;
   }
+
+  .search {
+    display: flex;
+    align-items: stretch;
+
+    & > label {
+      width: 100%;
+    }
+  }
 }
 
 .tags {
@@ -242,14 +204,15 @@
 .tag {
   display: flex;
   align-items: center;
-  padding: 2px 5px;
-  margin-right: 5px;
+  padding: 0.2rem 0.25rem;
+  margin-right: 0.3rem;
   border: 1px solid var(--grey-100);
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--grey-200-transparent);
   border-radius: 5px;
+  line-height: 0;
 
   & > span {
-    margin-left: 0.5rem;
+    margin-left: 0.15rem;
     font-size: 0.7rem;
   }
 

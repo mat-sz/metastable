@@ -55,7 +55,7 @@ export function List<T>({
     <div className={styles.wrapper}>
       <div className={styles.options}>
         {!!header && <div>{header}</div>}
-        <div>
+        <div className={styles.search}>
           {!!quickFilter && (
             <Search
               value={search}

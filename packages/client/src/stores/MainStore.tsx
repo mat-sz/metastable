@@ -99,6 +99,15 @@ class MainStore {
     this.init();
   }
 
+  get theme() {
+    const theme = mainStore.config.data?.ui.theme || 'dark';
+    if (theme !== 'system') {
+      return theme;
+    }
+
+    return uiStore.systemTheme;
+  }
+
   get deviceName() {
     if (this.status === 'ready') {
       const device = this.info.torch?.device;

@@ -3,7 +3,7 @@ $track-height: $toggle-indicator-size + 6;
 $track-width: $toggle-indicator-size * 2.5;
 $highContrastModeSupport: solid 2px transparent;
 
-$indicator: var(--grey-900);
+$indicator: var(--always-white);
 $track-background: var(--grey-700);
 $track-background-checked: var(--green-900);
 
@@ -67,9 +67,11 @@ $speed: 0.2s;
 }
 
 .checkmark {
-  fill: var(--grey-100);
-  height: $toggle-indicator-size - 4;
-  width: $toggle-indicator-size - 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--always-black);
+  font-size: $toggle-indicator-size;
   opacity: 0;
   transition: opacity $speed ease-in-out;
 }
@@ -78,12 +80,10 @@ $speed: 0.2s;
   background: $track-background-checked;
 
   .indicator {
-    background: $indicator;
     transform: translateX($track-width - $track-height);
 
     .checkmark {
       opacity: 1;
-      font-size: 0;
       transition: opacity $speed ease-in-out;
     }
   }

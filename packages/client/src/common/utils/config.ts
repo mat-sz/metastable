@@ -39,3 +39,4 @@ export const SERVER_HOST =
 
 export const IS_ELECTRON = import.meta.env.VITE_IS_ELECTRON === '1';
 export const IS_MAC = window.electronConfig?.isMac ?? getOS() === 'mac';
+export const IS_DEV = import.meta.env.MODE === 'development';

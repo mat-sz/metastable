@@ -15,8 +15,10 @@ import { LogoIcon } from '$components/logoIcon';
 import { Tab, TabContent, Tabs, TabView } from '$components/tabs';
 import { VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { IS_DEV } from '$utils/config';
 import { SettingsAbout } from './about';
 import { SettingsBackend } from './backend';
+import { SettingsComponents } from './components';
 import { SettingsDownloads } from './downloads';
 import { SettingsFeatures } from './features';
 import { SettingsGeneral } from './general';
@@ -53,6 +55,9 @@ export const Settings: React.FC = observer(() => {
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab id="features" title="Optional features" icon={<BsPatchPlus />} />
           <Tab id="about" title={`About ${__APP_NAME__}`} icon={<LogoIcon />} />
+          {IS_DEV && (
+            <Tab id="components" title="Component preview" icon={<BsGear />} />
+          )}
         </Tabs>
         <TabContent className={styles.content}>
           <div className={styles.wrapper}>
@@ -64,6 +69,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsHotkeys />
             <SettingsFeatures />
             <SettingsAbout />
+            {IS_DEV && <SettingsComponents />}
           </div>
         </TabContent>
       </TabView>

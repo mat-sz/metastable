@@ -12,13 +12,13 @@ export const LogoIcon: React.FC<Props> = props => {
           d="m84.3 69.8-34.3 19.8-34.3-19.8 5.84-34.6 28.5-24.8 28.5 24.8z"
           display="none"
           fill="none"
-          stroke="#fff"
+          stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeMiterlimit={0}
           strokeWidth={0.792}
         />
-        <g transform="translate(-9.59e-5)" fill="#fff">
+        <g transform="translate(-9.59e-5)" fill="currentColor">
           <circle cx={34.3} cy={18.7} r={3} />
           <circle cx={65.7} cy={18.7} r={3} />
           <circle cx={50} cy={12.7} r={6} />

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsChevronRight } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { Loading } from '$components/loading';
 import { setupStore } from '$stores/SetupStore';
 import { List } from './components/List';
@@ -29,10 +30,14 @@ export const Step1: React.FC = observer(() => {
             <ModelsItem />
           </List>
           <div className={styles.footer}>
-            <button className={styles.cta} onClick={() => setupStore.start()}>
+            <Button
+              variant="primary"
+              className={styles.cta}
+              onClick={() => setupStore.start()}
+            >
               <span>Continue</span>
               <BsChevronRight />
-            </button>
+            </Button>
           </div>
         </>
       ) : (

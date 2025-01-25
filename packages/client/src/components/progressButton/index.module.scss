@@ -28,10 +28,10 @@
     z-index: 0;
     background: repeating-linear-gradient(
       90deg,
-      #77f,
-      #77f 10%,
-      #465298 10%,
-      #465298 20%
+      var(--accent-900),
+      var(--accent-900) 10%,
+      var(--accent-500) 10%,
+      var(--accent-500) 20%
     );
     transform: skewX(45deg);
     transform-origin: bottom left;
