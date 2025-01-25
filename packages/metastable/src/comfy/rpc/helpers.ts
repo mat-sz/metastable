@@ -40,7 +40,7 @@ export function serializeObject<T>(object: T): T {
 
   for (const key of Object.keys(obj)) {
     if (typeof obj[key] === 'object') {
-      obj[key] = deserializeObject(obj[key]);
+      obj[key] = serializeObject(obj[key]);
     }
   }
 
