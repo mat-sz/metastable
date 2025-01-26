@@ -44,7 +44,10 @@
     background-size: cover;
     cursor: pointer;
     font-size: 0;
-    transition: 0.2s ease-in-out all;
+    transition:
+      0.2s ease-in-out opacity,
+      color,
+      background-color;
 
     .status {
       font-size: 2rem;
@@ -95,6 +98,21 @@
 
       .more {
         font-size: 1rem;
+      }
+    }
+  }
+}
+
+[data-theme='light'] {
+  .sidebar {
+    .recent {
+      li {
+        opacity: 0.65;
+
+        &:hover,
+        &.active {
+          opacity: 1;
+        }
       }
     }
   }

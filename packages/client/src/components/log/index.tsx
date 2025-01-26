@@ -21,7 +21,7 @@ export const Log: React.FC<Props> = ({ items, className }) => {
       return;
     }
 
-    logEl.scrollTo({ top: logEl.scrollHeight, behavior: 'smooth' });
+    logEl.scrollTo({ top: logEl.scrollHeight });
   }, [items]);
 
   return (

@@ -80,6 +80,7 @@ class MainStore {
       onData: items => {
         runInAction(() => {
           this.backendLog.push(...items);
+          this.backendLog = this.backendLog.slice(-30);
         });
       },
     });

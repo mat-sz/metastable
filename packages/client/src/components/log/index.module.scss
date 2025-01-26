@@ -27,7 +27,7 @@
 
   .text {
     margin-left: 0.5rem;
-    color: white;
+    color: var(--grey-900);
   }
 
   .timestamp {
@@ -35,6 +35,6 @@
   }
 
   .error {
-    color: red;
+    color: var(--red-900);
   }
 }
