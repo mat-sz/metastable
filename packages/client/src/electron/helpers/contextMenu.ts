@@ -1,7 +1,10 @@
+import path from 'path';
+
 import electron, {
   app,
   type BrowserWindow,
   type MenuItemConstructorOptions,
+  session,
 } from 'electron';
 
 const removeUnusedMenuItems = (
@@ -82,6 +85,36 @@ const create = (win: BrowserWindow) => {
           win.webContents.selectAll();
         },
       }),
+      saveImageAs: () => ({
+        id: 'saveImageAs',
+        label: 'Sa&ve Image As…',
+        visible: properties.mediaType === 'image',
+        async click() {
+          session.defaultSession.once('will-download', (_, item) => {
+            let filename = 'image.png';
+            if (properties.srcURL.startsWith('metastable+resolve://')) {
+              const split = properties.srcURL.split('/');
+              const segments = decodeURIComponent(split[2]).split(':');
+              filename = segments[segments.length - 1];
+            } else {
+              filename = `image.${item.getMimeType().split('/')[1]}`;
+            }
+
+            item.setSaveDialogOptions({
+              defaultPath: path.join(app.getPath('pictures'), filename),
+            });
+          });
+          win.webContents.downloadURL(properties.srcURL);
+        },
+      }),
+      copyImage: () => ({
+        id: 'copyImage',
+        label: 'Cop&y Image',
+        visible: properties.mediaType === 'image',
+        click() {
+          win.webContents.copyImageAt(properties.x, properties.y);
+        },
+      }),
       inspect: () => ({
         id: 'inspect',
         label: 'I&nspect Element',
@@ -138,6 +171,9 @@ const create = (win: BrowserWindow) => {
       defaultActions.copy(),
       defaultActions.paste(),
       defaultActions.selectAll(),
+      defaultActions.separator(),
+      defaultActions.saveImageAs(),
+      defaultActions.copyImage(),
       defaultActions.separator(),
       shouldShowInspectElement && defaultActions.inspect(),
       defaultActions.separator(),

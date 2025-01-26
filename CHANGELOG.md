@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Resolved problems with cleanup of draft projects.
+- Restored missing context menu options - "Save Image As" and "Copy Image".
 
 # 0.0.16 (2025-01-25)
 
