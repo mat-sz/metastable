@@ -27,6 +27,7 @@ class MainStore {
   projects = new ProjectStore();
   info!: InstanceInfo;
   backendLog: LogItem[] = [];
+  modelCache: string[] = [];
 
   backendStatus: BackendStatus = 'starting';
 
@@ -82,6 +83,11 @@ class MainStore {
           this.backendLog.push(...items);
           this.backendLog = this.backendLog.slice(-30);
         });
+      },
+    });
+    API.instance.onModelCacheChange.subscribe(undefined, {
+      onData: () => {
+        this.refreshModelCache();
       },
     });
     window.addEventListener('beforeunload', e => {
@@ -200,6 +206,7 @@ class MainStore {
       setupStore.init(),
     ]);
     postMessage({ payload: 'removeLoading' }, '*');
+    this.refreshModelCache();
     runInAction(() => {
       this.ready = true;
     });
@@ -252,6 +259,13 @@ class MainStore {
 
   get searchFn() {
     return this.config.data?.ui?.fuzzySearch ? fuzzy : strIncludes;
+  }
+
+  async refreshModelCache() {
+    const current = await API.instance.loadedModels.query();
+    runInAction(() => {
+      this.modelCache = current;
+    });
   }
 }
 

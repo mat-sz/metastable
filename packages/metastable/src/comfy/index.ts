@@ -19,6 +19,7 @@ type BackendEvents = {
   log: [item: LogItem];
   reset: [];
   status: [status: BackendStatus];
+  modelCacheChange: [];
 };
 
 export class Comfy extends EventEmitter<BackendEvents> {
@@ -34,8 +35,15 @@ export class Comfy extends EventEmitter<BackendEvents> {
   ) {
     super();
 
-    this.rpc.on('ready', () => {
-      this.setStatus('ready');
+    this.rpc.on('event', (eventName: string) => {
+      switch (eventName) {
+        case 'ready':
+          this.setStatus('ready');
+          break;
+        case 'model_cache_change':
+          this.emit('modelCacheChange');
+          break;
+      }
     });
     this.rpc.on('log', ({ type, text }) => {
       this.log(type, text);

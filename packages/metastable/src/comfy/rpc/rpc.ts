@@ -12,7 +12,7 @@ import { RPCRequest, RPCResponse } from './types.js';
 
 type RPCEvents = {
   log: [item: LogItem];
-  ready: [];
+  event: [eventName: string, eventData: any];
 };
 
 export class RPC extends EventEmitter<RPCEvents> {
@@ -127,9 +127,6 @@ export class RPC extends EventEmitter<RPCEvents> {
     }
 
     switch (e.event) {
-      case 'ready':
-        this.emit('ready');
-        break;
       case 'rpc.progress':
         this.sessions[e.data.sessionId]?.emit('progress', {
           max: e.data.max,
@@ -144,6 +141,8 @@ export class RPC extends EventEmitter<RPCEvents> {
           text: e.data.text,
         });
         break;
+      default:
+        this.emit('event', e.event, e.data);
     }
   }
 

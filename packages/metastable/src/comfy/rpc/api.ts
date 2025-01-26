@@ -45,6 +45,9 @@ export function getApi(rpc: RPC) {
       }> {
         return rpc.invoke(undefined, 'instance:info') as any;
       },
+      loadedModels(): Promise<string[]> {
+        return rpc.invoke(undefined, 'instance:loaded_models') as any;
+      },
     },
   };
 }
@@ -91,6 +94,9 @@ export function getSessionApi(session: RPCSession) {
         schedulers: string[];
       }> {
         return session.invoke('instance:info') as any;
+      },
+      loadedModels(): Promise<string[]> {
+        return session.invoke('instance:loaded_models') as any;
       },
     },
     clipVision: {

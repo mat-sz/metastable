@@ -1,9 +1,9 @@
 from typing import Callable
-import gc
 import comfy.model_sampling
 import comfy.sd
 import comfy.model_management
 import rpc_types
+import output
 
 def remove_none_from_dict(target: dict[str, any]) -> dict[str, any]:
     new_dict = {}
@@ -19,11 +19,15 @@ class ModelCache:
     def comfy_cleanup(self):
         comfy.model_management.cleanup_models()
 
+    def emit_event(self):
+        output.write_event("model_cache_change")
+
     def add(self, model, info: rpc_types.CachedModelInfo):
         path = info["path"]
         self.models[path] = model
         self.info[path] = info
         self.comfy_cleanup()
+        self.emit_event()
 
     def remove(self, path: str, cleanup: bool = True):
         if path in self.info:
@@ -32,6 +36,7 @@ class ModelCache:
             del self.models[path]
         if cleanup:
             self.comfy_cleanup()
+        self.emit_event()
 
     def has(self, path: str):
         return path in self.info and path in self.models
@@ -56,6 +61,7 @@ class ModelCache:
         self.models = {}
         self.info = {}
         comfy.model_management.unload_all_models()
+        self.emit_event()
 
     def remove_all_except_for(self, infos: list[rpc_types.CachedModelInfo]):
         info_map = {}
@@ -67,6 +73,7 @@ class ModelCache:
                 self.remove(key, False)
         
         comfy.model_management.unload_all_models()
+        self.emit_event()
 
     def load_cached(self, info: rpc_types.CachedModelInfo, load_function: Callable[[], any]):
         cached = self.get(info)

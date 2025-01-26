@@ -42,6 +42,7 @@ interface MetastableEvents {
   'project.fileChange': [id: string, type: ProjectFileType];
   'model.change': [];
   'config.change': [];
+  'comfy.modelCacheChange': [];
 }
 
 export interface MetastableInstanceConfig {
@@ -389,6 +390,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       );
       comfy.on('status', status => this.setStatus(status));
       comfy.on('log', e => this.logBuffer.push(e));
+      comfy.on('modelCacheChange', () => this.emit('comfy.modelCacheChange'));
       this.comfy = comfy;
     } catch (e) {
       this.logBuffer.push({

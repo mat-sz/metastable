@@ -161,6 +161,19 @@ export const router = t.router({
         await iter.next();
       }
     }),
+    onModelCacheChange: t.procedure.subscription(async function* ({
+      signal,
+      ctx: { metastable },
+    }) {
+      const iter = on(metastable, 'comfy.modelCacheChange', {
+        signal,
+      });
+
+      while (true) {
+        yield;
+        await iter.next();
+      }
+    }),
     info: t.procedure.query(async ({ ctx: { metastable, app } }) => {
       const info = (await metastable.comfy?.info()) || {
         schedulers: [],
@@ -299,6 +312,9 @@ export const router = t.router({
       }),
     unloadModels: t.procedure.mutation(async ({ ctx: { metastable } }) => {
       await metastable.comfy?.rpc.api.instance.cleanupModels({});
+    }),
+    loadedModels: t.procedure.query(async ({ ctx: { metastable } }) => {
+      return (await metastable.comfy?.rpc.api.instance.loadedModels()) || [];
     }),
   },
   model: {

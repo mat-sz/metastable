@@ -3,6 +3,7 @@
 ## Features
 
 - Added a button to unload all models from VRAM.
+- Added a list view of currently loaded models.
 
 ## Improvements
 

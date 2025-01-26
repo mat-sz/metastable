@@ -92,3 +92,7 @@ class InstanceNamespace:
             cache().remove_all_except_for(except_for)
         else:
             cache().clear()
+
+    @RPC.method
+    def loaded_models() -> list[str]:
+        return list(cache().models.keys())

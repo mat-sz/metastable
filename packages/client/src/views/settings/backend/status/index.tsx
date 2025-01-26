@@ -1,29 +1,18 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsArrowClockwise, BsBoxArrowDownLeft } from 'react-icons/bs';
 
-import { API } from '$api';
-import { Button } from '$components/button';
-import { Log } from '$components/log';
+import { RequirementsTable } from '$components/requirementsTable';
+import { TabPanel } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
+import { setupStore } from '$stores/SetupStore';
 import { filesize } from '$utils/file';
-import styles from './index.module.scss';
 
-export const General: React.FC = observer(() => {
+export const StatusTab: React.FC = observer(() => {
   const torchInfo = mainStore.info.torch;
+  const requirements = setupStore.requirements;
 
   return (
-    <>
-      <div className={styles.actions}>
-        <Button onClick={() => API.instance.restart.mutate()}>
-          <BsArrowClockwise />
-          <span>Restart backend</span>
-        </Button>
-        <Button onClick={() => API.instance.unloadModels.mutate()}>
-          <BsBoxArrowDownLeft />
-          <span>Unload all models</span>
-        </Button>
-      </div>
+    <TabPanel id="status">
       {torchInfo && (
         <table>
           <tbody>
@@ -58,7 +47,7 @@ export const General: React.FC = observer(() => {
           </tbody>
         </table>
       )}
-      <Log items={mainStore.backendLog} className={styles.log} />
-    </>
+      <RequirementsTable requirements={requirements} />
+    </TabPanel>
   );
 });
