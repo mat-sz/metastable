@@ -1,5 +1,9 @@
 # 0.0.17 (Upcoming)
 
+## Features
+
+- Added a button to unload all models from VRAM.
+
 ## Improvements
 
 - Model caching has been reworked to retain relevant models.

@@ -297,6 +297,9 @@ export const router = t.router({
         await fs.mkdir(folderPath, { recursive: true });
         return folderPath;
       }),
+    unloadModels: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+      await metastable.comfy?.rpc.api.instance.cleanupModels({});
+    }),
   },
   model: {
     onChange: t.procedure.subscription(async function* ({

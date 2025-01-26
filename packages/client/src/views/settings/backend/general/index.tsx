@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsArrowClockwise } from 'react-icons/bs';
+import { BsArrowClockwise, BsBoxArrowDownLeft } from 'react-icons/bs';
 
 import { API } from '$api';
+import { Button } from '$components/button';
 import { Log } from '$components/log';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
@@ -14,10 +15,14 @@ export const General: React.FC = observer(() => {
   return (
     <>
       <div className={styles.actions}>
-        <button onClick={() => API.instance.restart.mutate()}>
+        <Button onClick={() => API.instance.restart.mutate()}>
           <BsArrowClockwise />
           <span>Restart backend</span>
-        </button>
+        </Button>
+        <Button onClick={() => API.instance.unloadModels.mutate()}>
+          <BsBoxArrowDownLeft />
+          <span>Unload all models</span>
+        </Button>
       </div>
       {torchInfo && (
         <table>

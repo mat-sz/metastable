@@ -1,3 +1,5 @@
+from typing import Callable
+import gc
 import comfy.model_sampling
 import comfy.sd
 import comfy.model_management
@@ -14,18 +16,22 @@ class ModelCache:
     info: dict[str, rpc_types.CachedModelInfo] = {}
     models: dict[str, any] = {}
 
+    def comfy_cleanup(self):
+        comfy.model_management.cleanup_models()
+
     def add(self, model, info: rpc_types.CachedModelInfo):
         path = info["path"]
         self.models[path] = model
         self.info[path] = info
-        comfy.model_management.cleanup_models()
+        self.comfy_cleanup()
 
-    def remove(self, path: str):
+    def remove(self, path: str, cleanup: bool = True):
         if path in self.info:
             del self.info[path]
         if path in self.models:
             del self.models[path]
-        comfy.model_management.cleanup_models()
+        if cleanup:
+            self.comfy_cleanup()
 
     def has(self, path: str):
         return path in self.info and path in self.models
@@ -49,7 +55,7 @@ class ModelCache:
     def clear(self):
         self.models = {}
         self.info = {}
-        comfy.model_management.cleanup_models()
+        comfy.model_management.unload_all_models()
 
     def remove_all_except_for(self, infos: list[rpc_types.CachedModelInfo]):
         info_map = {}
@@ -58,9 +64,11 @@ class ModelCache:
 
         for key in self.info.copy().keys():
             if key not in info_map or not self.check(info_map[key]):
-                self.remove(key)
+                self.remove(key, False)
+        
+        comfy.model_management.unload_all_models()
 
-    def load_cached(self, info: rpc_types.CachedModelInfo, load_function):
+    def load_cached(self, info: rpc_types.CachedModelInfo, load_function: Callable[[], any]):
         cached = self.get(info)
         if cached:
             return cached
