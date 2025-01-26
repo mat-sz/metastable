@@ -27,6 +27,7 @@
 :root {
   --grey-050: #0a0a0f;
   --grey-100: #0f0f17;
+  --grey-100-transparent: #0f0f17dd;
   --grey-200: #17171f;
   --grey-200-transparent: #17171fdd;
   --grey-300: #22222a;
@@ -72,6 +73,7 @@
 [data-theme='light'] {
   --grey-050: #ffffff;
   --grey-100: #ffffff;
+  --grey-100-transparent: #ffffffdd;
   --grey-200: #f6f6f6;
   --grey-200-transparent: #f6f6f6dd;
   --grey-300: #eaeaea;

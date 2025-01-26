@@ -1,5 +1,5 @@
 import { ImageFile } from '@metastable/types';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   BsArrowLeft,
   BsArrowRight,
@@ -29,6 +29,7 @@ export const Lightbox: React.FC<Props> = ({
   onClose,
   actions,
 }) => {
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
   const currentFile = images[current];
   const filename = currentFile.name;
 
@@ -42,8 +43,19 @@ export const Lightbox: React.FC<Props> = ({
   );
 
   useHotkey('gallery_close', onClose);
-  useHotkey('gallery_next', previous);
-  useHotkey('gallery_previous', next);
+  useHotkey('gallery_next', next);
+  useHotkey('gallery_previous', previous);
+
+  useEffect(() => {
+    if (!thumbnailsRef.current) {
+      return;
+    }
+
+    const el = thumbnailsRef.current.querySelector(`[data-i='${current}']`);
+    if (el) {
+      el.scrollIntoView();
+    }
+  }, [current]);
 
   const currentUrl = resolveImage(currentFile.mrn);
 
@@ -86,21 +98,24 @@ export const Lightbox: React.FC<Props> = ({
           <BsArrowRight />
         </button>
       </div>
-      <div className={styles.thumbnails} onClick={e => e.stopPropagation()}>
-        {images.map((file, i) => {
-          if (Math.abs(current - i) > 5) {
-            return undefined;
-          }
-
-          return (
-            <img
-              src={resolveImage(file.mrn, 'thumbnail')}
-              key={i}
-              onClick={() => onChange(i)}
-              className={i === current ? styles.active : undefined}
-            />
-          );
-        })}
+      <div className={styles.thumbnailsWrapper}>
+        <div
+          className={styles.thumbnails}
+          onClick={e => e.stopPropagation()}
+          ref={thumbnailsRef}
+        >
+          {images.map((file, i) => {
+            return (
+              <img
+                src={resolveImage(file.mrn, 'thumbnail')}
+                key={i}
+                onClick={() => onChange(i)}
+                className={i === current ? styles.active : undefined}
+                data-i={i}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

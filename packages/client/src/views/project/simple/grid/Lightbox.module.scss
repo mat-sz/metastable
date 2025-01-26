@@ -1,7 +1,7 @@
 .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--grey-100);
   display: flex;
   flex-direction: column;
   z-index: 9999;
@@ -26,8 +26,12 @@
     grid-template-columns: 1fr 1fr 1fr;
     justify-content: space-between;
     align-items: center;
-    background: #000000;
     padding: 0.5rem;
+
+    & > div {
+      color: var(--grey-900);
+      font-size: 1rem;
+    }
 
     & > *:nth-child(2) {
       justify-self: center;
@@ -50,17 +54,34 @@
     flex: 1;
   }
 
-  .thumbnails {
+  .thumbnailsWrapper {
     overflow-y: hidden;
     overflow-x: visible;
-    display: flex;
-    justify-content: center;
+    scrollbar-width: none;
     margin-bottom: 1rem;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
+  }
+
+  .thumbnails {
+    display: flex;
+    margin: 0 auto;
+    justify-content: safe center;
 
     img {
       height: 5rem;
       width: auto;
       border: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.2s ease-in-out all;
+      opacity: 0.25;
+
+      &:hover,
+      &.active {
+        opacity: 1;
+      }
 
       &.active {
         border: 2px solid var(--grey-900);
