@@ -1,3 +1,9 @@
+# 0.0.17 (Upcoming)
+
+## Bug fixes
+
+- Resolved problems with cleanup of draft projects.
+
 # 0.0.16 (2025-01-25)
 
 ## Features

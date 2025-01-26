@@ -193,12 +193,14 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     }, 1000);
   }
 
-  async handleExit() {
+  async handleExit(exit = true) {
     console.log('Cleaning up and exiting...');
     await this.model.cleanup();
     await this.project.cleanup();
     console.log('Bye!');
-    process.exit(0);
+    if (exit) {
+      process.exit(0);
+    }
   }
 
   private resolvePath(value: string | undefined) {

@@ -193,12 +193,17 @@ async function createWindow() {
   await updateTheme();
   metastable.on('config.change', updateTheme);
 
-  let flagQuit = false;
+  let quitHandlerCalled = false;
+  let quitHandlerFinished = false;
   app.on('before-quit', async e => {
-    if (!flagQuit) {
-      flagQuit = true;
+    if (!quitHandlerFinished) {
       e.preventDefault();
-      await metastable.handleExit();
+    }
+
+    if (!quitHandlerCalled) {
+      quitHandlerCalled = true;
+      await metastable.handleExit(false);
+      quitHandlerFinished = true;
       app.quit();
     }
   });
