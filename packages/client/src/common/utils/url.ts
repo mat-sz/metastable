@@ -27,6 +27,7 @@ export function resolveMrn(mrn: string) {
 export function resolveImage<T extends string | undefined>(
   url?: T,
   size?: 'thumbnail',
+  cacheBreaker = false,
 ): T {
   if (typeof url === 'undefined') {
     return undefined as T;
@@ -36,5 +37,12 @@ export function resolveImage<T extends string | undefined>(
     return url;
   }
 
-  return resolveMrn(`${url}${size ? `?size=${size}` : ''}`) as T;
+  const resolvedUrl = new URL(
+    resolveMrn(`${url}${size ? `?size=${size}` : ''}`),
+  );
+  if (cacheBreaker) {
+    resolvedUrl.searchParams.append('c', `${Math.random()}`);
+  }
+
+  return resolvedUrl.toString() as T;
 }

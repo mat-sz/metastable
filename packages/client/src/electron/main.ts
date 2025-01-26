@@ -17,6 +17,7 @@ import {
 import { createIPCHandler } from 'trpc-electron/main';
 
 import contextMenu from './helpers/contextMenu';
+import { resolveUrlToMrn } from './helpers/resolve';
 import type { AppUpdater } from 'electron-updater';
 
 contextMenu();
@@ -242,10 +243,8 @@ async function createWindow() {
   });
 
   protocol.handle('metastable+resolve', async request => {
-    const split = request.url.split('/');
-
     try {
-      const resolved = await metastable.resolve(decodeURIComponent(split[2]));
+      const resolved = await metastable.resolve(resolveUrlToMrn(request.url));
       return await net.fetch(pathToFileURL(resolved).toString());
     } catch {
       //

@@ -7,6 +7,8 @@ import electron, {
   session,
 } from 'electron';
 
+import { resolveUrlToMrn } from './resolve';
+
 const removeUnusedMenuItems = (
   menuTemplate: (MenuItemConstructorOptions | undefined | false)[],
 ) => {
@@ -93,8 +95,7 @@ const create = (win: BrowserWindow) => {
           session.defaultSession.once('will-download', (_, item) => {
             let filename = 'image.png';
             if (properties.srcURL.startsWith('metastable+resolve://')) {
-              const split = properties.srcURL.split('/');
-              const segments = decodeURIComponent(split[2]).split(':');
+              const segments = resolveUrlToMrn(properties.srcURL).split(':');
               filename = segments[segments.length - 1];
             } else {
               filename = `image.${item.getMimeType().split('/')[1]}`;
@@ -102,6 +103,7 @@ const create = (win: BrowserWindow) => {
 
             item.setSaveDialogOptions({
               defaultPath: path.join(app.getPath('pictures'), filename),
+              title: 'Save Image As…',
             });
           });
           win.webContents.downloadURL(properties.srcURL);

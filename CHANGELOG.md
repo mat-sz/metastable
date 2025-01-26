@@ -4,6 +4,7 @@
 
 - Resolved problems with cleanup of draft projects.
 - Restored missing context menu options - "Save Image As" and "Copy Image".
+- Resolved an issue with the "Discard" button resulting in the old image being displayed as an output.
 
 # 0.0.16 (2025-01-25)
 
