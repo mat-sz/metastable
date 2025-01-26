@@ -6,6 +6,7 @@ import comfy.utils
 import rpc_types
 
 from rpc import RPC
+from model_cache import cache
 
 def vae_decode_circular(vae, samples):
     for layer in [
@@ -67,12 +68,22 @@ def vae_encode_inpaint(vae, pixels, mask, grow_mask_by=6):
 
     return {"samples":t, "noise_mask": (mask_erosion[:,:,:x,:y].round())}
 
+def load_vae(path: str):
+    info = {
+        "path": path,
+    }
+
+    def load():
+        sd = comfy.utils.load_torch_file(path)
+        return comfy.sd.VAE(sd=sd)
+    
+    return cache().load_cached(info, load)
+
 class VAENamespace:
     @RPC.autoref
     @RPC.method
     def load(path: str) -> rpc_types.VAE:
-        sd = comfy.utils.load_torch_file(path)
-        return comfy.sd.VAE(sd=sd)
+        return load_vae(path)
     
     @RPC.autoref
     @RPC.method

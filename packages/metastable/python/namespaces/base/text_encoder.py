@@ -2,6 +2,7 @@ import comfy.sd
 
 from rpc import RPC
 import rpc_types
+from model_cache import cache
 
 TYPE_MAP = {
     "stable_cascade": comfy.sd.CLIPType.STABLE_CASCADE,
@@ -11,12 +12,16 @@ TYPE_MAP = {
     "hunyuan_video": comfy.sd.CLIPType.HUNYUAN_VIDEO,
 }
 
-class TextEncoderNamespace:
-    @RPC.autoref
-    @RPC.method
-    def load(paths: list[str], type: str, embeddings_path: str = None) -> rpc_types.TextEncoder:
-        text_encoder_type = TYPE_MAP[type] if type in TYPE_MAP else comfy.sd.CLIPType.STABLE_DIFFUSION
+def load_text_encoder(paths: list[str], type: str, embeddings_path: str = None):
+    info = {
+        "path": ';'.join(paths),
+        "type": type,
+        "embeddings_path": embeddings_path
+    }
 
+    text_encoder_type = TYPE_MAP[type] if type in TYPE_MAP else comfy.sd.CLIPType.STABLE_DIFFUSION
+    
+    def load():
         if any(path.endswith('.gguf') for path in paths):
             try:
                 from .utils.gguf import load_text_encoder
@@ -25,6 +30,14 @@ class TextEncoderNamespace:
                 raise ValueError(f"Missing GGUF support.")
         
         return comfy.sd.load_clip(ckpt_paths=paths, embedding_directory=embeddings_path, clip_type=text_encoder_type)
+    
+    return cache().load_cached(info, load)
+
+class TextEncoderNamespace:
+    @RPC.autoref
+    @RPC.method
+    def load(paths: list[str], type: str, embeddings_path: str = None) -> rpc_types.TextEncoder:
+        return load_text_encoder(paths, type, embeddings_path)
     
     @RPC.autoref
     @RPC.method

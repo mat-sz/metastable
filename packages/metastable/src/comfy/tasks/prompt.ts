@@ -44,6 +44,7 @@ export class PromptTask extends BaseComfyTask<
 > {
   private details?: ModelDetails;
   private embeddingsPath?: string;
+  private checkpointPaths?: ComfyCheckpointPaths;
   public preview: ComfyPreviewSettings = {
     method: 'auto',
   };
@@ -101,7 +102,7 @@ export class PromptTask extends BaseComfyTask<
     };
   }
 
-  async getCheckpoint() {
+  async getCheckpointPaths() {
     let data = this.settings.models;
 
     if (data.mode === 'simple') {
@@ -176,10 +177,15 @@ export class PromptTask extends BaseComfyTask<
       );
     }
 
+    return paths;
+  }
+
+  async loadCheckpoint(paths: ComfyCheckpointPaths) {
+    const clipSkip = this.settings.models.clipSkip;
     return await loadCheckpoint(this.session!, {
-      type: this.details.architecture!,
+      type: this.details!.architecture!,
       paths,
-      clipLayer: data.clipSkip ? -1 * data.clipSkip : undefined,
+      clipLayer: clipSkip ? -1 * clipSkip : undefined,
     });
   }
 
@@ -273,12 +279,45 @@ export class PromptTask extends BaseComfyTask<
     }
   }
 
+  protected async prepareModels() {
+    const checkpointPaths = await this.getCheckpointPaths();
+    this.checkpointPaths = checkpointPaths;
+
+    if (checkpointPaths.checkpoint) {
+      this.cachedModels.push({
+        path: checkpointPaths.checkpoint,
+        config_path: checkpointPaths.config,
+        embeddings_path: checkpointPaths.embeddings,
+      });
+    }
+
+    if (checkpointPaths.diffusionModel) {
+      this.cachedModels.push({
+        path: checkpointPaths.diffusionModel,
+      });
+    }
+
+    if (checkpointPaths.vae) {
+      this.cachedModels.push({
+        path: checkpointPaths.vae,
+      });
+    }
+
+    if (checkpointPaths.textEncoders?.length) {
+      this.cachedModels.push({
+        path: checkpointPaths.textEncoders.join(';'),
+        embeddings_path: checkpointPaths.embeddings,
+        model_type: this.details?.architecture,
+      });
+    }
+  }
+
   protected async process() {
     const ctx = this.session!;
 
     this.step('checkpoint');
     const settings = this.settings;
-    this.checkpoint = await this.getCheckpoint();
+    this.checkpoint = await this.loadCheckpoint(this.checkpointPaths!);
 
     await this.executeHandlers('checkpoint');
 

@@ -19,6 +19,7 @@ import { Metastable } from '#metastable';
 import { ProjectEntity } from '../../data/project.js';
 import { BaseTask } from '../../tasks/task.js';
 import { RPCSession } from '../rpc/session.js';
+import { CachedModelInfo } from '../rpc/types.js';
 
 type TaskHandlers = { [key: string]: (...args: any[]) => Promise<void> | void };
 
@@ -32,6 +33,7 @@ export class BaseComfyTask<
 > extends BaseTask<ProjectTaskData> {
   public session?: RPCSession;
   private features: Feature[] = [];
+  public cachedModels: CachedModelInfo[] = [];
 
   constructor(
     name: string,
@@ -111,7 +113,11 @@ export class BaseComfyTask<
       if (field.type === FieldType.MODEL) {
         const fn = async () => {
           try {
-            await this.validateModel(field.modelType, true, parent?.[key]);
+            const mrn = parent?.[key];
+            await this.validateModel(field.modelType, true, mrn);
+            this.cachedModels.push({
+              path: await Metastable.instance.resolve(mrn),
+            });
           } catch {
             parent.enabled = false;
           }
@@ -179,6 +185,7 @@ export class BaseComfyTask<
     });
   }
 
+  protected async prepareModels() {}
   protected async process() {}
 
   async execute() {
@@ -195,6 +202,8 @@ export class BaseComfyTask<
         });
 
         this.session = ctx;
+        await this.prepareModels();
+        await ctx.api.instance.cleanupModels({ exceptFor: this.cachedModels });
         await this.process();
       });
     } catch (e) {

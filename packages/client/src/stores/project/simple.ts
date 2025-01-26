@@ -391,7 +391,6 @@ export class SimpleProject extends BaseProject<
 
     if (settings.models.mode === 'advanced') {
       totalVram += [
-        settings.models.checkpoint,
         settings.models.diffusionModel,
         ...(settings.models.textEncoders || []),
         settings.models.vae,

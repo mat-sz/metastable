@@ -5,6 +5,17 @@ import comfy.utils
 
 from rpc import RPC
 import rpc_types
+from model_cache import cache
+
+def load_lora(path: str):
+    info = {
+        "path": path,
+    }
+
+    def load():
+        return comfy.utils.load_torch_file(path, safe_load=True)
+    
+    return cache().load_cached(info, load)
 
 class LoraApplyResult(TypedDict):
     diffusion_model: rpc_types.DiffusionModel
@@ -14,7 +25,7 @@ class LORANamespace:
     @RPC.autoref
     @RPC.method
     def load(path: str) -> rpc_types.LORA:
-        return comfy.utils.load_torch_file(path, safe_load=True)
+        return load_lora(path)
 
     @RPC.autoref
     @RPC.method

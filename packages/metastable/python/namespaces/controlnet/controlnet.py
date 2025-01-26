@@ -2,12 +2,23 @@ import comfy.controlnet
 import rpc_types
 
 from rpc import RPC
+from model_cache import cache
+
+def load_controlnet(path: str):
+    info = {
+        "path": path,
+    }
+
+    def load():
+        return comfy.controlnet.load_controlnet(path)
+    
+    return cache().load_cached(info, load)
 
 class ControlnetNamespace:
     @RPC.autoref
     @RPC.method
     def load(path: str) -> rpc_types.ControlNet:
-        return comfy.controlnet.load_controlnet(path)
+        return load_controlnet(path)
     
     @RPC.autoref
     @RPC.method

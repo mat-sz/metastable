@@ -35,3 +35,10 @@ export interface RPCResponse {
   };
   id: string;
 }
+
+export interface CachedModelInfo {
+  path: string;
+  embeddings_path?: string;
+  config_path?: string;
+  model_type?: string;
+}

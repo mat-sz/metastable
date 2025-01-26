@@ -13,9 +13,7 @@ from .utils.checkpoint import get_latent_type
 
 from rpc import RPC
 import rpc_types
-
-last_checkpoint_path = None
-last_checkpoint = None
+from model_cache import cache
 
 def apply_config(checkpoint, config_path):
     try:
@@ -46,27 +44,21 @@ def apply_config(checkpoint, config_path):
         return checkpoint
 
 def load_checkpoint(path, embeddings_path=None, config_path=None):
-    checkpoint = comfy.sd.load_checkpoint_guess_config(path, output_vae=True, output_clip=True, embedding_directory=embeddings_path)
+    info = {
+        "path": path,
+        "embeddings_path": embeddings_path,
+        "config_path": config_path,
+    }
+  
+    def load():
+        checkpoint = comfy.sd.load_checkpoint_guess_config(path, output_vae=True, output_clip=True, embedding_directory=embeddings_path)
 
-    if config_path is None:
+        if config_path is not None:
+            checkpoint = apply_config(checkpoint, config_path)
+
         return checkpoint
-    else:
-        return apply_config(checkpoint, config_path)
-
-def load_checkpoint_cached(path, embeddings_path=None, config_path=None):
-    global last_checkpoint, last_checkpoint_path
-
-    comfy.model_management.cleanup_models()
-
-    if last_checkpoint != None and last_checkpoint_path == path:
-        return last_checkpoint
-
-    last_checkpoint = None
-    comfy.model_management.cleanup_models()
     
-    last_checkpoint_path = path
-    last_checkpoint = load_checkpoint(path, embeddings_path, config_path)
-    return last_checkpoint
+    return cache().load_cached(info, load)
 
 class CheckpointLoadResult(TypedDict):
     diffusion_model: rpc_types.DiffusionModel
@@ -78,7 +70,7 @@ class CheckpointNamespace:
     @RPC.autoref
     @RPC.method
     def load(path: str, embeddings_path: str = None, config_path: str = None) -> CheckpointLoadResult:
-        (diffusion_model, text_encoder, vae, _) = load_checkpoint_cached(path, embeddings_path, config_path)
+        (diffusion_model, text_encoder, vae, _) = load_checkpoint(path, embeddings_path, config_path)
 
         return {
             "diffusion_model": diffusion_model,

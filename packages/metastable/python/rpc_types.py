@@ -38,3 +38,9 @@ class ConditioningPair(TypedDict):
 class PreviewSettings(TypedDict):
     method: str
     taesd: NotRequired[dict[str, str]]
+
+class CachedModelInfo(TypedDict):
+    path: str
+    embeddings_path: NotRequired[str]
+    config_path: NotRequired[str]
+    model_type: NotRequired[str]

@@ -1,5 +1,9 @@
 # 0.0.17 (Upcoming)
 
+## Improvements
+
+- Model caching has been reworked to retain relevant models.
+
 ## Bug fixes
 
 - Resolved problems with cleanup of draft projects.

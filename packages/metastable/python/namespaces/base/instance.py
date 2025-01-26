@@ -2,11 +2,13 @@ from typing import NotRequired, TypedDict
 import psutil
 import torch
 
-from comfy.model_management import get_torch_device, get_total_memory, vae_dtype, is_intel_xpu
+from comfy.model_management import get_torch_device, get_total_memory, vae_dtype, is_intel_xpu, loaded_models
 import comfy.samplers
 from .utils import custom
 
 from rpc import RPC
+import rpc_types
+from model_cache import cache
 
 class TorchDeviceInfo(TypedDict):
     type: str
@@ -83,3 +85,10 @@ class InstanceNamespace:
             "samplers": comfy.samplers.KSampler.SAMPLERS,
             "schedulers": comfy.samplers.KSampler.SCHEDULERS + list(custom.get_custom_schedulers().keys())
         }
+    
+    @RPC.method
+    def cleanup_models(except_for: list[rpc_types.CachedModelInfo] = []) -> None:
+        if len(except_for) > 0:
+            cache().remove_all_except_for(except_for)
+        else:
+            cache().clear()

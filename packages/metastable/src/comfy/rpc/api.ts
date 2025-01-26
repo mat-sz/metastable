@@ -12,6 +12,18 @@ export function getApi(rpc: RPC) {
       },
     },
     instance: {
+      cleanupModels(args: {
+        exceptFor?: {
+          path: string;
+          embeddings_path?: string;
+          config_path?: string;
+          model_type?: string;
+        }[];
+      }): Promise<void> {
+        return rpc.invoke(undefined, 'instance:cleanup_models', {
+          except_for: args.exceptFor,
+        }) as any;
+      },
       info(): Promise<{
         torch: {
           memory: {
@@ -47,6 +59,18 @@ export function getSessionApi(session: RPCSession) {
       },
     },
     instance: {
+      cleanupModels(args: {
+        exceptFor?: {
+          path: string;
+          embeddings_path?: string;
+          config_path?: string;
+          model_type?: string;
+        }[];
+      }): Promise<void> {
+        return session.invoke('instance:cleanup_models', {
+          except_for: args.exceptFor,
+        }) as any;
+      },
       info(): Promise<{
         torch: {
           memory: {
