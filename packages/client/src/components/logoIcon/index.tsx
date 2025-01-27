@@ -6,7 +6,7 @@ interface Props {
 
 export const LogoIcon: React.FC<Props> = props => {
   return (
-    <svg viewBox="0 0 77.7 77.7" {...props}>
+    <svg viewBox="0 0 77.7 77.7" height="1em" width="1em" {...props}>
       <g transform="translate(-11.2 -8.67)">
         <path
           d="m84.3 69.8-34.3 19.8-34.3-19.8 5.84-34.6 28.5-24.8 28.5 24.8z"

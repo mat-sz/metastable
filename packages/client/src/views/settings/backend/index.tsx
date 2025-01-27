@@ -3,7 +3,7 @@ import React from 'react';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
 import styles from './index.module.scss';
 import { LoadedModelsTab } from './loadedModels';
-import { LogTab } from './log';
+import { LogsTab } from './logs';
 import { SettingsTab } from './settings';
 import { StatusTab } from './status';
 
@@ -15,13 +15,13 @@ export const SettingsBackend: React.FC = () => {
         <Tabs>
           <Tab id="settings" title="Settings" />
           <Tab id="status" title="Status" />
-          <Tab id="log" title="Log" />
+          <Tab id="logs" title="Logs" />
           <Tab id="loadedModels" title="Loaded models" />
         </Tabs>
         <TabContent className={styles.content}>
           <SettingsTab />
           <StatusTab />
-          <LogTab />
+          <LogsTab />
           <LoadedModelsTab />
         </TabContent>
       </TabView>

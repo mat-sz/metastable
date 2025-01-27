@@ -1,16 +1,18 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   BsFillCheckCircleFill,
   BsFillExclamationCircleFill,
   BsFillQuestionCircleFill,
   BsGpuCard,
+  BsPcDisplayHorizontal,
 } from 'react-icons/bs';
 
+import { LogoIcon } from '$components/logoIcon';
 import { mainStore } from '$stores/MainStore';
+import { uiStore } from '$stores/UIStore';
 import styles from './Status.module.scss';
-import { Utilization } from './Utilization';
 
 interface Props {
   className?: string;
@@ -18,7 +20,6 @@ interface Props {
 
 export const Status: React.FC<Props> = observer(({ className }) => {
   const status = mainStore.status;
-  const [showUtilization, setShowUtilization] = useState(false);
 
   return (
     <div className={clsx(styles.status, className)}>
@@ -42,13 +43,22 @@ export const Status: React.FC<Props> = observer(({ className }) => {
         <button
           onClick={e => {
             e.stopPropagation();
-            setShowUtilization(current => !current);
+            uiStore.toggleSystemMonitor();
           }}
         >
+          <BsPcDisplayHorizontal />
+          <span>System monitor</span>
+        </button>
+        <div>
           <BsGpuCard />
           <span>{mainStore.deviceName}</span>
-        </button>
-        {showUtilization && <Utilization />}
+        </div>
+        <div>
+          <LogoIcon />
+          <span>
+            {__APP_NAME__} {__APP_VERSION__}
+          </span>
+        </div>
       </div>
     </div>
   );

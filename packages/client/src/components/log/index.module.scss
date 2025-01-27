@@ -1,5 +1,5 @@
 .logWrapper {
-  margin-top: 1rem;
+  max-height: 300px;
   position: relative;
 
   .copy {
@@ -11,12 +11,11 @@
 }
 
 .log {
-  max-height: 300px;
+  height: 100%;
   overflow-y: auto;
   user-select: text;
   background: var(--grey-100);
   padding: 0.25rem;
-  white-space: pre-wrap;
   word-break: break-all;
   font-family: 'Inconsolata', 'Courier New', Courier, monospace;
 
@@ -25,9 +24,20 @@
     font-family: 'Inconsolata', 'Courier New', Courier, monospace;
   }
 
+  .item {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    align-items: start;
+  }
+
+  &.simple {
+    white-space: pre-wrap;
+  }
+
   .text {
     margin-left: 0.5rem;
     color: var(--grey-900);
+    white-space: pre-wrap;
   }
 
   .timestamp {

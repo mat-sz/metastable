@@ -1,6 +1,7 @@
 .status {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0.25rem 1rem;
   padding-top: 0.5rem;
 
@@ -52,8 +53,15 @@
     display: flex;
     align-items: center;
 
-    & > div {
+    & > * {
+      display: flex;
+      align-items: center;
+      margin-left: 0.5rem;
       padding: 0.2rem 0.6rem;
+
+      &:last-child {
+        margin-right: -0.6rem;
+      }
 
       span {
         margin-left: 0.5rem;

@@ -48,32 +48,59 @@
 
 .tabView {
   &.horizontal {
-    display: grid;
-    grid-template-rows: 1.5rem calc(100% - 1.5rem);
+    display: flex;
+    flex-direction: column;
     height: 100%;
 
     & > .tabs {
       display: flex;
-      border-bottom: 1px solid var(--grey-300);
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: none;
+      position: relative;
+
+      &:after {
+        position: absolute;
+        display: block;
+        content: '';
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-bottom: 1px solid var(--grey-400);
+      }
 
       &::-webkit-scrollbar {
         width: 0;
       }
 
       & > .tab {
-        background: var(--grey-300);
-        padding: 0 0.5rem;
+        padding: 0.5rem 0.75rem;
         margin-right: 0.25rem;
         display: inline-flex;
         align-items: center;
         cursor: pointer;
         flex-shrink: 0;
+        color: var(--grey-800);
+        font-size: 0.9rem;
+        position: relative;
+
+        &:hover {
+          color: var(--grey-900);
+        }
 
         &.selected {
-          background: var(--grey-600);
+          color: var(--grey-900);
+
+          &:after {
+            position: absolute;
+            display: block;
+            content: '';
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-bottom: 2px solid var(--grey-700);
+            z-index: 999;
+          }
         }
       }
     }

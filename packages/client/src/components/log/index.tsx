@@ -43,16 +43,18 @@ export const Log: React.FC<Props> = ({ items, className }) => {
       >
         <BsClipboard />
       </IconButton>
-      <div className={styles.log} ref={logRef}>
+      <div className={clsx(styles.log, styles.advanced)} ref={logRef}>
         {items.map((item, i) => (
           <div
             key={i}
-            className={clsx({ [styles.error]: item.type === 'stderr' })}
+            className={clsx(styles.item, {
+              [styles.error]: item.type === 'stderr',
+            })}
           >
-            <span className={styles.timestamp}>
+            <div className={styles.timestamp}>
               [{new Date(item.timestamp).toLocaleTimeString()}]
-            </span>
-            <span className={styles.text}>{item.text}</span>
+            </div>
+            <div className={styles.text}>{item.text}</div>
           </div>
         ))}
       </div>

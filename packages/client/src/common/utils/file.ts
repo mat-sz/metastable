@@ -53,3 +53,11 @@ export const EXTENSIONS: Record<string, string> = {
   'image/png': 'png',
   'image/jpeg': 'jpg',
 };
+
+export function basename(path: string) {
+  if (path.includes('/')) {
+    return path.split('/').pop()!;
+  }
+
+  return path.split('\\').pop()!;
+}

@@ -32,6 +32,8 @@ class UIStore {
 
   systemTheme: 'dark' | 'light';
 
+  showSystemMonitor = false;
+
   constructor() {
     makeAutoObservable(this);
 
@@ -82,6 +84,10 @@ class UIStore {
 
   setView(view: ViewName) {
     this.view = view;
+  }
+
+  toggleSystemMonitor() {
+    this.showSystemMonitor = !this.showSystemMonitor;
   }
 }
 

@@ -5,9 +5,9 @@ import { Log } from '$components/log';
 import { TabPanel } from '$components/tabs';
 import { mainStore } from '$stores/MainStore';
 
-export const LogTab: React.FC = observer(() => {
+export const LogsTab: React.FC = observer(() => {
   return (
-    <TabPanel id="log">
+    <TabPanel id="logs">
       <Log items={mainStore.backendLog} />
     </TabPanel>
   );
