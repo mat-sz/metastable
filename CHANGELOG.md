@@ -3,7 +3,7 @@
 ## Features
 
 - Added a button to unload all models from VRAM.
-- Added a list view of currently loaded models.
+- Added a new system monitor view with backend logs, loaded models and hardware utilization information.
 
 ## Improvements
 

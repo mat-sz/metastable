@@ -1,0 +1,47 @@
+.tag {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem 0.25rem;
+  margin-right: 0.3rem;
+  border: 1px solid var(--grey-100);
+  background: var(--grey-200-transparent);
+  border-radius: 5px;
+  line-height: 0;
+
+  & > span {
+    font-size: 0.8rem;
+  }
+
+  & > svg {
+    min-width: 1rem;
+    margin: 0;
+    margin-right: 0.15rem;
+  }
+
+  &.error {
+    border: 1px solid var(--red-900);
+    background: var(--red-100);
+
+    svg {
+      color: var(--red-900);
+    }
+  }
+
+  &.warning {
+    border: 1px solid var(--yellow-900);
+    background: var(--yellow-100);
+
+    svg {
+      color: var(--yellow-900);
+    }
+  }
+
+  &.ok {
+    border: 1px solid var(--green-900);
+    background: var(--green-100);
+
+    svg {
+      color: var(--green-900);
+    }
+  }
+}

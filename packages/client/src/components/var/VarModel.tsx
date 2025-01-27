@@ -5,6 +5,7 @@ import { BsChevronDown } from 'react-icons/bs';
 
 import { ModelBrowser } from '$components/modelBrowser';
 import { Popover } from '$components/popover';
+import { ThumbnailDisplay } from '$components/thumbnailDisplay';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';
@@ -80,14 +81,11 @@ export const VarModel = observer(
           >
             {model ? (
               <>
-                <div
-                  style={{ backgroundColor: stringToColor(currentValue) }}
+                <ThumbnailDisplay
                   className={styles.icon}
-                >
-                  {model.coverMrn && (
-                    <img src={resolveImage(model.coverMrn, 'thumbnail')} />
-                  )}
-                </div>
+                  color={stringToColor(currentValue)}
+                  imageUrl={resolveImage(model.coverMrn, 'thumbnail')}
+                />
                 <span className={styles.name}>{model.name}</span>
               </>
             ) : (

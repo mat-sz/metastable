@@ -18,7 +18,8 @@ import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
 import { IconButton } from '$components/iconButton';
-import { Card, CardTag, CardTags, List } from '$components/list';
+import { Card, CardTags, List } from '$components/list';
+import { Tag } from '$components/tag';
 import { ModelDelete, ModelEdit } from '$modals/model';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
@@ -173,17 +174,14 @@ export const ModelBrowserList: React.FC<ModelBrowserListProps> = observer(
             >
               <CardTags>
                 {item.details?.architecture && (
-                  <CardTag icon={<BsBoxFill />}>
+                  <Tag icon={<BsBoxFill />}>
                     {item.details?.architecture?.toUpperCase()}
-                  </CardTag>
+                  </Tag>
                 )}
                 {item.details?.corrupt && (
-                  <CardTag
-                    variant="warning"
-                    icon={<BsExclamationTriangleFill />}
-                  >
+                  <Tag variant="warning" icon={<BsExclamationTriangleFill />}>
                     CORRUPT
-                  </CardTag>
+                  </Tag>
                 )}
               </CardTags>
             </Card>

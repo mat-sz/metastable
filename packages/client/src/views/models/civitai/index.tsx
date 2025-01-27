@@ -12,8 +12,9 @@ import { MdNoPhotography } from 'react-icons/md';
 
 import { IconButton } from '$components/iconButton';
 import { Label } from '$components/label';
-import { Card, CardTag, CardTags, List } from '$components/list';
+import { Card, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
+import { Tag } from '$components/tag';
 import { Toggle } from '$components/toggle';
 import { CivitAIArgs, uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
@@ -235,15 +236,15 @@ export const CivitAI: React.FC = observer(() => {
                     icon={<MdNoPhotography />}
                   >
                     <CardTags>
-                      <CardTag icon={<BsHandThumbsUpFill />}>
+                      <Tag icon={<BsHandThumbsUpFill />}>
                         {item.stats.thumbsUpCount}
-                      </CardTag>
-                      <CardTag icon={<BsHandThumbsDownFill />}>
+                      </Tag>
+                      <Tag icon={<BsHandThumbsDownFill />}>
                         {item.stats.thumbsDownCount}
-                      </CardTag>
-                      <CardTag icon={<BsDownload />}>
+                      </Tag>
+                      <Tag icon={<BsDownload />}>
                         {item.stats.downloadCount}
-                      </CardTag>
+                      </Tag>
                     </CardTags>
                   </Card>
                 );

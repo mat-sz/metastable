@@ -1,6 +1,6 @@
 import { Utilization as UtilizationData } from '@metastable/types';
 import React, { useState } from 'react';
-import { BsCpu, BsGpuCard, BsMemory } from 'react-icons/bs';
+import { BsCpu, BsGpuCard, BsHdd, BsMemory } from 'react-icons/bs';
 
 import { TRPC } from '$api';
 import { ProgressBar } from '$components/progressBar';
@@ -98,9 +98,16 @@ export const Utilization: React.FC = () => {
             label="VRAM"
             secondaryLabelType="size"
             value={utilization.vramUsed}
-            max={utilization.hddTotal}
+            max={utilization.vramTotal}
           />
         )}
+      <UtilizationItem
+        icon={<BsHdd />}
+        label="HDD"
+        secondaryLabelType="size"
+        value={utilization.hddUsed}
+        max={utilization.hddTotal}
+      />
     </div>
   );
 };

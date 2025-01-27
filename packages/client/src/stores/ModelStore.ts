@@ -51,6 +51,15 @@ class ModelStore {
     return !!this.findByName(type, name);
   }
 
+  findByPath(path: string) {
+    for (const type of Object.values(ModelType)) {
+      const model = this.models[type]?.find(({ file }) => file.path == path);
+      if (model) {
+        return model;
+      }
+    }
+  }
+
   find(mrn?: string) {
     if (!mrn) {
       return undefined;

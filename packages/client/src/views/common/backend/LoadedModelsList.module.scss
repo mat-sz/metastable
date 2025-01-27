@@ -1,0 +1,30 @@
+.list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .tag {
+      padding: 0.2rem 0.25rem;
+      margin-right: 0.3rem;
+      border: 1px solid var(--grey-100);
+      background: var(--grey-200-transparent);
+      border-radius: 5px;
+    }
+
+    & > * {
+      margin-right: 0.5rem;
+    }
+  }
+}
