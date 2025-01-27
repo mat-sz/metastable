@@ -8,6 +8,8 @@ export interface ButtonProps
     React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
     'ref'
   > {
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
   href?: string;
   download?: string;
   variant?: 'danger' | 'primary' | 'secondary' | 'default';
@@ -15,6 +17,8 @@ export interface ButtonProps
 }
 
 export const Button: React.FC<ButtonProps> = ({
+  icon,
+  iconPosition = 'left',
   children,
   className,
   href,
@@ -22,27 +26,41 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'default',
   ...props
 }) => {
+  const buttonClassName = clsx(
+    styles.button,
+    styles[variant],
+    {
+      [styles.iconLeft]: iconPosition === 'left' && icon,
+      [styles.iconRight]: iconPosition === 'right' && icon,
+    },
+    className,
+  );
+  const contents = (
+    <>
+      {iconPosition === 'left' && icon}
+      <span className={styles.text}>{children}</span>
+      {iconPosition === 'right' && icon}
+    </>
+  );
+
   if (href) {
     return (
       <a
-        className={clsx(styles.button, styles[variant], className)}
+        className={buttonClassName}
         href={href}
         download={download}
         rel="noreferrer noopener"
         target="_blank"
         {...props}
       >
-        {children}
+        {contents}
       </a>
     );
   }
 
   return (
-    <button
-      className={clsx(styles.button, styles[variant], className)}
-      {...props}
-    >
-      {children}
+    <button className={buttonClassName} {...props}>
+      {contents}
     </button>
   );
 };

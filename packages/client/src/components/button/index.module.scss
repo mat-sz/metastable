@@ -4,7 +4,7 @@
   justify-content: center;
   background-color: var(--grey-400);
   color: var(--grey-900);
-  padding: 0.65rem 1.2rem;
+  padding: 0.75rem 1.2rem;
   font-size: 0.8rem;
   border-radius: 3px;
   transition: 0.2s ease-in-out all;
@@ -12,6 +12,22 @@
   text-shadow: none;
   text-decoration: none;
   cursor: pointer;
+
+  .text {
+    line-height: 0;
+  }
+
+  &.iconLeft {
+    .text {
+      margin-left: 0.5rem;
+    }
+  }
+
+  &.iconRight {
+    .text {
+      margin-right: 0.5rem;
+    }
+  }
 
   &:hover {
     background-color: var(--grey-600);
@@ -26,10 +42,6 @@
     &:hover {
       background-color: var(--grey-600) !important;
     }
-  }
-
-  span {
-    margin-left: 0.5rem;
   }
 
   &.danger {

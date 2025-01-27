@@ -2,6 +2,7 @@ import { Architecture, Model, ModelType } from '@metastable/types';
 import { useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { ModelBrowser } from '$components/modelBrowser';
 import { Popover } from '$components/popover';
 import styles from './VarAddModel.module.scss';
@@ -49,13 +50,13 @@ export const VarAddModel = ({
           />
         }
       >
-        <button
+        <Button
           className={styles.selection}
           onClick={() => setIsOpen(current => !current)}
+          icon={<BsPlusLg />}
         >
-          <BsPlusLg />
-          <span>Add {label}</span>
-        </button>
+          Add {label}
+        </Button>
       </Popover>
     </VarBase>
   );

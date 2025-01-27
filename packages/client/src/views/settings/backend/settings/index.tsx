@@ -29,13 +29,17 @@ export const SettingsTab: React.FC = observer(() => {
     <TabPanel id="settings">
       <VarCategory label="Actions">
         <div className={styles.actions}>
-          <Button onClick={() => API.instance.restart.mutate()}>
-            <BsArrowClockwise />
-            <span>Restart backend</span>
+          <Button
+            onClick={() => API.instance.restart.mutate()}
+            icon={<BsArrowClockwise />}
+          >
+            Restart backend
           </Button>
-          <Button onClick={() => API.instance.unloadModels.mutate()}>
-            <BsBoxArrowDownLeft />
-            <span>Unload all models</span>
+          <Button
+            onClick={() => API.instance.unloadModels.mutate()}
+            icon={<BsBoxArrowDownLeft />}
+          >
+            Unload all models
           </Button>
         </div>
       </VarCategory>

@@ -34,9 +34,10 @@ export const Step1: React.FC = observer(() => {
               variant="primary"
               className={styles.cta}
               onClick={() => setupStore.start()}
+              icon={<BsChevronRight />}
+              iconPosition="right"
             >
-              <span>Continue</span>
-              <BsChevronRight />
+              Continue
             </Button>
           </div>
         </>

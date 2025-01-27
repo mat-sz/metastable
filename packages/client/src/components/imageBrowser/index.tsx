@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BsFolderFill } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { Popover } from '$components/popover';
 import { ImageBrowser, ImageBrowserProps } from './ImageBrowser';
 
@@ -26,15 +27,15 @@ export const ImageBrowseButton = ({
         />
       }
     >
-      <button
+      <Button
         onClick={e => {
           e.stopPropagation();
           setIsBrowserOpen(current => !current);
         }}
+        icon={<BsFolderFill />}
       >
-        <BsFolderFill />
-        <span>Browse...</span>
-      </button>
+        Browse...
+      </Button>
     </Popover>
   );
 };

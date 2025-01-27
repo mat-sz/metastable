@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsDownload, BsHourglass, BsXCircleFill } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { mainStore } from '$stores/MainStore';
 import { modelStore } from '$stores/ModelStore';
 import { filesize } from '$utils/file';
@@ -101,24 +102,21 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
 
     if (failed) {
       return (
-        <button disabled>
-          <BsXCircleFill />
-          <span>{failed.error}</span>
-        </button>
+        <Button icon={<BsXCircleFill />} disabled>
+          {failed.error}
+        </Button>
       );
     } else if (isWaiting) {
       return (
-        <button disabled>
-          <BsHourglass />
-          <span>Retrieving metadata</span>
-        </button>
+        <Button icon={<BsHourglass />} disabled>
+          Retrieving metadata
+        </Button>
       );
     } else if (allDownloaded) {
       return (
-        <button disabled>
-          <BsDownload />
-          <span>Already downloaded</span>
-        </button>
+        <Button icon={<BsDownload />} disabled>
+          Already downloaded
+        </Button>
       );
     } else if (allQueued) {
       if (remaining.length) {
@@ -133,17 +131,15 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
           ) || 0;
 
         return (
-          <button disabled>
-            <BsDownload />
-            <span>Downloading ({percent}%)</span>
-          </button>
+          <Button icon={<BsDownload />} disabled>
+            Downloading ({percent}%)
+          </Button>
         );
       } else {
         return (
-          <button disabled>
-            <BsDownload />
-            <span>In queue</span>
-          </button>
+          <Button icon={<BsDownload />} disabled>
+            In queue
+          </Button>
         );
       }
     }
@@ -151,7 +147,8 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
     const size = toDownload.reduce((size, item) => size + (item.size || 0), 0);
 
     return (
-      <button
+      <Button
+        icon={<BsDownload />}
         onClick={() => {
           for (const file of toDownload) {
             mainStore.tasks.download(file.settings);
@@ -160,12 +157,9 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
           onClick?.();
         }}
       >
-        <BsDownload />
-        <span>
-          Download {toDownload.length > 1 && `(${toDownload.length} files)`}{' '}
-          {!!size && `(${filesize(size)})`}
-        </span>
-      </button>
+        Download {toDownload.length > 1 && `(${toDownload.length} files)`}{' '}
+        {!!size && `(${filesize(size)})`}
+      </Button>
     );
   },
 );

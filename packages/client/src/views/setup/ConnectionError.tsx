@@ -1,6 +1,7 @@
 import React from 'react';
 import { BsArrowRepeat } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { updateStore } from '$stores/UpdateStore';
 import styles from './index.module.scss';
 
@@ -15,10 +16,9 @@ export const ConnectionError: React.FC = () => {
         </div>
       </div>
       <div className={styles.footer}>
-        <button className={styles.cta} onClick={() => updateStore.refresh()}>
-          <span>Refresh</span>
-          <BsArrowRepeat />
-        </button>
+        <Button onClick={() => updateStore.refresh()} icon={<BsArrowRepeat />}>
+          Refresh
+        </Button>
       </div>
     </div>
   );

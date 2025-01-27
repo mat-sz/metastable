@@ -37,9 +37,9 @@ export const Home: React.FC = observer(() => {
                         app: { ...config.data!.app, hideWelcome: true },
                       });
                     }}
+                    icon={<BsXLg />}
                   >
-                    <BsXLg />
-                    <span>Close</span>
+                    Close
                   </Button>
                 </div>
                 <Social />

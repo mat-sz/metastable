@@ -6,6 +6,7 @@ import { BsArrowClockwise } from 'react-icons/bs';
 
 import { API } from '$api';
 import { Alert } from '$components/alert';
+import { Button } from '$components/button';
 import { LogSimple } from '$components/log';
 import { TabPanel } from '$components/tabs';
 import { VarToggle } from '$components/var';
@@ -21,10 +22,12 @@ export const SettingsFeatures: React.FC = observer(() => {
     <TabPanel id="features">
       <h2>Optional features</h2>
       <div className={styles.actions}>
-        <button onClick={() => API.instance.restart.mutate()}>
-          <BsArrowClockwise />
-          <span>Restart backend</span>
-        </button>
+        <Button
+          onClick={() => API.instance.restart.mutate()}
+          icon={<BsArrowClockwise />}
+        >
+          Restart backend
+        </Button>
       </div>
       {!available && (
         <Alert variant="warning">
@@ -63,7 +66,7 @@ export const SettingsFeatures: React.FC = observer(() => {
                   />
                 </>
               ) : (
-                <button
+                <Button
                   onClick={() =>
                     API.instance.installFeature.mutate({
                       featureId: feature.id,
@@ -71,7 +74,7 @@ export const SettingsFeatures: React.FC = observer(() => {
                   }
                 >
                   Install
-                </button>
+                </Button>
               )}
             </div>
             <div>{feature.description}</div>

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
+import { Button } from '$components/button';
 import { ProgressBar } from '$components/progressBar';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
@@ -64,21 +65,21 @@ export const Queue: React.FC = observer(() => {
             <div>
               {download.state === TaskState.RUNNING ||
               download.state === TaskState.QUEUED ? (
-                <button
+                <Button
                   onClick={() =>
                     mainStore.tasks.cancel('downloads', download.id)
                   }
                 >
                   Cancel
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={() =>
                     mainStore.tasks.dismiss('downloads', download.id)
                   }
                 >
                   Dismiss
-                </button>
+                </Button>
               )}
             </div>
           </div>

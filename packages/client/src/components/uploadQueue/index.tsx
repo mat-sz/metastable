@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { BsCheck, BsHourglass, BsXCircleFill, BsXLg } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { UploadQueueStore } from '$stores/project/UploadQueueStore';
 import styles from './index.module.scss';
 
@@ -18,12 +19,12 @@ export const UploadQueue: React.FC<Props> = observer(({ queue }) => {
     <div>
       <div className={styles.actions}>
         <span>Upload files ({queue.items.length}):</span>
-        <button onClick={() => queue.run()} disabled={queue.isRunning}>
+        <Button onClick={() => queue.run()} disabled={queue.isRunning}>
           Upload
-        </button>
-        <button onClick={() => queue.reset()} disabled={queue.isRunning}>
+        </Button>
+        <Button onClick={() => queue.reset()} disabled={queue.isRunning}>
           Reset
-        </button>
+        </Button>
       </div>
       <div className={styles.queue}>
         {queue.items.map(item => (

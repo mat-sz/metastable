@@ -17,6 +17,7 @@ import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
 import { API } from '$api';
 import { Breadcrumbs } from '$components/breadcrumbs';
+import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
 import { Card, CardTags, List } from '$components/list';
 import { Tag } from '$components/tag';
@@ -100,13 +101,13 @@ export const ModelBrowserList: React.FC<ModelBrowserListProps> = observer(
         noResultsView={
           <>
             <div className={styles.hint}>No models found.</div>
-            <button
+            <Button
               className={styles.selection}
               onClick={() => uiStore.setView('models')}
+              icon={<BsBox />}
             >
-              <BsBox />
-              <span>Download models</span>
-            </button>
+              Download models
+            </Button>
           </>
         }
         quickFilter={(_, search) =>
