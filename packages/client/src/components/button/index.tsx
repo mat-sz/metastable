@@ -16,51 +16,57 @@ export interface ButtonProps
   disabled?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  icon,
-  iconPosition = 'left',
-  children,
-  className,
-  href,
-  download,
-  variant = 'default',
-  ...props
-}) => {
-  const buttonClassName = clsx(
-    styles.button,
-    styles[variant],
+export const Button = React.forwardRef(
+  (
     {
-      [styles.iconLeft]: iconPosition === 'left' && icon,
-      [styles.iconRight]: iconPosition === 'right' && icon,
-    },
-    className,
-  );
-  const contents = (
-    <>
-      {iconPosition === 'left' && icon}
-      <span className={styles.text}>{children}</span>
-      {iconPosition === 'right' && icon}
-    </>
-  );
-
-  if (href) {
-    return (
-      <a
-        className={buttonClassName}
-        href={href}
-        download={download}
-        rel="noreferrer noopener"
-        target="_blank"
-        {...props}
-      >
-        {contents}
-      </a>
+      icon,
+      iconPosition = 'left',
+      children,
+      className,
+      href,
+      download,
+      variant = 'default',
+      ...props
+    }: ButtonProps,
+    ref: React.ForwardedRef<HTMLElement | null>,
+  ) => {
+    const buttonClassName = clsx(
+      styles.button,
+      styles[variant],
+      {
+        [styles.iconLeft]: iconPosition === 'left' && icon,
+        [styles.iconRight]: iconPosition === 'right' && icon,
+      },
+      className,
     );
-  }
+    const contents = (
+      <>
+        {iconPosition === 'left' && icon}
+        <span className={styles.text}>{children}</span>
+        {iconPosition === 'right' && icon}
+      </>
+    );
 
-  return (
-    <button className={buttonClassName} {...props}>
-      {contents}
-    </button>
-  );
-};
+    if (href) {
+      return (
+        <a
+          className={buttonClassName}
+          href={href}
+          download={download}
+          rel="noreferrer noopener"
+          target="_blank"
+          {...props}
+          ref={ref as any}
+        >
+          {contents}
+        </a>
+      );
+    }
+
+    return (
+      <button className={buttonClassName} {...props} ref={ref as any}>
+        {contents}
+      </button>
+    );
+  },
+);

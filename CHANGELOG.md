@@ -1,3 +1,9 @@
+# 0.0.18 (Upcoming)
+
+## Bug fixes
+
+- Fixed issues with popovers not showing up in the right place (e.g. model selection or mask image selection).
+
 # 0.0.17 (2025-01-27)
 
 ## Features
