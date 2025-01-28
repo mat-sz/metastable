@@ -5,6 +5,7 @@ import { TabPanel } from '$components/tabs';
 import {
   VarCategoryScope,
   VarPrompt,
+  VarSlider,
   VarSwitch,
   VarToggle,
 } from '$components/var';
@@ -25,6 +26,16 @@ export const SettingsGeneral: React.FC = observer(() => {
             { key: 'system', label: 'System' },
           ]}
           inline
+        />
+        <VarSlider
+          path="fontSize"
+          label="Font size"
+          defaultValue={16}
+          unit="px"
+          step={1}
+          min={12}
+          max={20}
+          showInput
         />
         <VarToggle path="fuzzySearch" label="Use fuzzy search" />
         {uiStore.notificationPermission !== 'denied' ? (

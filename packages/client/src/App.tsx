@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
@@ -15,11 +15,16 @@ import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
 
 const View: React.FC = observer(() => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     withoutTransitions(() => {
       document.documentElement.setAttribute('data-theme', mainStore.theme);
     });
   }, [mainStore.theme]);
+  useLayoutEffect(() => {
+    withoutTransitions(() => {
+      document.documentElement.style.fontSize = `${mainStore.config.data?.ui.fontSize || 16}px`;
+    });
+  }, [mainStore.config.data?.ui.fontSize]);
 
   if (setupStore?.status !== 'done') {
     return <Setup />;

@@ -24,6 +24,7 @@ const CONFIG_DEFAULTS: ConfigType = {
     fuzzySearch: true,
     notifications: false,
     theme: 'dark',
+    fontSize: 16,
   },
   app: {
     autoUpdate: true,

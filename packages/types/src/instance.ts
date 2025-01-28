@@ -70,6 +70,7 @@ export interface ConfigType {
     fuzzySearch: boolean;
     notifications: boolean;
     theme: 'dark' | 'light' | 'system';
+    fontSize: number;
   };
   generation: {
     preview: boolean;

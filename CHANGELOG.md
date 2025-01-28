@@ -1,5 +1,9 @@
 # 0.0.18 (Upcoming)
 
+## Features
+
+- Added a "Font size" slider to settings.
+
 ## Improvements
 
 - Added a close button to System Monitor.
