@@ -84,6 +84,19 @@
         font-size: 0.9rem;
         position: relative;
 
+        &:after {
+          position: absolute;
+          display: block;
+          content: '';
+          bottom: 0;
+          left: 0;
+          right: 0;
+          border-bottom: 2px solid var(--grey-900);
+          z-index: 999;
+          opacity: 0;
+          transition: 0.2s ease-in-out all;
+        }
+
         &:hover {
           color: var(--grey-900);
         }
@@ -92,14 +105,7 @@
           color: var(--grey-900);
 
           &:after {
-            position: absolute;
-            display: block;
-            content: '';
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-bottom: 2px solid var(--grey-700);
-            z-index: 999;
+            opacity: 1;
           }
         }
       }

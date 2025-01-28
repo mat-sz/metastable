@@ -27,7 +27,7 @@ export const SettingsTab: React.FC = observer(() => {
 
   return (
     <TabPanel id="settings">
-      <VarCategory label="Actions">
+      <VarCategory label="Actions" className={styles.actionsCategory}>
         <div className={styles.actions}>
           <Button
             onClick={() => API.instance.restart.mutate()}

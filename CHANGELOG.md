@@ -3,6 +3,7 @@
 ## Improvements
 
 - Added a close button to System Monitor.
+- Improved design consistency.
 
 ## Bug fixes
 

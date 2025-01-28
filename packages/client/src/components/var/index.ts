@@ -6,6 +6,7 @@ export * from './VarArray';
 export * from './VarArrayWithModal';
 export * from './VarBase';
 export * from './VarButton';
+export * from './VarHotkey';
 export * from './VarInputType';
 export * from './VarImage';
 export * from './VarImageMode';

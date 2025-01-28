@@ -14,6 +14,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+
+    [varui-label-title] {
+      margin: 0;
+    }
 
     kbd:not(:last-child) {
       margin-right: 0.25rem;
@@ -26,7 +31,7 @@
     & > div:nth-child(2),
     & > div:nth-child(3) {
       width: 210px;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
 
       & > div {
         margin: 0;

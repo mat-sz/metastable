@@ -23,8 +23,7 @@ interface ModelFoldersListProps {
 
 const ModelFoldersList: React.FC<ModelFoldersListProps> = ({ title, type }) => {
   return (
-    <div className={styles.list}>
-      <h3>{title}</h3>
+    <VarCategory label={title}>
       <VarArrayWithModal
         addModalTitle="Add folder"
         editModalTitle="Edit folder"
@@ -77,7 +76,7 @@ const ModelFoldersList: React.FC<ModelFoldersListProps> = ({ title, type }) => {
           </div>
         )}
       </VarArrayWithModal>
-    </div>
+    </VarCategory>
   );
 };
 
@@ -85,12 +84,10 @@ export const SettingsModelFolders: React.FC = observer(() => {
   return (
     <TabPanel id="modelFolders">
       <h2>Model folders</h2>
-      <div>
-        <VarScope path="modelFolders">
-          <ModelFoldersList title="Checkpoints" type={ModelType.CHECKPOINT} />
-          <ModelFoldersList title="LORAs" type={ModelType.LORA} />
-        </VarScope>
-      </div>
+      <VarScope path="modelFolders">
+        <ModelFoldersList title="Checkpoints" type={ModelType.CHECKPOINT} />
+        <ModelFoldersList title="LORAs" type={ModelType.LORA} />
+      </VarScope>
     </TabPanel>
   );
 });

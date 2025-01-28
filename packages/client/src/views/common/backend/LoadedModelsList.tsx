@@ -14,7 +14,9 @@ export const LoadedModelsList: React.FC = observer(() => {
   return (
     <div>
       {mainStore.modelCache.length === 0 && (
-        <div>No models are currently loaded.</div>
+        <div className={styles.empty}>
+          No models are currently loaded into memory.
+        </div>
       )}
       <ul className={styles.list}>
         {mainStore.modelCache.map(path => {
