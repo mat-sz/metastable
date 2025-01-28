@@ -4,13 +4,15 @@ import React from 'react';
 import { BsDownload, BsHourglass, BsXCircleFill } from 'react-icons/bs';
 
 import { Button } from '$components/button';
+import { ModelDownload } from '$modals/model';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { filesize } from '$utils/file';
 
 interface DownloadButtonProps {
   files: DownloadSettings[];
-  onClick?: () => void;
+  onDownload?: () => void;
 }
 
 interface DownloadFileState {
@@ -22,7 +24,7 @@ interface DownloadFileState {
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = observer(
-  ({ files, onClick }) => {
+  ({ files, onDownload }) => {
     const fileState: DownloadFileState[] = files.map(file => {
       const model = modelStore.findByName(file.type, file.name);
       if (model) {
@@ -150,11 +152,9 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
       <Button
         icon={<BsDownload />}
         onClick={() => {
-          for (const file of toDownload) {
-            mainStore.tasks.download(file.settings);
-          }
-
-          onClick?.();
+          modalStore.show(
+            <ModelDownload downloads={toDownload} onDownload={onDownload} />,
+          );
         }}
       >
         Download {toDownload.length > 1 && `(${toDownload.length} files)`}{' '}

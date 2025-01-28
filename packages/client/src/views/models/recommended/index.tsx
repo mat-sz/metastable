@@ -25,7 +25,7 @@ export const Recommended: React.FC = () => {
                     ...download.metadata,
                   },
             }))}
-            onClick={() => {
+            onDownload={() => {
               if (model.createMetamodel) {
                 API.model.createMetamodel.mutate({
                   ...model.createMetamodel,

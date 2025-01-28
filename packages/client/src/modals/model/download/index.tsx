@@ -1,0 +1,65 @@
+import { DownloadSettings } from '@metastable/types';
+import React from 'react';
+
+import { Button } from '$components/button';
+import { Modal, ModalActions, useModal } from '$components/modal';
+import { Tag } from '$components/tag';
+import { mainStore } from '$stores/MainStore';
+import { filesize } from '$utils/file';
+import styles from './index.module.scss';
+
+export interface DownloadFileState {
+  settings: DownloadSettings;
+  state: 'downloaded' | 'queued' | 'failed' | 'not_queued';
+  size?: number;
+  offset?: number;
+  error?: string;
+}
+
+interface Props {
+  downloads: DownloadFileState[];
+  onDownload?: () => void;
+}
+
+export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
+  const { close } = useModal();
+
+  return (
+    <Modal title="Download model" size="small">
+      <div>Would you like to download the following files?</div>
+      <ul className={styles.list}>
+        {downloads.map(download => (
+          <li key={download.settings.url}>
+            <div>{download.settings.name}</div>
+            {download.settings.size ? (
+              <Tag>{filesize(download.settings.size)}</Tag>
+            ) : undefined}
+          </li>
+        ))}
+      </ul>
+      <ModalActions>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            close();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            for (const file of downloads) {
+              mainStore.tasks.download(file.settings);
+            }
+
+            onDownload?.();
+            close();
+          }}
+        >
+          Download
+        </Button>
+      </ModalActions>
+    </Modal>
+  );
+};
