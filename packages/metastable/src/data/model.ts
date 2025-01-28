@@ -288,12 +288,31 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
     await this.watcher?.close();
   }
 
+  resetCache() {
+    this.cache = undefined;
+  }
+
   get path() {
     return this.baseDir;
   }
 
   getEntityPath(type: ModelType, name: string) {
     return path.join(this.baseDir, type, name);
+  }
+
+  async getDownloadPath(type: ModelType, name: string, folder?: string) {
+    let dir = path.join(this.baseDir, type);
+    if (folder) {
+      const configFolders =
+        await Metastable.instance.config.get('modelFolders');
+      const folderItem = configFolders?.[type]?.find(
+        item => item.name === folder,
+      );
+      if (folderItem) {
+        dir = folderItem.path;
+      }
+    }
+    return path.join(dir, name);
   }
 
   async refresh() {

@@ -24,8 +24,11 @@ class ModelStore {
     await this.refresh();
   }
 
-  async refresh() {
+  async refresh(resetCache = false) {
     this.isLoading = true;
+    if (resetCache) {
+      await API.model.resetCache.mutate();
+    }
     const data = await API.model.all.query();
     runInAction(() => {
       this.models = data;

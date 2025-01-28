@@ -239,7 +239,7 @@ export const ModelBrowser: React.FC<Props> = observer(
             <IconButton
               title="Refresh"
               onClick={() => {
-                modelStore.refresh();
+                modelStore.refresh(true);
               }}
             >
               <BsArrowClockwise />

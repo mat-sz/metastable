@@ -8,7 +8,6 @@ import {
   BackendStatus,
   DownloadSettings,
   LogItem,
-  ModelType,
   ProjectFileType,
   Utilization,
 } from '@metastable/types';
@@ -403,9 +402,10 @@ export class Metastable extends EventEmitter<MetastableEvents> {
   }
 
   async downloadModel(data: DownloadSettings) {
-    const savePath = this.model.getEntityPath(
-      data.type as ModelType,
+    const savePath = await this.model.getDownloadPath(
+      data.type,
       data.name,
+      data.folder,
     );
 
     const url = new URL(data.url);

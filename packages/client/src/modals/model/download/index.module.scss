@@ -8,6 +8,18 @@
     display: flex;
     align-items: center;
 
+    & > div:first-child {
+      max-width: 300px;
+    }
+
+    [varui-label] {
+      margin-left: auto;
+    }
+
+    [varui-label-title] {
+      margin: 0;
+    }
+
     & > * {
       margin-right: 0.5rem;
     }

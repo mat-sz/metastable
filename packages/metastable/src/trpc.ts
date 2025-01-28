@@ -102,6 +102,7 @@ export const router = t.router({
           url: string(),
           type: enums(Object.values(ModelType)),
           name: string(),
+          targetFolder: optional(string()),
           imageUrl: optional(string()),
           configUrl: optional(string()),
           configType: optional(string()),
@@ -341,6 +342,9 @@ export const router = t.router({
       }
 
       return map;
+    }),
+    resetCache: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+      metastable.model.resetCache();
     }),
     get: t.procedure
       .input(type({ mrn: string() }))

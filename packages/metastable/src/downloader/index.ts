@@ -6,6 +6,7 @@ import { ReadableStream } from 'stream/web';
 import { DownloadData, DownloadSettings, TaskState } from '@metastable/types';
 
 import { getDownloadHeaders } from '#helpers/download.js';
+import { Metastable } from '#metastable';
 import { ModelEntity } from '../data/model.js';
 import { exists, tryMkdir, tryUnlink } from '../helpers/fs.js';
 import { SuperTask } from '../tasks/supertask.js';
@@ -224,6 +225,8 @@ export class DownloadModelTask extends BaseDownloadTask {
           await model.metadata.set(metadata);
         } catch {}
       }
+
+      Metastable.instance.model.resetCache();
     }
 
     return state;

@@ -12,6 +12,7 @@ export interface DownloadSettings {
   name: string;
   type: ModelType;
   url: string;
+  folder?: string;
   size?: number;
   imageUrl?: string;
   configUrl?: string;

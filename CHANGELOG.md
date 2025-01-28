@@ -3,6 +3,7 @@
 ## Features
 
 - Added a "Font size" slider to settings.
+- Added a modal for model download confirmations and an input to select target folder.
 
 ## Improvements
 
