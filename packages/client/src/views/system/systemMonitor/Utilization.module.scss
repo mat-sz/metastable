@@ -1,6 +1,6 @@
 .utilization {
-  width: 350px;
-  height: 100%;
+  flex: 1;
+  overflow-y: auto;
 
   .loading {
     display: flex;

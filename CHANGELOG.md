@@ -1,5 +1,9 @@
 # 0.0.18 (Upcoming)
 
+## Improvements
+
+- Added a close button to System Monitor.
+
 ## Bug fixes
 
 - Fixed issues with popovers not showing up in the right place (e.g. model selection or mask image selection).

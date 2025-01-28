@@ -5,10 +5,10 @@ import {
   BsFillCheckCircleFill,
   BsFillExclamationCircleFill,
   BsFillQuestionCircleFill,
-  BsGpuCard,
   BsPcDisplayHorizontal,
 } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { LogoIcon } from '$components/logoIcon';
 import { mainStore } from '$stores/MainStore';
 import { uiStore } from '$stores/UIStore';
@@ -40,25 +40,18 @@ export const Status: React.FC<Props> = observer(({ className }) => {
         </div>
       </div>
       <div className={styles.info}>
-        <button
+        <Button
           onClick={e => {
             e.stopPropagation();
             uiStore.toggleSystemMonitor();
           }}
+          icon={<BsPcDisplayHorizontal />}
         >
-          <BsPcDisplayHorizontal />
-          <span>System monitor</span>
-        </button>
-        <div>
-          <BsGpuCard />
-          <span>{mainStore.deviceName}</span>
-        </div>
-        <div>
-          <LogoIcon />
-          <span>
-            {__APP_NAME__} {__APP_VERSION__}
-          </span>
-        </div>
+          System monitor
+        </Button>
+        <Button href="https://metastable.studio/" icon={<LogoIcon />}>
+          {__APP_NAME__} {__APP_VERSION__}
+        </Button>
       </div>
     </div>
   );
