@@ -25,6 +25,9 @@ const CONFIG_DEFAULTS: ConfigType = {
     notifications: false,
     theme: 'dark',
     fontSize: 16,
+    units: {
+      temperature: 'C',
+    },
   },
   app: {
     autoUpdate: true,

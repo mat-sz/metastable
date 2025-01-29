@@ -1,5 +1,9 @@
 # 0.0.19 (Upcoming)
 
+## Features
+
+- Added a "Temperature unit" switch to settings.
+
 ## Improvements
 
 - Removed bundle reset actions for Docker images.

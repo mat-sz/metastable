@@ -5,6 +5,7 @@ import { BsCpu, BsGpuCard, BsHdd, BsMemory } from 'react-icons/bs';
 import { TRPC } from '$api';
 import { ProgressBar } from '$components/progressBar';
 import { filesize } from '$utils/file';
+import { formatTemperature } from '$utils/units';
 import styles from './Utilization.module.scss';
 
 const EMPTY_UTILIZATION: UtilizationData = {
@@ -36,7 +37,7 @@ const UtilizationItem: React.FC<{
             `${filesize(value)}/${filesize(max)}`}
           {secondaryLabelType === 'temperature' &&
             typeof secondaryValue === 'number' &&
-            `${secondaryValue}°C`}
+            formatTemperature(secondaryValue)}
         </span>
       </div>
       <div className={styles.bar}>

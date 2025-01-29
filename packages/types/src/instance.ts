@@ -71,6 +71,9 @@ export interface ConfigType {
     notifications: boolean;
     theme: 'dark' | 'light' | 'system';
     fontSize: number;
+    units: {
+      temperature: 'C' | 'F';
+    };
   };
   generation: {
     preview: boolean;

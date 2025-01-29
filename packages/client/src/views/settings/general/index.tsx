@@ -59,6 +59,15 @@ export const SettingsGeneral: React.FC = observer(() => {
             </div>
           </>
         )}
+        <VarSwitch
+          path="units.temperature"
+          label="Temperature unit"
+          options={[
+            { key: 'C', label: '°C' },
+            { key: 'F', label: '°F' },
+          ]}
+          inline
+        />
       </VarCategoryScope>
       <VarCategoryScope path="generation" label="Generation">
         <VarToggle path="preview" label="Enable previews" />

@@ -315,5 +315,5 @@ async function createWindow() {
   }
 
   loadAppUpdater().then(checkForUpdates);
-  setInterval(checkForUpdates, 15 * 60 * 1000);
+  setInterval(checkForUpdates, 60 * 60 * 1000);
 }
