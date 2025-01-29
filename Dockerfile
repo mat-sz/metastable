@@ -1,22 +1,30 @@
-FROM archlinux:base-devel
-
-ENV PIP_PREFER_BINARY=1
-
-RUN pacman -Sy nodejs npm python uv --noconfirm 
+FROM node:bookworm-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH /app/node_modules/.bin:/root/.local/bin:$PATH
 COPY . /app
 
 RUN --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/root/.npm \
-  npm install -g yarn && \
-  yarn install && \
-  uv pip install --extra-index-url https://download.pytorch.org/whl/cu121 -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages && \
-  yarn build
+  uv python install 3.12 --preview --default
 
+RUN --mount=type=cache,target=/root/.cache \
+  uv pip install -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages
+
+RUN --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/root/.npm \
+  --mount=type=cache,target=/root/.yarn \
+  corepack enable yarn && \
+  yarn install && \
+  yarn build && \
+  find . -name node_modules -prune -exec rm -rf {} \; && \
+  yarn workspaces focus -A --production && \
+  rm -rf node_modules/@img/sharp-*-{win32,darwin}-* && \
+  rm -rf node_modules/@img/sharp-*-arm64 && \
+  rm -rf node_modules/@metastable/cppzst
+ 
 EXPOSE 5001
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV SERVER_USE_PROXY=0
 ENV SERVER_SKIP_PYTHON_SETUP=1
-CMD ["yarn", "start"]
+CMD ["corepack", "yarn", "start"]
