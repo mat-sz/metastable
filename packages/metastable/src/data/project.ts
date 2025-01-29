@@ -1,20 +1,25 @@
 import { EventEmitter } from 'events';
+import { FSWatcher, watch } from 'fs';
 import fs from 'fs/promises';
-import os from 'os';
 import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
 import { Project, ProjectFileType, ProjectType } from '@metastable/types';
-import chokidar from 'chokidar';
 import { nanoid } from 'nanoid';
 
+import { debounce } from '#helpers/common.js';
+import {
+  directorySize,
+  getAvailableName,
+  METADATA_DIRECTORY_NAME,
+  rmdir,
+} from '#helpers/fs.js';
 import {
   DirectoryEntity,
   EntityRepository,
   ImageEntity,
   Metadata,
 } from './common.js';
-import { directorySize, getAvailableName, rmdir } from '../helpers/fs.js';
 
 export class ProjectImageEntity extends ImageEntity {
   type: ProjectFileType;
@@ -130,9 +135,10 @@ type ProjectRepositoryEvents = {
   change: [];
   fileChange: [id: string, type: ProjectFileType];
 };
+
 export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
   private cache: ProjectEntity[] | undefined = undefined;
-  private watcher: chokidar.FSWatcher | undefined = undefined;
+  private watcher: FSWatcher | undefined = undefined;
 
   constructor(private baseDir: string) {
     super();
@@ -143,52 +149,55 @@ export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
       return false;
     }
 
-    let timeout: any = undefined;
-    const timeoutProject: Record<string, any> = {};
-    this.watcher = chokidar
-      .watch(this.baseDir, {
-        ignoreInitial: true,
-        ignorePermissionErrors: true,
-        usePolling: os.platform() === 'win32',
-      })
-      .on('all', async (event: string, filePath: string) => {
-        if (['addDir', 'unlinkDir'].includes(event)) {
-          this.cache = undefined;
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            this.emit('change');
-          }, 250);
+    const onChange = debounce(() => this.emit('change'), 250);
+    const onFileChange = debounce(
+      (projectId: string, type: ProjectFileType) =>
+        this.emit('fileChange', projectId, type),
+      250,
+    );
+
+    this.watcher = watch(
+      this.baseDir,
+      {
+        persistent: false,
+        recursive: true,
+      },
+      async (_, filePath) => {
+        if (!filePath) {
+          return;
         }
 
-        if (['add', 'unlink'].includes(event)) {
-          try {
-            const relative = path.relative(this.baseDir, filePath);
-            const split = relative.split(path.sep);
+        try {
+          const isTopLevel = !filePath.includes(path.sep);
+          if (isTopLevel) {
+            this.cache = undefined;
+            onChange();
+          } else {
+            const split = filePath.split(path.sep);
             const [name, type] = split;
 
             if (
               name &&
               type &&
-              Object.values(ProjectFileType).includes(type as any)
+              Object.values(ProjectFileType).includes(type as any) &&
+              split[3] !== METADATA_DIRECTORY_NAME
             ) {
               const project = await this.getByName(name);
               if (!project.id) {
                 return;
               }
 
-              clearTimeout(timeoutProject[project.id]);
-              timeoutProject[project.id] = setTimeout(() => {
-                this.emit('fileChange', project.id, type as ProjectFileType);
-              }, 250);
+              onFileChange(project.id, type as ProjectFileType);
             }
-          } catch {}
-        }
-      });
+          }
+        } catch {}
+      },
+    );
   }
 
   async cleanup() {
     await this.deleteDrafts();
-    await this.watcher?.close();
+    this.watcher?.close();
   }
 
   async deleteDrafts() {

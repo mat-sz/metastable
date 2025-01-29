@@ -6,9 +6,14 @@ import { ReadableStream } from 'stream/web';
 import { DownloadData, DownloadSettings, TaskState } from '@metastable/types';
 
 import { getDownloadHeaders } from '#helpers/download.js';
+import {
+  exists,
+  METADATA_DIRECTORY_NAME,
+  tryMkdir,
+  tryUnlink,
+} from '#helpers/fs.js';
 import { Metastable } from '#metastable';
 import { ModelEntity } from '../data/model.js';
-import { exists, tryMkdir, tryUnlink } from '../helpers/fs.js';
 import { SuperTask } from '../tasks/supertask.js';
 import { BaseTask } from '../tasks/task.js';
 
@@ -179,7 +184,9 @@ export class DownloadModelTask extends BaseDownloadTask {
       } = this.settings;
 
       const model = new ModelEntity(this.savePath);
-      await tryMkdir(path.join(path.dirname(this.savePath), '.metastable'));
+      await tryMkdir(
+        path.join(path.dirname(this.savePath), METADATA_DIRECTORY_NAME),
+      );
 
       if (imageUrl) {
         try {

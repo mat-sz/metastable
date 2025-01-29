@@ -211,7 +211,7 @@ export async function tryUnlink(filePath?: string): Promise<boolean> {
   }
 }
 
-const METADATA_DIRECTORY_NAME = '.metastable';
+export const METADATA_DIRECTORY_NAME = '.metastable';
 
 export function getMetadataDirectory(filePath: string) {
   const dirName = path.dirname(filePath);

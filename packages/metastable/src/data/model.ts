@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
+import { FSWatcher, watch } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
-import os from 'os';
 import path from 'path';
 
 import { MRN, MRNDataParsed } from '@metastable/common';
@@ -12,10 +12,8 @@ import {
   ModelMetadata,
   ModelType,
 } from '@metastable/types';
-import chokidar from 'chokidar';
 
-import { Metastable } from '#metastable';
-import { FileEntity, Metadata } from './common.js';
+import { debounce } from '#helpers/common.js';
 import {
   CONFIG_EXTENSIONS,
   exists,
@@ -26,8 +24,10 @@ import {
   testExtensions,
   tryUnlink,
   walk,
-} from '../helpers/fs.js';
-import { generateThumbnail, getThumbnailPath } from '../helpers/image.js';
+} from '#helpers/fs.js';
+import { generateThumbnail, getThumbnailPath } from '#helpers/image.js';
+import { Metastable } from '#metastable';
+import { FileEntity, Metadata } from './common.js';
 
 const MODEL_EXTENSIONS = [
   'ckpt',
@@ -253,7 +253,7 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
     [key in ModelType]?: { path: string; name?: string }[];
   } = {};
   private cache: ModelEntity[] | undefined = undefined;
-  private watcher: chokidar.FSWatcher | undefined = undefined;
+  private watcher: FSWatcher | undefined = undefined;
 
   constructor(private baseDir: string) {
     super();
@@ -264,28 +264,25 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
       return;
     }
 
-    let timeout: any = undefined;
-    this.watcher = chokidar
-      .watch(this.baseDir, {
-        ignoreInitial: true,
-        ignorePermissionErrors: true,
-        usePolling: os.platform() === 'win32',
-      })
-      .on('all', (event: string) => {
-        if (!['add', 'change', 'unlink'].includes(event)) {
-          return;
-        }
+    const onChange = debounce(() => {
+      this.emit('change');
+    }, 250);
 
+    this.watcher = watch(
+      this.baseDir,
+      {
+        persistent: false,
+        recursive: true,
+      },
+      () => {
         this.cache = undefined;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          this.emit('change');
-        }, 250);
-      });
+        onChange();
+      },
+    );
   }
 
   async cleanup() {
-    await this.watcher?.close();
+    this.watcher?.close();
   }
 
   resetCache() {

@@ -3,6 +3,7 @@
 ## Improvements
 
 - Removed bundle reset actions for Docker images.
+- Improved file update watcher performance.
 
 # 0.0.18 (2025-01-28)
 

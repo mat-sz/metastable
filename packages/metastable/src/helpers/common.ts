@@ -63,3 +63,19 @@ export function errorToString(e: any) {
     return String(e);
   }
 }
+
+export function debounce<T extends unknown[]>(
+  callback: (...args: T) => void,
+  ms: number,
+) {
+  const timeoutMap: Record<string, any> = {};
+
+  return (...args: T) => {
+    const key = args.join(',');
+    clearTimeout(timeoutMap[key]);
+    timeoutMap[key] = setTimeout(() => {
+      callback(...args);
+      delete timeoutMap[key];
+    }, ms);
+  };
+}
