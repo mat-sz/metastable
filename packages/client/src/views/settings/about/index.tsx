@@ -15,6 +15,8 @@ import styles from './index.module.scss';
 import { Social } from '../../common/Social';
 
 export const SettingsAbout: React.FC = observer(() => {
+  const canResetBundle = mainStore.config.data?.python.mode === 'static';
+
   return (
     <TabPanel id="about">
       <h2>About {__APP_NAME__}</h2>
@@ -75,14 +77,22 @@ export const SettingsAbout: React.FC = observer(() => {
         <div className={styles.info}>
           <div>This action will not delete your models or projects.</div>
           <div className={styles.buttons}>
-            <Button
-              onClick={() => modalStore.show(<InstanceBundleReset resetAll />)}
-            >
-              Reset bundle and all settings
-            </Button>
-            <Button onClick={() => modalStore.show(<InstanceBundleReset />)}>
-              Reset bundle
-            </Button>
+            {canResetBundle && (
+              <>
+                <Button
+                  onClick={() =>
+                    modalStore.show(<InstanceBundleReset resetAll />)
+                  }
+                >
+                  Reset bundle and all settings
+                </Button>
+                <Button
+                  onClick={() => modalStore.show(<InstanceBundleReset />)}
+                >
+                  Reset bundle
+                </Button>
+              </>
+            )}
             <Button onClick={() => modalStore.show(<InstanceSettingsReset />)}>
               Reset all settings
             </Button>

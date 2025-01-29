@@ -1,3 +1,9 @@
+# 0.0.19 (Upcoming)
+
+## Improvements
+
+- Removed bundle reset actions for Docker images.
+
 # 0.0.18 (2025-01-28)
 
 ## Features
