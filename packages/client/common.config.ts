@@ -38,6 +38,7 @@ export function getConfig(mode: string): any {
           }
         : {}),
       alias: {
+        exifreader: 'exifreader/dist/exif-reader.js',
         $: path.resolve(__dirname, './src'),
         $api: path.resolve(__dirname, './src/common/api'),
         $components: path.resolve(__dirname, './src/components'),

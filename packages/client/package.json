@@ -45,7 +45,7 @@
     "electron-vite": "^2.3.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.11",
-    "exifreader": "^4.22.1",
+    "exifreader": "^4.26.1",
     "filesize": "^10.1.0",
     "fxglue": "^0.2.1",
     "i18not": "^0.1.2",

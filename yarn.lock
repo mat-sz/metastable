@@ -2012,7 +2012,7 @@ __metadata:
     electron-vite: "npm:^2.3.0"
     eslint-plugin-react-hooks: "npm:^4.6.2"
     eslint-plugin-react-refresh: "npm:^0.4.11"
-    exifreader: "npm:^4.22.1"
+    exifreader: "npm:^4.26.1"
     filesize: "npm:^10.1.0"
     fxglue: "npm:^0.2.1"
     i18not: "npm:^0.1.2"
@@ -3677,10 +3677,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmldom/xmldom@npm:^0.8.10, @xmldom/xmldom@npm:^0.8.8":
+"@xmldom/xmldom@npm:^0.8.8":
   version: 0.8.10
   resolution: "@xmldom/xmldom@npm:0.8.10"
   checksum: 10c0/c7647c442502720182b0d65b17d45d2d95317c1c8c497626fe524bda79b4fb768a9aa4fae2da919f308e7abcff7d67c058b102a9d641097e9a57f0b80187851f
+  languageName: node
+  linkType: hard
+
+"@xmldom/xmldom@npm:^0.9.4":
+  version: 0.9.7
+  resolution: "@xmldom/xmldom@npm:0.9.7"
+  checksum: 10c0/d2f44a37bc76f699eebd074c2370a17029f1970252b4337837acb59396386ff5fdafb8a8550194705609d70b38a0453aed356e661893a5b4ae0ca5fe5d6ebaf9
   languageName: node
   linkType: hard
 
@@ -5925,15 +5932,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exifreader@npm:^4.22.1":
-  version: 4.23.5
-  resolution: "exifreader@npm:4.23.5"
+"exifreader@npm:^4.26.1":
+  version: 4.26.1
+  resolution: "exifreader@npm:4.26.1"
   dependencies:
-    "@xmldom/xmldom": "npm:^0.8.10"
+    "@xmldom/xmldom": "npm:^0.9.4"
   dependenciesMeta:
     "@xmldom/xmldom":
       optional: true
-  checksum: 10c0/84c4657b6480239d50321d5604566a0f06f9090d8fd4775636dc68a7bd827177429fea52ac8f7edeb187afad635e8b58d48d91798530574171d2edd1566c774e
+  checksum: 10c0/4dc290f3747acd4fdd37cea4c412a432ba7d93781f7208f209e23843f4956c2d110e1a381b4052b39f07ed1b5b6a57b3e0a59d359bf1d8844b9605d164e80627
   languageName: node
   linkType: hard
 

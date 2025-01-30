@@ -170,6 +170,23 @@ export async function loadSettingsFromFile(
 
         return settings;
       }
+    } else if (typeof tags['num_inference_steps']?.value === 'string') {
+      // EasyDiffusion PNG
+      const settings: ExternalSettings = {};
+
+      settings.prompt = {
+        positive: tags['prompt']?.value?.trim() || '',
+        negative: tags['negative_prompt']?.value?.trim() || '',
+      };
+
+      settings.sampler = {
+        steps:
+          parseInt(tags['num_inference_steps']?.value?.trim()) || undefined,
+        seed: parseInt(tags['seed']?.value?.trim()) || undefined,
+        cfg: parseInt(tags['guidance_scale']?.value?.trim()) || undefined,
+      };
+
+      return settings;
     } else if (typeof tags['prompt']?.value === 'string') {
       // ComfyUI metadata (likely)
       const json: any = JSON.parse(tags['prompt'].value);
@@ -199,10 +216,11 @@ export async function loadSettingsFromFile(
         };
         return settings;
       }
-    } else if (typeof tags['UserComment']?.value === 'object') {
+    } else if (typeof (tags['UserComment'] as any)?.value === 'object') {
+      // EasyDiffusion JPEG
       const textDecoder = new TextDecoder();
       const text = textDecoder.decode(
-        new Uint8Array(tags['UserComment'].value as any),
+        new Uint8Array((tags['UserComment'] as any)?.value as any),
       );
       const json = JSON.parse(text.replace('UNICODE', '').replace(/\0/g, ''));
 
