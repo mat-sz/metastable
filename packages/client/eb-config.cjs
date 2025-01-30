@@ -22,7 +22,7 @@ const config = {
   asar: true,
   disableSanityCheckAsar: true,
   electronLanguages: ['en', 'en-US', 'en_US'],
-  electronVersion: '32.1.2',
+  electronVersion: '34.0.2',
   nativeRebuilder: 'parallel',
   productName: 'Metastable',
   directories: {

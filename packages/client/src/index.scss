@@ -135,6 +135,12 @@
   box-sizing: border-box;
 }
 
+/* Electron SVG fix */
+svg:not(:root) {
+  overflow-clip-margin: unset;
+  overflow: unset;
+}
+
 body {
   background: var(--grey-100);
   line-height: 1.4;

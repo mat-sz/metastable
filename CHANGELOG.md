@@ -9,6 +9,7 @@
 - Removed bundle reset actions for Docker images.
 - Improved file update watcher performance.
 - Improved prompt data import from image files.
+- Updated Electron to v34.0.2.
 
 # 0.0.18 (2025-01-28)
 
