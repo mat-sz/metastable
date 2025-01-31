@@ -2,7 +2,6 @@ import { ProjectType, TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
 import {
   BsBoxFill,
   BsGearFill,
@@ -14,6 +13,7 @@ import { useContextMenu } from 'use-context-menu';
 
 import { ProgressBar } from '$components/progressBar';
 import { ProjectMenu } from '$components/projectMenu';
+import { useDrag, useDrop } from '$hooks/dnd';
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
@@ -101,21 +101,22 @@ export const BaseTab = React.forwardRef<
   },
 );
 
+interface ProjectDragItem {
+  id: string;
+}
+
 export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
   ({ project }) => {
     const ref = useRef<HTMLDivElement>(null);
 
-    const [{ isDragging }, drag] = useDrag(() => ({
+    const { isDragging, connect: drag } = useDrag(() => ({
       type: TAB_ITEM,
-      item: project,
-      collect: monitor => ({
-        isDragging: !!monitor.isDragging(),
-      }),
+      item: { id: project.id } as ProjectDragItem,
     }));
-    const [, drop] = useDrop(
+    const { isOver, connect: drop } = useDrop(
       () => ({
         accept: TAB_ITEM,
-        drop: (item: BaseProject) => {
+        drop: (item: ProjectDragItem) => {
           mainStore.projects.move(item.id, project.id);
         },
       }),
@@ -135,7 +136,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
           uiStore.view === 'project' &&
           mainStore.projects.currentId === project.id
         }
-        opacity={isDragging ? 0.5 : 1}
+        opacity={isDragging || isOver ? 0.5 : 1}
         onClick={() => mainStore.projects.select(project.id)}
         onClose={() => project.close()}
         badge={project.queueCount}
@@ -174,14 +175,10 @@ export const ViewTab: React.FC<
 });
 
 export const TabBar: React.FC = observer(() => {
-  const [, drop] = useDrop(
+  const { connect: drop } = useDrop(
     () => ({
       accept: TAB_ITEM,
-      drop: (item: BaseProject, monitor) => {
-        if (!monitor.isOver()) {
-          return;
-        }
-
+      drop: (item: BaseProject) => {
         mainStore.projects.move(item.id);
       },
     }),
