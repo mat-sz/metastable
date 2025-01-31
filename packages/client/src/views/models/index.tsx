@@ -37,3 +37,5 @@ export const ModelManager: React.FC<Props> = ({ defaultTab = 'installed' }) => {
     </TabView>
   );
 };
+
+export default ModelManager;

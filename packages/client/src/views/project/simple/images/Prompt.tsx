@@ -6,7 +6,7 @@ import { Button } from '$components/button';
 import { VarCategory, VarPrompt, VarUI } from '$components/var';
 import { useFileInput } from '$hooks/useFileInput';
 import { useHotkey } from '$hooks/useHotkey';
-import { ProjectLoadPrompt } from '$modals/project';
+import { ProjectLoadPrompt } from '$modals/project/loadPrompt';
 import { modalStore } from '$stores/ModalStore';
 import styles from './Prompt.module.scss';
 import { useSimpleProject } from '../../context';

@@ -2,11 +2,9 @@ import { Project } from '@metastable/types';
 import React from 'react';
 import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
-import {
-  ProjectDelete,
-  ProjectDuplicate,
-  ProjectRename,
-} from '$modals/project';
+import { ProjectDelete } from '$modals/project/delete';
+import { ProjectDuplicate } from '$modals/project/duplicate';
+import { ProjectRename } from '$modals/project/rename';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 

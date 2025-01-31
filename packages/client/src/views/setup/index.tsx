@@ -24,3 +24,5 @@ export const Setup: React.FC = observer(() => {
     return <Step1 />;
   }
 });
+
+export default Setup;

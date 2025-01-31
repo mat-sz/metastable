@@ -2,7 +2,7 @@ import { UpdateInfo } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
-import { InstanceUpdateAvailable } from '$modals/instance';
+import { InstanceUpdateAvailable } from '$modals/instance/updateAvailable';
 import { IS_ELECTRON } from '$utils/config';
 import { modalStore } from './ModalStore';
 

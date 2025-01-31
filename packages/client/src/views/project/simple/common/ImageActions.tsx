@@ -10,7 +10,8 @@ import {
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
-import { ProjectLoadPrompt, ProjectPostprocess } from '$modals/project';
+import { ProjectLoadPrompt } from '$modals/project/loadPrompt';
+import { ProjectPostprocess } from '$modals/project/postprocess';
 import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import { useSimpleProject } from '../../context';

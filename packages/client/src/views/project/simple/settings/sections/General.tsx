@@ -32,7 +32,7 @@ import {
   VarSwitch,
   VarToggle,
 } from '$components/var';
-import { ModelCreateMetamodel } from '$modals/model';
+import { ModelCreateMetamodel } from '$modals/model/createMetamodel';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { useSimpleProject } from '../../../context';

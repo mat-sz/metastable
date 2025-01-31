@@ -15,7 +15,7 @@ import {
 } from 'mobx';
 
 import { API } from '$api';
-import { ProjectDraft } from '$modals/project';
+import { ProjectDraft } from '$modals/project/draft';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { UploadQueueStore } from './UploadQueueStore';

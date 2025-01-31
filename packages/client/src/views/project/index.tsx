@@ -19,3 +19,5 @@ export const Project: React.FC = observer(() => {
     </ProjectContext.Provider>
   );
 });
+
+export default Project;

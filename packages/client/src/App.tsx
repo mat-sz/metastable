@@ -1,18 +1,20 @@
 import { observer } from 'mobx-react-lite';
-import React, { useLayoutEffect } from 'react';
+import React, { Suspense, useLayoutEffect } from 'react';
 
 import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
 import { setupStore } from '$stores/SetupStore';
 import { uiStore } from '$stores/UIStore';
 import { withoutTransitions } from '$utils/css';
+import { lazyPreload } from '$utils/react';
 import './index.scss';
-import { Home } from './views/home';
-import { ModelManager } from './views/models';
-import { Project } from './views/project';
-import { Settings } from './views/settings';
-import { Setup } from './views/setup';
 import { Main } from './views/system/Main';
+
+const Home = lazyPreload(() => import('./views/home'));
+const Project = lazyPreload(() => import('./views/project'));
+const Settings = lazyPreload(() => import('./views/settings'));
+const Setup = lazyPreload(() => import('./views/setup'));
+const ModelManager = lazyPreload(() => import('./views/models'));
 
 const View: React.FC = observer(() => {
   useLayoutEffect(() => {
@@ -46,7 +48,9 @@ export const App: React.FC = () => {
   return (
     <UIWrapper>
       <Main>
-        <View />
+        <Suspense fallback={<></>}>
+          <View />
+        </Suspense>
       </Main>
     </UIWrapper>
   );

@@ -62,3 +62,5 @@ export const Home: React.FC = observer(() => {
     </div>
   );
 });
+
+export default Home;

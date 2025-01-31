@@ -4,7 +4,7 @@ import React from 'react';
 import { BsDownload, BsHourglass, BsXCircleFill } from 'react-icons/bs';
 
 import { Button } from '$components/button';
-import { ModelDownload } from '$modals/model';
+import { ModelDownload } from '$modals/model/download';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';

@@ -10,6 +10,7 @@
 - Improved file update watcher performance.
 - Improved prompt data import from image files.
 - Updated Electron to v34.0.2.
+- Improved application loading time.
 
 # 0.0.18 (2025-01-28)
 

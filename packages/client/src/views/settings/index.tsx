@@ -76,3 +76,5 @@ export const Settings: React.FC = observer(() => {
     </VarUI>
   );
 });
+
+export default Settings;

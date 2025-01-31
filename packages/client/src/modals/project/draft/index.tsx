@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
-import { ProjectRename } from '$modals/project';
+import { ProjectRename } from '$modals/project/rename';
 import { modalStore } from '$stores/ModalStore';
 import { BaseProject } from '$stores/project';
 

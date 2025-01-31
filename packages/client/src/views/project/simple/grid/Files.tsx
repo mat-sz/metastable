@@ -6,7 +6,7 @@ import { BsPlus, BsTrash } from 'react-icons/bs';
 import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
-import { ProjectDeleteFile } from '$modals/project';
+import { ProjectDeleteFile } from '$modals/project/deleteFile';
 import { modalStore } from '$stores/ModalStore';
 import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';

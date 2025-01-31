@@ -4,7 +4,7 @@ import React from 'react';
 
 import { API } from '$api';
 import { Button } from '$components/button';
-import { InstanceSelectPath } from '$modals/instance';
+import { InstanceSelectPath } from '$modals/instance/selectPath';
 import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
