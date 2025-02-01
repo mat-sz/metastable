@@ -2,11 +2,10 @@ import React from 'react';
 import { BsXLg } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
-import { Log } from '$components/log';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { mainStore } from '$stores/MainStore';
 import { uiStore } from '$stores/UIStore';
 import styles from './index.module.scss';
+import { Logs } from './Logs';
 import { Utilization } from './Utilization';
 import { LoadedModelsList } from '../../common/backend/LoadedModelsList';
 
@@ -23,7 +22,7 @@ export const SystemMonitor: React.FC = () => {
             <LoadedModelsList />
           </TabPanel>
           <TabPanel id="logs">
-            <Log className={styles.log} items={mainStore.backendLog} />
+            <Logs />
           </TabPanel>
         </TabContent>
       </TabView>

@@ -23,6 +23,8 @@ import { TaskStore } from './TaskStore';
 import { uiStore } from './UIStore';
 import { updateStore } from './UpdateStore';
 
+const MAX_LOG_ITEMS = 100;
+
 class MainStore {
   projects = new ProjectStore();
   info!: InstanceInfo;
@@ -81,7 +83,7 @@ class MainStore {
       onData: items => {
         runInAction(() => {
           this.backendLog.push(...items);
-          this.backendLog = this.backendLog.slice(-30);
+          this.backendLog = this.backendLog.slice(-1 * MAX_LOG_ITEMS);
         });
       },
     });

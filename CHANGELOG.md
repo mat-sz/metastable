@@ -4,6 +4,10 @@
 
 - Added a "Temperature unit" switch to settings.
 
+## Bug fixes
+
+- Fixed issues with log items not being refreshed in "System monitor".
+
 ## Improvements
 
 - Removed bundle reset actions for Docker images.

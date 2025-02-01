@@ -70,7 +70,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
   internalPath!: string;
 
   status: BackendStatus = 'starting';
-  logBuffer = new CircularBuffer<LogItem>(25);
+  logBuffer = new CircularBuffer<LogItem>(100);
   enabledFeatures: string[] = [];
   enabledNamespaceGroups: string[] = [];
   private _dataRoot!: string;
