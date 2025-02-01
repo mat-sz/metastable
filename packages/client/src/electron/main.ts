@@ -2,7 +2,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { Metastable, router } from '@metastable/metastable';
 import { TaskState } from '@metastable/types';
 import {
   app,
@@ -16,9 +15,10 @@ import {
 } from 'electron';
 import { createIPCHandler } from 'trpc-electron/main';
 
+import { getUpdater, loadAppUpdater } from './helpers/autoUpdate';
 import contextMenu from './helpers/contextMenu';
 import { resolveUrlToMrn } from './helpers/resolve';
-import type { AppUpdater } from 'electron-updater';
+import { windowStateKeeper } from './helpers/windowState';
 
 contextMenu();
 
@@ -44,93 +44,6 @@ app.on('web-contents-created', (_, wc) => {
     }
   });
 });
-
-let updater: AppUpdater;
-async function loadAppUpdater() {
-  const { autoUpdater } = await import('electron-updater');
-  updater = autoUpdater;
-  if (__ELECTRON_UPDATER_BASE_URL__) {
-    autoUpdater.setFeedURL({
-      provider: 'generic',
-      url: __ELECTRON_UPDATER_BASE_URL__,
-    });
-  }
-
-  autoUpdater.autoInstallOnAppQuit = true;
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoRunAppAfterInstall = true;
-}
-
-const DEFAULT_WIDTH = 1200;
-const DEFAULT_HEIGHT = 800;
-
-interface WindowState {
-  x?: number;
-  y?: number;
-  width: number;
-  height: number;
-  isMaximized?: boolean;
-}
-
-const windowStateKeeper = async (windowName: string) => {
-  let window: BrowserWindow, windowState: WindowState;
-
-  const uiConfig = Metastable.instance.uiConfig;
-
-  const setBounds = async () => {
-    const data = await uiConfig.readJson();
-    const state = data?.windowState?.[windowName];
-    return (
-      state ?? {
-        x: undefined,
-        y: undefined,
-        width: DEFAULT_WIDTH,
-        height: DEFAULT_HEIGHT,
-      }
-    );
-  };
-
-  let saveTimeout: any = undefined;
-  const updateState = async () => {
-    const isMaximized = window.isMaximized();
-    if (!isMaximized) {
-      windowState = window.getBounds();
-    }
-    windowState.isMaximized = isMaximized;
-
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      saveState();
-    }, 100);
-  };
-
-  const saveState = async () => {
-    let data = await uiConfig.readJson();
-    if (!data) {
-      data = {};
-    }
-
-    if (!data.windowState) {
-      data.windowState = {};
-    }
-
-    data.windowState[windowName] = windowState;
-    await uiConfig.writeJson(data);
-  };
-
-  const track = async (win: BrowserWindow) => {
-    window = win;
-    ['resize', 'move', 'close'].forEach(event => {
-      win.on(event as any, updateState);
-    });
-  };
-
-  return {
-    ...(await setBounds()),
-    track,
-    saveState,
-  };
-};
 
 const IS_WINDOWS = os.platform() === 'win32';
 const IS_MAC = os.platform() === 'darwin';
@@ -172,6 +85,44 @@ function createMenu() {
 }
 
 async function createWindow() {
+  const mainWindowStateKeeper = await windowStateKeeper('main');
+
+  const win = new BrowserWindow({
+    title: 'Metastable',
+    minWidth: 1200,
+    minHeight: 700,
+    x: mainWindowStateKeeper.x,
+    y: mainWindowStateKeeper.y,
+    width: mainWindowStateKeeper.width,
+    height: mainWindowStateKeeper.height,
+    titleBarStyle: 'hidden',
+    frame: false,
+    trafficLightPosition: { x: 16, y: 18 },
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0f0f17' : '#ffffff',
+    webPreferences: {
+      preload: path.join(import.meta.dirname, 'preload.cjs'),
+    },
+  });
+
+  // macOS menu bar
+  if (IS_MAC) {
+    app.applicationMenu = createMenu();
+  }
+
+  win.setMenu(null);
+
+  if (mainWindowStateKeeper.isMaximized) {
+    win.maximize();
+  }
+
+  win.on('closed', () => {
+    app.quit();
+  });
+
+  mainWindowStateKeeper.track(win);
+
+  const { Metastable, router } = await import('@metastable/metastable');
+
   const comfyMainPath = path.join(
     app.isPackaged
       ? path.join(path.dirname(app.getPath('exe')), IS_MAC ? '..' : '.')
@@ -209,36 +160,11 @@ async function createWindow() {
     }
   });
 
-  const mainWindowStateKeeper = await windowStateKeeper('main');
-
-  const win = new BrowserWindow({
-    title: 'Metastable',
-    minWidth: 1200,
-    minHeight: 700,
-    x: mainWindowStateKeeper.x,
-    y: mainWindowStateKeeper.y,
-    width: mainWindowStateKeeper.width,
-    height: mainWindowStateKeeper.height,
-    titleBarStyle: 'hidden',
-    frame: false,
-    trafficLightPosition: { x: 16, y: 18 },
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0f0f17' : '#ffffff',
-    webPreferences: {
-      preload: path.join(import.meta.dirname, 'preload.cjs'),
-    },
-  });
-
-  if (mainWindowStateKeeper.isMaximized) {
-    win.maximize();
-  }
-
-  mainWindowStateKeeper.track(win);
-
   createIPCHandler({
     router,
     windows: [win],
     createContext: async () => {
-      return { metastable, win, autoUpdater: updater, app };
+      return { metastable, win, autoUpdater: getUpdater(), app };
     },
   });
 
@@ -252,17 +178,6 @@ async function createWindow() {
 
     const res = new Response(null, { status: 404 });
     return res;
-  });
-
-  win.setMenu(null);
-
-  // macOS menu bar
-  if (IS_MAC) {
-    app.applicationMenu = createMenu();
-  }
-
-  win.on('closed', () => {
-    app.quit();
   });
 
   if (ELECTRON_RENDERER_URL) {
@@ -310,7 +225,7 @@ async function createWindow() {
     const config = await metastable.config.get('app');
 
     if (config?.autoUpdate) {
-      updater?.checkForUpdates();
+      getUpdater()?.checkForUpdates();
     }
   }
 

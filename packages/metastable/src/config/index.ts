@@ -1,9 +1,8 @@
 import EventEmitter from 'events';
 
+import { JSONFile } from '@metastable/common/fs';
 import { ConfigType } from '@metastable/types';
 import { assign } from 'radash';
-
-import { JSONFile } from '../helpers/fs.js';
 
 const CONFIG_DEFAULTS: ConfigType = {
   python: {

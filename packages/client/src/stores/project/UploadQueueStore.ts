@@ -1,5 +1,5 @@
 import { ProjectFileType } from '@metastable/types';
-import { Base64 } from 'js-base64';
+import { fromByteArray } from 'base64-js';
 import { action, makeObservable, observable } from 'mobx';
 import { nanoid } from 'nanoid';
 
@@ -60,9 +60,7 @@ export class UploadQueueStore {
         await API.project.file.create.mutate({
           type: ProjectFileType.INPUT,
           projectId: this.projectId,
-          data: Base64.fromUint8Array(
-            new Uint8Array(await item.file.arrayBuffer()),
-          ),
+          data: fromByteArray(new Uint8Array(await item.file.arrayBuffer())),
           name: item.file.name,
           ext: item.file.name.split('.').pop()!,
         });

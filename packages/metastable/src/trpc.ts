@@ -2,7 +2,7 @@ import { on } from 'events';
 import fs from 'fs/promises';
 import path from 'path';
 
-import { semverCompare } from '@metastable/common';
+import { semverCompare } from '@metastable/common/semver';
 import {
   BackendStatus,
   LogItem,
@@ -21,7 +21,7 @@ import {
 import { initTRPC, TRPCError } from '@trpc/server';
 import { type App, type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
-import { Base64 } from 'js-base64';
+import { toByteArray } from 'base64-js';
 import { nanoid } from 'nanoid';
 import {
   any,
@@ -597,7 +597,7 @@ export const router = t.router({
             }
 
             const file = await project.files[type].create(name);
-            await file.write(Base64.toUint8Array(data));
+            await file.write(toByteArray(data));
             return await file.json(true);
           },
         ),

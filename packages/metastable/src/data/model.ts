@@ -3,7 +3,8 @@ import { FSWatcher, watch } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 
-import { MRN, MRNDataParsed } from '@metastable/common';
+import { JSONFile } from '@metastable/common/fs';
+import { MRN, MRNDataParsed } from '@metastable/common/mrn';
 import { getModelDetails, SUPPORTED_MODEL_TYPES } from '@metastable/model-info';
 import {
   Metamodel,
@@ -19,7 +20,6 @@ import {
   exists,
   getAvailableName,
   IMAGE_EXTENSIONS,
-  JSONFile,
   removeFileExtension,
   testExtensions,
   tryUnlink,
