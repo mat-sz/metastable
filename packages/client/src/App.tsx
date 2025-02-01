@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { Suspense, useLayoutEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 
 import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
@@ -8,26 +8,15 @@ import { uiStore } from '$stores/UIStore';
 import { withoutTransitions } from '$utils/css';
 import { lazyPreload } from '$utils/react';
 import './index.scss';
+import Home from './views/home';
 import { Main } from './views/system/Main';
 
-const Home = lazyPreload(() => import('./views/home'));
 const Project = lazyPreload(() => import('./views/project'));
 const Settings = lazyPreload(() => import('./views/settings'));
 const Setup = lazyPreload(() => import('./views/setup'));
 const ModelManager = lazyPreload(() => import('./views/models'));
 
 const View: React.FC = observer(() => {
-  useLayoutEffect(() => {
-    withoutTransitions(() => {
-      document.documentElement.setAttribute('data-theme', mainStore.theme);
-    });
-  }, [mainStore.theme]);
-  useLayoutEffect(() => {
-    withoutTransitions(() => {
-      document.documentElement.style.fontSize = `${mainStore.config.data?.ui.fontSize || 16}px`;
-    });
-  }, [mainStore.config.data?.ui.fontSize]);
-
   if (setupStore?.status !== 'done') {
     return <Setup />;
   }
@@ -44,14 +33,24 @@ const View: React.FC = observer(() => {
   }
 });
 
-export const App: React.FC = () => {
+export const App: React.FC = observer(() => {
+  const theme = mainStore.theme;
+  const fontSize = mainStore.config.data?.ui.fontSize || 16;
+
+  useEffect(() => {
+    withoutTransitions(() => {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.style.fontSize = `${fontSize}px`;
+    });
+  }, [theme, fontSize]);
+
   return (
     <UIWrapper>
       <Main>
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<Home />}>
           <View />
         </Suspense>
       </Main>
     </UIWrapper>
   );
-};
+});

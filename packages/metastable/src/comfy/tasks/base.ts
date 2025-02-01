@@ -2,10 +2,10 @@ import fs from 'fs/promises';
 
 import {
   joinFields,
-  MRN,
   recurseFields,
   setDefaultValues,
-} from '@metastable/common';
+} from '@metastable/common/field';
+import { MRN } from '@metastable/common/mrn';
 import {
   BaseSettings,
   Feature,

@@ -1,4 +1,7 @@
-import { ProjectQuality, ProjectSimpleSettings } from '@metastable/types';
+import {
+  ProjectQuality,
+  ProjectSimpleSettings,
+} from '@metastable/types/project';
 
 export const qualitySamplerSettings: Record<
   ProjectQuality,

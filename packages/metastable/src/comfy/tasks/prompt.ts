@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { preprocessPrompt } from '@metastable/common';
+import { preprocessPrompt } from '@metastable/common/prompt';
 import {
   Architecture,
   ImageFile,

@@ -1,4 +1,4 @@
-import { lexPrompt, PromptTokenType } from '@metastable/common';
+import { lexPrompt, PromptTokenType } from '@metastable/common/prompt';
 import clsx from 'clsx';
 import { useCallback, useRef, useState } from 'react';
 

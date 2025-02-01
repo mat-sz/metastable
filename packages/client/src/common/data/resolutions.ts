@@ -1,4 +1,5 @@
-import { Architecture, ProjectOrientation } from '@metastable/types';
+import { Architecture } from '@metastable/types/model';
+import { ProjectOrientation } from '@metastable/types/project';
 
 export type Resolution = [width: number, height: number];
 

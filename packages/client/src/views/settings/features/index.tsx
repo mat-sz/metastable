@@ -1,4 +1,4 @@
-import { semverCompare } from '@metastable/common';
+import { semverCompare } from '@metastable/common/semver';
 import { TaskState } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
 import React from 'react';

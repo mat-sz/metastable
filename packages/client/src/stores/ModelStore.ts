@@ -1,4 +1,4 @@
-import { MRN } from '@metastable/common';
+import { MRN } from '@metastable/common/mrn';
 import { Model, ModelType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 

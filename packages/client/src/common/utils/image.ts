@@ -1,5 +1,4 @@
 import { ProjectOrientation } from '@metastable/types';
-import { glueIsSourceLoaded } from 'fxglue';
 
 export const ACCEPT_IMAGES = 'image/png,image/jpeg';
 
@@ -38,7 +37,7 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
       resolve(source);
     };
 
-    if (glueIsSourceLoaded(source)) {
+    if (source.complete && source.naturalHeight > 0) {
       onload();
     } else {
       source.onload = onload;

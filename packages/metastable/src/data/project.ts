@@ -3,7 +3,7 @@ import { FSWatcher, watch } from 'fs';
 import fs from 'fs/promises';
 import path from 'path';
 
-import { MRN, MRNDataParsed } from '@metastable/common';
+import { MRN, MRNDataParsed } from '@metastable/common/mrn';
 import { Project, ProjectFileType, ProjectType } from '@metastable/types';
 import { nanoid } from 'nanoid';
 

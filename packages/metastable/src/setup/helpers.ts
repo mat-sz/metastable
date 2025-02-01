@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import os from 'os';
 
-import { semverCompare } from '@metastable/common';
+import { semverCompare } from '@metastable/common/semver';
 import { SetupOS } from '@metastable/types';
 
 export async function isGNULibc() {

@@ -1,4 +1,4 @@
-import { ModelType } from '@metastable/types';
+import { ModelType } from '@metastable/types/model';
 
 import { DownloadableModelGroup, DownloadableModelWarning } from '$types/model';
 

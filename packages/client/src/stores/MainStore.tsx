@@ -1,4 +1,4 @@
-import { joinFields } from '@metastable/common';
+import { joinFields } from '@metastable/common/field';
 import {
   BackendStatus,
   InstanceInfo,
@@ -13,7 +13,6 @@ import { parseHotkey } from '$hooks/useHotkey';
 import { InstanceBackendError } from '$modals/instance/backendError';
 import { ProjectUnsaved } from '$modals/project/unsaved';
 import { IS_ELECTRON } from '$utils/config';
-import { withoutTransitions } from '$utils/css';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { ConfigStore } from './ConfigStore';
 import { modalStore } from './ModalStore';
@@ -206,15 +205,15 @@ class MainStore {
       this.config.refresh(),
       setupStore.init(),
     ]);
-    withoutTransitions(() => {
-      document.documentElement.setAttribute('data-theme', this.theme);
-      document.documentElement.style.fontSize = `${this.config.data?.ui.fontSize || 16}px`;
-    });
-    postMessage({ payload: 'removeLoading' }, '*');
+    mainStore.removeLoading();
     this.refreshModelCache();
     runInAction(() => {
       this.ready = true;
     });
+  }
+
+  removeLoading() {
+    postMessage({ payload: 'removeLoading' }, '*');
   }
 
   get isConfigured() {

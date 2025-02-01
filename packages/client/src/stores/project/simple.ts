@@ -1,4 +1,4 @@
-import { FieldHandler, recurseFields } from '@metastable/common';
+import { FieldHandler, recurseFields } from '@metastable/common/field';
 import {
   Project as APIProject,
   Architecture,

@@ -19,9 +19,9 @@ import {
   Utilization,
 } from '@metastable/types';
 import { initTRPC, TRPCError } from '@trpc/server';
+import { toByteArray } from 'base64-js';
 import { type App, type BrowserWindow } from 'electron';
 import type { AppUpdater } from 'electron-updater';
-import { toByteArray } from 'base64-js';
 import { nanoid } from 'nanoid';
 import {
   any,

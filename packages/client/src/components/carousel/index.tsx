@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 
 import { useEventListener } from '$hooks/useEventListener';
 import { useResizeObserver } from '$hooks/useResizeObserver';
@@ -39,7 +39,7 @@ export const Carousel: React.FC<React.PropsWithChildren> = ({ children }) => {
             })
           }
         >
-          <FaChevronLeft />
+          <BsChevronLeft />
         </button>
       )}
       {hasAfter && (
@@ -52,7 +52,7 @@ export const Carousel: React.FC<React.PropsWithChildren> = ({ children }) => {
             })
           }
         >
-          <FaChevronRight />
+          <BsChevronRight />
         </button>
       )}
     </div>

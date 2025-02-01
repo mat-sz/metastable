@@ -2,7 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { TaskState } from '@metastable/types';
+import { TaskState } from '@metastable/types/task';
 import {
   app,
   BrowserWindow,
@@ -13,7 +13,6 @@ import {
   shell,
   WindowOpenHandlerResponse,
 } from 'electron';
-import { createIPCHandler } from 'trpc-electron/main';
 
 import { getUpdater, loadAppUpdater } from './helpers/autoUpdate';
 import contextMenu from './helpers/contextMenu';
@@ -160,6 +159,7 @@ async function createWindow() {
     }
   });
 
+  const { createIPCHandler } = await import('trpc-electron/main');
   createIPCHandler({
     router,
     windows: [win],

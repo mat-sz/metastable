@@ -15,6 +15,11 @@
       "require": "./lib/index.js",
       "import": "./lib/index.js",
       "types": "./lib/index.d.ts"
+    },
+    "./*": {
+      "require": "./lib/*.js",
+      "import": "./lib/*.js",
+      "types": "./lib/*.d.ts"
     }
   }
 }

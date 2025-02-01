@@ -1,12 +1,19 @@
 import attrAccept from 'attr-accept';
-import { filesize as fsize } from 'filesize';
+
+const BYTES = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 export function filesize(value?: number) {
   if (typeof value !== 'number') {
     return 'Unknown';
   }
 
-  return fsize(value, { standard: 'jedec' });
+  let i = 0;
+  while (value >= 1024 && i < BYTES.length) {
+    value /= 1024;
+    i++;
+  }
+
+  return `${value.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${BYTES[i]}`;
 }
 
 interface FilesEvent {
