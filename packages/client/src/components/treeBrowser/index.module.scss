@@ -1,0 +1,53 @@
+.browser {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .actions {
+      display: flex;
+      align-items: center;
+      margin-top: -0.5rem;
+
+      & > * {
+        margin-left: 0.5rem;
+      }
+    }
+
+    .enabled {
+      color: var(--green-900);
+    }
+
+    button {
+      padding: 0.5rem;
+    }
+  }
+
+  .info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  &.small,
+  &.small-grid {
+    margin: 1rem;
+    padding: 1rem;
+    background: var(--grey-300-transparent);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--grey-400);
+    border-radius: 5px;
+    width: 500px;
+    height: 400px;
+  }
+}
+
+.hint {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}

@@ -85,7 +85,9 @@ export const VarPrompt = ({
 
     if (
       e.key === '(' &&
-      (textStart !== textEnd || el.value[textStart] === ' ' || !el.value[textStart])
+      (textStart !== textEnd ||
+        el.value[textStart] === ' ' ||
+        !el.value[textStart])
     ) {
       e.stopPropagation();
       e.preventDefault();
@@ -139,18 +141,14 @@ export const VarPrompt = ({
               newWeight -= 0.05;
               break;
             case 'weightIncrease':
-              newWeight += 0.05
+              newWeight += 0.05;
               break;
             case 'weightReset':
               newWeight = 1;
               break;
           }
 
-          const replaceWith = serializeImportance(
-            parsed.text,
-            newWeight,
-          );
-
+          const replaceWith = serializeImportance(parsed.text, newWeight);
           replaceText(el, result.start, result.end, replaceWith);
         }
         break;

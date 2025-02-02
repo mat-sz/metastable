@@ -5,7 +5,7 @@ import { useContextMenu } from 'use-context-menu';
 import { ThumbnailDisplay } from '$components/thumbnailDisplay';
 import styles from './index.module.scss';
 
-interface CardProps {
+export interface CardProps {
   name?: string;
   imageUrl?: string;
   isVideo?: boolean;
@@ -45,6 +45,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
       <ThumbnailDisplay
         className={styles.thumbnail}
         imageClassName={styles.image}
+        noImageClassName={styles.noImage}
         color={color}
         icon={icon}
         imageUrl={imageUrl}

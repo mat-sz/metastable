@@ -28,7 +28,11 @@
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 
     &.small {
-      grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+
+      .card {
+        aspect-ratio: 1;
+      }
     }
 
     .card {
@@ -129,6 +133,12 @@
         display: flex;
         align-items: center;
         margin-left: 1rem;
+      }
+    }
+
+    &.small {
+      .noImage {
+        font-size: 1.2rem;
       }
     }
   }
