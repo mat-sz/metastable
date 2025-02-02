@@ -8,6 +8,7 @@ export interface PromptStyle {
   positive?: string;
   negative?: string;
   architecture?: Architecture | 'any';
+  parts?: string[];
 }
 
 export type PromptStyleSource = 'system' | 'user' | 'model';

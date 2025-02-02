@@ -10,7 +10,7 @@ import { TreeBrowserEntry } from './types';
 interface CommonProps<TData, TItem = TreeBrowserEntry<TData>> {
   getCardProps?: (item: TItem) => CardProps;
   small?: boolean;
-  view?: 'grid' | 'list';
+  view?: 'grid' | 'list' | 'details';
   onSelect: (item?: TItem) => void;
   noResultsView?: JSX.Element;
 }
