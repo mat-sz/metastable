@@ -11,6 +11,7 @@ import {
   BsExclamationTriangleFill,
   BsFolder,
   BsFolderFill,
+  BsPlusLg,
   BsXLg,
 } from 'react-icons/bs';
 import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
@@ -224,6 +225,14 @@ export const ModelBrowser: React.FC<Props> = observer(
         <div className={styles.header}>
           <Breadcrumbs value={parts} onChange={setParts} />
           <div className={styles.actions}>
+            {variant === "small" && <IconButton
+              title="Add more models"
+              onClick={() => {
+                uiStore.setView('models');
+              }}
+            >
+              <BsPlusLg />
+            </IconButton>}
             {!!architecture && (
               <IconButton
                 title={
