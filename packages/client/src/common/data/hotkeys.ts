@@ -41,6 +41,10 @@ export const hotkeyGroups: Record<string, HotkeyGroup> = {
         label: 'Decrease selected text weight',
         defaultKeys: 'CmdOrCtrl+Down',
       },
+      weightReset: {
+        label: 'Reset selected text weight',
+        defaultKeys: 'CmdOrCtrl+.',
+      },
       comment: {
         label: 'Comment out selected text',
         defaultKeys: 'CmdOrCtrl+/',

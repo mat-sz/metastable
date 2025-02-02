@@ -3,6 +3,7 @@
 ## Features
 
 - Added a "Temperature unit" switch to settings.
+- Added a keyboard shortcut to reset weight of selected text in prompt.
 
 ## Bug fixes
 

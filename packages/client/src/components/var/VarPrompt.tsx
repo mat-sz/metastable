@@ -117,11 +117,11 @@ export const VarPrompt = ({
     switch (hotkeyId) {
       case 'weightIncrease':
       case 'weightDecrease':
+      case 'weightReset':
         {
           e.stopPropagation();
           e.preventDefault();
 
-          const change = hotkeyId === 'weightIncrease' ? 0.05 : -0.05;
           const result = findClosestTokenOrImportance(
             el.value,
             textStart,
@@ -132,9 +132,23 @@ export const VarPrompt = ({
           }
 
           const parsed = parseImportance(result.text);
+
+          let newWeight = parsed.weight;
+          switch (hotkeyId) {
+            case 'weightDecrease':
+              newWeight -= 0.05;
+              break;
+            case 'weightIncrease':
+              newWeight += 0.05
+              break;
+            case 'weightReset':
+              newWeight = 1;
+              break;
+          }
+
           const replaceWith = serializeImportance(
             parsed.text,
-            parsed.weight + change,
+            newWeight,
           );
 
           replaceText(el, result.start, result.end, replaceWith);
