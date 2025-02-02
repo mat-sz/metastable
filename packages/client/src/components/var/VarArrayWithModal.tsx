@@ -4,7 +4,7 @@ import { Alert } from '$components/alert';
 import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { modalStore } from '$stores/ModalStore';
-import { VarArray } from './VarArray';
+import { IVarArrayProps, VarArray } from './VarArray';
 import { IVarBaseInputProps } from './VarBase';
 import { VarUI } from './VarUI';
 
@@ -28,7 +28,10 @@ interface VarArrayWithModalValidateContext<T> {
 }
 
 export interface IVarArrayWithModalProps<T = any>
-  extends Omit<IVarBaseInputProps<T[]>, 'label' | 'children' | 'readOnly'> {
+  extends Omit<
+    IVarArrayProps<T>,
+    'label' | 'children' | 'readOnly' | 'children' | 'footer'
+  > {
   addModalTitle?: string;
   editModalTitle?: string;
   modalChildren?: ReactNode;

@@ -4,6 +4,7 @@
 
 - Added a "Temperature unit" switch to settings.
 - Added a keyboard shortcut to reset weight of selected text in prompt.
+- Added support for grouping prompt styles.
 
 ## Improvements
 
@@ -79,8 +80,8 @@
 
 # 0.0.15 (2025-01-11)
 
-> [!WARNING]  
-> Manual steps required to finish the update.  
+> [!WARNING]
+> Manual steps required to finish the update.
 > If you have any CLIP or UNET models (in models/clip and models/unet), you will need to move them to models/text_encoder and models/diffusion_model respectively.
 
 ## Features

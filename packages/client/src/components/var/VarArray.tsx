@@ -21,6 +21,9 @@ export interface IVarArrayProps<T = any>
   extends Omit<IVarBaseInputProps<T[]>, 'label' | 'children' | 'readOnly'> {
   children?: ReactNode | ((context: VarArrayItemContext<T>) => ReactNode);
   footer?: ReactNode | ((context: VarArrayFooterContext<T>) => ReactNode);
+  onAdd?: (item: T) => void;
+  onRemove?: (item: T, i: number) => void;
+  onUpdate?: (item: T, i: number) => void;
 }
 
 /**
@@ -35,6 +38,9 @@ export const VarArray = ({
   footer,
   error,
   errorPath,
+  onAdd,
+  onRemove,
+  onUpdate,
 }: IVarArrayProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
@@ -76,11 +82,13 @@ export const VarArray = ({
                   index,
                   array,
                   update: (value: any) => {
+                    onUpdate?.(value, index);
                     const newArray = [...currentArray];
                     newArray[index] = value;
                     setCurrentValue(newArray);
                   },
                   remove: () => {
+                    onRemove?.(value, index);
                     const newArray = [...currentArray];
                     newArray.splice(index, 1);
                     setCurrentValue(newArray);
@@ -95,6 +103,7 @@ export const VarArray = ({
           ? footer({
               array: currentArray,
               append: item => {
+                onAdd?.(item);
                 setCurrentValue([...currentArray, item]);
               },
             })

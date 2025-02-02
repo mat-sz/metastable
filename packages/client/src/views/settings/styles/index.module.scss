@@ -26,3 +26,24 @@
 .prompt [varui-label-body] > div > div {
   min-height: 8rem;
 }
+
+.group {
+  &:not(.root) {
+    margin-left: 1rem;
+  }
+
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+
+  & > * {
+    flex: 1;
+    margin: 0;
+
+    &:not(:first-child) {
+      margin-left: 0.5rem;
+    }
+  }
+}
