@@ -18,6 +18,7 @@
 
 - Fixed issues with log items not being refreshed in "System monitor".
 - Fixed parenthesis insertion around words in prompts.
+- Fixed metadata for downloaded models.
 
 # 0.0.18 (2025-01-28)
 

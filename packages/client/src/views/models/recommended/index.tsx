@@ -18,7 +18,7 @@ export const Recommended: React.FC = () => {
           <DownloadButton
             files={model.downloads.map(download => ({
               ...download,
-              info: download.ignoreParentMetadata
+              metadata: download.ignoreParentMetadata
                 ? download.metadata
                 : {
                     ...baseMetadata,

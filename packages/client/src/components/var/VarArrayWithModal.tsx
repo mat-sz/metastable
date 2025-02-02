@@ -5,7 +5,6 @@ import { Button } from '$components/button';
 import { Modal, ModalActions, useModal } from '$components/modal';
 import { modalStore } from '$stores/ModalStore';
 import { IVarArrayProps, VarArray } from './VarArray';
-import { IVarBaseInputProps } from './VarBase';
 import { VarUI } from './VarUI';
 
 interface VarArrayWithModalItemContext<T> {
