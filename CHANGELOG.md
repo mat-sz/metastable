@@ -5,10 +5,6 @@
 - Added a "Temperature unit" switch to settings.
 - Added a keyboard shortcut to reset weight of selected text in prompt.
 
-## Bug fixes
-
-- Fixed issues with log items not being refreshed in "System monitor".
-
 ## Improvements
 
 - Removed bundle reset actions for Docker images.
@@ -16,6 +12,11 @@
 - Improved prompt data import from image files.
 - Updated Electron to v34.0.2.
 - Improved application loading time.
+
+## Bug fixes
+
+- Fixed issues with log items not being refreshed in "System monitor".
+- Fixed parenthesis insertion around words in prompts.
 
 # 0.0.18 (2025-01-28)
 

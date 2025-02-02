@@ -85,7 +85,7 @@ export const VarPrompt = ({
 
     if (
       e.key === '(' &&
-      (el.value[textStart] === ' ' || !el.value[textStart])
+      (textStart !== textEnd || el.value[textStart] === ' ' || !el.value[textStart])
     ) {
       e.stopPropagation();
       e.preventDefault();
