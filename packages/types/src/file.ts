@@ -3,7 +3,6 @@ export interface ImageFile {
   name: string;
   path: string;
   metadata?: any;
-  parts?: string[];
 }
 
 export enum DirentType {

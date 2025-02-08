@@ -10,7 +10,7 @@ import { IVarBaseInputProps, VarBase } from '$components/var/VarBase';
 import { resolveImage } from '$utils/url';
 import styles from './VarMask.module.scss';
 
-interface IVarMaskProps extends IVarBaseInputProps<string> {
+interface IVarMaskProps extends IVarBaseInputProps<string | undefined> {
   imagePath: string;
   imageBrowserProps?: Omit<ImageBrowserProps, 'onSelect'>;
 }
@@ -27,7 +27,9 @@ export const VarMask = ({
   label = 'Mask',
   imageBrowserProps,
 }: IVarMaskProps): JSX.Element => {
-  const [currentValue, setCurrentValue, currentError] = useVarUIValue({
+  const [currentValue, setCurrentValue, currentError] = useVarUIValue<
+    string | undefined
+  >({
     path,
     fallbackValue: value,
     onChange,

@@ -13,9 +13,10 @@ import {
   ProjectOrientation,
   ProjectSimpleSettings,
   ProjectTaskData,
-  PromptStyleWithSource,
+  PromptStyleNodeWithSource,
   Task,
   TaskState,
+  TreeGroup,
 } from '@metastable/types';
 import {
   action,
@@ -33,10 +34,12 @@ import { PROMPT_STYLES } from '$data/styles';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { modelStore } from '$stores/ModelStore';
+import { ImageFileTreeItem, ImageFileTreeNode } from '$types/project';
 import { randomSeed } from '$utils/comfy';
 import { EXTENSIONS, filesize } from '$utils/file';
 import { detectOrientation, fileToBase64 } from '$utils/image';
 import { get, set } from '$utils/object';
+import { removeEmptyGroups } from '$utils/tree';
 import { isLocalUrl, resolveImage } from '$utils/url';
 import { BaseProject } from './base';
 import { mainStore } from '../MainStore';
@@ -331,14 +334,33 @@ export class SimpleProject extends BaseProject<
     }
   }
 
-  get imageFiles(): ImageFile[] {
-    const files: ImageFile[] = [];
+  get imageFiles(): ImageFileTreeNode[] {
+    const files: ImageFileTreeNode[] = [
+      ...Object.values(ProjectFileType).map(
+        value =>
+          ({
+            id: value,
+            name: value,
+            nodeType: 'group',
+          }) as TreeGroup,
+      ),
+    ];
 
     for (const type of Object.values(ProjectFileType)) {
-      files.push(...this.files[type].map(file => ({ ...file, parts: [type] })));
+      files.push(
+        ...this.files[type].map(
+          file =>
+            ({
+              ...file,
+              id: file.name,
+              nodeType: 'item',
+              parentId: type,
+            }) as ImageFileTreeItem,
+        ),
+      );
     }
 
-    return files;
+    return removeEmptyGroups(files);
   }
 
   get autoSizes(): Record<ProjectOrientation, Resolution> | undefined {
@@ -441,21 +463,24 @@ export class SimpleProject extends BaseProject<
   }
 
   get availableStyles() {
-    const systemStyles: PromptStyleWithSource[] = PROMPT_STYLES.map(style => ({
-      ...style,
-      source: 'system',
-    }));
-    const userStyles: PromptStyleWithSource[] = (
+    const systemStyles: PromptStyleNodeWithSource[] = PROMPT_STYLES.map(
+      style => ({
+        ...style,
+        source: 'system',
+      }),
+    );
+    const userStyles: PromptStyleNodeWithSource[] = (
       mainStore.config.data?.styles || []
     ).map(style => ({ ...style, source: 'user' }));
     const allStyles = [...systemStyles, ...userStyles];
-
-    return allStyles.filter(
-      style =>
-        !style.architecture ||
-        style.architecture === 'any' ||
-        style.architecture === this.architecture,
+    const filtered = allStyles.filter(style =>
+      style.nodeType === 'item'
+        ? !style.architecture ||
+          style.architecture === 'any' ||
+          style.architecture === this.architecture
+        : true,
     );
+    return removeEmptyGroups(filtered);
   }
 
   get isLastOutput() {
@@ -567,7 +592,8 @@ export class SimpleProject extends BaseProject<
     const style = this.settings.prompt.style;
     if (style) {
       const saved = this.availableStyles.find(item => item.id === style.id);
-      this.settings.prompt.style = saved ? { ...saved } : undefined;
+      this.settings.prompt.style =
+        saved?.nodeType === 'item' ? { ...saved } : undefined;
     }
   }
 

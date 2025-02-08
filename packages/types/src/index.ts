@@ -8,3 +8,4 @@ export * from './model.js';
 export * from './project.js';
 export * from './setup.js';
 export * from './task.js';
+export * from './tree.js';

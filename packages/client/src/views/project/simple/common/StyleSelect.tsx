@@ -1,14 +1,13 @@
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { BsChevronDown, BsXLg } from 'react-icons/bs';
+import { BsChevronDown, BsPalette, BsXLg } from 'react-icons/bs';
 import { Popover } from 'react-tiny-popover';
 
 import { IconButton } from '$components/iconButton';
 import { TreeBrowser } from '$components/treeBrowser';
-import { getItemsFactory, listItems } from '$components/treeBrowser/helpers';
-import { TreeBrowserItem } from '$components/treeBrowser/types';
 import { VarBase } from '$components/var';
+import { PROMPT_STYLE_NONE_ID } from '$data/styles';
 import { mainStore } from '$stores/MainStore';
 import styles from './StyleSelect.module.scss';
 import { useSimpleProject } from '../../context';
@@ -21,11 +20,11 @@ export const StyleSelect: React.FC<Props> = observer(({ className }) => {
   const project = useSimpleProject();
   const [isOpen, setIsOpen] = useState(false);
 
-  const availableStyles = [undefined, ...project.availableStyles];
+  const availableStyles = [...project.availableStyles];
   const currentStyle = project.settings.prompt.style;
 
   return (
-    <VarBase label="Prompt style" className={className}>
+    <VarBase className={className}>
       <Popover
         isOpen={isOpen}
         positions={['bottom', 'left', 'right', 'top']}
@@ -34,24 +33,23 @@ export const StyleSelect: React.FC<Props> = observer(({ className }) => {
         content={
           <TreeBrowser
             small
-            view="details"
+            view="list"
             showBreadcrumbs
             onSelect={item => {
               setIsOpen(false);
               runInAction(() => {
-                project.settings.prompt.style = item?.data;
+                if (!item?.id || item.id === PROMPT_STYLE_NONE_ID) {
+                  project.settings.prompt.style = undefined;
+                } else {
+                  project.settings.prompt.style = { ...item };
+                }
               });
             }}
-            getItems={getItemsFactory(
-              availableStyles,
-              style => style?.id || '_none',
-              style => style?.parts,
-            )}
-            getCardProps={item => {
-              return {
-                name: item.data?.name || 'None',
-              };
-            }}
+            nodes={availableStyles}
+            getCardProps={item => ({
+              name: item.name,
+              icon: <BsPalette />,
+            })}
             actions={
               <IconButton
                 title="Reset"
@@ -65,25 +63,8 @@ export const StyleSelect: React.FC<Props> = observer(({ className }) => {
                 <BsXLg />
               </IconButton>
             }
-            quickFilter={(_: any, parts: string[], search) =>
-              mainStore
-                .searchFn(
-                  listItems(
-                    availableStyles,
-                    style => style?.parts,
-                    parts,
-                    true,
-                  ),
-                  search,
-                  item => item?.name ?? 'None',
-                )
-                .map(item => {
-                  return {
-                    id: item?.id || '_none',
-                    type: 'item',
-                    data: item,
-                  } as TreeBrowserItem<any>;
-                })
+            quickFilter={(nodes, search) =>
+              mainStore.searchFn(nodes, search, item => item?.name ?? 'None')
             }
           />
         }
@@ -93,7 +74,7 @@ export const StyleSelect: React.FC<Props> = observer(({ className }) => {
           onClick={() => setIsOpen(current => !current)}
         >
           <span className={styles.name}>
-            {currentStyle?.name || 'Select style'}
+            {currentStyle?.name || 'No style'}
           </span>
           <div className={styles.chevron}>
             <BsChevronDown />

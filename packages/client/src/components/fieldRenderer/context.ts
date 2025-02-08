@@ -1,9 +1,10 @@
-import { Architecture, ImageFile } from '@metastable/types';
+import { Architecture } from '@metastable/types';
 import React from 'react';
 
+import { ImageFileTreeNode } from '$types/project';
 export interface IFieldContext {
   architecture?: Architecture;
-  imageFiles?: ImageFile[];
+  imageFiles?: ImageFileTreeNode[];
   collapsed?: Record<string, boolean>;
   onToggleCollapsed?: (key: string, collapsed: boolean) => void;
 }

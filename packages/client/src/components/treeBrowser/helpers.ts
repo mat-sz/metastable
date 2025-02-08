@@ -1,79 +1,44 @@
-import { arrayStartsWith } from '$utils/array';
-import { TreeBrowserGroup, TreeBrowserItem } from './types';
+import { TreeNode } from '@metastable/types';
 
-export function listItems<TItem>(
-  data: TItem[],
-  getItemParts: (item: TItem) => string[] | undefined,
-  parts: string[],
-  includeSubgroups = false,
-) {
-  const entries: TItem[] = [];
-
-  for (const entry of data) {
-    const entryParts = getItemParts(entry) ?? [];
-    if (!includeSubgroups && parts.length !== entryParts.length) {
-      continue;
-    }
-
-    if (!arrayStartsWith(entryParts, parts)) {
-      continue;
-    }
-
-    entries.push(entry);
+export function getAncestors<TItem extends TreeNode>(
+  nodes: TItem[],
+  parentId?: string,
+): TItem[] {
+  if (!parentId) {
+    return [];
   }
 
-  return entries;
-}
-
-export function listGroups<TItem>(
-  data: TItem[],
-  getItemParts: (item: TItem) => string[] | undefined,
-  parts: string[],
-) {
-  const set = new Set<string>();
-
-  for (const entry of data) {
-    const entryParts = getItemParts(entry) ?? [];
-    if (
-      entryParts.length !== parts.length + 1 ||
-      !arrayStartsWith(entryParts, parts)
-    ) {
-      continue;
-    }
-
-    const first = entryParts[parts.length];
-    if (first) {
-      set.add(first);
+  const result: TItem[] = [];
+  let currentId: string | undefined = parentId;
+  while (currentId) {
+    const node = nodes.find(item => item.id === currentId);
+    currentId = node?.parentId;
+    if (node) {
+      result.push(node);
     }
   }
 
-  return [...set];
+  return result;
 }
 
-export function getItemsFactory<TItem>(
-  data: TItem[],
-  getId: (item: TItem) => string,
-  getItemParts: (item: TItem) => string[] | undefined,
-) {
-  return (parts: string[]) => {
-    return [
-      ...listGroups(data, getItemParts, parts).map(dir => {
-        const dirParts = [...parts, dir];
+export function getDescendants<TItem extends TreeNode>(
+  nodes: TItem[],
+  parentId?: string,
+): TItem[] {
+  if (!parentId) {
+    return nodes;
+  }
 
-        return {
-          id: `directory-${dirParts.join('-')}`,
-          type: 'group',
-          data: dir,
-          parts: dirParts,
-        } as TreeBrowserGroup<string>;
-      }),
-      ...listItems(data, getItemParts, parts, false).map(item => {
-        return {
-          id: getId(item),
-          type: 'item',
-          data: item,
-        } as TreeBrowserItem<TItem>;
-      }),
-    ];
-  };
+  const items = nodes.filter(node => node.parentId === parentId);
+  const queue = items.filter(node => node.nodeType === 'group');
+  const result = items;
+
+  while (queue.length) {
+    const current = queue.shift()!;
+    const items = nodes.filter(node => node.parentId === current.id);
+    queue.push(...items.filter(node => node.nodeType === 'group'));
+    result.push(...items);
+  }
+
+  return result;
 }

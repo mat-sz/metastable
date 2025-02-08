@@ -1,8 +1,22 @@
-import { Architecture, PromptStyle } from '@metastable/types';
+import { Architecture, PromptStyleNode } from '@metastable/types';
 
-export const PROMPT_STYLES: PromptStyle[] = [
+export const PROMPT_STYLE_NONE_ID = 'undefined';
+
+export const PROMPT_STYLES: PromptStyleNode[] = [
+  {
+    id: PROMPT_STYLE_NONE_ID,
+    nodeType: 'item',
+    name: 'No style',
+  },
+  {
+    id: 'system.group',
+    nodeType: 'group',
+    name: 'Built-in styles',
+  },
   {
     id: 'system.sdxl.fooocus.enhance',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Enhance',
     negative:
@@ -10,6 +24,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.semi_realistic',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Semi Realistic',
     negative:
@@ -17,6 +33,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.sharp',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Sharp',
     positive:
@@ -26,6 +44,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.masterpiece',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Masterpiece',
     positive:
@@ -35,6 +55,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.photograph',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Photograph',
     positive:
@@ -44,6 +66,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.negative',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Negative',
     negative:
@@ -51,6 +75,8 @@ export const PROMPT_STYLES: PromptStyle[] = [
   },
   {
     id: 'system.sdxl.fooocus.cinematic',
+    parentId: 'system.group',
+    nodeType: 'item',
     architecture: Architecture.SDXL,
     name: 'Cinematic',
     positive:

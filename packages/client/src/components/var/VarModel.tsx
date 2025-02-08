@@ -46,6 +46,7 @@ export const VarModel = observer(
     const [isOpen, setIsOpen] = useState(false);
 
     const model = currentValue ? modelStore.find(currentValue) : undefined;
+    const parts = model?.file.parts;
 
     return (
       <VarBase
@@ -63,7 +64,7 @@ export const VarModel = observer(
           content={
             <ModelBrowser
               variant="small"
-              defaultParts={model?.file.parts}
+              defaultParentId={parts?.length ? parts.join('/') : undefined}
               type={modelType}
               architecture={architecture}
               allowReset

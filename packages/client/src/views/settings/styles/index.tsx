@@ -3,12 +3,11 @@ import clsx from 'clsx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
-import React, { useState } from 'react';
+import React from 'react';
 import { BsPencil, BsTrash } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import { TabPanel } from '$components/tabs';
-import { listGroups, listItems } from '$components/treeBrowser/helpers';
 import {
   VarArrayWithModal,
   VarButton,
@@ -25,29 +24,30 @@ const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
 );
 
 interface SettingsStylesFolderProps {
-  parts: string[];
+  parentId?: string;
+  label?: string;
 }
 
 const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
-  ({ parts }) => {
-    const allStyles = mainStore.config.data?.styles || [];
-    const [tempGroups, setTempGroups] = useState<string[]>([]);
-
-    const groups = [
-      ...new Set([
-        ...listGroups(allStyles, item => item.parts, parts),
-        ...tempGroups,
-      ]),
-    ];
-    const items = listItems(allStyles, item => item.parts, parts);
+  ({ parentId, label = 'All styles' }) => {
+    const currentStyles =
+      mainStore.config.data?.styles.filter(
+        item => item.parentId === parentId,
+      ) || [];
+    const groups = currentStyles.filter(item => item.nodeType === 'group');
+    const items = currentStyles.filter(item => item.nodeType === 'item');
 
     return (
       <VarCategory
-        label={parts[parts.length - 1] ?? 'All styles'}
-        className={clsx(styles.group, { [styles.root]: parts.length === 0 })}
+        label={label}
+        className={clsx(styles.group, { [styles.root]: !parentId })}
       >
         {groups.map(group => (
-          <SettingsStylesFolder key={group} parts={[...parts, group]} />
+          <SettingsStylesFolder
+            key={group.id}
+            parentId={group.id}
+            label={group.name}
+          />
         ))}
         <VarArrayWithModal
           addModalTitle="Add prompt style"
@@ -76,14 +76,22 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
               <VarButton buttonLabel="Add style" onClick={add} />
               <VarButton
                 buttonLabel="Add group"
-                onClick={() => setTempGroups(groups => [...groups, nanoid()])}
+                onClick={() => {
+                  mainStore.config.data!.styles.push({
+                    id: nanoid(),
+                    name: 'New group',
+                    nodeType: 'group',
+                  });
+                  mainStore.config.save();
+                }}
               />
             </div>
           )}
           getEmptyObject={() => ({
             id: nanoid(),
+            nodeType: 'item',
             architecture: 'any',
-            parts: [...parts],
+            parentId,
           })}
           modalChildren={
             <>
@@ -142,7 +150,7 @@ export const SettingsStyles: React.FC = observer(() => {
   return (
     <TabPanel id="styles">
       <h2>Prompt styles</h2>
-      <SettingsStylesFolder parts={[]} />
+      <SettingsStylesFolder />
     </TabPanel>
   );
 });

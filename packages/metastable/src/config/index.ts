@@ -71,6 +71,16 @@ export class Config extends EventEmitter<ConfigEvents> {
       delete config['huggingface'];
     }
 
+    if (config.styles.length) {
+      config.styles = config.styles.map((item: any) => {
+        if (!item.nodeType) {
+          item.nodeType = 'item';
+        }
+
+        return item;
+      });
+    }
+
     return config;
   }
 

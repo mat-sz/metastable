@@ -18,7 +18,7 @@ function filterItems(items: DataTransferItemList) {
   return undefined;
 }
 
-export interface IVarImageProps extends IVarBaseInputProps<string> {
+export interface IVarImageProps extends IVarBaseInputProps<string | undefined> {
   imageBrowserProps?: Omit<ImageBrowserProps, 'onSelect'>;
 }
 
@@ -37,7 +37,9 @@ export const VarImage = ({
   errorPath,
   imageBrowserProps,
 }: IVarImageProps): JSX.Element => {
-  const [currentValue, setCurrentValue, currentError] = useVarUIValue({
+  const [currentValue, setCurrentValue, currentError] = useVarUIValue<
+    string | undefined
+  >({
     path,
     fallbackValue: value,
     onChange,

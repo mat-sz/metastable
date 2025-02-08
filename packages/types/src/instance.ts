@@ -1,19 +1,25 @@
 import { ComfyTorchInfo } from './comfy.js';
 import { Feature } from './feature.js';
 import { Architecture, ModelType } from './model.js';
+import { TreeGroup, TreeItem } from './tree.js';
 
-export interface PromptStyle {
-  id: string;
-  name: string;
+export interface PromptStyleItem extends TreeItem {
   positive?: string;
   negative?: string;
   architecture?: Architecture | 'any';
-  parts?: string[];
 }
 
 export type PromptStyleSource = 'system' | 'user' | 'model';
 
-export type PromptStyleWithSource = PromptStyle & { source: PromptStyleSource };
+export type PromptStyleNode = PromptStyleItem | TreeGroup;
+
+export type PromptStyleNodeWithSource = PromptStyleNode & {
+  source: PromptStyleSource;
+};
+
+export type PromptStyleItemWithSource = PromptStyleItem & {
+  source: PromptStyleSource;
+};
 
 export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu' | 'zluda';
 
@@ -90,7 +96,7 @@ export interface ConfigType {
     hideWelcome: boolean;
     hotkeys?: Record<string, string>;
   };
-  styles: PromptStyle[];
+  styles: PromptStyleNode[];
   modelFolders: {
     [K in ModelType]?: ExtraModelFolder[];
   };

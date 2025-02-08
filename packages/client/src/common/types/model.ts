@@ -1,8 +1,11 @@
 import {
   DownloadSettings,
   Metamodel,
+  Model,
   ModelMetadata,
   ModelType,
+  TreeGroup,
+  TreeItem,
 } from '@metastable/types';
 
 export enum DownloadableModelWarning {
@@ -38,3 +41,7 @@ export interface DownloadableModelGroup {
   recommended?: boolean;
   description?: string;
 }
+
+export interface ModelTreeItem extends TreeItem, Model {}
+
+export type ModelTreeNode = ModelTreeItem | TreeGroup;

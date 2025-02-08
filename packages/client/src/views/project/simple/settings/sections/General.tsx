@@ -190,6 +190,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                   });
                 }}
                 imageBrowserProps={{
+                  defaultParentId: ProjectFileType.INPUT,
                   files: project.imageFiles,
                   showBreadcrumbs: true,
                 }}
@@ -202,7 +203,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                     path="input.mask"
                     imagePath="input.image"
                     imageBrowserProps={{
-                      defaultParts: [ProjectFileType.MASK],
+                      defaultParentId: ProjectFileType.MASK,
                       files: project.imageFiles,
                     }}
                   />

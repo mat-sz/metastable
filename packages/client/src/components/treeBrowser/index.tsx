@@ -1,36 +1,37 @@
+import { TreeNode } from '@metastable/types';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BsFolder } from 'react-icons/bs';
 
-import { Breadcrumbs } from '$components/breadcrumbs';
 import { Card, CardProps, List } from '$components/list';
+import { Breadcrumbs } from './Breadcrumbs';
+import { getAncestors, getDescendants } from './helpers';
 import styles from './index.module.scss';
-import { TreeBrowserEntry } from './types';
 
-interface CommonProps<TData, TItem = TreeBrowserEntry<TData>> {
-  getCardProps?: (item: TItem) => CardProps;
+interface CommonProps<TNode extends TreeNode> {
+  getCardProps?: (item: Extract<TNode, { nodeType: 'item' }>) => CardProps;
   small?: boolean;
   view?: 'grid' | 'list' | 'details';
-  onSelect: (item?: TItem) => void;
+  onSelect: (item?: Extract<TNode, { nodeType: 'item' }>) => void;
   noResultsView?: JSX.Element;
 }
 
-interface Props<TData, TItem = TreeBrowserEntry<TData>>
-  extends CommonProps<TData> {
-  defaultParts?: string[];
-  getItems?: (parts: string[]) => TItem[];
-  actions?: ((items: TItem[]) => React.ReactNode) | React.ReactNode;
-  quickFilter?: (data: TItem[], parts: string[], search: string) => TItem[];
+interface Props<TNode extends TreeNode> extends CommonProps<TNode> {
+  defaultParentId?: string;
+  nodes: TNode[];
+  actions?: ((items: TNode[]) => React.ReactNode) | React.ReactNode;
+  quickFilter?: (data: TNode[], search: string) => TNode[];
   showBreadcrumbs?: boolean;
   className?: string;
 }
 
-interface TreeBrowserListProps extends CommonProps<any> {
-  items: TreeBrowserEntry<any>[];
-  quickFilter?: (data: any[], search: string) => any[];
+interface TreeBrowserListProps<TNode extends TreeNode>
+  extends CommonProps<TNode> {
+  items: TNode[];
+  quickFilter?: (data: TNode[], search: string) => TNode[];
 }
 
-export const TreeBrowserList: React.FC<TreeBrowserListProps> = ({
+export const TreeBrowserList: React.FC<TreeBrowserListProps<any>> = ({
   items,
   getCardProps,
   onSelect,
@@ -39,12 +40,12 @@ export const TreeBrowserList: React.FC<TreeBrowserListProps> = ({
   return (
     <List items={items} searchAutoFocus={!!props.small} {...props}>
       {item =>
-        item.type === 'group' ? (
+        item.nodeType === 'group' ? (
           <Card
             key={item.id}
             onClick={() => onSelect(item)}
             icon={<BsFolder />}
-            name={item.data}
+            name={item.name}
           />
         ) : (
           <Card
@@ -58,25 +59,50 @@ export const TreeBrowserList: React.FC<TreeBrowserListProps> = ({
   );
 };
 
-export const TreeBrowser: React.FC<Props<any>> = ({
-  getItems,
+export function TreeBrowser<TNode extends TreeNode>({
+  nodes,
   onSelect,
-  defaultParts = [],
+  defaultParentId,
   small = false,
   actions,
   quickFilter,
   showBreadcrumbs,
   className,
   ...props
-}) => {
-  const [parts, setParts] = useState<string[]>(defaultParts);
-  const items = getItems?.(parts) || [];
+}: Props<TNode>): JSX.Element {
+  const [parentId, setParentId] = useState(defaultParentId);
+  const sorted = useMemo(() => {
+    const currentNodes = [...nodes];
+    currentNodes.sort((a, b) => {
+      if (a.nodeType === 'group' && b.nodeType !== 'group') {
+        return -1;
+      }
+      if (a.nodeType !== 'group' && b.nodeType === 'group') {
+        return 1;
+      }
 
-  const onSelectItem = (item?: TreeBrowserEntry<any>) => {
-    if (item?.type === 'group') {
-      setParts([...item.parts]);
+      return a.name.localeCompare(b.name);
+    });
+    return currentNodes;
+  }, [nodes]);
+  const items = useMemo(
+    () => sorted.filter(node => node.parentId === parentId),
+    [sorted, parentId],
+  );
+  const descendants = useMemo(
+    () => getDescendants(sorted, parentId),
+    [sorted, parentId],
+  );
+  const ancestors = useMemo(
+    () => getAncestors(sorted, parentId),
+    [sorted, parentId],
+  );
+
+  const onSelectItem = (item?: TNode) => {
+    if (item?.nodeType === 'group') {
+      setParentId(item.id);
     } else {
-      onSelect?.(item);
+      onSelect?.(item as any);
     }
   };
 
@@ -88,7 +114,9 @@ export const TreeBrowser: React.FC<Props<any>> = ({
       }}
     >
       <div className={styles.header}>
-        {showBreadcrumbs && <Breadcrumbs value={parts} onChange={setParts} />}
+        {showBreadcrumbs && (
+          <Breadcrumbs value={ancestors} onChange={setParentId} />
+        )}
         <div className={styles.actions}>
           {typeof actions === 'function' ? actions(items) : actions}
         </div>
@@ -98,7 +126,7 @@ export const TreeBrowser: React.FC<Props<any>> = ({
         onSelect={onSelectItem}
         quickFilter={
           quickFilter
-            ? (data, search) => quickFilter?.(data, parts, search)
+            ? (_, search) => quickFilter?.(descendants, search)
             : undefined
         }
         small={small}
@@ -106,4 +134,4 @@ export const TreeBrowser: React.FC<Props<any>> = ({
       />
     </div>
   );
-};
+}

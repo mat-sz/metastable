@@ -1,5 +1,5 @@
 import { ImageFile } from './file.js';
-import { PromptStyleWithSource } from './instance.js';
+import { PromptStyleItemWithSource } from './instance.js';
 import { ModelInputType } from './model.js';
 
 export interface BaseSettings {
@@ -36,7 +36,7 @@ export interface ProjectSimpleSettings extends BaseSettings {
   prompt: {
     positive: string;
     negative: string;
-    style?: PromptStyleWithSource;
+    style?: PromptStyleItemWithSource;
   };
   sampler: {
     quality: ProjectQuality;

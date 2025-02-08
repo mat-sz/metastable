@@ -1,4 +1,9 @@
-import { Field, FieldModel, FieldType } from '@metastable/types';
+import {
+  Field,
+  FieldModel,
+  FieldType,
+  ProjectFileType,
+} from '@metastable/types';
 import { BsX } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
@@ -197,7 +202,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
                 ? {
                     files: imageFiles,
                     showBreadcrumbs: true,
-                    defaultParts: ['input'],
+                    defaultParentId: ProjectFileType.INPUT,
                   }
                 : undefined
             }

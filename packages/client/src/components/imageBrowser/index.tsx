@@ -20,9 +20,9 @@ export const ImageBrowseButton = ({
       content={
         <ImageBrowser
           {...props}
-          onSelect={url => {
+          onSelect={mrn => {
             setIsBrowserOpen(false);
-            onSelect(url);
+            onSelect(mrn);
           }}
         />
       }

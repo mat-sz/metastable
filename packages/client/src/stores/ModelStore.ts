@@ -3,6 +3,7 @@ import { Model, ModelType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
+import { ModelTreeItem, ModelTreeNode } from '$types/model';
 
 class ModelStore {
   models: Record<string, Model[]> = {};
@@ -18,6 +19,47 @@ class ModelStore {
     });
 
     this.init();
+  }
+
+  get treeNodes() {
+    const nodes: Record<string, ModelTreeNode[]> = {};
+
+    for (const [type, models] of Object.entries(this.models)) {
+      const modelNodes = models.map(model => ({
+        ...model,
+        nodeType: 'item',
+        parentId: model.file.parts?.length
+          ? model.file.parts.join('/')
+          : undefined,
+      })) as ModelTreeItem[];
+      nodes[type] = [...modelNodes];
+
+      const groupSet = new Set<string>();
+      for (const node of modelNodes) {
+        const parts = node.file.parts;
+        if (!parts?.length) {
+          continue;
+        }
+
+        for (let i = 0; i < parts.length; i++) {
+          groupSet.add(parts.slice(0, i + 1).join('/'));
+        }
+      }
+
+      for (const path of groupSet) {
+        const split = path.split('/');
+        const name = split.pop()!;
+
+        nodes[type].push({
+          id: path,
+          nodeType: 'group',
+          name,
+          parentId: split.length ? split.join('/') : undefined,
+        });
+      }
+    }
+
+    return nodes;
   }
 
   async init() {
