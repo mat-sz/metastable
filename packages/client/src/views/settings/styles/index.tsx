@@ -3,11 +3,14 @@ import clsx from 'clsx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
-import React from 'react';
+import React, { useState } from 'react';
 import { BsPencil, BsTrash } from 'react-icons/bs';
 
+import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
+import { Modal, ModalActions, useModal } from '$components/modal';
 import { TabPanel } from '$components/tabs';
+import { getDescendants } from '$components/treeBrowser/helpers';
 import {
   VarArrayWithModal,
   VarButton,
@@ -17,6 +20,7 @@ import {
   VarString,
 } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 
 const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
@@ -25,28 +29,100 @@ const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
 
 interface SettingsStylesFolderProps {
   parentId?: string;
-  label?: string;
+  parentName?: string;
 }
 
+interface GroupModalProps {
+  isEdit?: boolean;
+  name?: string;
+  onSave: (newName: string) => void;
+}
+
+const GroupModal = ({ isEdit, name = '', onSave }: GroupModalProps) => {
+  const [current, setCurrent] = useState(name);
+  const { close } = useModal();
+
+  return (
+    <Modal title={isEdit ? 'Update group' : 'Add group'} size="small">
+      <VarString label="Name" value={current} onChange={setCurrent} />
+      <ModalActions>
+        <Button variant="secondary" onClick={close}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            onSave(current);
+            close();
+          }}
+        >
+          {isEdit ? 'Save' : 'Add'}
+        </Button>
+      </ModalActions>
+    </Modal>
+  );
+};
+
 const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
-  ({ parentId, label = 'All styles' }) => {
-    const currentStyles =
-      mainStore.config.data?.styles.filter(
-        item => item.parentId === parentId,
-      ) || [];
+  ({ parentId, parentName }) => {
+    const allStyles = mainStore.config.data?.styles || [];
+    const currentStyles = allStyles.filter(item => item.parentId === parentId);
     const groups = currentStyles.filter(item => item.nodeType === 'group');
     const items = currentStyles.filter(item => item.nodeType === 'item');
 
     return (
       <VarCategory
-        label={label}
+        label={
+          <>
+            {parentName ?? 'All styles'}
+            {!!parentId && (
+              <div className={styles.actions}>
+                <IconButton
+                  onClick={() => {
+                    modalStore.show(
+                      <GroupModal
+                        isEdit
+                        name={parentName}
+                        onSave={name => {
+                          mainStore.config.data!.styles =
+                            mainStore.config.data!.styles.map(item =>
+                              item.id === parentId ? { ...item, name } : item,
+                            );
+                          mainStore.config.save();
+                        }}
+                      />,
+                    );
+                  }}
+                >
+                  <BsPencil />
+                </IconButton>
+                <IconButton
+                  onClick={() => {
+                    const removeIds = [
+                      parentId,
+                      ...getDescendants(allStyles, parentId).map(
+                        item => item.id,
+                      ),
+                    ];
+                    mainStore.config.data!.styles =
+                      mainStore.config.data!.styles.filter(
+                        item => !removeIds.includes(item.id),
+                      );
+                  }}
+                >
+                  <BsTrash />
+                </IconButton>
+              </div>
+            )}
+          </>
+        }
         className={clsx(styles.group, { [styles.root]: !parentId })}
       >
         {groups.map(group => (
           <SettingsStylesFolder
             key={group.id}
             parentId={group.id}
-            label={group.name}
+            parentName={group.name}
           />
         ))}
         <VarArrayWithModal
@@ -77,12 +153,19 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
               <VarButton
                 buttonLabel="Add group"
                 onClick={() => {
-                  mainStore.config.data!.styles.push({
-                    id: nanoid(),
-                    name: 'New group',
-                    nodeType: 'group',
-                  });
-                  mainStore.config.save();
+                  modalStore.show(
+                    <GroupModal
+                      onSave={name => {
+                        mainStore.config.data!.styles.push({
+                          id: nanoid(),
+                          name,
+                          nodeType: 'group',
+                          parentId,
+                        });
+                        mainStore.config.save();
+                      }}
+                    />,
+                  );
                 }}
               />
             </div>
