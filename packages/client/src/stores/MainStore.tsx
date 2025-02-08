@@ -207,7 +207,6 @@ class MainStore {
       this.config.refresh(),
       setupStore.init(),
     ]);
-    mainStore.removeLoading();
     this.refreshModelCache();
     runInAction(() => {
       this.ready = true;

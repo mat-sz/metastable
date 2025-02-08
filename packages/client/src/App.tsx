@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useLayoutEffect } from 'react';
 
 import { UIWrapper } from '$components/ui';
 import { mainStore } from '$stores/MainStore';
@@ -21,6 +21,8 @@ const View: React.FC = observer(() => {
     return <Setup />;
   }
 
+  mainStore.removeLoading();
+
   switch (uiStore.view) {
     case 'project':
       return <Project />;
@@ -37,7 +39,7 @@ export const App: React.FC = observer(() => {
   const theme = mainStore.theme;
   const fontSize = mainStore.config.data?.ui.fontSize || 16;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     withoutTransitions(() => {
       document.documentElement.setAttribute('data-theme', theme);
       document.documentElement.style.fontSize = `${fontSize}px`;
@@ -47,7 +49,7 @@ export const App: React.FC = observer(() => {
   return (
     <UIWrapper>
       <Main>
-        <Suspense fallback={<Home />}>
+        <Suspense fallback={<>Loading...</>}>
           <View />
         </Suspense>
       </Main>
