@@ -93,9 +93,11 @@ export const VarBase = ({
       className={clsx(styles.label, { [styles.inline]: inline }, className)}
       varui-label=""
     >
-      <div className={styles.title} varui-label-title="">
-        {label}
-      </div>
+      {!!label && (
+        <div className={styles.title} varui-label-title="">
+          {label}
+        </div>
+      )}
       <div varui-label-body="">{children}</div>
       {error ? <div className={styles.error}>{error}</div> : null}
     </div>
