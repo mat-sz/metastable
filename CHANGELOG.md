@@ -1,3 +1,14 @@
+# 0.0.20 (Upcoming)
+
+## Features
+
+- Added keyboard shortcuts for projects:
+  - `Ctrl+N` - opens a new project
+  - `Ctrl+W` - closes the current project
+  - `Ctrl+Shift+W` - closes the current project without saving
+  - `Ctrl+Left` - switches to the previous project in the project list
+  - `Ctrl+Right` - switches to the next project in the project list
+
 # 0.0.19 (2025-02-08)
 
 ## Features

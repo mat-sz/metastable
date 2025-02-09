@@ -1,4 +1,4 @@
-import { Project, ProjectType } from '@metastable/types';
+import { Project } from '@metastable/types';
 import React from 'react';
 import { BsPlus } from 'react-icons/bs';
 
@@ -37,9 +37,7 @@ export const ProjectList: React.FC<Props> = ({
             key={item}
             name="New empty project"
             icon={<BsPlus />}
-            onClick={() =>
-              mainStore.projects.create(undefined, ProjectType.SIMPLE, true)
-            }
+            onClick={() => mainStore.projects.create()}
           />
         ) : (
           <Card

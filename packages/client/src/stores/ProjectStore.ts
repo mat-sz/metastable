@@ -96,7 +96,7 @@ export class ProjectStore {
   async create(
     name: string = 'Untitled',
     type: ProjectType = ProjectType.SIMPLE,
-    draft = false,
+    draft = true,
     settings: any = defaultSettings(),
     ui?: any,
   ) {
@@ -173,6 +173,37 @@ export class ProjectStore {
     }
   }
 
+  get currentIndex() {
+    const index = this.projects.findIndex(p => p.id === this.currentId);
+    if (index === -1) {
+      return undefined;
+    }
+
+    return index;
+  }
+
+  selectNext() {
+    let index = this.currentIndex ?? 0;
+    if (index === this.projects.length - 1) {
+      index = 0;
+    } else {
+      index++;
+    }
+
+    this.select(this.projects[index].id);
+  }
+
+  selectPrevious() {
+    let index = this.currentIndex ?? 0;
+    if (index === 0) {
+      index = this.projects.length - 1;
+    } else {
+      index--;
+    }
+
+    this.select(this.projects[index].id);
+  }
+
   select(id?: APIProject['id']) {
     this.currentId = id;
     uiStore.setView(id ? 'project' : 'home');
@@ -187,10 +218,11 @@ export class ProjectStore {
   }
 
   close(id: APIProject['id']) {
+    const index = this.currentIndex ?? 0;
     this.projects = this.projects.filter(project => project.id !== id);
 
     if (id === this.currentId) {
-      const selectId = this.projects[0]?.id;
+      const selectId = this.projects[index === 0 ? 0 : index - 1]?.id;
       if (uiStore.view === 'project') {
         this.select(selectId);
       } else {

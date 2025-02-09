@@ -22,6 +22,31 @@ export const hotkeyGroups: Record<string, HotkeyGroup> = {
       },
     },
   },
+  projects: {
+    label: 'Projects',
+    hotkeys: {
+      new: {
+        label: 'New project',
+        defaultKeys: 'CmdOrCtrl+N',
+      },
+      close: {
+        label: 'Close project',
+        defaultKeys: 'CmdOrCtrl+W',
+      },
+      forceClose: {
+        label: 'Close project without saving',
+        defaultKeys: 'CmdOrCtrl+Shift+W',
+      },
+      previous: {
+        label: 'Switch to previous project',
+        defaultKeys: 'CmdOrCtrl+Left',
+      },
+      next: {
+        label: 'Switch to next project',
+        defaultKeys: 'CmdOrCtrl+Right',
+      },
+    },
+  },
   prompt: {
     label: 'Prompt',
     hotkeys: {

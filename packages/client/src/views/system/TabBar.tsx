@@ -1,7 +1,7 @@
-import { ProjectType, TaskState } from '@metastable/types';
+import { TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   BsBoxFill,
   BsGearFill,
@@ -15,6 +15,7 @@ import { ProgressBar } from '$components/progressBar';
 import { ProjectMenu } from '$components/projectMenu';
 import { useDrag, useDrop } from '$hooks/dnd';
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
+import { useHotkey } from '$hooks/useHotkey';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import { uiStore, ViewName } from '$stores/UIStore';
@@ -205,6 +206,18 @@ export const TabBar: React.FC = observer(() => {
   const areTrafficLightsVisible =
     IS_ELECTRON && IS_MAC && !uiStore.isFullScreen;
 
+  const previous = useCallback(() => mainStore.projects.selectPrevious(), []);
+  const next = useCallback(() => mainStore.projects.selectNext(), []);
+  const newProject = useCallback(() => mainStore.projects.create(), []);
+  const close = useCallback(() => mainStore.project?.close(), []);
+  const forceClose = useCallback(() => mainStore.project?.close(true), []);
+
+  useHotkey('projects_next', next);
+  useHotkey('projects_previous', previous);
+  useHotkey('projects_new', newProject);
+  useHotkey('projects_close', close);
+  useHotkey('projects_forceClose', forceClose);
+
   return (
     <div
       className={clsx(styles.tabs, { [styles.mac]: areTrafficLightsVisible })}
@@ -235,11 +248,7 @@ export const TabBar: React.FC = observer(() => {
           <ProjectTab key={project.id} project={project} />
         ))}
       </div>
-      <BaseTab
-        onClick={() =>
-          mainStore.projects.create(undefined, ProjectType.SIMPLE, true)
-        }
-      >
+      <BaseTab onClick={newProject}>
         <BsPlusLg />
       </BaseTab>
       <Controls />
