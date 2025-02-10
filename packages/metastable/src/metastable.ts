@@ -293,18 +293,24 @@ export class Metastable extends EventEmitter<MetastableEvents> {
   }
 
   async refreshFeatures() {
+    const enabledFeatures = [];
+    const enabledNamespaceGroups = [];
     const features = this.feature.availableFeatures;
+
     for (const feature of features) {
       if (!(await feature.isEnabled())) {
         continue;
       }
 
-      this.enabledFeatures.push(feature.id);
+      enabledFeatures.push(feature.id);
 
       if (feature instanceof FeaturePython && feature.pythonNamespaceGroup) {
-        this.enabledNamespaceGroups.push(feature.pythonNamespaceGroup);
+        enabledNamespaceGroups.push(feature.pythonNamespaceGroup);
       }
     }
+
+    this.enabledFeatures = enabledFeatures;
+    this.enabledNamespaceGroups = enabledNamespaceGroups;
   }
 
   private async getComfyOptions() {
