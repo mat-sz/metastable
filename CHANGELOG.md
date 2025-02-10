@@ -8,6 +8,7 @@
   - `Ctrl+Shift+W` - closes the current project without saving
   - `Ctrl+Left` - switches to the previous project in the project list
   - `Ctrl+Right` - switches to the next project in the project list
+- Added support for using Shift to skip the save dialog while closing draft projects.
 
 ## Bug fixes
 

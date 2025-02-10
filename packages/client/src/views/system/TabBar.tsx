@@ -34,7 +34,7 @@ interface BaseTabProps {
   isSelected?: boolean;
   opacity?: number;
   onClick?: () => void;
-  onClose?: () => void;
+  onClose?: (shiftPressed: boolean) => void;
   menu?: React.ReactNode;
 }
 
@@ -71,7 +71,7 @@ export const BaseTab = React.forwardRef<
         onPointerUp={e => {
           if (e.pointerType === 'mouse' && e.button === 1) {
             e.stopPropagation();
-            onClose?.();
+            onClose?.(e.shiftKey);
           }
         }}
         style={{ opacity }}
@@ -90,7 +90,7 @@ export const BaseTab = React.forwardRef<
           <button
             onClick={e => {
               e.stopPropagation();
-              onClose();
+              onClose(e.shiftKey);
             }}
           >
             <BsXLg />
@@ -139,7 +139,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         }
         opacity={isDragging || isOver ? 0.5 : 1}
         onClick={() => mainStore.projects.select(project.id)}
-        onClose={() => project.close()}
+        onClose={shiftPressed => project.close(shiftPressed)}
         badge={project.queueCount}
         value={value}
         max={max}
