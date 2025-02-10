@@ -2,8 +2,11 @@ import { Project as APIProject, ProjectType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API } from '$api';
+import { ProjectUnsaved } from '$modals/project/unsaved';
 import { arrayMove } from '$utils/array';
 import { tryParse } from '$utils/json';
+import { filterDraft } from '$utils/project';
+import { modalStore } from './ModalStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
@@ -24,7 +27,7 @@ export class ProjectStore {
   }
 
   get draft() {
-    return this.projects.filter(project => project.draft && project.changed);
+    return filterDraft(this.projects);
   }
 
   get current() {
@@ -56,8 +59,16 @@ export class ProjectStore {
     });
   }
 
+  findMultiple(ids: string[]) {
+    return this.projects.filter(project => ids.includes(project.id));
+  }
+
+  find(id: string) {
+    return this.projects.find(project => project.id === id);
+  }
+
   async get(id: string) {
-    const project = this.projects.find(project => project.id === id);
+    const project = this.find(id);
     if (project) {
       return project;
     }
@@ -217,7 +228,7 @@ export class ProjectStore {
     }
   }
 
-  close(id: APIProject['id']) {
+  dismiss(id: APIProject['id']) {
     const index = this.currentIndex ?? 0;
     this.projects = this.projects.filter(project => project.id !== id);
 
@@ -229,5 +240,23 @@ export class ProjectStore {
         this.currentId = selectId;
       }
     }
+  }
+
+  close(id: APIProject['id'], force?: boolean) {
+    return this.find(id)?.close(force);
+  }
+
+  async closeMultiple(ids: APIProject['id'][], force?: boolean) {
+    const projects = this.findMultiple(ids);
+
+    if (!force) {
+      const draft = filterDraft(projects);
+      if (draft.length) {
+        modalStore.show(<ProjectUnsaved projects={projects} />);
+        return;
+      }
+    }
+
+    await Promise.all(projects.map(project => project.close(true)));
   }
 }

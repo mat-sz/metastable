@@ -20,6 +20,8 @@ import { mainStore } from '$stores/MainStore';
 import { modalStore } from '$stores/ModalStore';
 import { UploadQueueStore } from './UploadQueueStore';
 
+const AUTOSAVE_TIMEOUT = 1000;
+
 export class BaseProject<TSettings = any, TUI = any> {
   currentOutput: ImageFile | undefined = undefined;
   mode: string = 'images';
@@ -73,6 +75,8 @@ export class BaseProject<TSettings = any, TUI = any> {
       progressMax: computed,
       progressMarquee: computed,
       extraFields: computed,
+      close: action,
+      closeOther: action,
     });
     this.refresh();
 
@@ -170,7 +174,7 @@ export class BaseProject<TSettings = any, TUI = any> {
 
   async delete() {
     this.cleanup();
-    mainStore.projects.close(this.id);
+    mainStore.projects.dismiss(this.id);
     mainStore.projects.removeRecent(this.id);
     await API.project.delete.mutate({ projectId: this.id });
     mainStore.projects.refresh();
@@ -182,17 +186,23 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   async close(force = false) {
-    if (!force && this.draft) {
-      if (this.changed) {
-        modalStore.show(<ProjectDraft project={this} />);
+    if (this.draft) {
+      if (force || !this.changed) {
+        return this.delete();
       } else {
-        this.delete();
+        modalStore.show(<ProjectDraft project={this} />);
       }
-      return;
     }
 
     this.cleanup();
-    mainStore.projects.close(this.id);
+    mainStore.projects.dismiss(this.id);
+  }
+
+  closeOther() {
+    const ids = mainStore.projects.projects
+      .filter(project => project.id !== this.id)
+      .map(project => project.id);
+    mainStore.projects.closeMultiple(ids);
   }
 
   async duplicate(name?: string) {
@@ -260,13 +270,16 @@ export class BaseProject<TSettings = any, TUI = any> {
     clearTimeout(this._autosaveTimeout);
     this._autosaveTimeout = setTimeout(
       () => this.save(undefined, undefined, true),
-      5000,
+      AUTOSAVE_TIMEOUT,
     ) as any;
   }
 
   private _autosaveUITimeout: number | undefined = undefined;
   triggerAutosaveUI() {
     clearTimeout(this._autosaveUITimeout);
-    this._autosaveUITimeout = setTimeout(() => this.saveUI(), 1000) as any;
+    this._autosaveUITimeout = setTimeout(
+      () => this.saveUI(),
+      AUTOSAVE_TIMEOUT,
+    ) as any;
   }
 }

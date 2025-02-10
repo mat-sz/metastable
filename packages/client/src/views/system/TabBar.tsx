@@ -144,7 +144,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         value={value}
         max={max}
         marquee={marquee}
-        menu={<ProjectMenu project={project} />}
+        menu={<ProjectMenu project={project} isTab />}
       >
         {project.name}
       </BaseTab>

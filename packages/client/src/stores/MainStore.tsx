@@ -170,7 +170,12 @@ class MainStore {
 
   beforeUnload() {
     if (this.projects.draft.length) {
-      modalStore.show(<ProjectUnsaved />);
+      modalStore.show(
+        <ProjectUnsaved
+          projects={this.projects.draft}
+          onClose={() => this.exit(true)}
+        />,
+      );
       return false;
     }
 
