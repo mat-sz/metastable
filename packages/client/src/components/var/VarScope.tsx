@@ -17,7 +17,7 @@ export const VarScope = ({
 }: React.PropsWithChildren<IVarBaseValueProps<any>>): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
-    fallbackValue: value,
+    fallbackValue: value ?? {},
     onChange,
     error,
     errorPath,

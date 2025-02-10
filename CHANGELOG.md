@@ -9,6 +9,10 @@
   - `Ctrl+Left` - switches to the previous project in the project list
   - `Ctrl+Right` - switches to the next project in the project list
 
+## Bug fixes
+
+- Fixed issues with project settings not being updated correctly.
+
 # 0.0.19 (2025-02-08)
 
 ## Features

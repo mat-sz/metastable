@@ -15,11 +15,6 @@ export interface IVarUIProps<T extends object> {
   errors?: any;
 
   /**
-   * @deprecated Replaced by onChange
-   */
-  updateValues?: (values: T) => void;
-
-  /**
    * The function to be called with the entire changed object.
    */
   onChange?: (values: T) => void;
@@ -50,7 +45,6 @@ export const VarUI: <T extends object>(
 ) => JSX.Element = ({
   values,
   errors,
-  updateValues,
   onChange,
   onChangeValue,
   className,
@@ -66,10 +60,9 @@ export const VarUI: <T extends object>(
     (path: string, value: any) => {
       onChangeValue?.(path, value);
       const newValues = path === '' ? value : set(clone(values), path, value);
-      updateValues?.(newValues);
       onChange?.(newValues);
     },
-    [values, updateValues, onChange, onChangeValue],
+    [values, onChange, onChangeValue],
   );
 
   const getError = useCallback(
