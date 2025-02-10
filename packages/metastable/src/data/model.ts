@@ -274,7 +274,11 @@ export class ModelRepository extends EventEmitter<ModelRepositoryEvents> {
         persistent: false,
         recursive: true,
       },
-      () => {
+      (_, filePath) => {
+        if (filePath?.endsWith('.part')) {
+          return;
+        }
+
         this.cache = undefined;
         onChange();
       },

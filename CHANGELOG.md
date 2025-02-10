@@ -14,6 +14,8 @@
 ## Bug fixes
 
 - Fixed issues with project settings not being updated correctly.
+- Fixed issues with optional features being broken after bundle reset.
+- Fixed high CPU usage when downloading models.
 
 # 0.0.19 (2025-02-08)
 
