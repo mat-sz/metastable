@@ -54,6 +54,17 @@ export interface ExtraModelFolder {
   path: string;
 }
 
+export interface InstanceAccount {
+  id: string;
+  username: string;
+  password: any;
+}
+
+export interface InstanceAuth {
+  enabled: boolean;
+  accounts: InstanceAccount[];
+}
+
 export interface ConfigType {
   python: {
     configured: boolean;

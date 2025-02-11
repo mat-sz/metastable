@@ -86,13 +86,13 @@ export class Config extends EventEmitter<ConfigEvents> {
 
   async all(): Promise<ConfigType> {
     const data = await this.configFile.readJson();
-    const config = assign({ ...CONFIG_DEFAULTS }, { ...data }) as any;
+    const config = assign({ ...CONFIG_DEFAULTS }, data);
     return this.upgrade(config);
   }
 
   async store(config: Partial<ConfigType>): Promise<void> {
     this.emit('change');
-    await this.configFile.writeJson({ ...config });
+    await this.configFile.writeJson(config);
   }
 
   async get<TKey extends keyof ConfigType>(
