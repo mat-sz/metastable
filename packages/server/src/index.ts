@@ -29,6 +29,7 @@ const metastable = await Metastable.initialize({
   skipPythonSetup,
   version: info.version,
   dataConfigPath,
+  enableAuth: true,
 });
 
 const app = Fastify({ maxParamLength: 5000, bodyLimit: 50 * 1024 * 1024 });

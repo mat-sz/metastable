@@ -31,6 +31,7 @@ export interface InstanceInfo {
   dataRoot: string;
   features: Feature[];
   defaultDirectory: string;
+  authAvailable: boolean;
 }
 
 export interface UpdateInfo {

@@ -19,6 +19,7 @@ import { errorToString } from '#helpers/common.js';
 import { getAuthorizationStrategy } from '#helpers/download.js';
 import { resolveConfigPath, rmdir } from '#helpers/fs.js';
 import { parseArgString } from '#helpers/shell.js';
+import { Auth } from './auth/index.js';
 import { Comfy } from './comfy/index.js';
 import { Config } from './config/index.js';
 import { ModelRepository } from './data/model.js';
@@ -52,6 +53,7 @@ export interface MetastableInstanceConfig {
   skipPythonSetup?: boolean;
   comfyArgs?: string[];
   version?: string;
+  enableAuth?: boolean;
 }
 
 export class Metastable extends EventEmitter<MetastableEvents> {
@@ -61,6 +63,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
   config!: Config;
   python?: PythonInstance;
   comfy?: Comfy;
+  auth!: Auth;
   setup = new Setup();
   tasks = new Tasks();
   feature = new FeatureManager();
@@ -136,6 +139,11 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     this.internalPath = path.join(this.dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
+    this.auth = new Auth(
+      this.settings.enableAuth
+        ? path.join(this.dataRoot, 'auth.json')
+        : undefined,
+    );
     this.infoUpdated();
     await Promise.all([
       this.project.deleteDrafts(),

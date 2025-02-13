@@ -193,6 +193,7 @@ export const router = t.router({
         dataRoot: metastable.dataRoot,
         features: await metastable.feature.all(),
         defaultDirectory: app?.getPath('documents') || metastable.dataRoot,
+        authAvailable: true,
       };
     }),
     updateInfo: t.procedure.query(
@@ -317,6 +318,33 @@ export const router = t.router({
     loadedModels: t.procedure.query(async ({ ctx: { metastable } }) => {
       return (await metastable.comfy?.rpc.api.instance.loadedModels()) || [];
     }),
+  },
+  auth: {
+    get: t.procedure.query(async ({ ctx: { metastable } }) => {
+      return await metastable.auth.get();
+    }),
+    setEnabled: t.procedure
+      .input(boolean())
+      .mutation(async ({ ctx: { metastable }, input }) => {
+        return await metastable.auth.setEnabled(input);
+      }),
+    user: {
+      create: t.procedure
+        .input(type({ username: string(), password: string() }))
+        .mutation(async ({ ctx: { metastable }, input }) => {
+          return await metastable.auth.create(input.username, input.password);
+        }),
+      update: t.procedure
+        .input(type({ username: string(), password: string() }))
+        .mutation(async ({ ctx: { metastable }, input }) => {
+          return await metastable.auth.update(input.username, input.password);
+        }),
+      delete: t.procedure
+        .input(string())
+        .mutation(async ({ ctx: { metastable }, input }) => {
+          return await metastable.auth.delete(input);
+        }),
+    },
   },
   model: {
     onChange: t.procedure.subscription(async function* ({

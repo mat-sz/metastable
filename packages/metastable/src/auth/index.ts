@@ -34,12 +34,36 @@ export class Auth {
     return assign({ ...AUTH_DEFAULTS }, data);
   }
 
+  async get() {
+    const all = await this.all();
+
+    return {
+      ...all,
+      accounts: all.accounts.map(account => ({
+        id: account.id,
+        username: account.username,
+      })),
+    };
+  }
+
+  async setEnabled(value: boolean) {
+    const data = await this.all();
+    data.enabled = value;
+    await this.store(data);
+  }
+
   store(data: InstanceAuth) {
     this.check();
     return this.configFile!.writeJson(data);
   }
 
   async create(username: string, password: string) {
+    username = username.trim();
+    password = password.trim();
+    if (!username || !password) {
+      throw new Error('Username and password must not be empty.');
+    }
+
     const data = await this.all();
     if (!data.enabled) {
       data.enabled = true;
