@@ -1,21 +1,12 @@
-import clsx from 'clsx';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { BsXLg } from 'react-icons/bs';
 
 import { PopoverContext } from '$components/popover/context';
 import { useModal } from './context';
 import styles from './Modal.module.scss';
+import { ModalContainer } from './ModalContainer';
+import { ModalProps } from './types';
 
-export interface ModalProps {
-  title: string;
-  size?: 'big' | 'small';
-}
-
-export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
-  children,
-  title,
-  size = 'big',
-}) => {
+export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = props => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const pointerInsideRef = useRef(false);
   const { close } = useModal();
@@ -42,27 +33,14 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
         }}
         onClose={wrappedClose}
       >
-        <div
-          className={clsx(styles.modal, styles[`modal_${size}`])}
+        <ModalContainer
+          {...props}
           onPointerDown={() => {
             pointerInsideRef.current = true;
           }}
-        >
-          <div className={styles.title}>
-            <span>{title}</span>
-            <button onClick={close}>
-              <BsXLg />
-            </button>
-          </div>
-          <div className={styles.body}>{children}</div>
-        </div>
+          onClose={close}
+        />
       </dialog>
     </PopoverContext.Provider>
   );
-};
-
-export const ModalActions: React.FC<React.PropsWithChildren> = ({
-  children,
-}) => {
-  return <div className={styles.actions}>{children}</div>;
 };
