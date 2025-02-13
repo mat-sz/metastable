@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added user accounts. **(Web UI only.)**
 - Added keyboard shortcuts for projects:
   - `Ctrl+N` - opens a new project
   - `Ctrl+W` - closes the current project

@@ -23,7 +23,6 @@ export class ProjectStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.init();
   }
 
   get draft() {
@@ -32,10 +31,6 @@ export class ProjectStore {
 
   get current() {
     return this.projects.find(project => project.id === this.currentId);
-  }
-
-  async init() {
-    this.refresh();
   }
 
   async refresh() {

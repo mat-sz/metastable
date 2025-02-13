@@ -25,8 +25,6 @@ class UpdateStore {
         },
       });
     }
-
-    this.refresh();
   }
 
   async refresh() {

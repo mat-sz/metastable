@@ -7,12 +7,11 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { defaultHotkeys } from '$data/hotkeys';
 import { parseHotkey } from '$hooks/useHotkey';
 import { InstanceBackendError } from '$modals/instance/backendError';
 import { ProjectUnsaved } from '$modals/project/unsaved';
-import { IS_ELECTRON } from '$utils/config';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { ConfigStore } from './ConfigStore';
 import { modalStore } from './ModalStore';
@@ -39,25 +38,19 @@ class MainStore {
   connected = false;
   ready = false;
   forceExit = false;
+  authorizationRequired = false;
+  token: string | undefined = undefined;
 
   constructor() {
     makeAutoObservable(this);
 
-    if (IS_ELECTRON) {
-      this.connected = true;
-    } else {
-      this.connected = window.wsIsOpen;
-      window.wsOnOpen = () => {
-        runInAction(() => {
-          this.connected = true;
-        });
-      };
-      window.wsOnClose = () => {
-        runInAction(() => {
-          this.connected = false;
-        });
-      };
-    }
+    this.connected = linkManager.isConnected;
+    linkManager.on('connectionStateChange', isConnected => {
+      runInAction(() => {
+        this.connected = isConnected;
+      });
+    });
+    linkManager.tokenCallback = () => this.token;
 
     API.instance.onBackendStatus.subscribe(undefined, {
       onData: status => {
@@ -206,16 +199,29 @@ class MainStore {
   }
 
   async init() {
-    updateStore.refresh();
-    await Promise.all([
-      this.refresh(),
-      this.config.refresh(),
-      setupStore.init(),
-    ]);
-    this.refreshModelCache();
-    runInAction(() => {
-      this.ready = true;
-    });
+    try {
+      await Promise.all([
+        this.refresh(),
+        this.config.refresh(),
+        setupStore.init(),
+      ]);
+      runInAction(() => {
+        this.ready = true;
+      });
+      await Promise.all([
+        this.refreshModelCache(),
+        updateStore.refresh(),
+        this.projects.refresh(),
+        this.tasks.refresh(),
+        modelStore.refresh(),
+      ]);
+    } catch (e: any) {
+      if (typeof e === 'object' && e.data?.code === 'UNAUTHORIZED') {
+        runInAction(() => {
+          this.authorizationRequired = true;
+        });
+      }
+    }
   }
 
   removeLoading() {
@@ -231,6 +237,14 @@ class MainStore {
     runInAction(() => {
       this.info = data;
     });
+  }
+
+  setToken(token: string) {
+    this.authorizationRequired = false;
+    this.ready = false;
+    this.token = token;
+    linkManager.reconnect();
+    this.init();
   }
 
   onConnected() {

@@ -44,7 +44,7 @@ export const SettingsUsers: React.FC = observer(() => {
             </Button>
           </div>
           {data.accounts.length ? (
-            <table>
+            <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Username</th>

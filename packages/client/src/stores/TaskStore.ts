@@ -26,7 +26,6 @@ export class TaskStore {
 
   constructor() {
     makeAutoObservable(this);
-    this.refresh();
 
     API.task.onCreate.subscribe(undefined, {
       onData: event => {

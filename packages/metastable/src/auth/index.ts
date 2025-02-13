@@ -2,7 +2,6 @@ import crypto from 'crypto';
 
 import { JSONFile } from '@metastable/common/fs';
 import { InstanceAuth } from '@metastable/types';
-import { EncryptJWT, jwtDecrypt } from 'jose';
 import { nanoid } from 'nanoid';
 import { assign } from 'radash';
 
@@ -123,6 +122,7 @@ export class Auth {
       await this.store(data);
     }
 
+    const { EncryptJWT } = await import('jose');
     const token = await new EncryptJWT({ id: account.id })
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()
@@ -139,6 +139,7 @@ export class Auth {
       throw new Error('Secret not found.');
     }
 
+    const { jwtDecrypt } = await import('jose');
     const { payload } = await jwtDecrypt(
       token,
       Buffer.from(data.secret, 'base64'),

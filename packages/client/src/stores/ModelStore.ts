@@ -17,8 +17,6 @@ class ModelStore {
         this.refresh();
       },
     });
-
-    this.init();
   }
 
   get treeNodes() {
@@ -60,10 +58,6 @@ class ModelStore {
     }
 
     return nodes;
-  }
-
-  async init() {
-    await this.refresh();
   }
 
   async refresh(resetCache = false) {

@@ -1,6 +1,7 @@
 import { GlueCanvas, glueGetSourceDimensions } from 'fxglue';
 import { nanoid } from 'nanoid';
 
+import { BasicEventEmitter } from '$utils/events';
 import { loadImage } from '$utils/image';
 import { isVisible, PointerData } from './helpers';
 import { BrushTool } from './tools/brush';
@@ -17,34 +18,6 @@ import {
   PointerState,
   Tool,
 } from './types';
-
-export class BasicEventEmitter<
-  TEvents extends { [key: string]: (...args: any[]) => void },
-> {
-  private _handlers: { [key in keyof TEvents]?: Set<TEvents[key]> } = {};
-
-  on<TKey extends keyof TEvents>(eventName: TKey, listener: TEvents[TKey]) {
-    if (!this._handlers[eventName]) {
-      this._handlers[eventName] = new Set();
-    }
-
-    this._handlers[eventName]?.add(listener);
-  }
-
-  off<TKey extends keyof TEvents>(eventName: TKey, listener: TEvents[TKey]) {
-    this._handlers[eventName]?.delete(listener);
-  }
-
-  emit<TKey extends keyof TEvents>(
-    eventName: TKey,
-    ...args: Parameters<TEvents[TKey]>
-  ) {
-    const callbacks = [...(this._handlers[eventName]?.values() || [])];
-    for (const callback of callbacks) {
-      callback.apply(this, args);
-    }
-  }
-}
 
 const selectionEdgeFragment = `
 @use wrap
