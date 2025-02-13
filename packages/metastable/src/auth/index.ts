@@ -1,5 +1,8 @@
+import crypto from 'crypto';
+
 import { JSONFile } from '@metastable/common/fs';
 import { InstanceAuth } from '@metastable/types';
+import { EncryptJWT, jwtDecrypt } from 'jose';
 import { nanoid } from 'nanoid';
 import { assign } from 'radash';
 
@@ -38,7 +41,7 @@ export class Auth {
     const all = await this.all();
 
     return {
-      ...all,
+      enabled: all.enabled,
       accounts: all.accounts.map(account => ({
         id: account.id,
         username: account.username,
@@ -115,6 +118,43 @@ export class Auth {
       throw new Error('Invalid username or password.');
     }
 
+    if (!data.secret) {
+      data.secret = crypto.randomBytes(32).toString('base64');
+      await this.store(data);
+    }
+
+    const token = await new EncryptJWT({ id: account.id })
+      .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
+      .setIssuedAt()
+      .setIssuer('urn:metastable')
+      .setExpirationTime('2h')
+      .encrypt(Buffer.from(data.secret, 'base64'));
+
+    return { account, token };
+  }
+
+  async validateToken(token: string) {
+    const data = await this.all();
+    if (!data.secret) {
+      throw new Error('Secret not found.');
+    }
+
+    const { payload } = await jwtDecrypt(
+      token,
+      Buffer.from(data.secret, 'base64'),
+      {
+        issuer: 'urn:metastable',
+      },
+    );
+    if (!payload.id) {
+      throw new Error('Invalid token.');
+    }
+
+    const account = data.accounts.find(account => account.id === payload.id);
+    if (!account) {
+      throw new Error('Account not fonud.');
+    }
+
     return account;
   }
 
@@ -128,6 +168,6 @@ export class Auth {
     }
 
     const data = await this.all();
-    return data.enabled && data.accounts.length;
+    return data.enabled && !!data.accounts.length;
   }
 }

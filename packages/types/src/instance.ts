@@ -63,6 +63,7 @@ export interface InstanceAccount {
 
 export interface InstanceAuth {
   enabled: boolean;
+  secret?: string;
   accounts: InstanceAccount[];
 }
 

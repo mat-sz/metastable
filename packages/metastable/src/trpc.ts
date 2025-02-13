@@ -5,6 +5,7 @@ import path from 'path';
 import { semverCompare } from '@metastable/common/semver';
 import {
   BackendStatus,
+  InstanceAccount,
   LogItem,
   Model,
   ModelType,
@@ -42,6 +43,8 @@ import * as disk from './sysinfo/disk.js';
 
 export interface TRPCContext {
   metastable: Metastable;
+  token?: string;
+  user?: InstanceAccount;
   win?: BrowserWindow;
   autoUpdater?: AppUpdater;
   app?: App;
@@ -64,13 +67,38 @@ export const t = initTRPC.context<TRPCContext>().create({
   transformer,
 });
 
-const electronProcedure = t.procedure.use(opts => {
+const protectedProcedure = t.procedure.use(async opts => {
+  const { metastable, token } = opts.ctx;
+  if (!(await metastable.auth.isEnabled())) {
+    return opts.next(opts);
+  }
+
+  if (!token) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
+
+  try {
+    const user = await metastable.auth.validateToken(token);
+    return opts.next({
+      ...opts,
+      ctx: {
+        ...opts.ctx,
+        user,
+      },
+    });
+  } catch {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
+});
+
+const electronProcedure = protectedProcedure.use(opts => {
   const win = opts.ctx.win;
   if (!win) {
     throw new TRPCError({ code: 'PRECONDITION_FAILED' });
   }
 
   return opts.next({
+    ...opts,
     ctx: {
       ...opts.ctx,
       win: win,
@@ -78,7 +106,7 @@ const electronProcedure = t.procedure.use(opts => {
   });
 });
 
-const autoUpdaterProcedure = t.procedure.use(opts => {
+const autoUpdaterProcedure = protectedProcedure.use(opts => {
   const autoUpdater = opts.ctx.autoUpdater;
   if (!autoUpdater) {
     throw new TRPCError({ code: 'PRECONDITION_FAILED' });
@@ -96,7 +124,7 @@ const versionEndpointUrl = 'https://update.metastable.studio/version.json';
 
 export const router = t.router({
   download: {
-    create: t.procedure
+    create: protectedProcedure
       .input(
         type({
           url: string(),
@@ -114,7 +142,7 @@ export const router = t.router({
       }),
   },
   instance: {
-    onUtilization: t.procedure.subscription(async function* ({
+    onUtilization: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -122,7 +150,7 @@ export const router = t.router({
         yield data as Utilization;
       }
     }),
-    onBackendLog: t.procedure.subscription(async function* ({
+    onBackendLog: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -137,7 +165,7 @@ export const router = t.router({
         yield [data as LogItem];
       }
     }),
-    onBackendStatus: t.procedure.subscription(async function* ({
+    onBackendStatus: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -149,7 +177,7 @@ export const router = t.router({
         yield data as BackendStatus;
       }
     }),
-    onInfoUpdate: t.procedure.subscription(async function* ({
+    onInfoUpdate: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -162,7 +190,7 @@ export const router = t.router({
         await iter.next();
       }
     }),
-    onModelCacheChange: t.procedure.subscription(async function* ({
+    onModelCacheChange: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -175,7 +203,7 @@ export const router = t.router({
         await iter.next();
       }
     }),
-    info: t.procedure.query(async ({ ctx: { metastable, app } }) => {
+    info: protectedProcedure.query(async ({ ctx: { metastable, app } }) => {
       const info = (await metastable.comfy?.info()) || {
         schedulers: [],
         samplers: [],
@@ -196,7 +224,7 @@ export const router = t.router({
         authAvailable: true,
       };
     }),
-    updateInfo: t.procedure.query(
+    updateInfo: protectedProcedure.query(
       async ({ ctx: { metastable, autoUpdater } }) => {
         let latestVersion: string | undefined = undefined;
         let isUpToDate: boolean | undefined = undefined;
@@ -223,27 +251,29 @@ export const router = t.router({
         } as UpdateInfo;
       },
     ),
-    installFeature: t.procedure
+    installFeature: protectedProcedure
       .input(type({ featureId: string() }))
       .mutation(async ({ ctx: { metastable }, input: { featureId } }) => {
         metastable.feature.install(featureId);
       }),
-    restart: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+    restart: protectedProcedure.mutation(async ({ ctx: { metastable } }) => {
       return await metastable.restartComfy();
     }),
-    resetSettings: t.procedure.mutation(async ({ ctx: { metastable } }) => {
-      await metastable.resetSettings();
-    }),
-    resetBundle: t.procedure
+    resetSettings: protectedProcedure.mutation(
+      async ({ ctx: { metastable } }) => {
+        await metastable.resetSettings();
+      },
+    ),
+    resetBundle: protectedProcedure
       .input(type({ resetAll: optional(boolean()) }))
       .mutation(async ({ ctx: { metastable }, input: { resetAll } }) => {
         await metastable.setup.resetBundle(resetAll);
       }),
     config: {
-      get: t.procedure.query(async ({ ctx: { metastable } }) => {
+      get: protectedProcedure.query(async ({ ctx: { metastable } }) => {
         return await metastable.config.all();
       }),
-      set: t.procedure
+      set: protectedProcedure
         .input(any())
         .mutation(async ({ ctx: { metastable }, input }) => {
           if (typeof input === 'object') {
@@ -251,7 +281,7 @@ export const router = t.router({
           }
           return await metastable.config.all();
         }),
-      onChange: t.procedure.subscription(async function* ({
+      onChange: protectedProcedure.subscription(async function* ({
         signal,
         ctx: { metastable },
       }) {
@@ -263,14 +293,16 @@ export const router = t.router({
         }
       }),
     },
-    validateModelPath: t.procedure.input(string()).query(async ({ input }) => {
-      if (!(await exists(input))) {
-        throw new Error('Directory not found.');
-      }
+    validateModelPath: protectedProcedure
+      .input(string())
+      .query(async ({ input }) => {
+        if (!(await exists(input))) {
+          throw new Error('Directory not found.');
+        }
 
-      return true;
-    }),
-    listFiles: t.procedure.input(string()).query(async ({ input }) => {
+        return true;
+      }),
+    listFiles: protectedProcedure.input(string()).query(async ({ input }) => {
       const dir = await fs.readdir(input, { withFileTypes: true });
       const resolved = path.resolve(input);
       const parsed = path.parse(resolved);
@@ -305,41 +337,56 @@ export const router = t.router({
         })),
       };
     }),
-    createFolder: t.procedure
+    createFolder: protectedProcedure
       .input(type({ path: string(), name: string() }))
       .mutation(async ({ input }) => {
         const folderPath = path.join(input.path, input.name);
         await fs.mkdir(folderPath, { recursive: true });
         return folderPath;
       }),
-    unloadModels: t.procedure.mutation(async ({ ctx: { metastable } }) => {
-      await metastable.comfy?.rpc.api.instance.cleanupModels({});
-    }),
-    loadedModels: t.procedure.query(async ({ ctx: { metastable } }) => {
+    unloadModels: protectedProcedure.mutation(
+      async ({ ctx: { metastable } }) => {
+        await metastable.comfy?.rpc.api.instance.cleanupModels({});
+      },
+    ),
+    loadedModels: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       return (await metastable.comfy?.rpc.api.instance.loadedModels()) || [];
     }),
   },
   auth: {
-    get: t.procedure.query(async ({ ctx: { metastable } }) => {
+    authenticate: t.procedure
+      .input(type({ username: string(), password: string() }))
+      .mutation(
+        async ({ ctx: { metastable }, input: { username, password } }) => {
+          return await metastable.auth.authenticate(username, password);
+        },
+      ),
+    state: protectedProcedure.query(async ({ ctx: { user } }) => {
+      return {
+        id: user!.id,
+        username: user!.username,
+      };
+    }),
+    get: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.auth.get();
     }),
-    setEnabled: t.procedure
+    setEnabled: protectedProcedure
       .input(boolean())
       .mutation(async ({ ctx: { metastable }, input }) => {
         return await metastable.auth.setEnabled(input);
       }),
     user: {
-      create: t.procedure
+      create: protectedProcedure
         .input(type({ username: string(), password: string() }))
         .mutation(async ({ ctx: { metastable }, input }) => {
           return await metastable.auth.create(input.username, input.password);
         }),
-      update: t.procedure
+      update: protectedProcedure
         .input(type({ username: string(), password: string() }))
         .mutation(async ({ ctx: { metastable }, input }) => {
           return await metastable.auth.update(input.username, input.password);
         }),
-      delete: t.procedure
+      delete: protectedProcedure
         .input(string())
         .mutation(async ({ ctx: { metastable }, input }) => {
           return await metastable.auth.delete(input);
@@ -347,7 +394,7 @@ export const router = t.router({
     },
   },
   model: {
-    onChange: t.procedure.subscription(async function* ({
+    onChange: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -358,7 +405,7 @@ export const router = t.router({
         yield;
       }
     }),
-    all: t.procedure.query(async ({ ctx: { metastable } }) => {
+    all: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       const models = await metastable.model.all();
       const jsons = await Promise.all(models.map(model => model.json()));
       const map: Record<string, Model[]> = {};
@@ -371,16 +418,16 @@ export const router = t.router({
 
       return map;
     }),
-    resetCache: t.procedure.mutation(async ({ ctx: { metastable } }) => {
+    resetCache: protectedProcedure.mutation(async ({ ctx: { metastable } }) => {
       metastable.model.resetCache();
     }),
-    get: t.procedure
+    get: protectedProcedure
       .input(type({ mrn: string() }))
       .query(async ({ ctx: { metastable }, input: { mrn } }) => {
         const model = await metastable.model.get(mrn);
         return await model.json();
       }),
-    update: t.procedure
+    update: protectedProcedure
       .input(
         type({
           mrn: string(),
@@ -392,7 +439,7 @@ export const router = t.router({
         await model.metadata.update(metadata);
         return await model.json();
       }),
-    createMetamodel: t.procedure
+    createMetamodel: protectedProcedure
       .input(
         type({
           name: string(),
@@ -414,7 +461,7 @@ export const router = t.router({
           );
         },
       ),
-    delete: t.procedure
+    delete: protectedProcedure
       .input(
         type({
           mrn: string(),
@@ -425,7 +472,7 @@ export const router = t.router({
       }),
   },
   setup: {
-    onStatus: t.procedure.subscription(async function* ({
+    onStatus: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -433,17 +480,19 @@ export const router = t.router({
         yield status as SetupStatus;
       }
     }),
-    status: t.procedure.query(async ({ ctx: { metastable } }) => {
+    status: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.status();
     }),
-    details: t.procedure.query(async ({ ctx: { metastable } }) => {
+    details: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       return await metastable.setup.details();
     }),
-    prepareDataRoot: t.procedure.input(string()).mutation(async ({ input }) => {
-      await fs.mkdir(input, { recursive: true });
-      return await disk.usage(input);
-    }),
-    start: t.procedure
+    prepareDataRoot: protectedProcedure
+      .input(string())
+      .mutation(async ({ input }) => {
+        await fs.mkdir(input, { recursive: true });
+        return await disk.usage(input);
+      }),
+    start: protectedProcedure
       .input(
         type({
           downloads: array(
@@ -458,7 +507,7 @@ export const router = t.router({
       }),
   },
   project: {
-    all: t.procedure.query(async ({ ctx: { metastable } }) => {
+    all: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       const projects = await metastable.project.all();
       const data = await Promise.allSettled(
         projects.map(project => project.json()),
@@ -468,7 +517,7 @@ export const router = t.router({
         .map(result => result.value)
         .filter(project => !project.draft);
     }),
-    create: t.procedure
+    create: protectedProcedure
       .input(
         type({
           name: string(),
@@ -497,13 +546,13 @@ export const router = t.router({
           return await project.json(true);
         },
       ),
-    get: t.procedure
+    get: protectedProcedure
       .input(type({ projectId: string() }))
       .query(async ({ ctx: { metastable }, input: { projectId } }) => {
         const project = await metastable.project.get(projectId);
         return await project.json(true);
       }),
-    update: t.procedure
+    update: protectedProcedure
       .input(
         type({
           projectId: string(),
@@ -536,7 +585,7 @@ export const router = t.router({
           return await project.json(true);
         },
       ),
-    delete: t.procedure
+    delete: protectedProcedure
       .input(
         type({
           projectId: string(),
@@ -546,7 +595,7 @@ export const router = t.router({
         const project = await metastable.project.get(projectId);
         await project.delete();
       }),
-    prompt: t.procedure
+    prompt: protectedProcedure
       .input(type({ projectId: string(), settings: any() }))
       .mutation(
         async ({ ctx: { metastable }, input: { projectId, settings } }) => {
@@ -561,7 +610,7 @@ export const router = t.router({
           return { id: task.id };
         },
       ),
-    postprocess: t.procedure
+    postprocess: protectedProcedure
       .input(type({ projectId: string(), settings: any() }))
       .mutation(
         async ({ ctx: { metastable }, input: { projectId, settings } }) => {
@@ -577,7 +626,7 @@ export const router = t.router({
         },
       ),
     file: {
-      all: t.procedure
+      all: protectedProcedure
         .input(
           type({
             type: enums(Object.values(ProjectFileType)),
@@ -589,7 +638,7 @@ export const router = t.router({
           const files = await project.files[type].all();
           return await Promise.all(files.map(file => file.json()));
         }),
-      get: t.procedure
+      get: protectedProcedure
         .input(
           type({
             type: enums(Object.values(ProjectFileType)),
@@ -604,7 +653,7 @@ export const router = t.router({
             return await file.json(true);
           },
         ),
-      create: t.procedure
+      create: protectedProcedure
         .input(
           type({
             type: enums(Object.values(ProjectFileType)),
@@ -629,7 +678,7 @@ export const router = t.router({
             return await file.json(true);
           },
         ),
-      update: t.procedure
+      update: protectedProcedure
         .input(
           type({
             type: enums(Object.values(ProjectFileType)),
@@ -650,7 +699,7 @@ export const router = t.router({
             return await file.json(true);
           },
         ),
-      delete: t.procedure
+      delete: protectedProcedure
         .input(
           type({
             type: enums(Object.values(ProjectFileType)),
@@ -664,7 +713,7 @@ export const router = t.router({
             await project.files[type].delete(name);
           },
         ),
-      onChange: t.procedure
+      onChange: protectedProcedure
         .input(
           type({
             projectId: string(),
@@ -685,7 +734,7 @@ export const router = t.router({
         }),
     },
     tagger: {
-      start: t.procedure
+      start: protectedProcedure
         .input(type({ projectId: string(), settings: any() }))
         .mutation(
           async ({ ctx: { metastable }, input: { projectId, settings } }) => {
@@ -703,7 +752,7 @@ export const router = t.router({
     },
   },
   task: {
-    onCreate: t.procedure.subscription(async function* ({
+    onCreate: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -711,7 +760,7 @@ export const router = t.router({
         yield event as TaskCreateEvent;
       }
     }),
-    onUpdate: t.procedure.subscription(async function* ({
+    onUpdate: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -719,7 +768,7 @@ export const router = t.router({
         yield event as TaskUpdateEvent;
       }
     }),
-    onDelete: t.procedure.subscription(async function* ({
+    onDelete: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -727,7 +776,7 @@ export const router = t.router({
         yield event as TaskDeleteEvent;
       }
     }),
-    onLog: t.procedure.subscription(async function* ({
+    onLog: protectedProcedure.subscription(async function* ({
       signal,
       ctx: { metastable },
     }) {
@@ -735,20 +784,20 @@ export const router = t.router({
         yield event as TaskLogEvent;
       }
     }),
-    all: t.procedure.query(({ ctx: { metastable } }) => {
+    all: protectedProcedure.query(({ ctx: { metastable } }) => {
       return metastable.tasks.all();
     }),
-    queue: t.procedure
+    queue: protectedProcedure
       .input(type({ queueId: string() }))
       .query(({ ctx: { metastable }, input: { queueId } }) => {
         metastable.tasks.queue(queueId);
       }),
-    cancel: t.procedure
+    cancel: protectedProcedure
       .input(type({ queueId: string(), taskId: string() }))
       .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
         metastable.tasks.cancel(queueId, taskId);
       }),
-    dismiss: t.procedure
+    dismiss: protectedProcedure
       .input(type({ queueId: string(), taskId: string() }))
       .mutation(({ ctx: { metastable }, input: { queueId, taskId } }) => {
         metastable.tasks.dismiss(queueId, taskId);

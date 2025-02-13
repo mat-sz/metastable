@@ -84,8 +84,13 @@ app.register(fastifyTRPCPlugin, {
   useWSS: true,
   trpcOptions: {
     router: router,
-    createContext: () => {
-      return { metastable };
+    createContext: ctx => {
+      return {
+        metastable,
+        token:
+          ctx.info.connectionParams?.authorization ??
+          ctx.req.headers.authorization,
+      };
     },
     onError({ path, error }) {
       // report to error monitoring
