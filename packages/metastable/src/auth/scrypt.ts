@@ -42,7 +42,7 @@ export async function hash(
   const salt = options?.salt ?? crypto.randomBytes(16);
   const { keyLength, logN, r, p } = {
     keyLength: 64,
-    logN: 17,
+    logN: 15,
     r: 8,
     p: 1,
     ...options,
@@ -53,6 +53,7 @@ export async function hash(
     N: Math.pow(2, logN),
     r,
     p,
+    maxmem: 64 * 1024 * 1024,
   });
 
   return {

@@ -1,0 +1,11 @@
+.actions {
+  margin-bottom: 1rem;
+
+  & > * {
+    margin-right: 0.5rem;
+  }
+}
+
+.empty {
+  font-size: 0.9rem;
+}

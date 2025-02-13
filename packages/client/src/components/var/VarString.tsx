@@ -19,6 +19,8 @@ export interface IVarStringProps extends IVarBaseInputProps<string> {
    * Only works with multiline instances.
    */
   autoexpand?: boolean;
+
+  type?: 'text' | 'password';
 }
 
 /**
@@ -37,6 +39,7 @@ export const VarString = ({
   className,
   error,
   errorPath,
+  type = 'text',
 }: IVarStringProps): JSX.Element => {
   const [currentValue, setCurrentValue, currentError] = useVarUIValue({
     path,
@@ -77,7 +80,7 @@ export const VarString = ({
         />
       ) : (
         <input
-          type="text"
+          type={type}
           maxLength={maxLength}
           value={currentValue}
           onChange={e => setCurrentValue(e.target.value)}

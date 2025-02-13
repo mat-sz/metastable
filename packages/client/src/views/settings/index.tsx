@@ -9,6 +9,7 @@ import {
   BsKeyboard,
   BsPalette,
   BsPatchPlus,
+  BsPeople,
 } from 'react-icons/bs';
 
 import { LogoIcon } from '$components/logoIcon';
@@ -26,6 +27,7 @@ import { SettingsHotkeys } from './hotkeys';
 import styles from './index.module.scss';
 import { SettingsModelFolders } from './modelFolders';
 import { SettingsStyles } from './styles';
+import { SettingsUsers } from './users';
 
 export const Settings: React.FC = observer(() => {
   const config = mainStore.config;
@@ -33,6 +35,8 @@ export const Settings: React.FC = observer(() => {
   if (!config.data) {
     return <div>Loading...</div>;
   }
+
+  const showUsers = mainStore.info.authAvailable;
 
   return (
     <VarUI
@@ -54,6 +58,7 @@ export const Settings: React.FC = observer(() => {
           <Tab id="styles" title="Prompt styles" icon={<BsPalette />} />
           <Tab id="hotkeys" title="Keyboard shortcuts" icon={<BsKeyboard />} />
           <Tab id="features" title="Optional features" icon={<BsPatchPlus />} />
+          {showUsers && <Tab id="users" title="Users" icon={<BsPeople />} />}
           <Tab id="about" title={`About ${__APP_NAME__}`} icon={<LogoIcon />} />
           {IS_DEV && (
             <Tab id="components" title="Component preview" icon={<BsGear />} />
@@ -68,6 +73,7 @@ export const Settings: React.FC = observer(() => {
             <SettingsStyles />
             <SettingsHotkeys />
             <SettingsFeatures />
+            {showUsers && <SettingsUsers />}
             <SettingsAbout />
             {IS_DEV && <SettingsComponents />}
           </div>
