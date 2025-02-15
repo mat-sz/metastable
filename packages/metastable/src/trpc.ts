@@ -713,25 +713,19 @@ export const router = t.router({
             await project.files[type].delete(name);
           },
         ),
-      onChange: protectedProcedure
-        .input(
-          type({
-            projectId: string(),
-          }),
-        )
-        .subscription(async function* ({
+      onChange: protectedProcedure.subscription(async function* ({
+        signal,
+        ctx: { metastable },
+      }) {
+        for await (const [id, type] of on(metastable, 'project.fileChange', {
           signal,
-          ctx: { metastable },
-          input: { projectId },
-        }) {
-          for await (const [id, type] of on(metastable, 'project.fileChange', {
-            signal,
-          })) {
-            if (id === projectId) {
-              yield type as ProjectFileType;
-            }
-          }
-        }),
+        })) {
+          yield {
+            id,
+            type: type as ProjectFileType,
+          };
+        }
+      }),
     },
     tagger: {
       start: protectedProcedure

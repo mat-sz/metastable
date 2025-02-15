@@ -1,11 +1,12 @@
 import { Project as APIProject, ProjectType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { ProjectUnsaved } from '$modals/project/unsaved';
 import { arrayMove } from '$utils/array';
 import { tryParse } from '$utils/json';
 import { filterDraft } from '$utils/project';
+import { combineUnsubscribables } from '$utils/trpc';
 import { modalStore } from './ModalStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
@@ -23,6 +24,16 @@ export class ProjectStore {
 
   constructor() {
     makeAutoObservable(this);
+
+    linkManager.subscribe(
+      combineUnsubscribables(() => [
+        API.project.file.onChange.subscribe(undefined, {
+          onData: ({ id, type }) => {
+            this.find(id)?.refreshFiles(type);
+          },
+        }),
+      ]),
+    );
   }
 
   get draft() {

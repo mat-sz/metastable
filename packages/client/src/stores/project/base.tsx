@@ -32,7 +32,6 @@ export class BaseProject<TSettings = any, TUI = any> {
   files: Record<ProjectFileType, ImageFile[]>;
   settings: TSettings;
   ui: TUI;
-  filesSubscription;
   uploadQueue: Record<ProjectFileType, UploadQueueStore>;
   changed = false;
 
@@ -91,15 +90,6 @@ export class BaseProject<TSettings = any, TUI = any> {
         this.triggerAutosave();
       }
     });
-
-    this.filesSubscription = API.project.file.onChange.subscribe(
-      { projectId: this.id },
-      {
-        onData: type => {
-          this.refreshFiles(type);
-        },
-      },
-    );
   }
 
   get extraFields() {
@@ -169,7 +159,6 @@ export class BaseProject<TSettings = any, TUI = any> {
   async cleanup() {
     clearTimeout(this._autosaveTimeout);
     clearTimeout(this._autosaveUITimeout);
-    this.filesSubscription.unsubscribe();
   }
 
   async delete() {
