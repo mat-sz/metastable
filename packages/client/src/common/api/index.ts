@@ -28,6 +28,9 @@ const transformer = {
   },
 };
 
+type Unsubscribe = () => void;
+type SubscriptionFn = () => void | Unsubscribe;
+
 class LinkManager extends BasicEventEmitter<{
   connectionStateChange: (isConnected: boolean) => void;
 }> {
@@ -35,6 +38,8 @@ class LinkManager extends BasicEventEmitter<{
   wsClient?: TRPCWebSocketClient;
   tokenCallback?: () => Promise<string | undefined> | string | undefined;
   private _connected = true;
+  private _subscriptions: SubscriptionFn[] = [];
+  private _subscriptionCallbacks: Unsubscribe[] = [];
 
   constructor() {
     super();
@@ -79,8 +84,31 @@ class LinkManager extends BasicEventEmitter<{
     return this._connected;
   }
 
+  subscribe(fn: SubscriptionFn) {
+    this._subscriptions.push(fn);
+    this.runSubscription(fn);
+  }
+
+  private resubscribeAll() {
+    for (const callback of this._subscriptionCallbacks) {
+      callback();
+    }
+    this._subscriptionCallbacks = [];
+    for (const fn of this._subscriptions) {
+      this.runSubscription(fn);
+    }
+  }
+
+  private runSubscription(fn: SubscriptionFn) {
+    const unsubscribe = fn();
+    if (unsubscribe) {
+      this._subscriptionCallbacks.push(unsubscribe);
+    }
+  }
+
   reconnect() {
     this.wsClient?.reconnect(null);
+    this.resubscribeAll();
   }
 }
 

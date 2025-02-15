@@ -1,7 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { IS_ELECTRON } from '$utils/config';
+import { combineUnsubscribables } from '$utils/trpc';
 
 export type ViewName = 'home' | 'models' | 'settings' | 'project';
 export interface CivitAIArgs {
@@ -44,21 +45,25 @@ class UIStore {
     });
 
     if (IS_ELECTRON) {
-      API.electron.window.onResize.subscribe(undefined, {
-        onData: ({ isMaximized, isFullScreen }) => {
-          runInAction(() => {
-            this.isMaximized = isMaximized;
-            this.isFullScreen = isFullScreen;
-          });
-        },
-      });
-      API.electron.window.onFocusChange.subscribe(undefined, {
-        onData: ({ isFocused }) => {
-          runInAction(() => {
-            this.isFocused = isFocused;
-          });
-        },
-      });
+      linkManager.subscribe(
+        combineUnsubscribables(() => [
+          API.electron.window.onResize.subscribe(undefined, {
+            onData: ({ isMaximized, isFullScreen }) => {
+              runInAction(() => {
+                this.isMaximized = isMaximized;
+                this.isFullScreen = isFullScreen;
+              });
+            },
+          }),
+          API.electron.window.onFocusChange.subscribe(undefined, {
+            onData: ({ isFocused }) => {
+              runInAction(() => {
+                this.isFocused = isFocused;
+              });
+            },
+          }),
+        ]),
+      );
     }
   }
 

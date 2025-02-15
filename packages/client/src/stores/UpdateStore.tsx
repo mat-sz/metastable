@@ -1,9 +1,10 @@
 import { UpdateInfo } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { InstanceUpdateAvailable } from '$modals/instance/updateAvailable';
 import { IS_ELECTRON } from '$utils/config';
+import { combineUnsubscribables } from '$utils/trpc';
 import { modalStore } from './ModalStore';
 
 class UpdateStore {
@@ -17,13 +18,17 @@ class UpdateStore {
     makeAutoObservable(this);
 
     if (IS_ELECTRON) {
-      API.electron.autoUpdater.onUpdateDownloaded.subscribe(undefined, {
-        onData: ({ updateDownloaded, version }) => {
-          if (updateDownloaded) {
-            modalStore.show(<InstanceUpdateAvailable version={version!} />);
-          }
-        },
-      });
+      linkManager.subscribe(
+        combineUnsubscribables(() => [
+          API.electron.autoUpdater.onUpdateDownloaded.subscribe(undefined, {
+            onData: ({ updateDownloaded, version }) => {
+              if (updateDownloaded) {
+                modalStore.show(<InstanceUpdateAvailable version={version!} />);
+              }
+            },
+          }),
+        ]),
+      );
     }
   }
 

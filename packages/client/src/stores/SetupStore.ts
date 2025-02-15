@@ -64,16 +64,16 @@ class SetupStore {
   async refresh() {
     const status = await API.setup.status.query();
 
+    runInAction(() => {
+      this.status = status;
+    });
+
     API.setup.onStatus.subscribe(undefined, {
       onData: status => {
         runInAction(() => {
           this.status = status;
         });
       },
-    });
-
-    runInAction(() => {
-      this.status = status;
     });
   }
 

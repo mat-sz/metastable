@@ -13,6 +13,7 @@ import { parseHotkey } from '$hooks/useHotkey';
 import { InstanceBackendError } from '$modals/instance/backendError';
 import { ProjectUnsaved } from '$modals/project/unsaved';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
+import { combineUnsubscribables } from '$utils/trpc';
 import { ConfigStore } from './ConfigStore';
 import { modalStore } from './ModalStore';
 import { modelStore } from './ModelStore';
@@ -52,39 +53,44 @@ class MainStore {
     });
     linkManager.tokenCallback = () => this.token;
 
-    API.instance.onBackendStatus.subscribe(undefined, {
-      onData: status => {
-        runInAction(() => {
-          this.backendStatus = status;
-        });
+    linkManager.subscribe(
+      combineUnsubscribables(() => [
+        API.instance.onBackendStatus.subscribe(undefined, {
+          onData: status => {
+            runInAction(() => {
+              this.backendStatus = status;
+            });
 
-        switch (status) {
-          case 'ready':
-            break;
-          case 'error':
-            modalStore.show(<InstanceBackendError />);
-            break;
-        }
-      },
-    });
-    API.instance.onInfoUpdate.subscribe(undefined, {
-      onData: () => {
-        this.refresh();
-      },
-    });
-    API.instance.onBackendLog.subscribe(undefined, {
-      onData: items => {
-        runInAction(() => {
-          this.backendLog.push(...items);
-          this.backendLog = this.backendLog.slice(-1 * MAX_LOG_ITEMS);
-        });
-      },
-    });
-    API.instance.onModelCacheChange.subscribe(undefined, {
-      onData: () => {
-        this.refreshModelCache();
-      },
-    });
+            switch (status) {
+              case 'ready':
+                break;
+              case 'error':
+                modalStore.show(<InstanceBackendError />);
+                break;
+            }
+          },
+        }),
+        API.instance.onInfoUpdate.subscribe(undefined, {
+          onData: () => {
+            this.refresh();
+          },
+        }),
+        API.instance.onBackendLog.subscribe(undefined, {
+          onData: items => {
+            runInAction(() => {
+              this.backendLog.push(...items);
+              this.backendLog = this.backendLog.slice(-1 * MAX_LOG_ITEMS);
+            });
+          },
+        }),
+        API.instance.onModelCacheChange.subscribe(undefined, {
+          onData: () => {
+            this.refreshModelCache();
+          },
+        }),
+      ]),
+    );
+
     window.addEventListener('beforeunload', e => {
       if (this.forceExit) {
         return true;

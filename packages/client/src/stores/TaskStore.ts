@@ -7,7 +7,8 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
+import { combineUnsubscribables } from '$utils/trpc';
 import { mainStore } from './MainStore';
 
 export class TaskStore {
@@ -27,45 +28,46 @@ export class TaskStore {
   constructor() {
     makeAutoObservable(this);
 
-    API.task.onCreate.subscribe(undefined, {
-      onData: event => {
-        this.updateQueue(event.queueId, queue => [
-          ...queue,
-          event as Task<any>,
-        ]);
-      },
-    });
+    linkManager.subscribe(
+      combineUnsubscribables(() => [
+        API.task.onCreate.subscribe(undefined, {
+          onData: event => {
+            this.updateQueue(event.queueId, queue => [
+              ...queue,
+              event as Task<any>,
+            ]);
+          },
+        }),
+        API.task.onUpdate.subscribe(undefined, {
+          onData: event => {
+            this.update(event);
 
-    API.task.onUpdate.subscribe(undefined, {
-      onData: event => {
-        this.update(event);
+            const task = this.find(event.queueId, event.id);
+            if (task) {
+              this.emit('update', task);
+              this.dispatchNotification(event, task);
+            }
+          },
+        }),
+        API.task.onDelete.subscribe(undefined, {
+          onData: event => {
+            const task = this.find(event.queueId, event.id);
+            if (task) {
+              this.emit('delete', task);
+            }
 
-        const task = this.find(event.queueId, event.id);
-        if (task) {
-          this.emit('update', task);
-          this.dispatchNotification(event, task);
-        }
-      },
-    });
-
-    API.task.onDelete.subscribe(undefined, {
-      onData: event => {
-        const task = this.find(event.queueId, event.id);
-        if (task) {
-          this.emit('delete', task);
-        }
-
-        this.updateQueue(event.queueId, queue =>
-          queue.filter(item => item.id !== event.id),
-        );
-      },
-    });
-
-    API.task.onLog.subscribe(undefined, {
-      onData: event => {
-        this.appendLog(event.queueId, event.id, event.log);
-      },
-    });
+            this.updateQueue(event.queueId, queue =>
+              queue.filter(item => item.id !== event.id),
+            );
+          },
+        }),
+        API.task.onLog.subscribe(undefined, {
+          onData: event => {
+            this.appendLog(event.queueId, event.id, event.log);
+          },
+        }),
+      ]),
+    );
   }
 
   on(event: 'update' | 'delete', listener: (task: Task<any>) => void) {

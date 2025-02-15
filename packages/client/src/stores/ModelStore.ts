@@ -2,8 +2,9 @@ import { MRN } from '@metastable/common/mrn';
 import { Model, ModelType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { ModelTreeItem, ModelTreeNode } from '$types/model';
+import { combineUnsubscribables } from '$utils/trpc';
 
 class ModelStore {
   models: Record<string, Model[]> = {};
@@ -12,11 +13,15 @@ class ModelStore {
   constructor() {
     makeAutoObservable(this);
 
-    API.model.onChange.subscribe(undefined, {
-      onData: () => {
-        this.refresh();
-      },
-    });
+    linkManager.subscribe(
+      combineUnsubscribables(() => [
+        API.model.onChange.subscribe(undefined, {
+          onData: () => {
+            this.refresh();
+          },
+        }),
+      ]),
+    );
   }
 
   get treeNodes() {
