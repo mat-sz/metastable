@@ -8,7 +8,7 @@ services:
     ports:
       - '5001:5001'
     volumes:
-      - ./data:/app/data
+      - /home/a/docker-data:/app/data
     stop_signal: SIGKILL
     tty: true
     deploy:

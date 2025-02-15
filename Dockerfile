@@ -11,6 +11,8 @@ RUN --mount=type=cache,target=/root/.cache \
 RUN --mount=type=cache,target=/root/.cache \
   uv pip install -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages
 
+ENV VITE_APP_ENABLE_OPTIONAL_FEATURES=1
+
 RUN --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/root/.npm \
   --mount=type=cache,target=/root/.yarn \
@@ -22,7 +24,7 @@ RUN --mount=type=cache,target=/root/.cache \
   rm -rf node_modules/@img/sharp-*-{win32,darwin}-* && \
   rm -rf node_modules/@img/sharp-*-arm64 && \
   rm -rf node_modules/@metastable/cppzst
- 
+
 EXPOSE 5001
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV SERVER_USE_PROXY=0

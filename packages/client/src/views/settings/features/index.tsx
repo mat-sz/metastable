@@ -15,7 +15,9 @@ import styles from './index.module.scss';
 
 export const SettingsFeatures: React.FC = observer(() => {
   const bundleVersion = mainStore.config.data?.python.bundleVersion || '0.0.0';
-  const available = semverCompare(bundleVersion, '0.1.3') >= 0;
+  const available =
+    import.meta.env.VITE_APP_ENABLE_OPTIONAL_FEATURES ||
+    semverCompare(bundleVersion, '0.1.3') >= 0;
   const features = available ? mainStore.info.features : [];
 
   return (

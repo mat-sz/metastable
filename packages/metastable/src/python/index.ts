@@ -126,7 +126,10 @@ export class PythonInstance {
   }
 
   async pipInstall(packages: string[], onLog?: (data: string) => void) {
-    await this.stdout(['-m', 'pip', 'install', ...packages], onLog);
+    await this.stdout(
+      ['-m', 'pip', 'install', ...packages, '--break-system-packages'],
+      onLog,
+    );
   }
 
   static async fromDirectory(dir: string, packagesDir?: string) {
