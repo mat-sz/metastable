@@ -2,7 +2,7 @@ FROM node:bookworm-slim
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:/root/.local/bin:$PATH
+ENV PATH=/app/node_modules/.bin:/root/.local/bin:$PATH
 COPY . /app
 
 RUN --mount=type=cache,target=/root/.cache \
