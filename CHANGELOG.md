@@ -1,3 +1,13 @@
+# 0.0.21 (Upcoming)
+
+## Features
+
+- Added support for Intel Arc/Battlemage GPUs.
+
+## Bug fixes
+
+- Resolved issues with opening a large amount of projects at once.
+
 # 0.0.20 (2025-02-15)
 
 ## Features

@@ -21,7 +21,7 @@ export type PromptStyleItemWithSource = PromptStyleItem & {
   source: PromptStyleSource;
 };
 
-export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu' | 'zluda';
+export type TorchMode = 'cuda' | 'rocm' | 'directml' | 'cpu' | 'zluda' | 'xpu';
 
 export interface InstanceInfo {
   samplers: string[];

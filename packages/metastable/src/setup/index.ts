@@ -99,9 +99,21 @@ export class Setup extends EventEmitter<SetupEvents> {
               }
               break;
             case 'Intel':
-              if (item.name?.includes('Arc') && platform === 'win32') {
-                torchModes.push('directml');
-                potentialTorchModes.push('directml');
+              {
+                const lowercase = item.name?.toLowerCase();
+                const isDedicated =
+                  lowercase?.includes('arc') ||
+                  lowercase?.includes('battlemage') ||
+                  lowercase?.includes('xe');
+                if (isDedicated) {
+                  torchModes.push('xpu');
+                  potentialTorchModes.push('xpu');
+
+                  if (platform === 'win32') {
+                    torchModes.push('directml');
+                    potentialTorchModes.push('directml');
+                  }
+                }
               }
               break;
             case 'NVIDIA':

@@ -24,6 +24,10 @@ export async function getBundleTorchMode(
         ) {
           return 'directml';
         } else if (
+          await exists(path.join(packagesDir, 'torch', 'lib', 'torch_xpu.dll'))
+        ) {
+          return 'xpu';
+        } else if (
           await exists(path.join(packagesDir, 'torch', 'lib', 'torch_cpu.dll'))
         ) {
           return 'cpu';
@@ -69,6 +73,12 @@ export async function getBundleTorchMode(
           )
         ) {
           return 'rocm';
+        } else if (
+          await exists(
+            path.join(packagesDir, 'torch', 'lib', 'libtorch_xpu.so'),
+          )
+        ) {
+          return 'xpu';
         } else if (
           await exists(
             path.join(packagesDir, 'torch', 'lib', 'libtorch_cpu.so'),
