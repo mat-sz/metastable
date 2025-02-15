@@ -9,16 +9,16 @@
 </p>
 </h1>
 
-> [!NOTE]  
+> [!NOTE]
 > [Getting started with Metastable](https://docs.metastable.studio/guide/getting-started/quickstart.html)
 
-> [!WARNING]  
+> [!WARNING]
 > This project is still in an experimental state. Breaking changes WILL occur and may require manual intervention or reinstallation of the software.
 
-> [!NOTE]  
+> [!NOTE]
 > [Download Metastable for Windows, macOS and Linux.](https://metastable.studio/download)
 
-> [!NOTE]  
+> [!NOTE]
 > [Join the project's Discord server for updates, suggestions and development.](https://discord.gg/Sf9zKaXzXe)
 
 <p align="center">
@@ -44,6 +44,8 @@ Metastable bundles code from:
 
 ## Automatic installation
 
+### Local
+
 Download an installer from: https://metastable.studio/download
 
 Builds are available for:
@@ -52,9 +54,19 @@ Builds are available for:
 - macOS (64-bit and Apple Silicon; dmg)
 - Linux (64-bit only; AppImage)
 
+### Runpod
+
+[Install Metastable in Runpod](https://runpod.io/console/deploy?template=3mku99rsgt&ref=8p7pm5ph)
+
 ## Manual installation
 
 ### Docker
+
+#### Docker image
+
+A Docker image for NVIDIA GPUs is available at: `ghcr.io/mat-sz/metastable:cuda`.
+
+#### Docker Compose
 
 If you have an NVIDIA GPU and nvidia-container-runtime is properly configured in your system, you can use the easy Docker compose setup:
 
