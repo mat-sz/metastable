@@ -454,7 +454,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
         draggable={false}
         ref={canvasRef}
       />
-      <div className={styles.header}>
+      <div className={styles.toolSection}>
         <div className={styles.tools}>
           <IconButton
             className={clsx({ [styles.active]: tool === 'add' })}
@@ -500,23 +500,20 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
             ]}
           />
         </VarUI>
-        <div className={styles.actions}>
-          <IconButton onClick={undo} disabled={historyIndex < 0}>
-            <BsArrow90DegLeft />
-          </IconButton>
-          <IconButton
-            onClick={redo}
-            disabled={historyIndex >= historyLength - 1}
-          >
-            <BsArrow90DegRight />
-          </IconButton>
-          <IconButton onClick={reset}>
-            <BsArrowRepeat />
-          </IconButton>
-          <IconButton onClick={saveAndClose}>
-            <BsFloppy />
-          </IconButton>
-        </div>
+      </div>
+      <div className={styles.actions}>
+        <IconButton onClick={saveAndClose}>
+          <BsFloppy />
+        </IconButton>
+        <IconButton onClick={reset}>
+          <BsArrowRepeat />
+        </IconButton>
+        <IconButton onClick={undo} disabled={historyIndex < 0}>
+          <BsArrow90DegLeft />
+        </IconButton>
+        <IconButton onClick={redo} disabled={historyIndex >= historyLength - 1}>
+          <BsArrow90DegRight />
+        </IconButton>
       </div>
     </div>
   );

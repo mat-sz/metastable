@@ -5,6 +5,10 @@
   z-index: 9999;
   -webkit-app-region: no-drag;
 
+  svg {
+    font-size: 1.6rem;
+  }
+
   .header {
     background: var(--grey-100);
     box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
@@ -15,8 +19,6 @@
     justify-content: space-between;
 
     position: relative;
-    padding: 0.5rem 2rem;
-    border-radius: 2rem;
     font-size: 0;
 
     max-width: 960px;
@@ -27,16 +29,56 @@
     }
   }
 
-  .toolSettings {
+  .tools,
+  .toolSettings,
+  .actions {
+    background: var(--grey-100);
+    box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    padding: 0.5rem;
+    border-radius: 5px;
+  }
+
+  .toolSection,
+  .actions {
     display: flex;
+    position: absolute;
+    top: 1rem;
+    font-size: 0;
+  }
+
+  .toolSection {
+    left: 1rem;
+  }
+
+  .actions {
+    position: absolute;
+    right: 1rem;
+  }
+
+  .actions,
+  .tools {
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    button {
+      padding: 0.2rem;
+
+      &.active {
+        background: var(--grey-600);
+      }
+
+      &:not(:last-child) {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .toolSettings {
+    margin-left: 0.5rem;
 
     & > div {
       margin: 0;
-
-      &:not(:last-child) {
-        margin-right: 1rem;
-      }
     }
 
     .size {
@@ -59,28 +101,5 @@
   canvas {
     position: absolute;
     inset: 0;
-  }
-
-  .tools {
-    button {
-      margin-right: 0.25rem;
-    }
-  }
-
-  .actions {
-    button {
-      margin-left: 0.25rem;
-    }
-  }
-
-  .tools,
-  .actions {
-    button {
-      padding: 0.2rem;
-
-      &.active {
-        background: var(--grey-600);
-      }
-    }
   }
 }
