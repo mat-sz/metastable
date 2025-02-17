@@ -9,9 +9,9 @@ import { nanoid } from 'nanoid';
 
 import { debounce } from '#helpers/common.js';
 import {
-  directorySize,
   getAvailableName,
   METADATA_DIRECTORY_NAME,
+  removeFileExtension,
   rmdir,
 } from '#helpers/fs.js';
 import {
@@ -94,9 +94,11 @@ export class ProjectEntity extends DirectoryEntity {
       });
     }
 
-    for (const key of Object.values(ProjectFileType)) {
-      await fs.mkdir(this.files[key].path, { recursive: true });
-    }
+    await Promise.all(
+      Object.values(ProjectFileType).map(key =>
+        fs.mkdir(this.files[key].path, { recursive: true }),
+      ),
+    );
   }
 
   async cleanup() {
@@ -108,18 +110,34 @@ export class ProjectEntity extends DirectoryEntity {
     await fs.mkdir(this.tempPath, { recursive: true });
   }
 
+  async lastOutput() {
+    const repository = this.files.output;
+    const dirents = await fs.readdir(repository.path, { withFileTypes: true });
+
+    let max = 0;
+    let maxName = undefined;
+    for (const dirent of dirents) {
+      const fileNum = parseInt(removeFileExtension(dirent.name));
+      if (!isNaN(fileNum) && fileNum > max) {
+        max = fileNum;
+        maxName = dirent.name;
+      }
+    }
+
+    if (maxName) {
+      return await repository.get(maxName);
+    }
+  }
+
   async json(full = false): Promise<Project> {
     await this.load();
-    const outputs = await this.files.output.all();
-    const lastOutput = outputs[outputs.length - 1];
+    const lastOutput = await this.lastOutput();
 
     const json: Project = {
       type: ProjectType.SIMPLE,
       ...this.metadata.json!,
       name: this.name,
       lastOutput: await lastOutput?.json(),
-      outputCount: outputs.length,
-      size: await directorySize(this._path),
     };
 
     if (full) {
@@ -233,11 +251,7 @@ export class ProjectRepository extends EventEmitter<ProjectRepositoryEvents> {
 
     const items = await fs.readdir(this.baseDir, { withFileTypes: true });
 
-    const promises = items.map(async item => {
-      const project = await ProjectEntity.fromDirent(item);
-      await project.load();
-      return project;
-    });
+    const promises = items.map(item => ProjectEntity.fromDirent(item));
 
     const projects = (await Promise.allSettled(promises))
       .filter(entity => entity.status === 'fulfilled')

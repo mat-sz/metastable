@@ -73,6 +73,7 @@ export class Metadata<T> {
     await tryUnlink(this.path);
   }
 }
+
 export class BaseEntity {
   static readonly isDirectory: boolean = false;
   baseDir;
@@ -168,14 +169,15 @@ export class FileEntity extends BaseEntity {
   constructor(_path: string) {
     super(_path);
 
-    this.metadata = new Metadata(
-      path.join(this.metadataPath, `${this.name}.json`),
-      {},
-    );
+    this.metadata = new Metadata(this.metadataFilePath, {});
   }
 
   get metadataPath() {
     return getMetadataDirectory(this.path);
+  }
+
+  get metadataFilePath() {
+    return path.join(this.metadataPath, `${this.name}.json`);
   }
 
   async load(): Promise<void> {
@@ -233,15 +235,12 @@ export class ImageEntity extends FileEntity {
 
     await generateThumbnail(filePath);
 
-    const oldThumbnailPath = getThumbnailPath(filePath, 'jpg');
-    await tryUnlink(oldThumbnailPath);
-
     return await super.fromPath<T>(filePath);
   }
 
   async write(data: Uint8Array) {
     await fs.writeFile(this.path, data);
-    await generateThumbnail(this.path);
+    await generateThumbnail(this.path, true);
   }
 
   async delete(): Promise<void> {

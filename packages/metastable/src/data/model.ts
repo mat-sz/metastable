@@ -73,25 +73,32 @@ export class ModelEntity extends FileEntity {
 
     await super.load();
 
-    this.imageName = await testExtensions(
-      this.metadataPath,
-      this.name,
-      IMAGE_EXTENSIONS,
-    );
-    this.configName = await testExtensions(
-      this.baseDir,
-      this.name,
-      CONFIG_EXTENSIONS,
-    );
+    if (!this.imageName) {
+      this.imageName = await testExtensions(
+        this.metadataPath,
+        this.name,
+        IMAGE_EXTENSIONS,
+      );
 
-    const imagePath = this.imagePath;
-    if (imagePath) {
-      await generateThumbnail(imagePath);
+      const imagePath = this.imagePath;
+      if (imagePath) {
+        await generateThumbnail(imagePath);
+      }
+    }
+
+    if (!this.configName) {
+      this.configName = await testExtensions(
+        this.baseDir,
+        this.name,
+        CONFIG_EXTENSIONS,
+      );
     }
 
     if (this.isMetamodel) {
-      this.metamodel = new Metadata(this.path);
-      await this.metamodel.get();
+      if (!this.metamodel) {
+        this.metamodel = new Metadata(this.path);
+        await this.metamodel.get();
+      }
     } else if (!this.details && SUPPORTED_MODEL_TYPES.includes(this.type!)) {
       try {
         this.details = await getModelDetails(this.path);

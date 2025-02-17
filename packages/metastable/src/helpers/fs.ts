@@ -40,7 +40,7 @@ export function isPathIn(parent: string, filePath: string) {
 
 export async function exists(path: string) {
   try {
-    return !!(await fs.lstat(path));
+    return !!(await fs.stat(path));
   } catch {
     return false;
   }
@@ -76,24 +76,11 @@ export async function imageFilenames(dirPath: string) {
 }
 
 export async function walk(currentPath: string) {
-  const files = await fs.readdir(currentPath, {
+  const dirents = await fs.readdir(currentPath, {
     withFileTypes: true,
+    recursive: true,
   });
-
-  const output: Dirent[] = [];
-  for (const file of files) {
-    if (file.isFile()) {
-      if (file.name.startsWith('.')) {
-        continue;
-      }
-
-      output.push(file);
-    } else if (file.isDirectory()) {
-      output.push(...(await walk(path.join(file.parentPath, file.name))));
-    }
-  }
-
-  return output;
+  return dirents.filter(entity => entity.isFile());
 }
 
 export async function fileSize(filePath: string) {
@@ -104,19 +91,18 @@ export async function fileSize(filePath: string) {
 export async function directorySize(currentPath: string) {
   const files = await fs.readdir(currentPath, {
     withFileTypes: true,
+    recursive: true,
   });
 
   const promises: Promise<number>[] = [];
   for (const file of files) {
-    const filePath = path.join(currentPath, file.name);
+    const filePath = path.join(file.parentPath, file.name);
     if (file.isFile()) {
-      if (file.name.startsWith('.')) {
+      if (file.parentPath.includes(METADATA_DIRECTORY_NAME)) {
         continue;
       }
 
       promises.push(fileSize(filePath));
-    } else if (file.isDirectory()) {
-      promises.push(directorySize(filePath));
     }
   }
 

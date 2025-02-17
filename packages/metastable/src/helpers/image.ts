@@ -19,11 +19,11 @@ export function getThumbnailPath(filePath: string, ext = 'webp') {
   return undefined;
 }
 
-export async function generateThumbnail(filePath: string) {
+export async function generateThumbnail(filePath: string, force = false) {
   const thumbPath = getThumbnailPath(filePath);
 
   if (thumbPath) {
-    if (await exists(thumbPath)) {
+    if (!force && (await exists(thumbPath))) {
       return;
     }
 
