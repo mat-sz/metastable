@@ -419,7 +419,7 @@ export class PromptTask extends BaseComfyTask<
       });
 
       const output = await this.project!.files.output.get(filename);
-      await output.metadata.set(settings);
+      await output.settings.set(settings);
       outputs.push(await output.json());
     } else {
       for (const image of this.images) {
@@ -443,7 +443,7 @@ export class PromptTask extends BaseComfyTask<
         const filename = await getNextFilename(outputDir, ext);
         await fs.writeFile(path.join(outputDir, filename), buffer);
         const output = await this.project!.files.output.get(filename);
-        await output.metadata.set(settings);
+        await output.settings.set(settings);
         outputs.push(await output.json());
       }
     }

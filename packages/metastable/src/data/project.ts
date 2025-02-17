@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid';
 
 import { debounce } from '#helpers/common.js';
 import {
+  exists,
   getAvailableName,
   METADATA_DIRECTORY_NAME,
   removeFileExtension,
@@ -23,10 +24,20 @@ import {
 
 export class ProjectImageEntity extends ImageEntity {
   type: ProjectFileType;
+  settings;
 
   constructor(_path: string) {
     super(_path);
     this.type = path.basename(this.baseDir) as ProjectFileType;
+    this.settings = new Metadata(this.settingsFilePath, {});
+  }
+
+  get metadataFilePath() {
+    return path.join(this.metadataPath, `${this.name}.metadata.json`);
+  }
+
+  get settingsFilePath() {
+    return path.join(this.metadataPath, `${this.name}.settings.json`);
   }
 
   static get mrnBaseSegments(): string[] {
@@ -39,11 +50,31 @@ export class ProjectImageEntity extends ImageEntity {
     });
   }
 
-  async json(withMetadata = false) {
+  async load(): Promise<void> {
+    const oldMetadataFilePath = path.join(
+      this.metadataPath,
+      `${this.name}.json`,
+    );
+    if (
+      this.type === ProjectFileType.OUTPUT &&
+      (await exists(oldMetadataFilePath)) &&
+      !(await exists(this.settingsFilePath))
+    ) {
+      await fs.rename(oldMetadataFilePath, this.settingsFilePath);
+    }
+  }
+
+  async delete(): Promise<void> {
+    await super.delete();
+    await this.settings.delete();
+  }
+
+  async json(withSettings = false) {
     return {
       name: this.name,
       path: this.path,
-      metadata: withMetadata ? await this.metadata.get() : undefined,
+      metadata: await this.metadata.get(),
+      settings: withSettings ? await this.settings.get() : undefined,
       mrn: this.mrn,
     };
   }

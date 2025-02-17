@@ -70,7 +70,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
             projectId: project.id,
             name: file.name,
           });
-          const settings = data.metadata as any;
+          const settings = data.settings as any;
           if (settings) {
             modalStore.show(
               <ProjectLoadPrompt project={project} loadedSettings={settings} />,
