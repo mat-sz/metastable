@@ -1,0 +1,24 @@
+.wrapper {
+  background: var(--grey-200);
+  max-height: 100%;
+}
+
+.grid {
+  overflow-y: auto;
+  margin-bottom: auto;
+  height: 100%;
+  font-size: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.manager {
+  flex: 1;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

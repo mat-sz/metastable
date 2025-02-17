@@ -62,6 +62,8 @@ export class ProjectImageEntity extends ImageEntity {
     ) {
       await fs.rename(oldMetadataFilePath, this.settingsFilePath);
     }
+
+    await super.load();
   }
 
   async delete(): Promise<void> {

@@ -1,0 +1,19 @@
+.main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 500px;
+}
+
+.center {
+  overflow: hidden;
+  max-height: 100%;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}

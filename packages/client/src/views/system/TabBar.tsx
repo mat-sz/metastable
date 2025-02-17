@@ -1,4 +1,4 @@
-import { TaskState } from '@metastable/types';
+import { ProjectType, TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useRef } from 'react';
@@ -9,7 +9,7 @@ import {
   BsPlusLg,
   BsXLg,
 } from 'react-icons/bs';
-import { useContextMenu } from 'use-context-menu';
+import { ContextMenuItem, useContextMenu } from 'use-context-menu';
 
 import { ProgressBar } from '$components/progressBar';
 import { ProjectMenu } from '$components/projectMenu';
@@ -248,7 +248,27 @@ export const TabBar: React.FC = observer(() => {
           <ProjectTab key={project.id} project={project} />
         ))}
       </div>
-      <BaseTab onClick={newProject}>
+      <BaseTab
+        onClick={newProject}
+        menu={
+          <>
+            <ContextMenuItem
+              onSelect={() => {
+                mainStore.projects.create(undefined, ProjectType.SIMPLE);
+              }}
+            >
+              New simple project
+            </ContextMenuItem>
+            <ContextMenuItem
+              onSelect={() => {
+                mainStore.projects.create(undefined, ProjectType.TRAINING);
+              }}
+            >
+              New training project
+            </ContextMenuItem>
+          </>
+        }
+      >
         <BsPlusLg />
       </BaseTab>
       <Controls />

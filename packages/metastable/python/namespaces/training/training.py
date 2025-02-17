@@ -1,0 +1,3 @@
+
+class TrainingNamespace:
+    pass

@@ -59,9 +59,25 @@ export interface ProjectTrainingInputMetadata {
 }
 
 export interface ProjectTrainingSettings extends BaseSettings {
-  mode: 'lora';
-  base: string;
-  resolution: { width: number; height: number };
+  version: number;
+  models: {
+    mode: 'simple' | 'advanced';
+    checkpoint?: string;
+    diffusionModel?: string;
+    textEncoders?: string[];
+    vae?: string;
+    clipSkip?: number;
+  };
+  input: {
+    resolution: { width: number; height: number };
+    bucketing: boolean;
+    activationTags: string[];
+    shuffleTags: boolean;
+    repeats: number;
+  };
+  output: {
+    type: 'lora';
+  };
   network: {
     dimensions: number;
     alpha: number;
@@ -80,12 +96,6 @@ export interface ProjectTrainingSettings extends BaseSettings {
   optimizer: {
     name: string;
     arguments: string[];
-  };
-  dataset: {
-    bucketing: boolean;
-    activationTags: string[];
-    shuffleTags: boolean;
-    repeats: number;
   };
   limits: {
     trainingEpochs: number;
