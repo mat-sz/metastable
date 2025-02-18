@@ -37,7 +37,7 @@ export const ProjectRename: React.FC<Props> = observer(
               if (name && name !== project.name) {
                 close();
 
-                await project.save(name);
+                await project.save({ name });
                 if (closeAfterRenaming) {
                   project.close(true);
                 }

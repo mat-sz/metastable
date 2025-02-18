@@ -43,7 +43,7 @@ export const ProjectUnsaved: React.FC<ProjectUnsavedProps> = observer(
             variant="primary"
             onClick={async () => {
               await Promise.all(
-                projects.map(project => project.save(undefined, false)),
+                projects.map(project => project.save({ draft: false })),
               );
               for (const project of projects) {
                 project.close(true);

@@ -41,7 +41,7 @@ import { detectOrientation, fileToBase64 } from '$utils/image';
 import { get, set } from '$utils/object';
 import { removeEmptyGroups } from '$utils/tree';
 import { isLocalUrl, resolveImage } from '$utils/url';
-import { BaseProject } from './base';
+import { BaseProject, ProjectSaveOptions } from './base';
 import { mainStore } from '../MainStore';
 
 class SimpleProjectValidator {
@@ -577,9 +577,9 @@ export class SimpleProject extends BaseProject<
     await Promise.all(promises);
   }
 
-  async save(name?: string, draft?: boolean, auto = false) {
+  async save(options?: ProjectSaveOptions) {
     await this.handleImages();
-    await super.save(name, draft, auto);
+    await super.save(options);
   }
 
   beforeRequest() {

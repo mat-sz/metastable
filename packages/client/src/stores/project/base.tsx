@@ -22,6 +22,12 @@ import { UploadQueueStore } from './UploadQueueStore';
 
 const AUTOSAVE_TIMEOUT = 1000;
 
+export interface ProjectSaveOptions {
+  name?: string;
+  draft?: boolean;
+  isAutosave?: boolean;
+}
+
 export class BaseProject<TSettings = any, TUI = any> {
   currentOutput: ImageFile | undefined = undefined;
   mode: string = 'images';
@@ -213,13 +219,17 @@ export class BaseProject<TSettings = any, TUI = any> {
     });
   }
 
-  async save(name?: string, draft?: boolean, isAutosave = false) {
+  async save({
+    name,
+    draft = this.draft && !name,
+    isAutosave = false,
+  }: ProjectSaveOptions = {}) {
     const id = this.id;
     const json = await API.project.update.mutate({
       projectId: id,
       settings: this.settings,
       name,
-      draft: draft ?? (this.draft && !name),
+      draft,
     });
 
     if (json) {
@@ -256,7 +266,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   triggerAutosave() {
     clearTimeout(this._autosaveTimeout);
     this._autosaveTimeout = setTimeout(
-      () => this.save(undefined, undefined, true),
+      () => this.save({ isAutosave: true }),
       AUTOSAVE_TIMEOUT,
     ) as any;
   }
