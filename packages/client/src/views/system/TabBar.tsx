@@ -19,7 +19,7 @@ import { useHotkey } from '$hooks/useHotkey';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
 import { uiStore, ViewName } from '$stores/UIStore';
-import { IS_ELECTRON, IS_MAC } from '$utils/config';
+import { IS_DEV, IS_ELECTRON, IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
 import styles from './TabBar.module.scss';
@@ -259,13 +259,15 @@ export const TabBar: React.FC = observer(() => {
             >
               New simple project
             </ContextMenuItem>
-            <ContextMenuItem
-              onSelect={() => {
-                mainStore.projects.create(undefined, ProjectType.TRAINING);
-              }}
-            >
-              New training project
-            </ContextMenuItem>
+            {IS_DEV && (
+              <ContextMenuItem
+                onSelect={() => {
+                  mainStore.projects.create(undefined, ProjectType.TRAINING);
+                }}
+              >
+                New training project
+              </ContextMenuItem>
+            )}
           </>
         }
       >
