@@ -20,6 +20,13 @@
       display: flex;
       justify-content: space-between;
     }
+
+    .favorite {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 1.4rem;
+    }
   }
 
   &.view_grid {
@@ -92,6 +99,20 @@
         &:hover {
           background: none !important;
         }
+      }
+
+      .favorite {
+        margin-top: 0.25rem;
+        margin-left: 0.25rem;
+
+        svg {
+          filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.2));
+        }
+      }
+
+      .menuToggle {
+        margin-top: 0.25rem;
+        margin-right: 0.25rem;
       }
     }
   }

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { BsClockHistory, BsFiles, BsXLg } from 'react-icons/bs';
+import { BsClockHistory, BsFiles, BsStar, BsXLg } from 'react-icons/bs';
 
 import { Button } from '$components/button';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
@@ -20,6 +20,9 @@ export const Home: React.FC = observer(() => {
       >
         <Tabs buttonStyle="normal">
           <Tab id="recent" title="Recent" icon={<BsClockHistory />} />
+          {!!mainStore.projects.favorite.length && (
+            <Tab id="favorite" title="Favorite" icon={<BsStar />} />
+          )}
           <Tab id="all" title="All projects" icon={<BsFiles />} />
         </Tabs>
         <TabContent>
@@ -48,6 +51,13 @@ export const Home: React.FC = observer(() => {
             <ProjectList
               title="Recent"
               projects={['new', ...mainStore.projects.recent]}
+            />
+          </TabPanel>
+          <TabPanel id="favorite">
+            <ProjectList
+              title="Favorite projects"
+              searchable
+              projects={mainStore.projects.favorite}
             />
           </TabPanel>
           <TabPanel id="all">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { useContextMenu } from 'use-context-menu';
 
@@ -70,65 +70,5 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
         </>
       )}
     </div>
-  );
-};
-
-export const CardTags: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <div className={styles.tags}>{children}</div>;
-};
-
-export const CardMenu: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const close = () => setOpen(false);
-    document.addEventListener('pointerdown', close);
-
-    return () => {
-      document.removeEventListener('pointerdown', close);
-    };
-  }, [open]);
-
-  return (
-    <div
-      className={styles.menu}
-      onClick={e => {
-        e.stopPropagation();
-      }}
-    >
-      <button
-        onClick={() => setOpen(current => !current)}
-        onPointerDown={e => e.stopPropagation()}
-        className={styles.menuToggle}
-      >
-        <BsThreeDots />
-      </button>
-      {open && <div className={styles.menuItems}>{children}</div>}
-    </div>
-  );
-};
-
-interface CardMenuItemProps {
-  icon?: React.ReactNode;
-  onClick?: () => void;
-}
-
-export const CardMenuItem: React.FC<
-  React.PropsWithChildren<CardMenuItemProps>
-> = ({ icon, children, onClick }) => {
-  return (
-    <button
-      className={styles.menuItem}
-      onPointerDown={() => {
-        onClick?.();
-      }}
-    >
-      {icon}
-      {icon ? <span>{children}</span> : children}
-    </button>
   );
 };

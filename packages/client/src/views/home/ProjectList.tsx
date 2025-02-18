@@ -2,7 +2,7 @@ import { Project } from '@metastable/types';
 import React from 'react';
 import { BsPlus } from 'react-icons/bs';
 
-import { Card, List } from '$components/list';
+import { Card, CardFavorite, List } from '$components/list';
 import { ProjectMenu } from '$components/projectMenu';
 import { mainStore } from '$stores/MainStore';
 import { resolveImage } from '$utils/url';
@@ -51,7 +51,14 @@ export const ProjectList: React.FC<Props> = ({
               mainStore.projects.open(item.id, false);
             }}
             menu={<ProjectMenu projectData={item} />}
-          />
+          >
+            <CardFavorite
+              value={item.favorite}
+              onChange={value => {
+                mainStore.projects.setFavorite(item.id, value);
+              }}
+            />
+          </Card>
         )
       }
     </List>

@@ -127,6 +127,7 @@ export interface Project {
   outputCount?: number;
   size?: number;
   draft?: boolean;
+  favorite?: boolean;
 }
 
 export interface ProjectTaskData {

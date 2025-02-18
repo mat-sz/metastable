@@ -2,7 +2,8 @@
 
 ## Features
 
-- Added support for Intel Arc/Battlemage GPUs.
+- Added an option to mark projects as favorite.
+- Added experimental support for Intel Arc/Battlemage GPUs.
 
 ## Bug fixes
 

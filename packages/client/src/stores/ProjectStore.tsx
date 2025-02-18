@@ -44,6 +44,10 @@ export class ProjectStore {
     return this.projects.find(project => project.id === this.currentId);
   }
 
+  get favorite() {
+    return this.all.filter(project => project.favorite);
+  }
+
   async refresh() {
     const json = await API.project.all.query();
     if (!json) {
@@ -188,6 +192,11 @@ export class ProjectStore {
     } finally {
       this.loading = false;
     }
+  }
+
+  async setFavorite(id: APIProject['id'], value: boolean) {
+    await API.project.update.mutate({ projectId: id, favorite: value });
+    await this.refresh();
   }
 
   get currentIndex() {
