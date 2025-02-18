@@ -7,6 +7,8 @@
 ## Bug fixes
 
 - Resolved issues with opening a large amount of projects at once.
+- Resolved performance issues with loading the project list.
+- Resolved issues with draft projects not being saved correctly.
 
 # 0.0.20 (2025-02-15)
 

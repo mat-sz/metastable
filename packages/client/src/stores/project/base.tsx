@@ -156,14 +156,14 @@ export class BaseProject<TSettings = any, TUI = any> {
     );
   }
 
-  async cleanup() {
+  async dismiss() {
+    mainStore.projects.dismiss(this.id);
     clearTimeout(this._autosaveTimeout);
     clearTimeout(this._autosaveUITimeout);
   }
 
   async delete() {
-    this.cleanup();
-    mainStore.projects.dismiss(this.id);
+    this.dismiss();
     mainStore.projects.removeRecent(this.id);
     await API.project.delete.mutate({ projectId: this.id });
     mainStore.projects.refresh();
@@ -175,16 +175,18 @@ export class BaseProject<TSettings = any, TUI = any> {
   }
 
   async close(force = false) {
-    if (this.draft) {
-      if (force || !this.changed) {
-        return this.delete();
-      } else {
-        modalStore.show(<ProjectDraft project={this} />);
-      }
+    if (!this.draft) {
+      // The changes are autosaved anyway.
+      this.dismiss();
+      return;
     }
 
-    this.cleanup();
-    mainStore.projects.dismiss(this.id);
+    if (this.changed && !force) {
+      modalStore.show(<ProjectDraft project={this} />);
+      return;
+    }
+
+    this.delete();
   }
 
   closeOther() {
@@ -211,9 +213,8 @@ export class BaseProject<TSettings = any, TUI = any> {
     });
   }
 
-  async save(name?: string, draft?: boolean, auto = false) {
+  async save(name?: string, draft?: boolean, isAutosave = false) {
     const id = this.id;
-
     const json = await API.project.update.mutate({
       projectId: id,
       settings: this.settings,
@@ -225,12 +226,9 @@ export class BaseProject<TSettings = any, TUI = any> {
       runInAction(() => {
         this.id = json.id;
         this.name = json.name;
+        this.draft = json.draft ?? false;
 
-        if (mainStore.projects.currentId === id && id !== json.id) {
-          mainStore.projects.select(json.id);
-        }
-
-        if (!json.draft && !auto) {
+        if (!json.draft && !isAutosave) {
           mainStore.projects.removeRecent(id);
           mainStore.projects.pushRecent(json.id);
         }

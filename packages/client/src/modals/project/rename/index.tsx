@@ -32,14 +32,15 @@ export const ProjectRename: React.FC<Props> = observer(
           </Button>
           <Button
             variant="primary"
-            onClick={() => {
+            onClick={async () => {
               const name = projectName.trim();
               if (name && name !== project.name) {
-                project.save(name);
+                close();
+
+                await project.save(name);
                 if (closeAfterRenaming) {
                   project.close(true);
                 }
-                close();
               }
             }}
           >

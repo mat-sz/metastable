@@ -14,12 +14,13 @@ interface ProjectUnsavedProps {
 export const ProjectUnsaved: React.FC<ProjectUnsavedProps> = observer(
   ({ projects, onClose }) => {
     const { close } = useModal();
+    const draftProjects = filterDraft(projects);
 
     return (
       <Modal title="Unsaved projects" size="small">
         <div>The following projects will be lost after closing:</div>
         <ul>
-          {filterDraft(projects).map(project => (
+          {draftProjects.map(project => (
             <li key={project.id}>{project.name}</li>
           ))}
         </ul>
@@ -31,7 +32,7 @@ export const ProjectUnsaved: React.FC<ProjectUnsavedProps> = observer(
           <Button
             variant="danger"
             onClick={async () => {
-              await Promise.all(projects.map(project => project.delete()));
+              await Promise.all(projects.map(project => project.close(true)));
               close();
               onClose?.();
             }}
