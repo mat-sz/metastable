@@ -6,7 +6,7 @@
   "author": "Mat Sz <contact@mat.dev>",
   "private": true,
   "type": "module",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "main": "out/main.js",
   "scripts": {
     "dev": "vite",
