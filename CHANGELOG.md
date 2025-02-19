@@ -1,3 +1,9 @@
+# 0.0.22 (Upcoming)
+
+## Features
+
+- Added a button to invert the mask in the mask editor.
+
 # 0.0.21 (2025-02-18)
 
 ## Features

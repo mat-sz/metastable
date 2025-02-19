@@ -10,6 +10,7 @@ import {
   BsFloppy,
   BsSquareFill,
 } from 'react-icons/bs';
+import { IoInvertMode } from 'react-icons/io5';
 
 import { IconButton } from '$components/iconButton';
 import { VarSlider, VarSwitch, VarUI } from '$components/var';
@@ -342,6 +343,14 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
     }
   };
 
+  const historyPush = () => {
+    const newHistory = historyRef.current.slice(0, historyIndex + 1);
+    newHistory.push(maskCanvasRef.current!.toDataURL());
+    historyRef.current = newHistory;
+    setHistoryLength(newHistory.length);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
   useHotkey('maskEditor_saveAndClose', saveAndClose);
   useHotkey('maskEditor_reset', reset);
   useHotkey('global_undo', undo);
@@ -432,12 +441,7 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
               state[i].current = Vector2.fromEvent(e);
 
               draw();
-
-              const newHistory = historyRef.current.slice(0, historyIndex + 1);
-              newHistory.push(maskCanvasRef.current!.toDataURL());
-              historyRef.current = newHistory;
-              setHistoryLength(newHistory.length);
-              setHistoryIndex(newHistory.length - 1);
+              historyPush();
             }
 
             state.splice(i, 1);
@@ -471,6 +475,19 @@ export const MaskEditor: React.FC<Props> = ({ imageSrc, maskSrc, onClose }) => {
             }}
           >
             <BsEraser />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              const canvas = maskCanvasRef.current!;
+              const ctx = canvas.getContext('2d')!;
+              ctx.globalCompositeOperation = 'source-out';
+              ctx.fillStyle = 'black';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              historyPush();
+            }}
+          >
+            <IoInvertMode />
           </IconButton>
         </div>
         <VarUI
