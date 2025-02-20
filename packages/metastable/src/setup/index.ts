@@ -27,12 +27,10 @@ export type SetupEvents = {
 export class Setup extends EventEmitter<SetupEvents> {
   settings: SetupSettings | undefined = undefined;
   skipPythonSetup: boolean = false;
-  private _status: SetupStatus = 'required';
   private _pythonHome: string | undefined = undefined;
   private _packagesDir: string | undefined = undefined;
   private _bundleVersion: string | undefined = undefined;
-
-  private _checked = false;
+  private _inProgress = false;
 
   constructor() {
     super();
@@ -41,28 +39,21 @@ export class Setup extends EventEmitter<SetupEvents> {
   async resetBundle(resetAll = false) {
     await Metastable.instance.config.reset(resetAll ? undefined : 'python');
     await Metastable.instance.deleteBundle();
-    this.resetStatus();
     await this.emitStatus();
   }
 
-  resetStatus() {
-    this._checked = false;
-  }
-
   async status(): Promise<SetupStatus> {
-    if (!this._checked) {
-      const python = await Metastable.instance.config.get('python');
-
-      if (python?.configured || this.skipPythonSetup) {
-        this._status = 'done';
-      } else {
-        this._status = 'required';
-      }
-
-      this._checked = true;
+    if (this._inProgress) {
+      return 'in_progress';
     }
 
-    return this._status;
+    const python = await Metastable.instance.config.get('python');
+
+    if (python?.configured || this.skipPythonSetup) {
+      return 'done';
+    } else {
+      return 'required';
+    }
   }
 
   async details(): Promise<SetupDetails> {
@@ -125,8 +116,8 @@ export class Setup extends EventEmitter<SetupEvents> {
             vendor: item.vendor || 'unknown',
             name: item.name!,
             vram: item.vram,
-            torchModes,
-            potentialTorchModes,
+            torchModes: [],
+            potentialTorchModes: [],
           };
         }),
       storage: await disk.usage(dataRoot),
@@ -142,9 +133,7 @@ export class Setup extends EventEmitter<SetupEvents> {
       throw new Error('Error.');
     }
 
-    this._status = 'done';
-    this.emitStatus();
-
+    this._inProgress = false;
     await Metastable.instance.config.set('python', {
       configured: true,
       mode: 'static',
@@ -158,6 +147,7 @@ export class Setup extends EventEmitter<SetupEvents> {
       features: {},
     });
 
+    this.emitStatus();
     Metastable.instance.reload();
   }
 
@@ -196,7 +186,7 @@ export class Setup extends EventEmitter<SetupEvents> {
     }
 
     this.settings = settings;
-    this._status = 'in_progress';
+    this._inProgress = true;
     this.emitStatus();
 
     const setupQueue = Metastable.instance.tasks.queues.setup;

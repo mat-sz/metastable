@@ -95,9 +95,9 @@ export class BaseQueue<T = any>
       item =>
         item.state === TaskState.QUEUED || item.state === TaskState.PREPARING,
     );
-    if (current) {
-      this.running = true;
 
+    this.running = true;
+    if (current) {
       let failed = false;
       try {
         await current.waitForPrepared();
@@ -119,21 +119,18 @@ export class BaseQueue<T = any>
       } catch (e: any) {
         failed = true;
         current.appendLog(errorToString(e));
-
         current.stopped(TaskState.FAILED);
       }
 
       if (failed && this.settings.stopOnFailure) {
         this.emit('failed');
-        return;
+      } else {
+        this.next();
       }
-
-      this.running = false;
-      this.next();
     } else {
-      this.running = false;
       this.emit('empty');
     }
+    this.running = false;
   }
 
   cancel(id: string) {

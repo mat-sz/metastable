@@ -73,6 +73,7 @@ class MainStore {
         API.instance.onInfoUpdate.subscribe(undefined, {
           onData: () => {
             this.refresh();
+            this.config.refresh();
           },
         }),
         API.instance.onBackendLog.subscribe(undefined, {

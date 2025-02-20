@@ -7,8 +7,9 @@ import {
 } from '@metastable/types';
 import { makeAutoObservable, runInAction, toJS } from 'mobx';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
 import { filesize } from '$utils/file';
+import { combineUnsubscribables } from '$utils/trpc';
 
 const GB = 1024 * 1024 * 1024;
 const VRAM_MIN = 2 * GB;
@@ -35,6 +36,18 @@ class SetupStore {
 
   constructor() {
     makeAutoObservable(this);
+
+    linkManager.subscribe(
+      combineUnsubscribables(() => [
+        API.setup.onStatus.subscribe(undefined, {
+          onData: status => {
+            runInAction(() => {
+              this.status = status;
+            });
+          },
+        }),
+      ]),
+    );
   }
 
   async init() {
@@ -66,14 +79,6 @@ class SetupStore {
 
     runInAction(() => {
       this.status = status;
-    });
-
-    API.setup.onStatus.subscribe(undefined, {
-      onData: status => {
-        runInAction(() => {
-          this.status = status;
-        });
-      },
     });
   }
 

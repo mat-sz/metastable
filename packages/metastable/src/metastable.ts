@@ -70,7 +70,6 @@ export class Metastable extends EventEmitter<MetastableEvents> {
   project!: ProjectRepository;
   model!: ModelRepository;
   vram = 0;
-  internalPath!: string;
 
   status: BackendStatus = 'starting';
   logBuffer = new CircularBuffer<LogItem>(100);
@@ -135,8 +134,9 @@ export class Metastable extends EventEmitter<MetastableEvents> {
     this.config?.removeAllListeners();
 
     this._dataRoot = dataRoot;
+    await mkdir(this.internalPath, { recursive: true });
+
     this.config = new Config(path.join(this.dataRoot, 'config.json'));
-    this.internalPath = path.join(this.dataRoot, 'internal');
     this.project = new ProjectRepository(path.join(this.dataRoot, 'projects'));
     this.model = new ModelRepository(path.join(this.dataRoot, 'models'));
     this.auth = new Auth(
@@ -145,10 +145,7 @@ export class Metastable extends EventEmitter<MetastableEvents> {
         : undefined,
     );
     this.infoUpdated();
-    await Promise.all([
-      this.project.deleteDrafts(),
-      mkdir(this.internalPath, { recursive: true }),
-    ]);
+    await this.project.deleteDrafts();
 
     this.project.on('fileChange', (id, type) =>
       this.emit('project.fileChange', id, type),
@@ -165,6 +162,10 @@ export class Metastable extends EventEmitter<MetastableEvents> {
 
   get dataRoot() {
     return this._dataRoot;
+  }
+
+  get internalPath() {
+    return path.join(this._dataRoot, 'internal');
   }
 
   async refreshUtilization() {
