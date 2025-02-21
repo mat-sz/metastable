@@ -12,7 +12,7 @@
     "build": "tsc",
     "lint": "run -T eslint src",
     "test": "run -T vitest",
-    "types": "tsx ./scripts/generateTypes.ts > src/comfy/rpc/api.ts"
+    "rpc:types": "tsx ./scripts/generateTypes.ts > src/comfy/rpc/api.ts && yarn workspace:format packages/metastable/src/comfy/rpc/api.ts --write"
   },
   "peerDependencies": {
     "electron": "*",

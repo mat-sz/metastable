@@ -14,7 +14,8 @@
     "start": "yarn workspace @metastable/server run start",
     "dev": "yarn workspaces foreach -Rpi --from '@metastable/{client,server}' run dev",
     "lint": "yarn workspaces foreach -Api run lint",
-    "test": "vitest"
+    "test": "vitest",
+    "workspace:format": "prettier"
   },
   "husky": {
     "hooks": {
