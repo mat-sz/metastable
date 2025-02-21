@@ -37,11 +37,11 @@ export function stdout(
     options?.onLog?.(chunk.toString());
   });
 
-  proc.on('close', code => {
+  proc.on('close', (code, signal) => {
     if (code !== 0) {
       wrapped.reject(
         new Error(
-          `Process '${command}' exited with non-zero exit code: ${code}\n\n${output}`,
+          `Process '${command}' exited with non-zero exit code: ${code}, signal: ${signal}\n\n${output}`,
         ),
       );
     } else {

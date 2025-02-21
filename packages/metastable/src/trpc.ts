@@ -37,6 +37,7 @@ import {
 import { PostprocessTask } from './comfy/tasks/postprocess.js';
 import { PromptTask } from './comfy/tasks/prompt.js';
 import { TagTask } from './comfy/tasks/tag.js';
+import { TrainingTask } from './comfy/tasks/training.js';
 import { direntType, exists, getNextFilename } from './helpers/fs.js';
 import type { Metastable } from './index.js';
 import * as disk from './sysinfo/disk.js';
@@ -606,6 +607,21 @@ export const router = t.router({
 
           const project = await metastable.project.get(projectId);
           const task = new PromptTask(project, settings);
+          metastable.tasks.queues.project.add(task);
+
+          return { id: task.id };
+        },
+      ),
+    train: protectedProcedure
+      .input(type({ projectId: string(), settings: any() }))
+      .mutation(
+        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
+          if (metastable.status !== 'ready') {
+            return undefined;
+          }
+
+          const project = await metastable.project.get(projectId);
+          const task = new TrainingTask(project, settings);
           metastable.tasks.queues.project.add(task);
 
           return { id: task.id };

@@ -26,6 +26,7 @@ SegmentModel = NewType('SegmentModel', any)
 FaceAnalysis = NewType('FaceAnalysis', any)
 EvaClip = NewType('EvaClip', any)
 PULID = NewType('PULID', any)
+Optimizer = NewType('Optimizer', torch.optim.Optimizer)
 
 class Latent(TypedDict):
     samples: LatentTensor
@@ -44,3 +45,7 @@ class CachedModelInfo(TypedDict):
     embeddings_path: NotRequired[str]
     config_path: NotRequired[str]
     model_type: NotRequired[str]
+
+class TrainingInput(TypedDict):
+    latent: Latent
+    prompt: str

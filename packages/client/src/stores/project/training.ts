@@ -7,6 +7,7 @@ import {
 import { Project as APIProject } from '@metastable/types';
 import { action, computed, makeObservable, observable } from 'mobx';
 
+import { API } from '$api';
 import { modelStore } from '$stores/ModelStore';
 import { BaseProject } from './base';
 
@@ -89,5 +90,14 @@ export class TrainingProject extends BaseProject<
     return (
       this.currentTask || (!this.currentOutput ? this.tasks[0] : undefined)
     );
+  }
+
+  async request() {
+    this.save();
+
+    await API.project.train.mutate({
+      projectId: this.id,
+      settings: this.settings,
+    });
   }
 }

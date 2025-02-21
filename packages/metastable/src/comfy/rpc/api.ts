@@ -532,5 +532,35 @@ export function getSessionApi(session: RPCSession) {
         }) as any;
       },
     },
+    training: {
+      getOptimizer(args: {
+        diffusionModel: RPCRef<'DiffusionModel'>;
+        textEncoder: RPCRef<'TextEncoder'>;
+      }): Promise<RPCRef<'Optimizer'>> {
+        return session.invoke('training:get_optimizer', {
+          diffusion_model: args.diffusionModel,
+          text_encoder: args.textEncoder,
+        }) as any;
+      },
+      train(args: {
+        optimizer: RPCRef<'Optimizer'>;
+        diffusionModel: RPCRef<'DiffusionModel'>;
+        textEncoder: RPCRef<'TextEncoder'>;
+        inputs: {
+          latent: {
+            samples: RPCRef<'LatentTensor'>;
+            noise_mask?: RPCRef<'LatentTensor'>;
+          };
+          prompt: string;
+        }[];
+      }): Promise<void> {
+        return session.invoke('training:train', {
+          optimizer: args.optimizer,
+          diffusion_model: args.diffusionModel,
+          text_encoder: args.textEncoder,
+          inputs: args.inputs,
+        }) as any;
+      },
+    },
   };
 }

@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
+import { Button } from '$components/button';
 import styles from './index.module.scss';
 import { useTrainingProject } from '../../context';
 import { Settings } from '../settings';
@@ -18,11 +19,16 @@ const Preview: React.FC = observer(() => {
     );
 });
 
-export const Main: React.FC = () => {
+export const Main: React.FC = observer(() => {
+  const project = useTrainingProject();
+
   return (
     <div className={styles.main}>
       <Preview />
-      <Settings className={styles.settings} />
+      <Settings
+        className={styles.settings}
+        actions={<Button onClick={() => project.request()}>Train</Button>}
+      />
     </div>
   );
-};
+});

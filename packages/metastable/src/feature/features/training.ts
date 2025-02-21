@@ -11,7 +11,6 @@ export class FeatureTraining extends FeaturePython {
     { name: 'omegaconf' },
     { name: 'invisible-watermark' },
     { name: 'pooch' },
-    { name: 'open-clip-torch' },
     { name: 'diffusers' },
     { name: 'dadaptation' },
     { name: 'lion-pytorch' },
