@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BsGear } from 'react-icons/bs';
 
 import { Alert, Alerts } from '$components/alert';
@@ -14,9 +14,12 @@ import { ProgressCircle } from '$components/progressCircle';
 import { Search } from '$components/search';
 import { Switch, SwitchOption } from '$components/switch';
 import { TabPanel } from '$components/tabs';
+import { TagInput } from '$components/tagInput';
 import { Toggle } from '$components/toggle';
 
 export const SettingsComponents: React.FC = () => {
+  const [tags, setTags] = useState<string[]>([]);
+
   return (
     <TabPanel id="components">
       <h2>Component preview</h2>
@@ -102,6 +105,10 @@ export const SettingsComponents: React.FC = () => {
           <SwitchOption value="test2">test 2</SwitchOption>
           <SwitchOption value="test3">test 3</SwitchOption>
         </Switch>
+      </div>
+      <div>
+        <h3>Tag input</h3>
+        <TagInput value={tags} onChange={setTags} />
       </div>
       <div>
         <h3>Toggle</h3>

@@ -1,0 +1,32 @@
+.wrapper {
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
+  color: var(--grey-900);
+  padding: 0.6rem;
+  border-radius: 5px;
+  outline: none !important;
+  transition: 0.2sease-in-out all;
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.25rem;
+    margin-right: 0.3rem;
+    border-radius: 5px;
+    line-height: 0;
+    color: var(--grey-100);
+
+    button {
+      margin-left: 0.25rem;
+      color: var(--grey-100);
+    }
+  }
+
+  .newTag {
+    display: inline-block;
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 1rem;
+  }
+}
