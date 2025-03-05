@@ -128,6 +128,7 @@ export interface Project {
   size?: number;
   draft?: boolean;
   favorite?: boolean;
+  tags?: string[];
 }
 
 export interface ProjectTaskData {

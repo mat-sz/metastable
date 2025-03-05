@@ -563,6 +563,7 @@ export const router = t.router({
           ui: optional(any()),
           draft: optional(boolean()),
           favorite: optional(boolean()),
+          tags: optional(array(string())),
         }),
       )
       .mutation(

@@ -40,8 +40,10 @@ export class BaseProject<TSettings = any, TUI = any> {
   ui: TUI;
   uploadQueue: Record<ProjectFileType, UploadQueueStore>;
   changed = false;
+  metadata: APIProject;
 
   constructor(data: APIProject) {
+    this.metadata = { ...data, settings: undefined };
     this.settings = data.settings;
     this.ui = data.ui ?? {};
     this.id = data.id;
@@ -60,6 +62,7 @@ export class BaseProject<TSettings = any, TUI = any> {
     this.uploadQueue = uploadQueue;
 
     makeObservable(this, {
+      metadata: observable,
       currentOutput: observable,
       files: observable,
       mode: observable,
