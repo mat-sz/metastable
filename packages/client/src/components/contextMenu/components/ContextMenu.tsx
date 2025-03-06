@@ -26,6 +26,7 @@ interface Props {
   dataTestName?: string;
   hide: () => void;
   style?: CSSProperties;
+  isSubmenu?: boolean;
 }
 
 export const ContextMenu: React.FC<Props> = ({
@@ -39,6 +40,7 @@ export const ContextMenu: React.FC<Props> = ({
   dataTestName = 'ContextMenu',
   hide,
   style: styleFromProps,
+  isSubmenu,
 }) => {
   const { contextMenuEvent, registerMenu } = useContext(ContextMenuContext);
 
@@ -100,7 +102,7 @@ export const ContextMenu: React.FC<Props> = ({
     hide();
   };
 
-  const onMouseMove = (event: MouseEvent) => {
+  const stopPropagation = (event: React.SyntheticEvent) => {
     event.stopPropagation();
   };
 
@@ -116,24 +118,32 @@ export const ContextMenu: React.FC<Props> = ({
     style = Object.assign(style, styleFromProps);
   }
 
-  return createPortal(
+  const menu = (
     <div
-      className={styles.backdrop}
-      onClick={onClick}
-      onMouseMove={onMouseMove}
+      className={clsx(styles.contextMenu, className)}
+      data-context-menu
+      data-test-id={dataTestId}
+      data-test-name={dataTestName}
+      ref={ref}
+      style={style}
+      tabIndex={0}
     >
+      {children}
+    </div>
+  );
+
+  return createPortal(
+    isSubmenu ? (
+      menu
+    ) : (
       <div
-        className={clsx(styles.contextMenu, className)}
-        data-context-menu
-        data-test-id={dataTestId}
-        data-test-name={dataTestName}
-        ref={ref}
-        style={style}
-        tabIndex={0}
+        className={styles.backdrop}
+        onClick={onClick}
+        onPointerMove={stopPropagation}
       >
-        {children}
+        {menu}
       </div>
-    </div>,
+    ),
     document.body,
   );
 };

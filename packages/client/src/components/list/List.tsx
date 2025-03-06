@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { useRef, useState } from 'react';
 import { BsGrid, BsList, BsListUl } from 'react-icons/bs';
 
+import { wrapAround } from '$utils/math';
 import styles from './index.module.scss';
 import { Search } from '../search';
 import { Switch, SwitchOption } from '../switch';
@@ -80,17 +81,12 @@ export function List<T>({
                         selected.removeAttribute('aria-selected');
                       }
 
-                      if (e.key === 'ArrowUp') {
-                        currentIndex--;
-                        if (currentIndex < 0) {
-                          currentIndex = items.length - 1;
-                        }
-                      } else {
-                        currentIndex++;
-                        if (currentIndex >= items.length) {
-                          currentIndex = -1;
-                        }
-                      }
+                      const delta = e.key === 'ArrowUp' ? -1 : 1;
+                      currentIndex = wrapAround(
+                        currentIndex + delta,
+                        0,
+                        items.length - 1,
+                      );
 
                       const newSelected = items[currentIndex];
                       if (newSelected) {

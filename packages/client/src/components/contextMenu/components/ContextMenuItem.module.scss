@@ -9,6 +9,11 @@
   cursor: pointer;
   font-size: 0.9rem;
 
+  .chevron {
+    margin-left: 0.5rem;
+    color: var(--grey-800);
+  }
+
   .text {
     flex: 1;
   }
@@ -25,8 +30,7 @@
   }
 
   &:not([data-disabled='true']) {
-    &:hover,
-    &:focus {
+    &[aria-selected='true'] {
       background-color: var(--grey-500);
     }
   }

@@ -21,19 +21,6 @@ export function useModalDismissSignal(
       }
     };
 
-    const handleMouseEvent = (event: MouseEvent) => {
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      if (!element.contains(event.target as Node)) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        dismissCallback();
-      }
-    };
-
     let ownerDocument: Document | null = null;
 
     // Delay until after the current call stack is empty,
@@ -47,9 +34,6 @@ export function useModalDismissSignal(
       ownerDocument = element.ownerDocument;
       ownerDocument.addEventListener('keydown', handleKeyboardEvent);
       if (dismissOnClickOutside) {
-        ownerDocument.addEventListener('click', handleMouseEvent, true);
-        ownerDocument.addEventListener('contextmenu', handleMouseEvent, true);
-        ownerDocument.addEventListener('mousedown', handleMouseEvent, true);
         ownerDocument.addEventListener('scroll', dismissCallback, true);
       }
     }, 0);
@@ -61,13 +45,6 @@ export function useModalDismissSignal(
 
       if (ownerDocument !== null) {
         ownerDocument.removeEventListener('keydown', handleKeyboardEvent);
-        ownerDocument.removeEventListener('click', handleMouseEvent, true);
-        ownerDocument.removeEventListener(
-          'contextmenu',
-          handleMouseEvent,
-          true,
-        );
-        ownerDocument.removeEventListener('mousedown', handleMouseEvent, true);
         ownerDocument.removeEventListener('scroll', dismissCallback, true);
       }
     };
