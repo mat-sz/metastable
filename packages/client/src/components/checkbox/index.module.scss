@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   position: relative;
+  font-size: 1rem;
 
   input {
     width: 0;
@@ -11,26 +12,30 @@
 
   .indicator {
     background: var(--grey-200);
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 100%;
+    border: 1px solid var(--grey-400);
+    width: 1em;
+    height: 1em;
+    border-radius: 5px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0;
     transition: 0.2s ease-in-out all;
-    color: var(--green-100);
+    color: var(--accent-100);
 
     svg {
       opacity: 0;
-      font-size: 1.5rem;
+      font-size: 1em;
       transition: 0.2s ease-in-out all;
     }
   }
 
+  .label {
+    margin-left: 0.5rem;
+  }
+
   input:checked + .indicator {
-    background: var(--green-900);
+    background: var(--accent-900);
 
     svg {
       opacity: 1;

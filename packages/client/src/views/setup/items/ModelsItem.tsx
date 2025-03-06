@@ -7,6 +7,7 @@ import { Checkbox } from '$components/checkbox';
 import { ModelList } from '$components/modelList';
 import { setupStore } from '$stores/SetupStore';
 import { DownloadableModel } from '$types/model';
+import styles from './ModelsItem.module.scss';
 import { Item } from '../components/Item';
 
 interface ModelCheckboxProps {
@@ -20,6 +21,7 @@ const ModelCheckbox: React.FC<ModelCheckboxProps> = observer(({ model }) => {
 
   return (
     <Checkbox
+      className={styles.checkbox}
       value={value}
       onChange={value => {
         runInAction(() => {
