@@ -1,0 +1,29 @@
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.contextMenu {
+  position: fixed;
+  flex-direction: column;
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+  background: var(--grey-300-transparent);
+  border: 1px solid var(--grey-400);
+  box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  min-width: 15rem;
+  z-index: 10000;
+
+  &:focus {
+    outline: none;
+  }
+}

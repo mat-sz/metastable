@@ -1,0 +1,11 @@
+.category {
+  color: var(--grey-800);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  min-height: var(--context-menu-category-height, 1.5rem);
+}

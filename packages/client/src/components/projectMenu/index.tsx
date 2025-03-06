@@ -1,7 +1,7 @@
 import { Project } from '@metastable/types';
 import React, { useCallback } from 'react';
-import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
+import { ContextMenuDivider, ContextMenuItem } from '$components/contextMenu';
 import { ProjectDelete } from '$modals/project/delete';
 import { ProjectDuplicate } from '$modals/project/duplicate';
 import { ProjectRename } from '$modals/project/rename';

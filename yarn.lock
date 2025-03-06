@@ -2296,7 +2296,6 @@ __metadata:
     sass-embedded: "npm:^1.83.4"
     trpc-electron: "npm:^0.1.2"
     typescript: "npm:^5.7.3"
-    use-context-menu: "npm:^0.5.1"
     vite: "npm:^6.0.11"
     vite-bundle-visualizer: "npm:^1.1.0"
     vite-plugin-native: "npm:^2.2.2"
@@ -11018,16 +11017,6 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10c0/4ef57b45aa820d7ac6496e9208559986c665e49447cb072744c13b66925a362d96dd5a46c4530a6b8e203e5db5fe849369444440cb22ecfc26c679359e5dfa3c
-  languageName: node
-  linkType: hard
-
-"use-context-menu@npm:^0.5.1":
-  version: 0.5.1
-  resolution: "use-context-menu@npm:0.5.1"
-  peerDependencies:
-    react: ^16.14.0 || ^17 || ^18 || ^19
-    react-dom: ^16.14.0 || ^17 || ^18 || ^19
-  checksum: 10c0/2bc3cfbc5575977dd22c9d9fd7af6fa116f40b3a75e3c9c86e1341d8be3b5fed2015597f340025ed9f74e9f530252cf18754ef7b56b56d236383162337308eed
   languageName: node
   linkType: hard
 

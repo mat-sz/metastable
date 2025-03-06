@@ -1,0 +1,23 @@
+.item {
+  color: var(--grey-900);
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s ease-in-out all;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &[data-disabled='true'] {
+    color: var(--grey-600);
+    cursor: not-allowed;
+  }
+
+  &:not([data-disabled='true']) {
+    &:hover,
+    &:focus {
+      background-color: var(--grey-500);
+    }
+  }
+}

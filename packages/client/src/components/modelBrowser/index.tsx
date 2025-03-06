@@ -13,10 +13,10 @@ import {
   BsPlusLg,
   BsXLg,
 } from 'react-icons/bs';
-import { ContextMenuDivider, ContextMenuItem } from 'use-context-menu';
 
 import { API } from '$api';
 import { Button } from '$components/button';
+import { ContextMenuDivider, ContextMenuItem } from '$components/contextMenu';
 import { IconButton } from '$components/iconButton';
 import { CardTags } from '$components/list';
 import { Tag } from '$components/tag';

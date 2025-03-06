@@ -59,7 +59,6 @@
     "react-use-pointer-drag": "^0.1.2",
     "sass-embedded": "^1.83.4",
     "typescript": "^5.7.3",
-    "use-context-menu": "^0.5.1",
     "vite": "^6.0.11",
     "vite-bundle-visualizer": "^1.1.0",
     "vite-plugin-native": "^2.2.2"

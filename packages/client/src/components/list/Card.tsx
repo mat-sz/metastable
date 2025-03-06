@@ -1,7 +1,7 @@
 import React from 'react';
 import { BsThreeDots } from 'react-icons/bs';
-import { useContextMenu } from 'use-context-menu';
 
+import { useContextMenu } from '$components/contextMenu';
 import { ThumbnailDisplay } from '$components/thumbnailDisplay';
 import styles from './index.module.scss';
 

@@ -9,8 +9,8 @@ import {
   BsPlusLg,
   BsXLg,
 } from 'react-icons/bs';
-import { ContextMenuItem, useContextMenu } from 'use-context-menu';
 
+import { ContextMenuItem, useContextMenu } from '$components/contextMenu';
 import { ProgressBar } from '$components/progressBar';
 import { ProjectMenu } from '$components/projectMenu';
 import { useDrag, useDrop } from '$hooks/dnd';

@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsImage, BsPlus } from 'react-icons/bs';
-import { ContextMenuItem, useContextMenu } from 'use-context-menu';
 
+import { ContextMenuItem, useContextMenu } from '$components/contextMenu';
 import { IconButton } from '$components/iconButton';
 import type { Layer } from '$editor/types';
 import { useEditor } from './context';

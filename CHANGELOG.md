@@ -4,6 +4,10 @@
 
 - Added a button to invert the mask in the mask editor.
 
+## Improvements
+
+- Improved design consistency of context menus.
+
 # 0.0.21 (2025-02-18)
 
 ## Features
