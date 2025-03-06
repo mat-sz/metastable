@@ -6,27 +6,30 @@
   border-radius: 5px;
   outline: none !important;
   transition: 0.2sease-in-out all;
+  display: flex;
+  flex-wrap: wrap;
 
   .tag {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     padding: 0.2rem 0.25rem;
     margin-right: 0.3rem;
     border-radius: 5px;
     line-height: 0;
-    color: var(--grey-100);
+    color: var(--always-white);
 
     button {
       margin-left: 0.25rem;
-      color: var(--grey-100);
+      color: var(--always-white);
     }
   }
 
   .newTag {
-    display: inline-block;
+    flex: 1;
     border: none;
     background: none;
     padding: 0;
     font-size: 1rem;
+    min-width: 10rem;
   }
 }

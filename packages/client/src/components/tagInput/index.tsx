@@ -24,12 +24,7 @@ const Tag: React.FC<TagProps> = ({ tag, onDelete }) => {
       style={{ backgroundColor: stringToColor(tag) }}
     >
       <span>{tag}</span>
-      <IconButton
-        onClick={e => {
-          e.stopPropagation();
-          onDelete?.();
-        }}
-      >
+      <IconButton onClick={onDelete}>
         <BsX />
       </IconButton>
     </div>

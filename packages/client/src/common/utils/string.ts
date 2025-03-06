@@ -16,7 +16,7 @@ export function stringToColor(str?: string) {
 
   const H = (((hash >> 8) & 0xff) / 0xff) * 360;
   const S = (((hash >> 0) & 0xff) / 0xff) * 25 + 10;
-  const L = (((hash >> 16) & 0xff) / 0xff) * 25 + 15;
+  const L = (((hash >> 16) & 0xff) / 0xff) * 25 + 45;
 
   return `hsl(${H}deg, ${S}%, ${L}%)`;
 }
