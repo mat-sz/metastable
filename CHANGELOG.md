@@ -7,6 +7,7 @@
 ## Improvements
 
 - Improved design consistency of context menus.
+- Made all project settings categories not collapsed by default.
 
 # 0.0.21 (2025-02-18)
 

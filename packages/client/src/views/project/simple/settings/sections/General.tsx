@@ -286,11 +286,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
           inline
         />
       </SettingsCategory>
-      <SettingsCategory
-        label="Sampler"
-        sectionId="sampler"
-        defaultCollapsed={true}
-      >
+      <SettingsCategory label="Sampler" sectionId="sampler">
         <VarSwitch
           label="Quality"
           path="sampler.quality"
@@ -347,7 +343,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
         )}
         <VarToggle label="Tiling" path="sampler.tiling" />
       </SettingsCategory>
-      <SettingsCategory label="Other" sectionId="other" defaultCollapsed={true}>
+      <SettingsCategory label="Other" sectionId="other">
         <VarSwitch
           label="Format"
           path="output.format"
