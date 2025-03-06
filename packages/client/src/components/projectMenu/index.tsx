@@ -1,5 +1,6 @@
 import { Project } from '@metastable/types';
 import React, { useCallback } from 'react';
+import { BsCopy, BsPencil, BsTrash, BsXLg } from 'react-icons/bs';
 
 import { ContextMenuDivider, ContextMenuItem } from '$components/contextMenu';
 import { ProjectDelete } from '$modals/project/delete';
@@ -35,6 +36,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
         onSelect={async () => {
           modalStore.show(<ProjectDuplicate project={await getProjectObj()} />);
         }}
+        icon={<BsCopy />}
       >
         Duplicate
       </ContextMenuItem>
@@ -42,6 +44,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
         onSelect={async () => {
           modalStore.show(<ProjectRename project={await getProjectObj()} />);
         }}
+        icon={<BsPencil />}
       >
         Rename
       </ContextMenuItem>
@@ -49,16 +52,20 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
         onSelect={async () => {
           modalStore.show(<ProjectDelete project={await getProjectObj()} />);
         }}
+        icon={<BsTrash />}
       >
         Delete
       </ContextMenuItem>
       {isTab && !!project && (
         <>
           <ContextMenuDivider />
-          <ContextMenuItem onSelect={() => project.close()}>
+          <ContextMenuItem onSelect={() => project.close()} icon={<BsXLg />}>
             Close
           </ContextMenuItem>
-          <ContextMenuItem onSelect={() => project.closeOther()}>
+          <ContextMenuItem
+            onSelect={() => project.closeOther()}
+            icon={<BsXLg />}
+          >
             Close other tabs
           </ContextMenuItem>
         </>

@@ -9,6 +9,16 @@
   cursor: pointer;
   font-size: 0.9rem;
 
+  .text {
+    flex: 1;
+  }
+
+  &.hasIcon {
+    .text {
+      margin-left: 0.5rem;
+    }
+  }
+
   &[data-disabled='true'] {
     color: var(--grey-600);
     cursor: not-allowed;

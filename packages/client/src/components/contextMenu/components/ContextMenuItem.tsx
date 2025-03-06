@@ -20,6 +20,7 @@ interface Props {
   disabled?: boolean;
   onSelect?: (event: UIEvent) => void;
   style?: CSSProperties;
+  icon?: ReactNode;
 }
 
 export const ContextMenuItem: React.FC<Props> = ({
@@ -31,6 +32,7 @@ export const ContextMenuItem: React.FC<Props> = ({
   disabled = false,
   onSelect,
   style,
+  icon,
 }) => {
   const { registerMenuItem } = useContext(ContextMenuContext);
 
@@ -52,7 +54,7 @@ export const ContextMenuItem: React.FC<Props> = ({
 
   return (
     <div
-      className={clsx(styles.item, className)}
+      className={clsx(styles.item, { [styles.hasIcon]: !!icon }, className)}
       data-context-menu-item
       data-disabled={disabled}
       data-test-id={dataTestId}
@@ -63,7 +65,8 @@ export const ContextMenuItem: React.FC<Props> = ({
       style={style}
       tabIndex={disabled ? -1 : 0}
     >
-      {children}
+      {icon}
+      <span className={styles.text}>{children}</span>
     </div>
   );
 };
