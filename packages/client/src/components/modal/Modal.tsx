@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { PopoverContext } from '$components/popover/context';
+import { PopoverContext } from '$hooks/usePopover';
 import { useModal } from './context';
 import styles from './Modal.module.scss';
 import { ModalContainer } from './ModalContainer';

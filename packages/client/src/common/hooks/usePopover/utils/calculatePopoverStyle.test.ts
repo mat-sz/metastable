@@ -1,13 +1,13 @@
 import { Rect } from '../types';
-import { calculateContextMenuStyle } from './calculateContextMenuStyle';
+import { calculatePopoverStyle } from './calculatePopoverStyle';
 
-describe('calculateContextMenuStyle', () => {
+describe('calculatePopoverStyle', () => {
   describe('alignTo:above', () => {
     it('should auto-center above the target', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'above',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(200, 50, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -22,11 +22,11 @@ describe('calculateContextMenuStyle', () => {
   describe('alignTo:auto-cursor', () => {
     it('should work in the top left corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          cursorX: 12,
-          cursorY: 12,
-          menuRect: createRect(0, 0, 50, 20),
+          x: 12,
+          y: 12,
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(10, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -39,11 +39,11 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the top right corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          cursorX: 762,
-          cursorY: 12,
-          menuRect: createRect(0, 0, 50, 20),
+          x: 762,
+          y: 12,
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(764, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -56,11 +56,11 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the bottom left corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          cursorX: 12,
-          cursorY: 588,
-          menuRect: createRect(0, 0, 50, 20),
+          x: 12,
+          y: 588,
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(10, 564, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -73,11 +73,11 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the bottom right corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          cursorX: 762,
-          cursorY: 588,
-          menuRect: createRect(0, 0, 50, 20),
+          x: 762,
+          y: 588,
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(764, 564, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -90,9 +90,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should fall back to auto-target if there are no cursor coordinates', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(20, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -106,11 +106,11 @@ describe('calculateContextMenuStyle', () => {
 
     it('should handle when the menu is larger than the viewport', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-cursor',
-          cursorX: 770,
-          cursorY: 15,
-          menuRect: createRect(0, 0, 1000, 1000),
+          x: 770,
+          y: 15,
+          popoverRect: createRect(0, 0, 1000, 1000),
           targetRect: createRect(764, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -125,9 +125,9 @@ describe('calculateContextMenuStyle', () => {
   describe('alignTo:auto-target', () => {
     it('should work in the top left corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(20, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -141,9 +141,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the top right corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(754, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -157,9 +157,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the bottom left corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(20, 564, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -173,9 +173,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should work in the bottom right corner', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(754, 564, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -189,9 +189,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should realign at the left when the menu would go offscreen', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(10, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -205,9 +205,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should realign at the right when the menu would go offscreen', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(764, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -221,9 +221,9 @@ describe('calculateContextMenuStyle', () => {
 
     it('should handle when the menu is larger than the viewport', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'auto-target',
-          menuRect: createRect(0, 0, 1000, 1000),
+          popoverRect: createRect(0, 0, 1000, 1000),
           targetRect: createRect(764, 10, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -239,9 +239,9 @@ describe('calculateContextMenuStyle', () => {
   describe('alignTo:below', () => {
     it('should auto-center below the target', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'below',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(200, 50, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -256,9 +256,9 @@ describe('calculateContextMenuStyle', () => {
   describe('alignTo:left', () => {
     it('should auto-center to the left of the target', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'left',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(200, 50, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,
@@ -273,9 +273,9 @@ describe('calculateContextMenuStyle', () => {
   describe('alignTo:right', () => {
     it('should auto-center to the right of the target', () => {
       expect(
-        calculateContextMenuStyle({
+        calculatePopoverStyle({
           alignTo: 'right',
-          menuRect: createRect(0, 0, 50, 20),
+          popoverRect: createRect(0, 0, 50, 20),
           targetRect: createRect(200, 50, 26, 26),
           viewportHeight: 600,
           viewportWidth: 800,

@@ -2291,7 +2291,6 @@ __metadata:
     react-dom: "npm:^18.3.0"
     react-i18not: "npm:^0.1.1"
     react-icons: "npm:^5.4.0"
-    react-tiny-popover: "npm:^8.1.4"
     react-use-pointer-drag: "npm:^0.1.2"
     sass-embedded: "npm:^1.83.4"
     trpc-electron: "npm:^0.1.2"
@@ -9151,16 +9150,6 @@ __metadata:
   version: 0.14.2
   resolution: "react-refresh@npm:0.14.2"
   checksum: 10c0/875b72ef56b147a131e33f2abd6ec059d1989854b3ff438898e4f9310bfcc73acff709445b7ba843318a953cb9424bcc2c05af2b3d80011cee28f25aef3e2ebb
-  languageName: node
-  linkType: hard
-
-"react-tiny-popover@npm:^8.1.4":
-  version: 8.1.4
-  resolution: "react-tiny-popover@npm:8.1.4"
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/b96d4d5ee95f93dc70d5c057654bd14a7036290da448c26dd61ded71bac5e5d1508a2e947a414c88c305ccfdddc5880bad0c4c65e5c8bcc27a6a0257d9fb8849
   languageName: node
   linkType: hard
 

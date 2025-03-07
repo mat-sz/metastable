@@ -29,3 +29,24 @@ export const isPrimitive = (value: any): boolean => {
     (typeof value !== 'object' && typeof value !== 'function')
   );
 };
+
+export function assert(
+  expectedCondition: boolean,
+  message: string = 'Assertion failed',
+): asserts expectedCondition {
+  if (!expectedCondition) {
+    console.error(message);
+
+    throw Error(message);
+  }
+}
+
+export function isEvent(event: any): event is React.SyntheticEvent {
+  return 'nativeEvent' in event;
+}
+
+export function isMouseEvent(
+  event: React.SyntheticEvent,
+): event is React.MouseEvent {
+  return 'clientX' in event && typeof event.clientX === 'number';
+}

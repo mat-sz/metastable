@@ -4,7 +4,6 @@ import { MutableRefObject, RefObject, useEffect } from 'react';
 export function useModalDismissSignal(
   modalRef: MutableRefObject<HTMLDivElement> | RefObject<HTMLDivElement>,
   dismissCallback: () => void,
-  dismissOnClickOutside: boolean = true,
 ) {
   useEffect(() => {
     const element = modalRef.current;
@@ -33,9 +32,6 @@ export function useModalDismissSignal(
       // The root document might belong to a different window.
       ownerDocument = element.ownerDocument;
       ownerDocument.addEventListener('keydown', handleKeyboardEvent);
-      if (dismissOnClickOutside) {
-        ownerDocument.addEventListener('scroll', dismissCallback, true);
-      }
     }, 0);
 
     return () => {
@@ -45,8 +41,7 @@ export function useModalDismissSignal(
 
       if (ownerDocument !== null) {
         ownerDocument.removeEventListener('keydown', handleKeyboardEvent);
-        ownerDocument.removeEventListener('scroll', dismissCallback, true);
       }
     };
-  }, [modalRef, dismissCallback, dismissOnClickOutside]);
+  }, [modalRef, dismissCallback]);
 }

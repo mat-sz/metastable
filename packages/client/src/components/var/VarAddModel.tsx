@@ -1,10 +1,9 @@
 import { Architecture, Model, ModelType } from '@metastable/types';
-import { useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 
 import { Button } from '$components/button';
 import { ModelBrowser } from '$components/modelBrowser';
-import { Popover } from '$components/popover';
+import { usePopover } from '$hooks/usePopover';
 import styles from './VarAddModel.module.scss';
 import { VarBase } from './VarBase';
 
@@ -25,39 +24,32 @@ export const VarAddModel = ({
   architecture,
   className,
 }: IVarAddModelProps): JSX.Element => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { popover, onClick, hide } = usePopover(
+    <ModelBrowser
+      variant="small"
+      type={modelType}
+      architecture={architecture}
+      onSelect={model => {
+        if (!model) {
+          return;
+        }
+
+        onSelect?.(model);
+        hide();
+      }}
+    />,
+  );
 
   return (
     <VarBase disabled={disabled} className={className}>
-      <Popover
-        isOpen={isOpen}
-        positions={['bottom', 'left', 'right', 'top']}
-        containerStyle={{ zIndex: '10' }}
-        onClickOutside={() => setIsOpen(false)}
-        content={
-          <ModelBrowser
-            variant="small"
-            type={modelType}
-            architecture={architecture}
-            onSelect={model => {
-              if (!model) {
-                return;
-              }
-
-              onSelect?.(model);
-              setIsOpen(false);
-            }}
-          />
-        }
+      <Button
+        className={styles.selection}
+        onClick={onClick}
+        icon={<BsPlusLg />}
       >
-        <Button
-          className={styles.selection}
-          onClick={() => setIsOpen(current => !current)}
-          icon={<BsPlusLg />}
-        >
-          Add {label}
-        </Button>
-      </Popover>
+        Add {label}
+      </Button>
+      {popover}
     </VarBase>
   );
 };

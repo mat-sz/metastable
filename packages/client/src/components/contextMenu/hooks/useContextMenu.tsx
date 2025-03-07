@@ -1,8 +1,7 @@
+import clsx from 'clsx';
 import {
   CSSProperties,
   ReactNode,
-  KeyboardEvent as SyntheticKeyboardEvent,
-  MouseEvent as SyntheticMouseEvent,
   UIEvent,
   useCallback,
   useEffect,
@@ -11,32 +10,25 @@ import {
   useState,
 } from 'react';
 
+import { PopoverShowOptions, usePopover } from '$hooks/usePopover';
 import { wrapAround } from '$utils/math';
-import { ContextMenu } from '../components/ContextMenu';
 import {
   ContextMenuContext,
   ContextMenuContextType,
 } from '../ContextMenuContext';
 import { AlignTo } from '../types';
-
-interface State {
-  clientX: number;
-  clientY: number;
-  event?: React.SyntheticEvent;
-  target: HTMLElement;
-  targetRect: DOMRect;
-}
-
-interface ShowMenuOptions {
-  positioningTarget?: HTMLElement;
-  focusTarget?: HTMLElement;
-}
+import styles from './useContextMenu.module.scss';
 
 const ATTR_MENU_ITEM = 'data-context-menu-item';
 const ATTR_SELECTED = 'aria-selected';
 const ATTR_DISABLED = 'data-disabled';
 const SELECTOR_ITEM = `div[${ATTR_MENU_ITEM}]`;
 const SELECTOR_ITEM_SELECTED = `${SELECTOR_ITEM}[${ATTR_SELECTED}="true"]`;
+
+interface MenuItemsState {
+  menuItems: HTMLDivElement[];
+  enabledMenuItems: number[];
+}
 
 const getMenuItems = (menu: HTMLDivElement) => {
   const menuItems = [
@@ -56,7 +48,7 @@ const getMenuItems = (menu: HTMLDivElement) => {
   return {
     menuItems,
     enabledMenuItems,
-  };
+  } as MenuItemsState;
 };
 
 const clearSelectedItem = (menu: HTMLDivElement) => {
@@ -80,43 +72,23 @@ export function useContextMenu(
     dataTestName?: string;
     onHide?: () => void | Promise<void>;
     onShow?: (event?: React.SyntheticEvent) => void | Promise<void>;
-    requireClickToShow?: boolean;
     style?: CSSProperties;
-    isSubmenu?: boolean;
+    noBackdrop?: boolean;
   } = {},
 ): {
-  contextMenu: ReactNode | null;
-  hideMenu: () => void;
-  onKeyDown: (event: SyntheticKeyboardEvent) => void;
-  onContextMenu: (
-    event?: React.SyntheticEvent,
-    options?: ShowMenuOptions,
-  ) => void;
+  contextMenu?: ReactNode;
+  show: (options: PopoverShowOptions) => void;
+  hide: () => void;
+  onContextMenu: (event: React.SyntheticEvent) => void;
 } {
-  const {
-    alignTo = 'auto-cursor',
-    className,
-    dataTestId,
-    dataTestName,
-    onHide,
-    onShow,
-    requireClickToShow = false,
-    style,
-    isSubmenu,
-  } = options;
+  const { onHide, onShow } = options;
 
-  const [state, setState] = useState<State>();
   const [currentFocusId, setCurrentFocusId] = useState<string>();
-
-  const menuRef = useRef<HTMLDivElement>();
-
-  const registerMenu = useCallback((menu: HTMLDivElement) => {
-    menuRef.current = menu;
-  }, []);
+  const menuItemsStateRef = useRef<MenuItemsState>();
 
   const focusItem = useCallback(
     (element?: HTMLDivElement) => {
-      const menu = menuRef.current as HTMLDivElement;
+      const menu = popoverRef.current as HTMLDivElement;
       clearSelectedItem(menu);
       element?.setAttribute('aria-selected', 'true');
       setCurrentFocusId(element?.id);
@@ -124,209 +96,128 @@ export function useContextMenu(
     [setCurrentFocusId],
   );
 
-  const hideMenu = useCallback(() => {
-    const { onHide, state } = committedValuesRef.current;
-
-    if (!state) {
+  const focus = (focusIndex: number) => {
+    if (!menuItemsStateRef.current) {
       return;
     }
 
-    setState(undefined);
-
-    if (typeof onHide === 'function') {
-      onHide();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!state) {
-      return;
-    }
-
-    const target = state.target;
-    const menu = menuRef.current as HTMLDivElement;
-
-    target.blur();
-    menu.focus();
-
-    const { menuItems, enabledMenuItems } = getMenuItems(menu);
-
-    const focus = (focusIndex: number) => {
-      const index = enabledMenuItems[focusIndex];
-      const menuItem = menuItems[index];
-      focusItem(menuItem);
-    };
-
-    if (!state.event?.isTrusted) {
-      focus(0);
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      const selectedItem = getSelectedItem(menu);
-      let focusIndex = menuItems.indexOf(selectedItem!);
-
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowUp': {
-          const delta = event.key === 'ArrowUp' ? -1 : 1;
-          focusIndex = wrapAround(
-            focusIndex + delta,
-            0,
-            enabledMenuItems.length - 1,
-          );
-          focus(focusIndex);
-          event.preventDefault();
-          event.stopPropagation();
-          break;
-        }
-        case 'ArrowLeft':
-          hideMenu();
-          break;
-        case 'ArrowRight':
-        case 'Enter':
-          selectedItem?.click();
-          break;
-        case 'Tab': {
-          if (event.shiftKey) {
-            focusIndex =
-              focusIndex - 1 >= 0
-                ? focusIndex - 1
-                : enabledMenuItems.length - 1;
-          } else {
-            focusIndex =
-              focusIndex + 1 < enabledMenuItems.length ? focusIndex + 1 : 0;
-          }
-          focus(focusIndex);
-          event.preventDefault();
-          event.stopPropagation();
-          break;
-        }
-      }
-    };
-
-    menu.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      menu.removeEventListener('keydown', onKeyDown);
-
-      menuItems.splice(0, menuItems.length);
-
-      // Return focus to the target element that triggered the context menu.
-      target.focus();
-    };
-  }, [requireClickToShow, state, hideMenu]);
-
-  const committedValuesRef = useRef<{
-    onHide?: () => void | Promise<void>;
-    onShow?: (event: UIEvent) => void | Promise<void>;
-    state?: State;
-  }>({ onHide, onShow, state });
-
-  useEffect(() => {
-    committedValuesRef.current.onHide = onHide;
-    committedValuesRef.current.onShow = onShow;
-    committedValuesRef.current.state = state;
-  });
-
-  const context = useMemo<ContextMenuContextType>(
-    () => ({
-      contextMenuEvent: state?.event,
-      registerMenu,
-      focusItem,
-      currentFocusId,
-      menuRef,
-    }),
-    [registerMenu, focusItem, currentFocusId, state?.event],
-  );
-
-  const showMenu = (
-    event?: React.SyntheticEvent,
-    options: ShowMenuOptions = {},
-  ) => {
-    if (!contextMenuItems || event?.defaultPrevented) {
-      // Support nested context menus
-      return;
-    }
-
-    event?.preventDefault();
-
-    if (typeof onShow === 'function') {
-      onShow(event);
-    }
-
-    const currentTarget = event?.currentTarget as HTMLElement | undefined;
-    const {
-      positioningTarget = currentTarget,
-      focusTarget = positioningTarget ?? currentTarget,
-    } = options;
-
-    if (!positioningTarget || !focusTarget) {
-      return;
-    }
-
-    const targetRect = positioningTarget.getBoundingClientRect();
-    const clientX = isMouseEvent(event) ? event.clientX : targetRect.x;
-    const clientY = isMouseEvent(event) ? event.clientY : targetRect.y;
-
-    setState({
-      clientX,
-      clientY,
-      event,
-      target: focusTarget,
-      targetRect,
-    });
+    const { menuItems, enabledMenuItems } = menuItemsStateRef.current;
+    const index = enabledMenuItems[focusIndex];
+    const menuItem = menuItems[index];
+    focusItem(menuItem);
   };
 
-  const onContextMenu = showMenu;
-  const onKeyDown = (event: SyntheticKeyboardEvent) => {
-    if (state) {
-      return;
-    } else if (requireClickToShow) {
+  const onKeyDown = (event: KeyboardEvent) => {
+    const menu = popoverRef.current;
+    if (!menu || !menuItemsStateRef.current) {
       return;
     }
+
+    const { menuItems, enabledMenuItems } = menuItemsStateRef.current;
+    const selectedItem = getSelectedItem(menu);
+    let focusIndex = menuItems.indexOf(selectedItem!);
 
     switch (event.key) {
       case 'ArrowDown':
-      case 'ArrowUp':
-      case 'ContextMenu':
+      case 'ArrowUp': {
+        const delta = event.key === 'ArrowUp' ? -1 : 1;
+        focusIndex = wrapAround(
+          focusIndex + delta,
+          0,
+          enabledMenuItems.length - 1,
+        );
+        focus(focusIndex);
+        event.preventDefault();
+        event.stopPropagation();
+        break;
+      }
+      case 'ArrowLeft':
+        hide();
+        break;
+      case 'ArrowRight':
       case 'Enter':
-      case ' ': {
-        showMenu(event);
+        selectedItem?.click();
+        break;
+      case 'Tab': {
+        if (event.shiftKey) {
+          focusIndex =
+            focusIndex - 1 >= 0 ? focusIndex - 1 : enabledMenuItems.length - 1;
+        } else {
+          focusIndex =
+            focusIndex + 1 < enabledMenuItems.length ? focusIndex + 1 : 0;
+        }
+        focus(focusIndex);
+        event.preventDefault();
+        event.stopPropagation();
         break;
       }
     }
   };
 
-  let contextMenu = null;
-  if (state) {
+  const wrappedOnShow = (event?: React.SyntheticEvent) => {
+    const menu = popoverRef.current;
+    if (!menu) {
+      return;
+    }
+
+    menuItemsStateRef.current = getMenuItems(menu);
+    if (!event?.isTrusted) {
+      focus(0);
+    }
+
+    menu.addEventListener('keydown', onKeyDown);
+    onShow?.(event);
+  };
+
+  const wrappedOnHide = () => {
+    const menu = popoverRef.current;
+    menu?.removeEventListener('keydown', onKeyDown);
+    onHide?.();
+  };
+
+  const { show, hide, onClick, popover, popoverRef } = usePopover(
+    contextMenuItems,
+    {
+      ...options,
+      className: clsx(styles.contextMenu, options.className),
+      alignTo: options.alignTo ?? 'auto-cursor',
+      onShow: wrappedOnShow,
+      onHide: wrappedOnHide,
+    },
+  );
+
+  const committedValuesRef = useRef<{
+    onHide?: () => void | Promise<void>;
+    onShow?: (event: UIEvent) => void | Promise<void>;
+  }>({ onHide, onShow });
+
+  useEffect(() => {
+    committedValuesRef.current.onHide = onHide;
+    committedValuesRef.current.onShow = onShow;
+  });
+
+  const context = useMemo<ContextMenuContextType>(
+    () => ({
+      focusItem,
+      currentFocusId,
+      menuRef: popoverRef,
+    }),
+    [focusItem, currentFocusId],
+  );
+
+  let contextMenu;
+  if (popover) {
     contextMenu = (
       <ContextMenuContext.Provider value={context}>
-        <ContextMenu
-          alignTo={alignTo}
-          className={className}
-          clientX={state.clientX}
-          clientY={state.clientY}
-          dataTestId={dataTestId}
-          dataTestName={dataTestName}
-          hide={hideMenu}
-          style={style}
-          targetRect={state.targetRect}
-          isSubmenu={isSubmenu}
-        >
-          {contextMenuItems}
-        </ContextMenu>
+        {popover}
       </ContextMenuContext.Provider>
     );
   }
 
   return {
     contextMenu,
-    hideMenu,
-    onContextMenu,
-    onKeyDown,
+    show,
+    hide,
+    onContextMenu: onClick,
   };
-}
-
-function isMouseEvent(event: any): event is SyntheticMouseEvent {
-  return event?.pageX != null && event?.pageY != null;
 }

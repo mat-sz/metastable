@@ -9,24 +9,20 @@ interface Props extends ContextMenuItemProps {
 }
 
 export const ContextMenuSubmenu: React.FC<Props> = ({ items, ...props }) => {
-  const { contextMenu, onContextMenu, hideMenu } = useContextMenu(items, {
+  const { contextMenu, show, hide } = useContextMenu(items, {
     alignTo: 'right',
-    isSubmenu: true,
+    noBackdrop: true,
   });
 
   const { menuRef } = useContext(ContextMenuContext);
 
   const onSelect = (event: React.UIEvent) => {
     event.stopPropagation();
-    onContextMenu(event, {
-      focusTarget: menuRef?.current,
-    });
+    show({ positioningTarget: event, focusTarget: menuRef?.current });
   };
 
   const onPointerOver = (event: React.SyntheticEvent) => {
-    onContextMenu(event, {
-      focusTarget: menuRef?.current,
-    });
+    show({ positioningTarget: event, focusTarget: menuRef?.current });
   };
 
   return (
@@ -35,7 +31,7 @@ export const ContextMenuSubmenu: React.FC<Props> = ({ items, ...props }) => {
         onSelect={onSelect}
         onPointerOver={onPointerOver}
         {...props}
-        onBlur={hideMenu}
+        onBlur={hide}
         isSubmenu
       />
       {contextMenu}

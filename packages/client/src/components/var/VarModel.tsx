@@ -1,11 +1,10 @@
 import { Architecture, Model, ModelType } from '@metastable/types';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 
 import { ModelBrowser } from '$components/modelBrowser';
-import { Popover } from '$components/popover';
 import { ThumbnailDisplay } from '$components/thumbnailDisplay';
+import { usePopover } from '$hooks/usePopover';
 import { modelStore } from '$stores/ModelStore';
 import { stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';
@@ -43,10 +42,23 @@ export const VarModel = observer(
       error,
       errorPath,
     });
-    const [isOpen, setIsOpen] = useState(false);
-
     const model = currentValue ? modelStore.find(currentValue) : undefined;
     const parts = model?.file.parts;
+
+    const { popover, onClick, hide } = usePopover(
+      <ModelBrowser
+        variant="small"
+        defaultParentId={parts?.length ? parts.join('/') : undefined}
+        type={modelType}
+        architecture={architecture}
+        allowReset
+        onSelect={model => {
+          setCurrentValue(model?.mrn);
+          onSelect?.(model);
+          hide();
+        }}
+      />,
+    );
 
     return (
       <VarBase
@@ -56,49 +68,26 @@ export const VarModel = observer(
         className={className}
         error={currentError}
       >
-        <Popover
-          isOpen={isOpen}
-          positions={['bottom', 'left', 'right', 'top']}
-          containerStyle={{ zIndex: '10' }}
-          onClickOutside={() => setIsOpen(false)}
-          content={
-            <ModelBrowser
-              variant="small"
-              defaultParentId={parts?.length ? parts.join('/') : undefined}
-              type={modelType}
-              architecture={architecture}
-              allowReset
-              onSelect={model => {
-                setCurrentValue(model?.mrn);
-                onSelect?.(model);
-                setIsOpen(false);
-              }}
-            />
-          }
-        >
-          <button
-            className={styles.selection}
-            onClick={() => setIsOpen(current => !current)}
-          >
-            {model ? (
-              <>
-                <ThumbnailDisplay
-                  className={styles.icon}
-                  color={stringToColor(currentValue)}
-                  imageUrl={resolveImage(model.coverMrn, 'thumbnail')}
-                />
-                <span className={styles.name}>{model.name}</span>
-              </>
-            ) : (
-              <>
-                <span className={styles.name}>(none)</span>
-              </>
-            )}
-            <div className={styles.chevron}>
-              <BsChevronDown />
-            </div>
-          </button>
-        </Popover>
+        <button className={styles.selection} onClick={onClick}>
+          {model ? (
+            <>
+              <ThumbnailDisplay
+                className={styles.icon}
+                color={stringToColor(currentValue)}
+                imageUrl={resolveImage(model.coverMrn, 'thumbnail')}
+              />
+              <span className={styles.name}>{model.name}</span>
+            </>
+          ) : (
+            <>
+              <span className={styles.name}>(none)</span>
+            </>
+          )}
+          <div className={styles.chevron}>
+            <BsChevronDown />
+          </div>
+        </button>
+        {popover}
       </VarBase>
     );
   },

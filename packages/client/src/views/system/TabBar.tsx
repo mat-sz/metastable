@@ -57,7 +57,7 @@ export const BaseTab = React.forwardRef<
     },
     ref,
   ) => {
-    const { contextMenu, onContextMenu, onKeyDown } = useContextMenu(menu);
+    const { contextMenu, onContextMenu } = useContextMenu(menu);
 
     return (
       <div
@@ -66,7 +66,6 @@ export const BaseTab = React.forwardRef<
           [styles.selected]: isSelected,
         })}
         onContextMenu={onContextMenu}
-        onKeyDown={onKeyDown}
         onClick={onClick}
         onPointerUp={e => {
           if (e.pointerType === 'mouse' && e.button === 1) {

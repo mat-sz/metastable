@@ -15,7 +15,7 @@ export interface LayerProps {
 export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
   const editor = useEditor();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { contextMenu, onContextMenu, onKeyDown } = useContextMenu(
+  const { contextMenu, onContextMenu } = useContextMenu(
     <>
       <ContextMenuItem onSelect={() => editor.duplicateLayer(layer.id)}>
         Duplicate layer
@@ -44,7 +44,6 @@ export const LayerItem: React.FC<LayerProps> = ({ layer }) => {
       key={layer.id}
       onClick={() => editor.selectLayer(layer.id)}
       onContextMenu={onContextMenu}
-      onKeyDown={onKeyDown}
       className={clsx(styles.layer, {
         [styles.active]: editor.state.currentLayerId === layer.id,
       })}
