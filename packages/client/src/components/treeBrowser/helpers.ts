@@ -21,6 +21,20 @@ export function getAncestors<TItem extends TreeNode>(
   return result;
 }
 
+export function getChildren<TItem extends TreeNode>(
+  nodes: TItem[],
+  parentId?: string,
+): TItem[] {
+  return nodes.filter(node => node.parentId === parentId);
+}
+
+export function filterType<TItem extends TreeNode>(
+  nodes: TItem[],
+  nodeType: TreeNode['nodeType'],
+): TItem[] {
+  return nodes.filter(node => node.nodeType === nodeType);
+}
+
 export function getDescendants<TItem extends TreeNode>(
   nodes: TItem[],
   parentId?: string,
@@ -29,15 +43,14 @@ export function getDescendants<TItem extends TreeNode>(
     return nodes;
   }
 
-  const items = nodes.filter(node => node.parentId === parentId);
-  const queue = items.filter(node => node.nodeType === 'group');
-  const result = items;
+  const queue: TItem[] = [];
+  const result: TItem[] = [];
 
-  while (queue.length) {
-    const current = queue.shift()!;
-    const items = nodes.filter(node => node.parentId === current.id);
-    queue.push(...items.filter(node => node.nodeType === 'group'));
+  while (parentId) {
+    const items = getChildren(nodes, parentId);
+    queue.push(...filterType(items, 'group'));
     result.push(...items);
+    parentId = queue.shift()?.id;
   }
 
   return result;
