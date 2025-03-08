@@ -5,22 +5,18 @@ const rl = readline.createInterface({
 });
 
 const PASSWORD_ENV = 'CODESIGN_PASSWORD';
+const password = process.env[PASSWORD_ENV];
 
 exports.default = async function (configuration) {
-  const tokenPassword = async () => {
-    if (!process.env[PASSWORD_ENV]) {
-      process.env[PASSWORD_ENV] = await rl.question(
-        '\n\n\tPlease enter the password for the hardware token: ',
-      );
-    }
-    return process.env[PASSWORD_ENV];
-  };
+  if (!password) {
+    return;
+  }
 
   require('child_process').execSync(
     `java \
     -jar ../../vendor/jsign-6.0.jar \
     --keystore ./build/hardwareToken.cfg \
-    --storepass "${await tokenPassword()}" \
+    --storepass "${password}" \
     --storetype PKCS11 \
     --tsaurl http://time.certum.pl/ \
     "${configuration.path}"
