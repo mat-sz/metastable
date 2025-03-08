@@ -69,6 +69,11 @@ export const SettingsTab: React.FC = observer(() => {
           showInput
         />
         <VarToggle label="Run VAE on CPU" path="cpuVae" defaultValue={false} />
+        <VarToggle
+          label="Enable experimental optimizations"
+          path="fast"
+          defaultValue={false}
+        />
         <VarString label="Extra arguments" path="extraArgs" defaultValue="" />
       </VarCategoryScope>
     </TabPanel>

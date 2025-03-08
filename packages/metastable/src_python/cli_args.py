@@ -90,6 +90,7 @@ if args.fast is None:
     args.fast = set()
 # '--fast' is provided with an empty list, enable all optimizations
 elif args.fast == []:
+    print("Enabling all experimental performance optimizations")
     args.fast = set(PerformanceFeature)
 # '--fast' is provided with a list of performance features, use that list
 else:

@@ -4,6 +4,7 @@
 
 - Added project tagging to context menu and project list.
 - Added a button to invert the mask in the mask editor.
+- Added an option to enable experimental performance optimizations in backend settings.
 
 ## Improvements
 

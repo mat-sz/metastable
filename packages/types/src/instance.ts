@@ -81,6 +81,7 @@ export interface ConfigType {
     extraArgs?: string;
     env?: Record<string, string>;
     cpuVae?: boolean;
+    fast?: boolean;
   };
   downloader: {
     apiKeys: Record<string, string>;
