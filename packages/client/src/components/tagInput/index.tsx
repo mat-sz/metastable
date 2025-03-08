@@ -1,9 +1,8 @@
 import clsx from 'clsx';
 import React, { useMemo, useRef, useState } from 'react';
-import { BsX } from 'react-icons/bs';
 
-import { IconButton } from '$components/iconButton';
-import { stringToColor } from '$utils/string';
+import { Tag } from '$components/tag';
+import { TagIcon } from '$components/tagIcon';
 import styles from './index.module.scss';
 
 export interface TagInputProps {
@@ -11,25 +10,6 @@ export interface TagInputProps {
   onChange?: (value: string[]) => void;
   className?: string;
 }
-
-interface TagProps {
-  tag: string;
-  onDelete?: () => void;
-}
-
-const Tag: React.FC<TagProps> = ({ tag, onDelete }) => {
-  return (
-    <div
-      className={clsx(styles.tag)}
-      style={{ backgroundColor: stringToColor(tag) }}
-    >
-      <span>{tag}</span>
-      <IconButton onClick={onDelete}>
-        <BsX />
-      </IconButton>
-    </div>
-  );
-};
 
 export const TagInput: React.FC<TagInputProps> = ({
   className,
@@ -50,11 +30,13 @@ export const TagInput: React.FC<TagInputProps> = ({
       {uniqueTags.map(tag => (
         <Tag
           key={tag}
-          tag={tag}
+          icon={<TagIcon tag={tag} />}
           onDelete={() => {
             onChange?.([...uniqueTags.filter(item => item !== tag)]);
           }}
-        />
+        >
+          {tag}
+        </Tag>
       ))}
       <input
         className={styles.newTag}

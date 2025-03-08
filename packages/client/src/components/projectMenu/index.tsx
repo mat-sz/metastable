@@ -17,6 +17,8 @@ import {
   ContextMenuItem,
   ContextMenuSubmenu,
 } from '$components/contextMenu';
+import { Tag } from '$components/tag';
+import { TagIcon } from '$components/tagIcon';
 import { ProjectDelete } from '$modals/project/delete';
 import { ProjectDuplicate } from '$modals/project/duplicate';
 import { ProjectRename } from '$modals/project/rename';
@@ -98,7 +100,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
                     }
                   }}
                 >
-                  {tag}
+                  <Tag icon={<TagIcon tag={tag} />}>{tag}</Tag>
                 </ContextMenuCheckbox>
               ))}
             </>
