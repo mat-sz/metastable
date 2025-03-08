@@ -5,7 +5,6 @@ const globalIgnore = [
   '!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}',
   '!**/node_modules/.bin',
   '!**/node_modules/**/*.map',
-  '!**/node_modules/@metastable/metastable/python_kohya',
   '!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}',
   '!.editorconfig',
   '!**/._*',
@@ -30,8 +29,8 @@ const config = {
   },
   extraFiles: [
     {
-      from: '../metastable/python',
-      to: 'python',
+      from: '../metastable/src_python',
+      to: 'src_python',
       filter: ['**/*', '!**/__pycache__'],
     },
   ],

@@ -58,7 +58,7 @@ interface RPCSchema {
 }
 
 const data = await stdout('python', [
-  path.resolve('./python/rpc_generate_types.py'),
+  path.resolve('./src_python/rpc_generate_types.py'),
 ]);
 const schema = JSON.parse(data) as RPCSchema;
 

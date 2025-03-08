@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup:amd:rocm": "pip3 install --extra-index-url https://download.pytorch.org/whl/rocm6.1 -r ./python/requirements.txt",
-    "setup:nvidia": "pip3 install --extra-index-url https://download.pytorch.org/whl/cu124 -r ./python/requirements.txt",
-    "setup:other": "pip3 install -r ./python/requirements.txt",
+    "setup:amd:rocm": "pip3 install --extra-index-url https://download.pytorch.org/whl/rocm6.1 -r ./src_python/requirements.txt",
+    "setup:nvidia": "pip3 install --extra-index-url https://download.pytorch.org/whl/cu124 -r ./src_python/requirements.txt",
+    "setup:other": "pip3 install -r ./src_python/requirements.txt",
     "setup:amd": "yarn setup:amd:rocm",
     "rebuild": "electron-rebuild",
     "build": "tsc",

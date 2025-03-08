@@ -126,7 +126,7 @@ async function createWindow() {
     app.isPackaged
       ? path.join(path.dirname(app.getPath('exe')), IS_MAC ? '..' : '.')
       : path.resolve('../metastable'),
-    'python',
+    'src_python',
     'main.py',
   );
   const metastable = await Metastable.initialize({

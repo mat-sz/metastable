@@ -182,6 +182,14 @@ export class Setup extends EventEmitter<SetupEvents> {
     }
 
     if (settings.dataRoot !== Metastable.instance.dataRoot) {
+      // Prevent accidental overwriting of application files.
+      if (
+        (await exists(path.join(settings.dataRoot, 'Metastable.exe'))) ||
+        (await exists(path.join(settings.dataRoot, 'Metastable')))
+      ) {
+        settings.dataRoot = path.join(settings.dataRoot, 'data');
+      }
+
       await Metastable.instance.setDataRoot(settings.dataRoot, true);
     }
 

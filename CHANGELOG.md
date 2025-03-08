@@ -10,6 +10,10 @@
 - Improved design consistency of context menus.
 - Made all project settings categories not collapsed by default.
 
+## Bug fixes
+
+- Added a check during installation to ensure application files aren't overwritten with custom paths.
+
 # 0.0.21 (2025-02-18)
 
 ## Features

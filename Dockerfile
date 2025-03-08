@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.cache \
   uv python install 3.12 --preview --default
 
 RUN --mount=type=cache,target=/root/.cache \
-  uv pip install -r ./packages/metastable/python/requirements.txt --python $(which python) --break-system-packages
+  uv pip install -r ./packages/metastable/src_python/requirements.txt --python $(which python) --break-system-packages
 
 ENV VITE_APP_ENABLE_OPTIONAL_FEATURES=1
 

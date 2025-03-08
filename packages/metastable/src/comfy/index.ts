@@ -29,7 +29,7 @@ export class Comfy extends EventEmitter<BackendEvents> {
 
   constructor(
     public python: PythonInstance,
-    private mainPath = path.join(baseDir, 'python', 'main.py'),
+    private mainPath = path.join(baseDir, 'src_python', 'main.py'),
     private args: string[] = [],
     private env: Record<string, string> = {},
   ) {
