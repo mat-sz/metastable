@@ -95,8 +95,9 @@ export class TrainingProject extends BaseProject<
   async request() {
     this.save();
 
-    await API.project.train.mutate({
+    await API.project.execute.mutate({
       projectId: this.id,
+      taskType: 'train',
       settings: this.settings,
     });
   }

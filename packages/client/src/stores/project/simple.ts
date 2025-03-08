@@ -610,16 +610,18 @@ export class SimpleProject extends BaseProject<
     this.selectOutput(undefined);
     this.save();
 
-    await API.project.prompt.mutate({
+    await API.project.execute.mutate({
       projectId: this.id,
+      taskType: 'prompt',
       settings: this.settings,
     });
   }
 
   async postprocess(settings: PostprocessSettings) {
     this.selectOutput(undefined);
-    await API.project.postprocess.mutate({
+    await API.project.execute.mutate({
       projectId: this.id,
+      taskType: 'postprocess',
       settings: settings,
     });
   }

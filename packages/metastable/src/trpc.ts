@@ -598,46 +598,36 @@ export const router = t.router({
         const project = await metastable.project.get(projectId);
         await project.delete();
       }),
-    prompt: protectedProcedure
-      .input(type({ projectId: string(), settings: any() }))
+    execute: protectedProcedure
+      .input(type({ projectId: string(), taskType: string(), settings: any() }))
       .mutation(
-        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
+        async ({
+          ctx: { metastable },
+          input: { projectId, taskType, settings },
+        }) => {
           if (metastable.status !== 'ready') {
             return undefined;
           }
 
           const project = await metastable.project.get(projectId);
-          const task = new PromptTask(project, settings);
-          metastable.tasks.queues.project.add(task);
-
-          return { id: task.id };
-        },
-      ),
-    train: protectedProcedure
-      .input(type({ projectId: string(), settings: any() }))
-      .mutation(
-        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-          if (metastable.status !== 'ready') {
-            return undefined;
+          let task;
+          switch (taskType) {
+            case 'prompt':
+              task = new PromptTask(project, settings);
+              break;
+            case 'train':
+              task = new TrainingTask(project, settings);
+              break;
+            case 'postprocess':
+              task = new PostprocessTask(project, settings);
+              break;
+            case 'tag':
+              task = new TagTask(project, settings);
+              break;
+            default:
+              throw new Error(`Invalid task type: ${taskType}`);
           }
 
-          const project = await metastable.project.get(projectId);
-          const task = new TrainingTask(project, settings);
-          metastable.tasks.queues.project.add(task);
-
-          return { id: task.id };
-        },
-      ),
-    postprocess: protectedProcedure
-      .input(type({ projectId: string(), settings: any() }))
-      .mutation(
-        async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-          if (metastable.status !== 'ready') {
-            return undefined;
-          }
-
-          const project = await metastable.project.get(projectId);
-          const task = new PostprocessTask(project, settings);
           metastable.tasks.queues.project.add(task);
 
           return { id: task.id };
@@ -744,23 +734,6 @@ export const router = t.router({
           };
         }
       }),
-    },
-    tagger: {
-      start: protectedProcedure
-        .input(type({ projectId: string(), settings: any() }))
-        .mutation(
-          async ({ ctx: { metastable }, input: { projectId, settings } }) => {
-            if (metastable.status !== 'ready') {
-              return undefined;
-            }
-
-            const project = await metastable.project.get(projectId);
-            const task = new TagTask(project, settings);
-            metastable.tasks.queues.project.add(task);
-
-            return { id: task.id };
-          },
-        ),
     },
   },
   task: {
