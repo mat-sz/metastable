@@ -26,6 +26,7 @@ export interface ContextMenuItemProps {
   style?: CSSProperties;
   icon?: ReactNode;
   isSubmenu?: boolean;
+  variant?: 'danger' | 'default';
 }
 
 export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
@@ -41,6 +42,7 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
   onPointerOver,
   onBlur,
   isSubmenu,
+  variant = 'default',
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
@@ -77,7 +79,12 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
 
   return (
     <div
-      className={clsx(styles.item, { [styles.hasIcon]: !!icon }, className)}
+      className={clsx(
+        styles.item,
+        styles[variant],
+        { [styles.hasIcon]: !!icon },
+        className,
+      )}
       id={id}
       data-context-menu-item
       data-disabled={disabled}

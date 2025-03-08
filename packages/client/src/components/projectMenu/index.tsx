@@ -58,7 +58,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
           }}
           icon={<BsCopy />}
         >
-          Duplicate
+          Duplicate project
         </ContextMenuItem>
         <ContextMenuItem
           onSelect={async () => {
@@ -66,15 +66,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
           }}
           icon={<BsPencil />}
         >
-          Rename
-        </ContextMenuItem>
-        <ContextMenuItem
-          onSelect={async () => {
-            modalStore.show(<ProjectDelete project={await getProjectObj()} />);
-          }}
-          icon={<BsTrash />}
-        >
-          Delete
+          Rename project
         </ContextMenuItem>
         <ContextMenuSubmenu
           icon={<BsTag />}
@@ -106,8 +98,18 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
             </>
           }
         >
-          Tag
+          Tag project
         </ContextMenuSubmenu>
+        <ContextMenuDivider />
+        <ContextMenuItem
+          onSelect={async () => {
+            modalStore.show(<ProjectDelete project={await getProjectObj()} />);
+          }}
+          icon={<BsTrash />}
+          variant="danger"
+        >
+          Delete project
+        </ContextMenuItem>
         {isTab && (
           <>
             <ContextMenuDivider />
@@ -118,7 +120,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
               }}
               icon={<BsXLg />}
             >
-              Close
+              Close project
             </ContextMenuItem>
             <ContextMenuItem
               onSelect={async () => {
@@ -127,7 +129,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
               }}
               icon={<BsXLg />}
             >
-              Close other tabs
+              Close other projects
             </ContextMenuItem>
           </>
         )}

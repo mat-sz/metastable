@@ -26,6 +26,10 @@
     }
   }
 
+  &.danger {
+    color: var(--red-900);
+  }
+
   &[data-disabled='true'] {
     color: var(--grey-600);
     cursor: not-allowed;

@@ -4,13 +4,16 @@ import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import {
   BsArrowClockwise,
+  BsArrowUpRightSquare,
   BsBox,
   BsBoxFill,
   BsCheckCircle,
   BsCheckCircleFill,
   BsExclamationTriangleFill,
   BsFolderFill,
+  BsPencil,
   BsPlusLg,
+  BsTrash,
   BsXLg,
 } from 'react-icons/bs';
 
@@ -147,6 +150,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                         'noopener noreferrer',
                       );
                     }}
+                    icon={<BsArrowUpRightSquare />}
                   >
                     View homepage
                   </ContextMenuItem>
@@ -155,16 +159,19 @@ export const ModelBrowser: React.FC<Props> = observer(
                   onSelect={() => {
                     modalStore.show(<ModelEdit mrn={model.mrn} />);
                   }}
+                  icon={<BsPencil />}
                 >
-                  Edit
+                  Edit model
                 </ContextMenuItem>
                 <ContextMenuDivider />
                 <ContextMenuItem
                   onSelect={() => {
                     modalStore.show(<ModelDelete mrn={model.mrn} />);
                   }}
+                  icon={<BsTrash />}
+                  variant="danger"
                 >
-                  Delete
+                  Delete model
                 </ContextMenuItem>
               </>
             ) : undefined,
