@@ -3,13 +3,24 @@ import React from 'react';
 import { BsClockHistory, BsFiles, BsStar, BsXLg } from 'react-icons/bs';
 
 import { Button } from '$components/button';
-import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
+import {
+  Tab,
+  TabCategory,
+  TabContent,
+  TabDivider,
+  TabPanel,
+  Tabs,
+  TabView,
+} from '$components/tabs';
+import { TagIcon } from '$components/tagIcon';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { ProjectList } from './ProjectList';
 import { Social } from '../common/Social';
 
 export const Home: React.FC = observer(() => {
+  const { recent, all, favorite, tags } = mainStore.projects;
+
   return (
     <div className={styles.home}>
       <TabView
@@ -20,10 +31,24 @@ export const Home: React.FC = observer(() => {
       >
         <Tabs buttonStyle="normal">
           <Tab id="recent" title="Recent" icon={<BsClockHistory />} />
-          {!!mainStore.projects.favorite.length && (
+          {!!favorite.length && (
             <Tab id="favorite" title="Favorite" icon={<BsStar />} />
           )}
           <Tab id="all" title="All projects" icon={<BsFiles />} />
+          {!!tags.length && (
+            <>
+              <TabDivider />
+              <TabCategory>Tags</TabCategory>
+              {tags.map(tag => (
+                <Tab
+                  id={`tag_${tag}`}
+                  key={tag}
+                  title={tag}
+                  icon={<TagIcon tag={tag} />}
+                />
+              ))}
+            </>
+          )}
         </Tabs>
         <TabContent>
           <TabPanel id="recent">
@@ -48,25 +73,27 @@ export const Home: React.FC = observer(() => {
                 <Social />
               </div>
             )}
-            <ProjectList
-              title="Recent"
-              projects={['new', ...mainStore.projects.recent]}
-            />
+            <ProjectList title="Recent" projects={['new', ...recent]} />
           </TabPanel>
           <TabPanel id="favorite">
             <ProjectList
               title="Favorite projects"
               searchable
-              projects={mainStore.projects.favorite}
+              projects={favorite}
             />
           </TabPanel>
           <TabPanel id="all">
-            <ProjectList
-              title="All projects"
-              searchable
-              projects={mainStore.projects.all}
-            />
+            <ProjectList title="All projects" searchable projects={all} />
           </TabPanel>
+          {tags.map(tag => (
+            <TabPanel id={`tag_${tag}`} key={tag}>
+              <ProjectList
+                title={tag}
+                searchable
+                projects={all.filter(project => project.tags?.includes(tag))}
+              />
+            </TabPanel>
+          ))}
         </TabContent>
       </TabView>
     </div>

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useContext, useState } from 'react';
+import React, { PropsWithChildren, useContext, useState } from 'react';
 
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import styles from './index.module.scss';
@@ -30,6 +30,14 @@ export const Tab: React.FC<React.PropsWithChildren<TabProps>> = ({
       <span>{title}</span>
     </div>
   );
+};
+
+export const TabDivider: React.FC = () => {
+  return <div className={styles.divider} />;
+};
+
+export const TabCategory: React.FC<PropsWithChildren> = ({ children }) => {
+  return <div className={styles.category}>{children}</div>;
 };
 
 type TabsDirection = 'horizontal' | 'vertical';

@@ -2,6 +2,7 @@
 
 ## Features
 
+- Added project tagging to context menu and project list.
 - Added a button to invert the mask in the mask editor.
 
 ## Improvements
