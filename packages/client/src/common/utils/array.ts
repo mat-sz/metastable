@@ -18,3 +18,12 @@ export function arrayStartsWith<T>(array: T[], search: T[]): boolean {
 
   return true;
 }
+
+export function arrayUnique<T>(
+  ...items: ((T | undefined)[] | T | undefined)[]
+): T[] {
+  const array = items
+    .flat()
+    .filter(item => typeof item !== 'undefined' && item !== null);
+  return [...new Set(array)] as T[];
+}

@@ -143,7 +143,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         value={value}
         max={max}
         marquee={marquee}
-        menu={<ProjectMenu project={project} isTab />}
+        menu={<ProjectMenu projectId={project.id} isTab />}
       >
         {project.name}
       </BaseTab>
@@ -205,8 +205,8 @@ export const TabBar: React.FC = observer(() => {
   const areTrafficLightsVisible =
     IS_ELECTRON && IS_MAC && !uiStore.isFullScreen;
 
-  const previous = useCallback(() => mainStore.projects.selectPrevious(), []);
-  const next = useCallback(() => mainStore.projects.selectNext(), []);
+  const previous = useCallback(() => mainStore.projects.selectOffset(-1), []);
+  const next = useCallback(() => mainStore.projects.selectOffset(1), []);
   const newProject = useCallback(() => mainStore.projects.create(), []);
   const close = useCallback(() => mainStore.project?.close(), []);
   const forceClose = useCallback(() => mainStore.project?.close(true), []);

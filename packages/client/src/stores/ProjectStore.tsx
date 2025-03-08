@@ -3,8 +3,9 @@ import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API, linkManager } from '$api';
 import { ProjectUnsaved } from '$modals/project/unsaved';
-import { arrayMove } from '$utils/array';
+import { arrayMove, arrayUnique } from '$utils/array';
 import { tryParse } from '$utils/json';
+import { wrapAround } from '$utils/math';
 import { filterDraft } from '$utils/project';
 import { combineUnsubscribables } from '$utils/trpc';
 import { modalStore } from './ModalStore';
@@ -21,6 +22,8 @@ export class ProjectStore {
   recent: APIProject[] = [];
   all: APIProject[] = [];
   loading = false;
+
+  private tagCache: string[] = [];
 
   constructor() {
     makeAutoObservable(this);
@@ -56,6 +59,9 @@ export class ProjectStore {
 
     runInAction(() => {
       this.all = json as any;
+      this.tagCache = arrayUnique(
+        this.all.flatMap(project => project.tags ?? []),
+      );
 
       const recentArray = tryParse(localStorage.getItem(LS_RECENT)) || [];
       const recent: APIProject[] = Array.isArray(recentArray)
@@ -200,33 +206,15 @@ export class ProjectStore {
   }
 
   get currentIndex() {
-    const index = this.projects.findIndex(p => p.id === this.currentId);
-    if (index === -1) {
-      return undefined;
-    }
-
-    return index;
+    return this.projects.findIndex(p => p.id === this.currentId);
   }
 
-  selectNext() {
-    let index = this.currentIndex ?? 0;
-    if (index === this.projects.length - 1) {
-      index = 0;
-    } else {
-      index++;
-    }
-
-    this.select(this.projects[index].id);
-  }
-
-  selectPrevious() {
-    let index = this.currentIndex ?? 0;
-    if (index === 0) {
-      index = this.projects.length - 1;
-    } else {
-      index--;
-    }
-
+  selectOffset(offset: number) {
+    const index = wrapAround(
+      this.currentIndex + offset,
+      0,
+      this.projects.length - 1,
+    );
     this.select(this.projects[index].id);
   }
 
@@ -273,5 +261,43 @@ export class ProjectStore {
     }
 
     await Promise.all(projects.map(project => project.close(true)));
+  }
+
+  get tags() {
+    return this.tagCache;
+  }
+
+  async setTags(id: APIProject['id'], tags: string[]) {
+    this.all = this.all.map(project =>
+      project.id === id ? { ...project, tags } : project,
+    );
+    await API.project.update.mutate({ projectId: id, tags: arrayUnique(tags) });
+  }
+
+  async addTag(id: APIProject['id'], tag: string) {
+    const project = this.all.find(project => project.id == id);
+    if (!project) {
+      return;
+    }
+
+    if (!this.tagCache.includes(tag)) {
+      this.tagCache.push(tag);
+    }
+
+    const { tags = [] } = project;
+    await this.setTags(id, [...tags, tag]);
+  }
+
+  async removeTag(id: APIProject['id'], tag: string) {
+    const project = this.all.find(project => project.id == id);
+    if (!project) {
+      return;
+    }
+
+    const { tags = [] } = project;
+    await this.setTags(
+      id,
+      tags.filter(item => item !== tag),
+    );
   }
 }
