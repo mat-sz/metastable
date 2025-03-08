@@ -78,7 +78,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
             <>
               <ContextMenuInput
                 onSubmit={tag => {
-                  mainStore.projects.addTag(data.id, tag.trim());
+                  mainStore.projects.addTag(data.id, tag);
                 }}
                 placeholder="Add new tag"
                 buttonIcon={<BsPlusLg />}

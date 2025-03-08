@@ -34,7 +34,11 @@ export const ContextMenuInput: React.FC<ContextMenuInputProps> = ({
         className={styles.form}
         onSubmit={e => {
           e.preventDefault();
-          onSubmit?.(value);
+          const trimmed = value.trim();
+          if (trimmed) {
+            onSubmit?.(value);
+          }
+
           setValue('');
         }}
       >
