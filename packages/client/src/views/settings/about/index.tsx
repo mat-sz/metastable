@@ -6,10 +6,10 @@ import { Button } from '$components/button';
 import { Link } from '$components/link';
 import { TabPanel } from '$components/tabs';
 import { VarButton, VarCategory, VarToggle } from '$components/var';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { InstanceBundleReset } from '$modals/instance/bundleReset';
 import { InstanceSettingsReset } from '$modals/instance/settingsReset';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { updateStore } from '$stores/UpdateStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
@@ -17,6 +17,7 @@ import { Social } from '../../common/Social';
 
 export const SettingsAbout: React.FC = observer(() => {
   const canResetBundle = mainStore.config.data?.python.mode === 'static';
+  const modalWrapper = useModalWrapperContext();
 
   return (
     <TabPanel id="about">
@@ -82,19 +83,21 @@ export const SettingsAbout: React.FC = observer(() => {
               <>
                 <Button
                   onClick={() =>
-                    modalStore.show(<InstanceBundleReset resetAll />)
+                    modalWrapper.open(<InstanceBundleReset resetAll />)
                   }
                 >
                   Reset bundle and all settings
                 </Button>
                 <Button
-                  onClick={() => modalStore.show(<InstanceBundleReset />)}
+                  onClick={() => modalWrapper.open(<InstanceBundleReset />)}
                 >
                   Reset bundle
                 </Button>
               </>
             )}
-            <Button onClick={() => modalStore.show(<InstanceSettingsReset />)}>
+            <Button
+              onClick={() => modalWrapper.open(<InstanceSettingsReset />)}
+            >
               Reset all settings
             </Button>
           </div>

@@ -6,23 +6,24 @@ import { Button } from '$components/button';
 import { VarCategory, VarPrompt, VarUI } from '$components/var';
 import { useFileInput } from '$hooks/useFileInput';
 import { useHotkey } from '$hooks/useHotkey';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { ProjectLoadPrompt } from '$modals/project/loadPrompt';
-import { modalStore } from '$stores/ModalStore';
 import styles from './Prompt.module.scss';
 import { useSimpleProject } from '../../context';
 import { StyleSelect } from '../common/StyleSelect';
 
 export const Prompt: React.FC = observer(() => {
   const project = useSimpleProject();
+  const modalWrapper = useModalWrapperContext();
   const onFiles = useCallback(
     (files: File[]) => {
       if (files[0]) {
-        modalStore.show(
+        modalWrapper.open(
           <ProjectLoadPrompt project={project} file={files[0]} />,
         );
       }
     },
-    [project],
+    [project, modalWrapper],
   );
   const { open } = useFileInput({ onFiles });
   const validationResult = project.validate();

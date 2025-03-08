@@ -24,10 +24,10 @@ import { IconButton } from '$components/iconButton';
 import { CardTags } from '$components/list';
 import { Tag } from '$components/tag';
 import { TreeBrowser } from '$components/treeBrowser';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { ModelDelete } from '$modals/model/delete';
 import { ModelEdit } from '$modals/model/edit';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { uiStore } from '$stores/UIStore';
 import { IS_ELECTRON } from '$utils/config';
@@ -54,6 +54,7 @@ export const ModelBrowser: React.FC<Props> = observer(
     architecture,
     allowReset,
   }) => {
+    const modalWrapper = useModalWrapperContext();
     const [compatibleOnly, setCompatibleOnly] = useState(true);
     const types = Array.isArray(type) ? type : [type];
 
@@ -157,7 +158,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                 )}
                 <ContextMenuItem
                   onSelect={() => {
-                    modalStore.show(<ModelEdit mrn={model.mrn} />);
+                    modalWrapper.open(<ModelEdit mrn={model.mrn} />);
                   }}
                   icon={<BsPencil />}
                 >
@@ -166,7 +167,7 @@ export const ModelBrowser: React.FC<Props> = observer(
                 <ContextMenuDivider />
                 <ContextMenuItem
                   onSelect={() => {
-                    modalStore.show(<ModelDelete mrn={model.mrn} />);
+                    modalWrapper.open(<ModelDelete mrn={model.mrn} />);
                   }}
                   icon={<BsTrash />}
                   variant="danger"

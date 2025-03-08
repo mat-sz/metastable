@@ -10,6 +10,8 @@ import {
 
 import { Button } from '$components/button';
 import { LogoIcon } from '$components/logoIcon';
+import { useModalCondition } from '$hooks/useModal';
+import { InstanceBackendError } from '$modals/instance/backendError';
 import { mainStore } from '$stores/MainStore';
 import { uiStore } from '$stores/UIStore';
 import styles from './Status.module.scss';
@@ -20,6 +22,9 @@ interface Props {
 
 export const Status: React.FC<Props> = observer(({ className }) => {
   const status = mainStore.status;
+
+  const isError = status === 'error';
+  useModalCondition(<InstanceBackendError />, () => isError, [isError]);
 
   return (
     <div className={clsx(styles.status, className)}>

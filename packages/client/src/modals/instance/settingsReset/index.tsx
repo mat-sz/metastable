@@ -2,10 +2,11 @@ import React from 'react';
 
 import { API } from '$api';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 
 export const InstanceSettingsReset: React.FC = () => {
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal title="Reset all settings" size="small">

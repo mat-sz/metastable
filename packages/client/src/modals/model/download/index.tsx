@@ -3,9 +3,10 @@ import { toJS } from 'mobx';
 import React, { useEffect, useState } from 'react';
 
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { Tag } from '$components/tag';
 import { VarArray, VarSelect, VarUI } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
@@ -24,7 +25,7 @@ interface Props {
 }
 
 export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [data, setData] = useState(toJS(downloads));
 
   useEffect(() => {

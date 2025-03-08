@@ -3,7 +3,8 @@ import React from 'react';
 import { TRPC } from '$api';
 import { Alert } from '$components/alert';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   username: string;
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export const UserDelete: React.FC<Props> = ({ username, onDone }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   const mutation = TRPC.auth.user.delete.useMutation();
 

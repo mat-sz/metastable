@@ -4,9 +4,9 @@ import React from 'react';
 import { BsDownload, BsHourglass, BsXCircleFill } from 'react-icons/bs';
 
 import { Button } from '$components/button';
+import { useModal } from '$hooks/useModal';
 import { ModelDownload } from '$modals/model/download';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { modelStore } from '$stores/ModelStore';
 import { filesize } from '$utils/file';
 
@@ -147,16 +147,12 @@ export const DownloadButton: React.FC<DownloadButtonProps> = observer(
     }
 
     const size = toDownload.reduce((size, item) => size + (item.size || 0), 0);
+    const { show } = useModal(
+      <ModelDownload downloads={toDownload} onDownload={onDownload} />,
+    );
 
     return (
-      <Button
-        icon={<BsDownload />}
-        onClick={() => {
-          modalStore.show(
-            <ModelDownload downloads={toDownload} onDownload={onDownload} />,
-          );
-        }}
-      >
+      <Button icon={<BsDownload />} onClick={show}>
         Download {toDownload.length > 1 && `(${toDownload.length} files)`}{' '}
         {!!size && `(${filesize(size)})`}
       </Button>

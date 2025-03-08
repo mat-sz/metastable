@@ -3,15 +3,16 @@ import React, { useEffect, useState } from 'react';
 
 import { TRPC } from '$api';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   mrn: string;
 }
 
 export const ModelEdit: React.FC<Props> = ({ mrn }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [metadata, setMetadata] = useState<Model['metadata']>();
 
   const metadataQuery = TRPC.model.get.useQuery({

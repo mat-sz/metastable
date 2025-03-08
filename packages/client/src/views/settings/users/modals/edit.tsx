@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { TRPC } from '$api';
 import { Alert } from '$components/alert';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   username: string;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export const UserEdit: React.FC<Props> = ({ username, onDone }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [data, setData] = useState<{ password: string }>({
     password: '',
   });

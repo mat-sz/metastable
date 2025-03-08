@@ -4,9 +4,9 @@ import React from 'react';
 
 import { API } from '$api';
 import { Button } from '$components/button';
+import { useModal } from '$hooks/useModal';
 import { InstanceSelectPath } from '$modals/instance/selectPath';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 
@@ -23,6 +23,10 @@ export const PathInput: React.FC<PathInputProps> = ({
   onChange,
   type = DirentType.DIRECTORY,
 }) => {
+  const { show } = useModal((current: string) => (
+    <InstanceSelectPath value={current} onChange={onChange} type={type} />
+  ));
+
   return (
     <div className={clsx(styles.wrapper, className)}>
       <input type="text" readOnly value={value} />
@@ -36,13 +40,7 @@ export const PathInput: React.FC<PathInputProps> = ({
               .then(value => onChange?.(value))
               .catch(() => {});
           } else {
-            modalStore.show(
-              <InstanceSelectPath
-                value={current}
-                onChange={onChange}
-                type={type}
-              />,
-            );
+            show(current);
           }
         }}
       >

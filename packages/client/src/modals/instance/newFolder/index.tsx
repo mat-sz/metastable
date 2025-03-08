@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 
 import { API } from '$api';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { VarString } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   path: string;
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export const InstanceNewFolder: React.FC<Props> = ({ path, onSave }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [name, setName] = useState('');
 
   return (

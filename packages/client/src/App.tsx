@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { Suspense, useLayoutEffect } from 'react';
 
-import { UIWrapper } from '$components/ui';
+import { ModalWrapperProvider } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { setupStore } from '$stores/SetupStore';
 import { uiStore } from '$stores/UIStore';
@@ -47,12 +47,12 @@ export const App: React.FC = observer(() => {
   }, [theme, fontSize]);
 
   return (
-    <UIWrapper>
+    <ModalWrapperProvider>
       <Main>
         <Suspense fallback={<>Loading...</>}>
           <View />
         </Suspense>
       </Main>
-    </UIWrapper>
+    </ModalWrapperProvider>
   );
 });

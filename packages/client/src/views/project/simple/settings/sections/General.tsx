@@ -32,9 +32,9 @@ import {
   VarSwitch,
   VarToggle,
 } from '$components/var';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { ModelCreateMetamodel } from '$modals/model/createMetamodel';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { useSimpleProject } from '../../../context';
 import { ResolutionSelect } from '../../common/ResolutionSelect';
 import { SettingsCategory } from '../../common/SettingsCategory';
@@ -58,6 +58,8 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
   const showInputSection =
     project.inputTypes.length > 1 ||
     project.inputTypes[0] !== ModelInputType.NONE;
+
+  const modalWrapper = useModalWrapperContext();
 
   return (
     <>
@@ -118,7 +120,7 @@ export const General: React.FC<Props> = observer(({ showPrompt }) => {
                   textEncoders: projectModels.textEncoders,
                   vae: projectModels.vae,
                 };
-                modalStore.show(
+                modalWrapper.open(
                   <ModelCreateMetamodel
                     models={models}
                     onSave={mrn => {

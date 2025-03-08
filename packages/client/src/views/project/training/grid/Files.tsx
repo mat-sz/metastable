@@ -6,8 +6,8 @@ import { BsPlus, BsTrash } from 'react-icons/bs';
 import { FileManager, FileManagerItem } from '$components/fileManager';
 import { FilePicker } from '$components/filePicker';
 import { UploadQueue } from '$components/uploadQueue';
+import { useModal } from '$hooks/useModal';
 import { ProjectDeleteFile } from '$modals/project/deleteFile';
-import { modalStore } from '$stores/ModalStore';
 import { resolveImage } from '$utils/url';
 import styles from './index.module.scss';
 import { useProject } from '../../context';
@@ -59,6 +59,17 @@ export const Files: React.FC<Props> = observer(({ type, allowUpload }) => {
     thumbnailUrl: resolveImage(file.mrn, 'thumbnail'),
   }));
 
+  const { show } = useModal((selection: FileManagerItem[]) => (
+    <ProjectDeleteFile
+      count={selection.length}
+      onDelete={async () => {
+        for (const item of selection) {
+          project.deleteFile(type, item.name);
+        }
+      }}
+    />
+  ));
+
   return (
     <div className={styles.grid}>
       {allowUpload && <UploadQueue queue={project.uploadQueue[type]} />}
@@ -71,20 +82,7 @@ export const Files: React.FC<Props> = observer(({ type, allowUpload }) => {
         }}
         selectionActions={selection => (
           <>
-            <button
-              onClick={() => {
-                modalStore.show(
-                  <ProjectDeleteFile
-                    count={selection.length}
-                    onDelete={async () => {
-                      for (const item of selection) {
-                        project.deleteFile(type, item.name);
-                      }
-                    }}
-                  />,
-                );
-              }}
-            >
+            <button onClick={() => show(selection)}>
               <BsTrash />
               <span>Delete</span>
             </button>

@@ -10,9 +10,9 @@ import {
 
 import { API } from '$api';
 import { IconButton } from '$components/iconButton';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { ProjectLoadPrompt } from '$modals/project/loadPrompt';
 import { ProjectPostprocess } from '$modals/project/postprocess';
-import { modalStore } from '$stores/ModalStore';
 import { IS_ELECTRON } from '$utils/config';
 import { useSimpleProject } from '../../context';
 
@@ -23,6 +23,7 @@ interface Props {
 
 export const ImageActions: React.FC<Props> = ({ type, file }) => {
   const project = useSimpleProject();
+  const modalWrapper = useModalWrapperContext();
 
   return (
     <>
@@ -55,7 +56,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
       <IconButton
         title="Postprocess image"
         onClick={() => {
-          modalStore.show(
+          modalWrapper.open(
             <ProjectPostprocess project={project} imageMrn={file.mrn} />,
           );
         }}
@@ -72,7 +73,7 @@ export const ImageActions: React.FC<Props> = ({ type, file }) => {
           });
           const settings = data.settings as any;
           if (settings) {
-            modalStore.show(
+            modalWrapper.open(
               <ProjectLoadPrompt project={project} loadedSettings={settings} />,
             );
           }

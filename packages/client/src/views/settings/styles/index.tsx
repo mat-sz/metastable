@@ -8,7 +8,7 @@ import { BsPencil, BsTrash } from 'react-icons/bs';
 
 import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { TabPanel } from '$components/tabs';
 import { getDescendants } from '$components/treeBrowser/helpers';
 import {
@@ -19,8 +19,8 @@ import {
   VarSelect,
   VarString,
 } from '$components/var';
+import { useModalContext, useModalWrapperContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import styles from './index.module.scss';
 
 const MAPPED_ARCHITECTURES = Object.entries(Architecture).map(
@@ -40,7 +40,7 @@ interface GroupModalProps {
 
 const GroupModal = ({ isEdit, name = '', onSave }: GroupModalProps) => {
   const [current, setCurrent] = useState(name);
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal title={isEdit ? 'Update group' : 'Add group'} size="small">
@@ -69,6 +69,7 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
     const currentStyles = allStyles.filter(item => item.parentId === parentId);
     const groups = currentStyles.filter(item => item.nodeType === 'group');
     const items = currentStyles.filter(item => item.nodeType === 'item');
+    const modalWrapper = useModalWrapperContext();
 
     return (
       <VarCategory
@@ -79,7 +80,7 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
               <div className={styles.actions}>
                 <IconButton
                   onClick={() => {
-                    modalStore.show(
+                    modalWrapper.open(
                       <GroupModal
                         isEdit
                         name={parentName}
@@ -153,7 +154,7 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = observer(
               <VarButton
                 buttonLabel="Add group"
                 onClick={() => {
-                  modalStore.show(
+                  modalWrapper.open(
                     <GroupModal
                       onSave={name => {
                         mainStore.config.data!.styles.push({

@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 import { setupStore } from '$stores/SetupStore';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export const InstanceBundleReset: React.FC<Props> = ({ resetAll }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal

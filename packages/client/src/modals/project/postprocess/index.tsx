@@ -4,8 +4,9 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { FieldRenderer } from '$components/fieldRenderer';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { VarScope, VarUI } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 import { useStorage } from '$hooks/useStorage';
 import { mainStore } from '$stores/MainStore';
 import type { SimpleProject } from '$stores/project';
@@ -17,7 +18,7 @@ interface Props {
 
 export const ProjectPostprocess: React.FC<Props> = observer(
   ({ imageMrn, project }) => {
-    const { close } = useModal();
+    const { close } = useModalContext();
     const sections = Object.entries(mainStore.postprocessFields);
     const [settings, setSettings] = useStorage<
       Omit<PostprocessSettings, 'input'>

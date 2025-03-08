@@ -2,13 +2,11 @@ import { Project as APIProject, ProjectType } from '@metastable/types';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API, linkManager } from '$api';
-import { ProjectUnsaved } from '$modals/project/unsaved';
 import { arrayMove, arrayUnique } from '$utils/array';
 import { tryParse } from '$utils/json';
 import { wrapAround } from '$utils/math';
 import { filterDraft } from '$utils/project';
 import { combineUnsubscribables } from '$utils/trpc';
-import { modalStore } from './ModalStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
@@ -22,6 +20,9 @@ export class ProjectStore {
   recent: APIProject[] = [];
   all: APIProject[] = [];
   loading = false;
+  unsavedProjectsModalData:
+    | { projects: BaseProject[]; onClose?: () => void }
+    | undefined = undefined;
 
   private tagCache: string[] = [];
 
@@ -255,7 +256,7 @@ export class ProjectStore {
     if (!force) {
       const draft = filterDraft(projects);
       if (draft.length) {
-        modalStore.show(<ProjectUnsaved projects={projects} />);
+        this.unsavedProjectsModalData = { projects };
         return;
       }
     }

@@ -2,14 +2,15 @@ import React from 'react';
 
 import { API } from '$api';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   version: string;
 }
 
 export const InstanceUpdateAvailable: React.FC<Props> = ({ version }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal title="Update available" size="small">

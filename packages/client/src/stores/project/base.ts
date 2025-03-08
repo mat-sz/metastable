@@ -15,9 +15,7 @@ import {
 } from 'mobx';
 
 import { API } from '$api';
-import { ProjectDraft } from '$modals/project/draft';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 import { UploadQueueStore } from './UploadQueueStore';
 
 const AUTOSAVE_TIMEOUT = 1000;
@@ -41,6 +39,7 @@ export class BaseProject<TSettings = any, TUI = any> {
   uploadQueue: Record<ProjectFileType, UploadQueueStore>;
   changed = false;
   metadata: APIProject;
+  showDraftModal = false;
 
   constructor(data: APIProject) {
     this.metadata = { ...data, settings: undefined };
@@ -85,6 +84,7 @@ export class BaseProject<TSettings = any, TUI = any> {
       extraFields: computed,
       close: action,
       closeOther: action,
+      showDraftModal: observable,
     });
     this.refresh();
 
@@ -190,8 +190,9 @@ export class BaseProject<TSettings = any, TUI = any> {
       return;
     }
 
+    this.showDraftModal = false;
     if (this.changed && !force) {
-      modalStore.show(<ProjectDraft project={this} />);
+      this.showDraftModal = true;
       return;
     }
 

@@ -10,12 +10,9 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { API, linkManager } from '$api';
 import { defaultHotkeys } from '$data/hotkeys';
 import { parseHotkey } from '$hooks/useHotkey';
-import { InstanceBackendError } from '$modals/instance/backendError';
-import { ProjectUnsaved } from '$modals/project/unsaved';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { combineUnsubscribables } from '$utils/trpc';
 import { ConfigStore } from './ConfigStore';
-import { modalStore } from './ModalStore';
 import { modelStore } from './ModelStore';
 import { ProjectStore } from './ProjectStore';
 import { setupStore } from './SetupStore';
@@ -60,14 +57,6 @@ class MainStore {
             runInAction(() => {
               this.backendStatus = status;
             });
-
-            switch (status) {
-              case 'ready':
-                break;
-              case 'error':
-                modalStore.show(<InstanceBackendError />);
-                break;
-            }
           },
         }),
         API.instance.onInfoUpdate.subscribe(undefined, {
@@ -170,12 +159,10 @@ class MainStore {
 
   beforeUnload() {
     if (this.projects.draft.length) {
-      modalStore.show(
-        <ProjectUnsaved
-          projects={this.projects.draft}
-          onClose={() => this.exit(true)}
-        />,
-      );
+      this.projects.unsavedProjectsModalData = {
+        projects: [...this.projects.draft],
+        onClose: () => this.exit(true),
+      };
       return false;
     }
 

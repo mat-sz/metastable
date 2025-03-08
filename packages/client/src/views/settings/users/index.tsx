@@ -8,7 +8,7 @@ import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
 import { LoadingOverlay } from '$components/loadingOverlay';
 import { TabPanel } from '$components/tabs';
-import { modalStore } from '$stores/ModalStore';
+import { useModalWrapperContext } from '$hooks/useModal';
 import styles from './index.module.scss';
 import { UserAdd } from './modals/add';
 import { UserDelete } from './modals/delete';
@@ -17,6 +17,7 @@ import { UserEdit } from './modals/edit';
 export const SettingsUsers: React.FC = observer(() => {
   const { data, isLoading, error, refetch } = TRPC.auth.get.useQuery();
   const setEnabledMutation = TRPC.auth.setEnabled.useMutation();
+  const modalWrapper = useModalWrapperContext();
 
   const showLoading = setEnabledMutation.isPending || isLoading;
 
@@ -37,7 +38,7 @@ export const SettingsUsers: React.FC = observer(() => {
               {data.enabled ? 'Disable' : 'Enable'} authentication
             </Button>
             <Button
-              onClick={() => modalStore.show(<UserAdd onDone={refetch} />)}
+              onClick={() => modalWrapper.open(<UserAdd onDone={refetch} />)}
               icon={<BsPersonFillAdd />}
             >
               Add a new user
@@ -58,7 +59,7 @@ export const SettingsUsers: React.FC = observer(() => {
                     <td className={styles.rowActions}>
                       <IconButton
                         onClick={() =>
-                          modalStore.show(
+                          modalWrapper.open(
                             <UserEdit
                               username={account.username}
                               onDone={refetch}
@@ -70,7 +71,7 @@ export const SettingsUsers: React.FC = observer(() => {
                       </IconButton>
                       <IconButton
                         onClick={() =>
-                          modalStore.show(
+                          modalWrapper.open(
                             <UserDelete
                               username={account.username}
                               onDone={refetch}

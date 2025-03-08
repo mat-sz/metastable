@@ -3,11 +3,12 @@ import React from 'react';
 import { API } from '$api';
 import { Button } from '$components/button';
 import { Log } from '$components/log';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 
 export const InstanceBackendError: React.FC = () => {
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal title="Backend error" size="small">

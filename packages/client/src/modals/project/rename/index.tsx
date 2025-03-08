@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 
 import { Button } from '$components/button';
 import { Label } from '$components/label';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext } from '$hooks/useModal';
 import { BaseProject } from '$stores/project';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 
 export const ProjectRename: React.FC<Props> = observer(
   ({ project, closeAfterRenaming }) => {
-    const { close } = useModal();
+    const { close } = useModalContext();
     const [projectName, setProjectName] = useState(project.name);
 
     return (

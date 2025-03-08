@@ -19,11 +19,11 @@ import {
 } from '$components/contextMenu';
 import { Tag } from '$components/tag';
 import { TagIcon } from '$components/tagIcon';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { ProjectDelete } from '$modals/project/delete';
 import { ProjectDuplicate } from '$modals/project/duplicate';
 import { ProjectRename } from '$modals/project/rename';
 import { mainStore } from '$stores/MainStore';
-import { modalStore } from '$stores/ModalStore';
 
 export interface ProjectMenuProps {
   projectId: APIProject['id'];
@@ -42,6 +42,8 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
       project => project.id === projectId,
     );
 
+    const modalWrapper = useModalWrapperContext();
+
     if (!data) {
       return null;
     }
@@ -52,7 +54,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
       <>
         <ContextMenuItem
           onSelect={async () => {
-            modalStore.show(
+            modalWrapper.open(
               <ProjectDuplicate project={await getProjectObj()} />,
             );
           }}
@@ -62,7 +64,9 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
         </ContextMenuItem>
         <ContextMenuItem
           onSelect={async () => {
-            modalStore.show(<ProjectRename project={await getProjectObj()} />);
+            modalWrapper.open(
+              <ProjectRename project={await getProjectObj()} />,
+            );
           }}
           icon={<BsPencil />}
         >
@@ -103,7 +107,9 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = observer(
         <ContextMenuDivider />
         <ContextMenuItem
           onSelect={async () => {
-            modalStore.show(<ProjectDelete project={await getProjectObj()} />);
+            modalWrapper.open(
+              <ProjectDelete project={await getProjectObj()} />,
+            );
           }}
           icon={<BsTrash />}
           variant="danger"

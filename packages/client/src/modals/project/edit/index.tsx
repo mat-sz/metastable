@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { API } from '$api';
 import { Button } from '$components/button';
 import { Label } from '$components/label';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import { TagInput } from '$components/tagInput';
+import { useModalContext } from '$hooks/useModal';
 import { BaseProject } from '$stores/project';
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export const ProjectEdit: React.FC<Props> = observer(({ project }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [tags, setTags] = useState(project.metadata.tags || []);
 
   return (

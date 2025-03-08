@@ -2,8 +2,8 @@ import { ReactNode, useState } from 'react';
 
 import { Alert } from '$components/alert';
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
-import { modalStore } from '$stores/ModalStore';
+import { Modal, ModalActions } from '$components/modal';
+import { useModalContext, useModalWrapperContext } from '$hooks/useModal';
 import { IVarArrayProps, VarArray } from './VarArray';
 import { VarUI } from './VarUI';
 
@@ -59,7 +59,7 @@ const ItemModal = ({
   const [data, setData] = useState<any>(initialData);
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<string>();
-  const { close } = useModal();
+  const { close } = useModalContext();
 
   return (
     <Modal title={title} size="small">
@@ -110,6 +110,8 @@ export const VarArrayWithModal = ({
   onValidate,
   ...props
 }: IVarArrayWithModalProps): JSX.Element => {
+  const modalWrapper = useModalWrapperContext();
+
   return (
     <VarArray
       {...props}
@@ -117,7 +119,7 @@ export const VarArrayWithModal = ({
         footer?.({
           array,
           add: () => {
-            modalStore.show(
+            modalWrapper.open(
               <ItemModal
                 title={addModalTitle}
                 onValidate={
@@ -141,7 +143,7 @@ export const VarArrayWithModal = ({
           remove,
           element,
           edit: () =>
-            modalStore.show(
+            modalWrapper.open(
               <ItemModal
                 title={editModalTitle}
                 onValidate={

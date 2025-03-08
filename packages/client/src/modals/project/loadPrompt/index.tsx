@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '$components/button';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import {
   VarCategory,
   VarNumber,
@@ -12,6 +12,7 @@ import {
   VarString,
   VarUI,
 } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { SimpleProject } from '$stores/project';
 import {
@@ -28,7 +29,7 @@ interface Props {
 
 export const ProjectLoadPrompt: React.FC<Props> = observer(
   ({ project, file, loadedSettings }) => {
-    const { close } = useModal();
+    const { close } = useModalContext();
     const [loaded, setLoaded] = useState(false);
     const [settings, setSettings] = useState<ExternalSettings>();
 

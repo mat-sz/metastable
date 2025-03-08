@@ -5,7 +5,7 @@ import { BsX } from 'react-icons/bs';
 import { API } from '$api';
 import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
-import { Modal, ModalActions, useModal } from '$components/modal';
+import { Modal, ModalActions } from '$components/modal';
 import {
   VarAddModel,
   VarArray,
@@ -14,6 +14,7 @@ import {
   VarString,
   VarUI,
 } from '$components/var';
+import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   models?: Metamodel['models'];
@@ -24,7 +25,7 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
   models = {},
   onSave,
 }) => {
-  const { close } = useModal();
+  const { close } = useModalContext();
   const [data, setData] = useState<{
     name: string;
     models: Metamodel['models'];

@@ -7,7 +7,3 @@ export interface IModalContext {
 export const ModalContext = React.createContext<IModalContext>(
   undefined as any,
 );
-
-export function useModal() {
-  return React.useContext(ModalContext);
-}
