@@ -1,10 +1,9 @@
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Button } from '$components/button';
 import { Label } from '$components/label';
 import { Modal, ModalActions } from '$components/modal';
-import { useModalContext } from '$hooks/useModal';
 import { BaseProject } from '$stores/project';
 
 interface Props {
@@ -14,39 +13,33 @@ interface Props {
 
 export const ProjectRename: React.FC<Props> = observer(
   ({ project, closeAfterRenaming }) => {
-    const { close } = useModalContext();
-    const [projectName, setProjectName] = useState(project.name);
-
     return (
-      <Modal title="Rename project" size="small">
+      <Modal
+        title="Rename project"
+        size="small"
+        onSubmit={async values => {
+          let name = values['name'];
+          if (typeof name !== 'string') {
+            throw new Error('Invalid name.');
+          }
+
+          name = name.trim();
+          if (!name) {
+            throw new Error('Name is required.');
+          }
+
+          await project.save({ name });
+          if (closeAfterRenaming) {
+            project.close(true);
+          }
+        }}
+      >
         <div>Choose a new name for the project.</div>
         <Label label="New name" required>
-          <input
-            type="text"
-            value={projectName}
-            onChange={e => setProjectName(e.target.value)}
-          />
+          <input name="name" type="text" />
         </Label>
         <ModalActions>
-          <Button variant="secondary" onClick={() => close()}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={async () => {
-              const name = projectName.trim();
-              if (name && name !== project.name) {
-                close();
-
-                await project.save({ name });
-                if (closeAfterRenaming) {
-                  project.close(true);
-                }
-              }
-            }}
-          >
-            Save
-          </Button>
+          <Button variant="primary">Save</Button>
         </ModalActions>
       </Modal>
     );

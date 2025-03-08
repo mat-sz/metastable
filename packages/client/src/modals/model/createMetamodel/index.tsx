@@ -14,7 +14,6 @@ import {
   VarString,
   VarUI,
 } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   models?: Metamodel['models'];
@@ -25,14 +24,31 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
   models = {},
   onSave,
 }) => {
-  const { close } = useModalContext();
   const [data, setData] = useState<{
     name: string;
     models: Metamodel['models'];
   }>({ name: '', models });
 
   return (
-    <Modal title="Create metamodel" size="small">
+    <Modal
+      title="Create metamodel"
+      size="small"
+      onSubmit={async () => {
+        data.name = data.name.trim();
+        if (!data.name) {
+          return;
+        }
+
+        const modelMrn = await API.model.createMetamodel.mutate({
+          ...data,
+          type: ModelType.CHECKPOINT,
+        });
+
+        if (modelMrn) {
+          onSave?.(modelMrn);
+        }
+      }}
+    >
       <div>
         <VarUI onChange={setData} values={data}>
           <VarString path="name" label="Filename" />
@@ -79,30 +95,7 @@ export const ModelCreateMetamodel: React.FC<Props> = ({
         </VarUI>
       </div>
       <ModalActions>
-        <Button variant="secondary" onClick={() => close()}>
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={async () => {
-            data.name = data.name.trim();
-            if (!data.name) {
-              return;
-            }
-
-            const modelMrn = await API.model.createMetamodel.mutate({
-              ...data,
-              type: ModelType.CHECKPOINT,
-            });
-            close();
-
-            if (modelMrn) {
-              onSave?.(modelMrn);
-            }
-          }}
-        >
-          Create
-        </Button>
+        <Button variant="primary">Create</Button>
       </ModalActions>
     </Modal>
   );

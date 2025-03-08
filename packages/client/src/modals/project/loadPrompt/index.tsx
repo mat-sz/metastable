@@ -12,7 +12,6 @@ import {
   VarString,
   VarUI,
 } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { SimpleProject } from '$stores/project';
 import {
@@ -29,7 +28,6 @@ interface Props {
 
 export const ProjectLoadPrompt: React.FC<Props> = observer(
   ({ project, file, loadedSettings }) => {
-    const { close } = useModalContext();
     const [loaded, setLoaded] = useState(false);
     const [settings, setSettings] = useState<ExternalSettings>();
 
@@ -55,8 +53,22 @@ export const ProjectLoadPrompt: React.FC<Props> = observer(
       }
     }, [file, loadedSettings, load, setLoaded, setSettings]);
 
+    const settingsAvailable = loaded && settings;
+
     return (
-      <Modal title="Load prompt" size="small">
+      <Modal
+        title="Load prompt"
+        size="small"
+        onSubmit={() => {
+          if (settings) {
+            const newSettings = assign(
+              toJS(project.settings),
+              toJS(settings),
+            ) as any;
+            project.setSettings(newSettings);
+          }
+        }}
+      >
         {loaded ? (
           settings ? (
             <>
@@ -133,34 +145,15 @@ export const ProjectLoadPrompt: React.FC<Props> = observer(
         ) : (
           <div>Loading...</div>
         )}
-        <ModalActions>
-          {loaded && settings ? (
+        <ModalActions hideCancel={!settingsAvailable}>
+          {settingsAvailable ? (
             <>
-              <Button variant="secondary" onClick={close}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  if (settings) {
-                    const newSettings = assign(
-                      toJS(project.settings),
-                      toJS(settings),
-                    ) as any;
-                    project.setSettings(newSettings);
-                  }
-                  close();
-                }}
-              >
-                Use
-              </Button>
+              <Button variant="primary">Use</Button>
             </>
           ) : (
-            <>
-              <Button variant="primary" onClick={close}>
-                Close
-              </Button>
-            </>
+            <Button variant="primary" action="cancel">
+              Close
+            </Button>
           )}
         </ModalActions>
       </Modal>

@@ -14,6 +14,7 @@ export interface ButtonProps
   download?: string;
   variant?: 'danger' | 'primary' | 'secondary' | 'default';
   disabled?: boolean;
+  action?: string;
 }
 
 export const Button = React.forwardRef(
@@ -26,6 +27,7 @@ export const Button = React.forwardRef(
       href,
       download,
       variant = 'default',
+      action,
       ...props
     }: ButtonProps,
     ref: React.ForwardedRef<HTMLElement | null>,
@@ -55,6 +57,7 @@ export const Button = React.forwardRef(
           download={download}
           rel="noreferrer noopener"
           target="_blank"
+          data-action={action}
           {...props}
           ref={ref as any}
         >
@@ -64,7 +67,12 @@ export const Button = React.forwardRef(
     }
 
     return (
-      <button className={buttonClassName} {...props} ref={ref as any}>
+      <button
+        className={buttonClassName}
+        data-action={action}
+        {...props}
+        ref={ref as any}
+      >
         {contents}
       </button>
     );

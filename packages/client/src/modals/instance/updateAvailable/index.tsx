@@ -3,39 +3,30 @@ import React from 'react';
 import { API } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   version: string;
 }
 
 export const InstanceUpdateAvailable: React.FC<Props> = ({ version }) => {
-  const { close } = useModalContext();
-
   return (
-    <Modal title="Update available" size="small">
+    <Modal
+      title="Update available"
+      size="small"
+      onSubmit={() => API.electron.autoUpdater.install.mutate()}
+    >
       <div>
         New version of {__APP_NAME__} is available: {version}
       </div>
       <div>Would you like to install and restart?</div>
-      <ModalActions>
-        <Button variant="secondary" onClick={() => close()}>
-          Close
-        </Button>
+      <ModalActions cancelText="Close">
         <Button
           variant="secondary"
           href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md"
         >
           View changelog
         </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            API.electron.autoUpdater.install.mutate();
-          }}
-        >
-          Restart
-        </Button>
+        <Button variant="primary">Restart</Button>
       </ModalActions>
     </Modal>
   );

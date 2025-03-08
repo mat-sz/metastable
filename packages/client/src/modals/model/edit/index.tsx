@@ -5,14 +5,12 @@ import { TRPC } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   mrn: string;
 }
 
 export const ModelEdit: React.FC<Props> = ({ mrn }) => {
-  const { close } = useModalContext();
   const [metadata, setMetadata] = useState<Model['metadata']>();
 
   const metadataQuery = TRPC.model.get.useQuery({
@@ -31,7 +29,13 @@ export const ModelEdit: React.FC<Props> = ({ mrn }) => {
   }
 
   return (
-    <Modal title="Update model" size="small">
+    <Modal
+      title="Update model"
+      size="small"
+      onSubmit={() => {
+        metadataMutation.mutate({ mrn, metadata });
+      }}
+    >
       <div>
         <VarUI onChange={setMetadata} values={metadata!}>
           <VarString
@@ -49,18 +53,7 @@ export const ModelEdit: React.FC<Props> = ({ mrn }) => {
         </VarUI>
       </div>
       <ModalActions>
-        <Button variant="secondary" onClick={() => close()}>
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            metadataMutation.mutate({ mrn, metadata });
-            close();
-          }}
-        >
-          Save
-        </Button>
+        <Button variant="primary">Save</Button>
       </ModalActions>
     </Modal>
   );

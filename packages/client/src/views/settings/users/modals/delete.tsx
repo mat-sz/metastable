@@ -1,10 +1,8 @@
 import React from 'react';
 
-import { TRPC } from '$api';
-import { Alert } from '$components/alert';
+import { API } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   username: string;
@@ -12,40 +10,23 @@ interface Props {
 }
 
 export const UserDelete: React.FC<Props> = ({ username, onDone }) => {
-  const { close } = useModalContext();
-
-  const mutation = TRPC.auth.user.delete.useMutation();
-
   return (
-    <Modal title="Confirm user deletion" size="small">
+    <Modal
+      title="Confirm user deletion"
+      size="small"
+      onSubmit={async () => {
+        await API.auth.user.delete.mutate(username);
+        onDone?.();
+      }}
+    >
       <div>
-        {!!mutation.error && (
-          <Alert variant="error">{mutation.error.message}</Alert>
-        )}
         <p>
           Are you sure you want to delete the <strong>{username}</strong> user
           account?
         </p>
       </div>
       <ModalActions>
-        <Button
-          variant="secondary"
-          onClick={() => close()}
-          disabled={mutation.isPending}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="danger"
-          disabled={mutation.isPending}
-          onClick={async () => {
-            await mutation.mutateAsync(username);
-            onDone?.();
-            close();
-          }}
-        >
-          Delete
-        </Button>
+        <Button variant="danger">Delete</Button>
       </ModalActions>
     </Modal>
   );

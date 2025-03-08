@@ -6,7 +6,6 @@ import { Button } from '$components/button';
 import { FieldRenderer } from '$components/fieldRenderer';
 import { Modal, ModalActions } from '$components/modal';
 import { VarScope, VarUI } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 import { useStorage } from '$hooks/useStorage';
 import { mainStore } from '$stores/MainStore';
 import type { SimpleProject } from '$stores/project';
@@ -18,7 +17,6 @@ interface Props {
 
 export const ProjectPostprocess: React.FC<Props> = observer(
   ({ imageMrn, project }) => {
-    const { close } = useModalContext();
     const sections = Object.entries(mainStore.postprocessFields);
     const [settings, setSettings] = useStorage<
       Omit<PostprocessSettings, 'input'>
@@ -27,7 +25,18 @@ export const ProjectPostprocess: React.FC<Props> = observer(
     });
 
     return (
-      <Modal title="Postprocess image" size="small">
+      <Modal
+        title="Postprocess image"
+        size="small"
+        onSubmit={() => {
+          project.postprocess({
+            ...settings,
+            input: {
+              image: imageMrn,
+            },
+          });
+        }}
+      >
         <VarUI onChange={setSettings} values={settings}>
           <VarScope path="featureData">
             {sections.map(([key, section]) => (
@@ -36,23 +45,7 @@ export const ProjectPostprocess: React.FC<Props> = observer(
           </VarScope>
         </VarUI>
         <ModalActions>
-          <Button variant="secondary" onClick={() => close()}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              project.postprocess({
-                ...settings,
-                input: {
-                  image: imageMrn,
-                },
-              });
-              close();
-            }}
-          >
-            Start
-          </Button>
+          <Button variant="primary">Start</Button>
         </ModalActions>
       </Modal>
     );

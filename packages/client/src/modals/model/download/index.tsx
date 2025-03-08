@@ -6,7 +6,6 @@ import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
 import { Tag } from '$components/tag';
 import { VarArray, VarSelect, VarUI } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
@@ -25,7 +24,6 @@ interface Props {
 }
 
 export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
-  const { close } = useModalContext();
   const [data, setData] = useState(toJS(downloads));
 
   useEffect(() => {
@@ -33,7 +31,23 @@ export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
   }, [downloads, setData]);
 
   return (
-    <Modal title="Download model" size="small">
+    <Modal
+      title="Download model"
+      size="small"
+      onSubmit={() => {
+        for (const file of data) {
+          mainStore.tasks.download({
+            ...file.settings,
+            folder:
+              file.settings.folder === 'default'
+                ? undefined
+                : file.settings.folder,
+          });
+        }
+
+        onDownload?.();
+      }}
+    >
       <div>Would you like to download the following files?</div>
       <ul className={styles.list}>
         <VarUI values={data} onChange={setData}>
@@ -68,33 +82,7 @@ export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
         </VarUI>
       </ul>
       <ModalActions>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            close();
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            for (const file of data) {
-              mainStore.tasks.download({
-                ...file.settings,
-                folder:
-                  file.settings.folder === 'default'
-                    ? undefined
-                    : file.settings.folder,
-              });
-            }
-
-            onDownload?.();
-            close();
-          }}
-        >
-          Download
-        </Button>
+        <Button variant="primary">Download</Button>
       </ModalActions>
     </Modal>
   );

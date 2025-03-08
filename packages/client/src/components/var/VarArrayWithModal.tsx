@@ -1,9 +1,8 @@
 import { ReactNode, useState } from 'react';
 
-import { Alert } from '$components/alert';
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
-import { useModalContext, useModalWrapperContext } from '$hooks/useModal';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { IVarArrayProps, VarArray } from './VarArray';
 import { VarUI } from './VarUI';
 
@@ -58,41 +57,26 @@ const ItemModal = ({
 }: React.PropsWithChildren<ItemModalProps>) => {
   const [data, setData] = useState<any>(initialData);
   const [isValidating, setIsValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<string>();
-  const { close } = useModalContext();
 
   return (
-    <Modal title={title} size="small">
-      {!!validationResult && <Alert variant="error">{validationResult}</Alert>}
+    <Modal
+      title={title}
+      size="small"
+      onSubmit={async () => {
+        if (onValidate) {
+          setIsValidating(true);
+          onSave({ ...(await onValidate(data)) });
+          setIsValidating(false);
+        } else {
+          onSave({ ...data });
+        }
+      }}
+    >
       <VarUI values={data} onChange={setData}>
         {children}
       </VarUI>
       <ModalActions>
-        <Button variant="secondary" onClick={close}>
-          Cancel
-        </Button>
-        <Button
-          disabled={isValidating}
-          variant="primary"
-          onClick={async () => {
-            if (onValidate) {
-              setIsValidating(true);
-              setValidationResult(undefined);
-
-              try {
-                onSave({ ...(await onValidate(data)) });
-                close();
-              } catch (e) {
-                setValidationResult(`${e}`);
-              }
-
-              setIsValidating(false);
-            } else {
-              onSave({ ...data });
-              close();
-            }
-          }}
-        >
+        <Button disabled={isValidating} variant="primary">
           {primaryButtonLabel}
         </Button>
       </ModalActions>

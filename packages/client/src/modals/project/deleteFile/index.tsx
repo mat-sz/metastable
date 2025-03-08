@@ -2,18 +2,15 @@ import React from 'react';
 
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   count: number;
-  onDelete: () => void;
+  onDelete: () => Promise<void> | void;
 }
 
 export const ProjectDeleteFile: React.FC<Props> = ({ count, onDelete }) => {
-  const { close } = useModalContext();
-
   return (
-    <Modal title="Delete files" size="small">
+    <Modal title="Delete files" size="small" onSubmit={onDelete}>
       <div>
         Are you sure you want to delete{' '}
         <span>
@@ -22,23 +19,7 @@ export const ProjectDeleteFile: React.FC<Props> = ({ count, onDelete }) => {
         ?
       </div>
       <ModalActions>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            close();
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => {
-            onDelete();
-            close();
-          }}
-        >
-          Delete
-        </Button>
+        <Button variant="danger">Delete</Button>
       </ModalActions>
     </Modal>
   );

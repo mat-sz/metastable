@@ -4,7 +4,6 @@ import { API } from '$api';
 import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
 import { VarString } from '$components/var';
-import { useModalContext } from '$hooks/useModal';
 
 interface Props {
   path: string;
@@ -12,35 +11,29 @@ interface Props {
 }
 
 export const InstanceNewFolder: React.FC<Props> = ({ path, onSave }) => {
-  const { close } = useModalContext();
   const [name, setName] = useState('');
 
   return (
-    <Modal title="New folder" size="small">
+    <Modal
+      title="New folder"
+      size="small"
+      onSubmit={async () => {
+        const trimmed = name.trim();
+        if (!trimmed) {
+          return;
+        }
+        const newPath = await API.instance.createFolder.mutate({
+          path,
+          name: trimmed,
+        });
+        onSave?.(newPath);
+      }}
+    >
       <div>
         <VarString onChange={setName} value={name} label="Name" />
       </div>
       <ModalActions>
-        <Button variant="secondary" onClick={() => close()}>
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={async () => {
-            const trimmed = name.trim();
-            if (!trimmed) {
-              return;
-            }
-            const newPath = await API.instance.createFolder.mutate({
-              path,
-              name: trimmed,
-            });
-            onSave?.(newPath);
-            close();
-          }}
-        >
-          Save
-        </Button>
+        <Button variant="primary">Save</Button>
       </ModalActions>
     </Modal>
   );

@@ -19,7 +19,7 @@ import {
   VarSelect,
   VarString,
 } from '$components/var';
-import { useModalContext, useModalWrapperContext } from '$hooks/useModal';
+import { useModalWrapperContext } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
@@ -40,24 +40,16 @@ interface GroupModalProps {
 
 const GroupModal = ({ isEdit, name = '', onSave }: GroupModalProps) => {
   const [current, setCurrent] = useState(name);
-  const { close } = useModalContext();
 
   return (
-    <Modal title={isEdit ? 'Update group' : 'Add group'} size="small">
+    <Modal
+      title={isEdit ? 'Update group' : 'Add group'}
+      size="small"
+      onSubmit={() => onSave(current)}
+    >
       <VarString label="Name" value={current} onChange={setCurrent} />
       <ModalActions>
-        <Button variant="secondary" onClick={close}>
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={() => {
-            onSave(current);
-            close();
-          }}
-        >
-          {isEdit ? 'Save' : 'Add'}
-        </Button>
+        <Button variant="primary">{isEdit ? 'Save' : 'Add'}</Button>
       </ModalActions>
     </Modal>
   );

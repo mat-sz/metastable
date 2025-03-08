@@ -14,7 +14,7 @@ import { Button } from '$components/button';
 import { IconButton } from '$components/iconButton';
 import { LoadingOverlay } from '$components/loadingOverlay';
 import { Modal, ModalActions } from '$components/modal';
-import { useModal, useModalContext } from '$hooks/useModal';
+import { useModal } from '$hooks/useModal';
 import styles from './index.module.scss';
 import { InstanceNewFolder } from '../newFolder';
 
@@ -29,7 +29,6 @@ export const InstanceSelectPath: React.FC<Props> = ({
   type,
   onChange,
 }) => {
-  const { close } = useModalContext();
   const [path, setPath] = useState(value);
   const { show } = useModal(<InstanceNewFolder path={path} onSave={setPath} />);
 
@@ -42,7 +41,13 @@ export const InstanceSelectPath: React.FC<Props> = ({
   }
 
   return (
-    <Modal title="Choose path" size="small">
+    <Modal
+      title="Choose path"
+      size="small"
+      onSubmit={() => {
+        onChange?.(path);
+      }}
+    >
       <div className={styles.picker}>
         {isLoading && <LoadingOverlay className={styles.loading} />}
         <div className={styles.current}>
@@ -95,22 +100,7 @@ export const InstanceSelectPath: React.FC<Props> = ({
         </div>
       </div>
       <ModalActions>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            close();
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          disabled={!isSuccess}
-          onClick={() => {
-            onChange?.(path);
-            close();
-          }}
-        >
+        <Button variant="primary" disabled={!isSuccess}>
           Select folder
         </Button>
       </ModalActions>
