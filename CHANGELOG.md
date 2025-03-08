@@ -13,6 +13,7 @@
 ## Bug fixes
 
 - Added a check during installation to ensure application files aren't overwritten with custom paths.
+- Resolved issues with installation task queue being stuck.
 
 # 0.0.21 (2025-02-18)
 
