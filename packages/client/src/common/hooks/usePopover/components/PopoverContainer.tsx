@@ -130,6 +130,7 @@ export const PopoverContainer = forwardRef<HTMLDivElement, Props>(
         <div
           className={styles.backdrop}
           onClick={onClick}
+          onContextMenu={onClick}
           onPointerMove={stopPropagation}
         >
           {popover}
