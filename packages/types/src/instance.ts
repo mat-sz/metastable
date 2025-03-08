@@ -30,7 +30,6 @@ export interface InstanceInfo {
   vram: number;
   dataRoot: string;
   features: Feature[];
-  defaultDirectory: string;
   authAvailable: boolean;
 }
 

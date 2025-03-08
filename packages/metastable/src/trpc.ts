@@ -204,7 +204,7 @@ export const router = t.router({
         await iter.next();
       }
     }),
-    info: protectedProcedure.query(async ({ ctx: { metastable, app } }) => {
+    info: protectedProcedure.query(async ({ ctx: { metastable } }) => {
       const info = (await metastable.comfy?.info()) || {
         schedulers: [],
         samplers: [],
@@ -221,7 +221,6 @@ export const router = t.router({
         vram,
         dataRoot: metastable.dataRoot,
         features: await metastable.feature.all(),
-        defaultDirectory: app?.getPath('documents') || metastable.dataRoot,
         authAvailable: true,
       };
     }),

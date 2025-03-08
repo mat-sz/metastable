@@ -9,6 +9,7 @@
 
 - Improved design consistency of context menus.
 - Made all project settings categories not collapsed by default.
+- Added detection of custom installation paths when using the Windows installer.
 
 ## Bug fixes
 

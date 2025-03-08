@@ -27,7 +27,7 @@ export const StorageItem: React.FC = observer(() => {
     >
       <PathInput
         className={styles.path}
-        value={storage?.path || mainStore.info.defaultDirectory}
+        value={storage?.path || mainStore.info.dataRoot}
         onChange={value => {
           setupStore.setDataRoot(value);
         }}

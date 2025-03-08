@@ -17,7 +17,7 @@ import { CircularBuffer } from '#helpers/buffer.js';
 import { getBundleTorchMode } from '#helpers/bundle.js';
 import { errorToString } from '#helpers/common.js';
 import { getAuthorizationStrategy } from '#helpers/download.js';
-import { resolveConfigPath, rmdir } from '#helpers/fs.js';
+import { exists, resolveConfigPath, rmdir } from '#helpers/fs.js';
 import { parseArgString } from '#helpers/shell.js';
 import { Auth } from './auth/index.js';
 import { Comfy } from './comfy/index.js';
@@ -49,6 +49,7 @@ interface MetastableEvents {
 export interface MetastableInstanceConfig {
   dataConfigPath?: string;
   dataRoot: string;
+  defaultDataRoot?: string;
   comfyMainPath?: string;
   skipPythonSetup?: boolean;
   comfyArgs?: string[];
@@ -106,7 +107,16 @@ export class Metastable extends EventEmitter<MetastableEvents> {
       }
     }
 
-    await metastable.setDataRoot(settings.dataRoot);
+    let persist = false;
+    if (
+      settings.defaultDataRoot &&
+      !(await exists(path.join(settings.dataRoot, 'config.json')))
+    ) {
+      settings.dataRoot = settings.defaultDataRoot;
+      persist = true;
+    }
+
+    await metastable.setDataRoot(settings.dataRoot, persist);
     metastable.updateVram();
 
     setTimeout(() => {

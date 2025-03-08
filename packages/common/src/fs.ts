@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 
 export class TextFile {
   constructor(protected path: string) {}
@@ -40,4 +41,11 @@ export class JSONFile<T> extends TextFile {
   async writeJson(data: T) {
     await this.write(JSON.stringify(data));
   }
+}
+
+export function isPathIn(parent: string, filePath: string) {
+  const rel = path.relative(parent, filePath);
+  return (
+    typeof rel === 'string' && !rel.startsWith('..') && !path.isAbsolute(rel)
+  );
 }

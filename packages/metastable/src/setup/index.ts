@@ -233,9 +233,7 @@ export class Setup extends EventEmitter<SetupEvents> {
     }
 
     if (settings.downloads.length) {
-      Metastable.instance.tasks.queues.setup.add(
-        new DownloadModelsTask(settings.downloads),
-      );
+      setupQueue.add(new DownloadModelsTask(settings.downloads));
     }
 
     setupQueue.next();

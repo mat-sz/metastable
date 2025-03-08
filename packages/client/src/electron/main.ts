@@ -2,6 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { isPathIn } from '@metastable/common/fs';
 import { TaskState } from '@metastable/types/task';
 import {
   app,
@@ -129,9 +130,21 @@ async function createWindow() {
     'src_python',
     'main.py',
   );
+
+  const dataRoot = path.join(app.getPath('userData'), 'data');
+  let defaultDataRoot = path.join(app.getPath('documents'), 'Metastable');
+  if (os.platform() === 'win32') {
+    const exePath = path.join(app.getPath('exe'), '..');
+    const appDataPath = path.join(app.getPath('appData'), '..');
+    if (!exePath.includes('node_modules') && !isPathIn(appDataPath, exePath)) {
+      defaultDataRoot = path.join(exePath, 'data');
+    }
+  }
+
   const metastable = await Metastable.initialize({
     dataConfigPath: path.join(app.getPath('userData'), 'data.json'),
-    dataRoot: path.join(app.getPath('userData'), 'data'),
+    dataRoot,
+    defaultDataRoot,
     comfyMainPath,
     version: __APP_VERSION__,
   });

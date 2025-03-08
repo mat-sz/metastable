@@ -31,13 +31,6 @@ export async function testExtensions(
   return undefined;
 }
 
-export function isPathIn(parent: string, filePath: string) {
-  const rel = path.relative(parent, filePath);
-  return (
-    typeof rel === 'string' && !rel.startsWith('..') && !path.isAbsolute(rel)
-  );
-}
-
 export async function exists(path: string) {
   try {
     return !!(await fs.stat(path));

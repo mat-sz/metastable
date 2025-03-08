@@ -32,7 +32,7 @@ export const PathInput: React.FC<PathInputProps> = ({
       <input type="text" readOnly value={value} />
       <Button
         onClick={() => {
-          const current = value || mainStore.info.defaultDirectory;
+          const current = value || mainStore.info.dataRoot;
 
           if (IS_ELECTRON) {
             API.electron.shell.selectDirectory
