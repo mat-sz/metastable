@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Fixed issues with NVIDIA driver detection on Windows.
+- Fixed issues with Intel Arc GPUs not being correctly utilized within PyTorch.
 
 # 0.0.22 (2025-03-08)
 

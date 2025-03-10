@@ -20,7 +20,12 @@ if __name__ == "__main__":
 import cuda_malloc
 
 import torch
-if not torch.cuda.is_available() and not args.directml and not torch.backends.mps.is_available():
+if  (
+    not torch.cuda.is_available() and
+    not args.directml and
+    not torch.backends.mps.is_available() and
+    not (hasattr(torch, "xpu") and torch.xpu.is_available())
+    ):
     args.cpu = True
 
 # Main code
