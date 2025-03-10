@@ -26,7 +26,10 @@ class MainStore {
   projects = new ProjectStore();
   info!: InstanceInfo;
   backendLog: LogItem[] = [];
-  modelCache: string[] = [];
+  modelCache: {
+    path: string;
+    size?: number;
+  }[] = [];
 
   backendStatus: BackendStatus = 'starting';
 

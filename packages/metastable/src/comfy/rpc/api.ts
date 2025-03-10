@@ -45,7 +45,12 @@ export function getApi(rpc: RPC) {
       }> {
         return rpc.invoke(undefined, 'instance:info') as any;
       },
-      loadedModels(): Promise<string[]> {
+      loadedModels(): Promise<
+        {
+          path: string;
+          size?: number;
+        }[]
+      > {
         return rpc.invoke(undefined, 'instance:loaded_models') as any;
       },
     },
@@ -59,6 +64,60 @@ export function getSessionApi(session: RPCSession) {
       },
       start(): Promise<string> {
         return session.invoke('session:start') as any;
+      },
+    },
+    checkpoint: {
+      load(args: {
+        path: string;
+        embeddingsPath?: string;
+        configPath?: string;
+      }): Promise<{
+        diffusion_model: RPCRef<'DiffusionModel'>;
+        text_encoder?: RPCRef<'TextEncoder'>;
+        vae?: RPCRef<'VAE'>;
+        latent_type: string;
+      }> {
+        return session.invoke('checkpoint:load', {
+          path: args.path,
+          embeddings_path: args.embeddingsPath,
+          config_path: args.configPath,
+        }) as any;
+      },
+    },
+    clipVision: {
+      load(args: { path: string }): Promise<RPCRef<'ClipVisionModel'>> {
+        return session.invoke('clip_vision:load', {
+          path: args.path,
+        }) as any;
+      },
+    },
+    diffusionModel: {
+      load(args: { path: string }): Promise<{
+        diffusion_model: RPCRef<'DiffusionModel'>;
+        latent_type: string;
+      }> {
+        return session.invoke('diffusion_model:load', {
+          path: args.path,
+        }) as any;
+      },
+    },
+    image: {
+      dump(args: {
+        image: RPCRef<'ImageTensor'>;
+        format?: string;
+      }): Promise<Buffer> {
+        return session.invoke('image:dump', {
+          image: args.image,
+          format: args.format,
+        }) as any;
+      },
+      load(args: { data: Buffer }): Promise<{
+        image: RPCRef<'ImageTensor'>;
+        mask: RPCRef<'ImageTensor'>;
+      }> {
+        return session.invoke('image:load', {
+          data: args.data,
+        }) as any;
       },
     },
     instance: {
@@ -95,101 +154,13 @@ export function getSessionApi(session: RPCSession) {
       }> {
         return session.invoke('instance:info') as any;
       },
-      loadedModels(): Promise<string[]> {
+      loadedModels(): Promise<
+        {
+          path: string;
+          size?: number;
+        }[]
+      > {
         return session.invoke('instance:loaded_models') as any;
-      },
-    },
-    clipVision: {
-      load(args: { path: string }): Promise<RPCRef<'ClipVisionModel'>> {
-        return session.invoke('clip_vision:load', {
-          path: args.path,
-        }) as any;
-      },
-    },
-    checkpoint: {
-      load(args: {
-        path: string;
-        embeddingsPath?: string;
-        configPath?: string;
-      }): Promise<{
-        diffusion_model: RPCRef<'DiffusionModel'>;
-        text_encoder?: RPCRef<'TextEncoder'>;
-        vae?: RPCRef<'VAE'>;
-        latent_type: string;
-      }> {
-        return session.invoke('checkpoint:load', {
-          path: args.path,
-          embeddings_path: args.embeddingsPath,
-          config_path: args.configPath,
-        }) as any;
-      },
-    },
-    image: {
-      dump(args: {
-        image: RPCRef<'ImageTensor'>;
-        format?: string;
-      }): Promise<Buffer> {
-        return session.invoke('image:dump', {
-          image: args.image,
-          format: args.format,
-        }) as any;
-      },
-      load(args: { data: Buffer }): Promise<{
-        image: RPCRef<'ImageTensor'>;
-        mask: RPCRef<'ImageTensor'>;
-      }> {
-        return session.invoke('image:load', {
-          data: args.data,
-        }) as any;
-      },
-    },
-    vae: {
-      decode(args: {
-        vae: RPCRef<'VAE'>;
-        samples: RPCRef<'LatentTensor'>;
-        isCircular?: boolean;
-      }): Promise<RPCRef<'ImageTensor'>[]> {
-        return session.invoke('vae:decode', {
-          vae: args.vae,
-          samples: args.samples,
-          is_circular: args.isCircular,
-        }) as any;
-      },
-      decodeTiled(args: {
-        vae: RPCRef<'VAE'>;
-        samples: RPCRef<'LatentTensor'>;
-        tileSize: number;
-        overlap: number;
-        temporalSize: number;
-        temporalOverlap: number;
-      }): Promise<RPCRef<'ImageTensor'>[]> {
-        return session.invoke('vae:decode_tiled', {
-          vae: args.vae,
-          samples: args.samples,
-          tile_size: args.tileSize,
-          overlap: args.overlap,
-          temporal_size: args.temporalSize,
-          temporal_overlap: args.temporalOverlap,
-        }) as any;
-      },
-      encode(args: {
-        vae: RPCRef<'VAE'>;
-        image: RPCRef<'ImageTensor'>;
-        mask?: RPCRef<'ImageTensor'>;
-      }): Promise<{
-        samples: RPCRef<'LatentTensor'>;
-        noise_mask?: RPCRef<'LatentTensor'>;
-      }> {
-        return session.invoke('vae:encode', {
-          vae: args.vae,
-          image: args.image,
-          mask: args.mask,
-        }) as any;
-      },
-      load(args: { path: string }): Promise<RPCRef<'VAE'>> {
-        return session.invoke('vae:load', {
-          path: args.path,
-        }) as any;
       },
     },
     latent: {
@@ -209,47 +180,6 @@ export function getSessionApi(session: RPCSession) {
           length: args.length,
           batch_size: args.batchSize,
           latent_type: args.latentType,
-        }) as any;
-      },
-    },
-    diffusionModel: {
-      load(args: { path: string }): Promise<{
-        diffusion_model: RPCRef<'DiffusionModel'>;
-        latent_type: string;
-      }> {
-        return session.invoke('diffusion_model:load', {
-          path: args.path,
-        }) as any;
-      },
-    },
-    textEncoder: {
-      encode(args: {
-        textEncoder: RPCRef<'TextEncoder'>;
-        text: string;
-      }): Promise<RPCRef<'Conditioning'>> {
-        return session.invoke('text_encoder:encode', {
-          text_encoder: args.textEncoder,
-          text: args.text,
-        }) as any;
-      },
-      load(args: {
-        paths: string[];
-        type: string;
-        embeddingsPath?: string;
-      }): Promise<RPCRef<'TextEncoder'>> {
-        return session.invoke('text_encoder:load', {
-          paths: args.paths,
-          type: args.type,
-          embeddings_path: args.embeddingsPath,
-        }) as any;
-      },
-      setLayer(args: {
-        textEncoder: RPCRef<'TextEncoder'>;
-        layer: number;
-      }): Promise<RPCRef<'TextEncoder'>> {
-        return session.invoke('text_encoder:set_layer', {
-          text_encoder: args.textEncoder,
-          layer: args.layer,
         }) as any;
       },
     },
@@ -358,6 +288,86 @@ export function getSessionApi(session: RPCSession) {
           sigmas: args.sigmas,
           latent: args.latent,
           preview: args.preview,
+        }) as any;
+      },
+    },
+    textEncoder: {
+      encode(args: {
+        textEncoder: RPCRef<'TextEncoder'>;
+        text: string;
+      }): Promise<RPCRef<'Conditioning'>> {
+        return session.invoke('text_encoder:encode', {
+          text_encoder: args.textEncoder,
+          text: args.text,
+        }) as any;
+      },
+      load(args: {
+        paths: string[];
+        type: string;
+        embeddingsPath?: string;
+      }): Promise<RPCRef<'TextEncoder'>> {
+        return session.invoke('text_encoder:load', {
+          paths: args.paths,
+          type: args.type,
+          embeddings_path: args.embeddingsPath,
+        }) as any;
+      },
+      setLayer(args: {
+        textEncoder: RPCRef<'TextEncoder'>;
+        layer: number;
+      }): Promise<RPCRef<'TextEncoder'>> {
+        return session.invoke('text_encoder:set_layer', {
+          text_encoder: args.textEncoder,
+          layer: args.layer,
+        }) as any;
+      },
+    },
+    vae: {
+      decode(args: {
+        vae: RPCRef<'VAE'>;
+        samples: RPCRef<'LatentTensor'>;
+        isCircular?: boolean;
+      }): Promise<RPCRef<'ImageTensor'>[]> {
+        return session.invoke('vae:decode', {
+          vae: args.vae,
+          samples: args.samples,
+          is_circular: args.isCircular,
+        }) as any;
+      },
+      decodeTiled(args: {
+        vae: RPCRef<'VAE'>;
+        samples: RPCRef<'LatentTensor'>;
+        tileSize: number;
+        overlap: number;
+        temporalSize: number;
+        temporalOverlap: number;
+      }): Promise<RPCRef<'ImageTensor'>[]> {
+        return session.invoke('vae:decode_tiled', {
+          vae: args.vae,
+          samples: args.samples,
+          tile_size: args.tileSize,
+          overlap: args.overlap,
+          temporal_size: args.temporalSize,
+          temporal_overlap: args.temporalOverlap,
+        }) as any;
+      },
+      encode(args: {
+        vae: RPCRef<'VAE'>;
+        image: RPCRef<'ImageTensor'>;
+        mask?: RPCRef<'ImageTensor'>;
+      }): Promise<{
+        samples: RPCRef<'LatentTensor'>;
+        noise_mask?: RPCRef<'LatentTensor'>;
+      }> {
+        return session.invoke('vae:encode', {
+          vae: args.vae,
+          image: args.image,
+          mask: args.mask,
+        }) as any;
+      },
+      load(args: { path: string }): Promise<RPCRef<'VAE'>> {
+        return session.invoke('vae:load', {
+          path: args.path,
         }) as any;
       },
     },
@@ -475,6 +485,22 @@ export function getSessionApi(session: RPCSession) {
         }) as any;
       },
     },
+    segment: {
+      load(args: { path: string }): Promise<RPCRef<'SegmentModel'>> {
+        return session.invoke('segment:load', {
+          path: args.path,
+        }) as any;
+      },
+      segment(args: {
+        model: RPCRef<'SegmentModel'>;
+        image: RPCRef<'ImageTensor'>;
+      }): Promise<RPCRef<'ImageTensor'>> {
+        return session.invoke('segment:segment', {
+          model: args.model,
+          image: args.image,
+        }) as any;
+      },
+    },
     tagger: {
       tag(args: {
         modelPath: any;
@@ -497,38 +523,6 @@ export function getSessionApi(session: RPCSession) {
           undesired_tags: args.undesiredTags,
           caption_separator: args.captionSeparator,
           csv_path: args.csvPath,
-        }) as any;
-      },
-    },
-    upscaleModel: {
-      apply(args: {
-        upscaleModel: RPCRef<'UpscaleModel'>;
-        images: RPCRef<'ImageTensor'>[];
-      }): Promise<RPCRef<'ImageTensor'>[]> {
-        return session.invoke('upscale_model:apply', {
-          upscale_model: args.upscaleModel,
-          images: args.images,
-        }) as any;
-      },
-      load(args: { path: string }): Promise<RPCRef<'UpscaleModel'>> {
-        return session.invoke('upscale_model:load', {
-          path: args.path,
-        }) as any;
-      },
-    },
-    segment: {
-      load(args: { path: string }): Promise<RPCRef<'SegmentModel'>> {
-        return session.invoke('segment:load', {
-          path: args.path,
-        }) as any;
-      },
-      segment(args: {
-        model: RPCRef<'SegmentModel'>;
-        image: RPCRef<'ImageTensor'>;
-      }): Promise<RPCRef<'ImageTensor'>> {
-        return session.invoke('segment:segment', {
-          model: args.model,
-          image: args.image,
         }) as any;
       },
     },
@@ -559,6 +553,22 @@ export function getSessionApi(session: RPCSession) {
           diffusion_model: args.diffusionModel,
           text_encoder: args.textEncoder,
           inputs: args.inputs,
+        }) as any;
+      },
+    },
+    upscaleModel: {
+      apply(args: {
+        upscaleModel: RPCRef<'UpscaleModel'>;
+        images: RPCRef<'ImageTensor'>[];
+      }): Promise<RPCRef<'ImageTensor'>[]> {
+        return session.invoke('upscale_model:apply', {
+          upscale_model: args.upscaleModel,
+          images: args.images,
+        }) as any;
+      },
+      load(args: { path: string }): Promise<RPCRef<'UpscaleModel'>> {
+        return session.invoke('upscale_model:load', {
+          path: args.path,
         }) as any;
       },
     },

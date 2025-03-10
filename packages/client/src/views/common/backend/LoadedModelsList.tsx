@@ -19,26 +19,27 @@ export const LoadedModelsList: React.FC = observer(() => {
         </div>
       )}
       <ul className={styles.list}>
-        {mainStore.modelCache.map(path => {
-          const model = modelStore.findByPath(path);
+        {mainStore.modelCache.map(item => {
+          const model = modelStore.findByPath(item.path);
 
           if (!model) {
             return (
-              <li key={basename(path)}>
-                <span>{basename(path)}</span>
+              <li key={basename(item.path)}>
+                <span>{basename(item.path)}</span>
+                {!!item.size && <Tag>{filesize(item.size)}</Tag>}
               </li>
             );
           }
 
           return (
-            <li key={path}>
+            <li key={item.path}>
               <ThumbnailDisplay
                 className={styles.icon}
                 color={stringToColor(model.mrn)}
                 imageUrl={resolveImage(model.coverMrn, 'thumbnail')}
               />
               <span>{model.name}</span>
-              <Tag>{filesize(model.file.size)}</Tag>
+              <Tag>{filesize(item.size || model.file.size)}</Tag>
             </li>
           );
         })}
