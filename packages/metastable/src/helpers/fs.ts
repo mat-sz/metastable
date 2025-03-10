@@ -57,6 +57,16 @@ export async function filenames(dirPath: string) {
   }
 }
 
+export async function dirnames(dirPath: string) {
+  try {
+    return (await fs.readdir(dirPath, { withFileTypes: true }))
+      .filter(file => file.isDirectory())
+      .map(file => file.name);
+  } catch {
+    return [];
+  }
+}
+
 export async function imageFilenames(dirPath: string) {
   return (await filenames(dirPath)).filter(name => {
     if (name.includes('thumb')) {

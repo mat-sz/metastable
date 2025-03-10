@@ -1,3 +1,9 @@
+# 0.0.23 (Upcoming)
+
+## Bug fixes
+
+- Fixed issues with NVIDIA driver detection on Windows.
+
 # 0.0.22 (2025-03-08)
 
 ## Features

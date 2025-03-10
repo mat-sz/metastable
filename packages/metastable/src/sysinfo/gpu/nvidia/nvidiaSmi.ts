@@ -5,38 +5,62 @@ import path from 'path';
 import which from 'which';
 
 import { memoized, parseNumber } from '#helpers/common.js';
+import { dirnames } from '#helpers/fs.js';
 import { stdout } from '#helpers/spawn.js';
+import { PATH_PROGRAM_FILES, PATH_SYSTEM32 } from '../../win32.js';
 import { normalizeBusAddress } from '../helpers.js';
 import { GPUInfoProvider } from '../types.js';
 
 const PROVIDER_ID = 'nvidia-smi';
-const WINDIR = process.env.WINDIR || 'C:\\Windows';
+
+async function _locateSmiWin32() {
+  const whichSmi = await which('nvidia-smi.exe');
+  if (whichSmi) {
+    return whichSmi;
+  }
+
+  const system32Path = PATH_SYSTEM32;
+  const fileRepositoryPath = path.join(
+    system32Path,
+    'DriverStore',
+    'FileRepository',
+  );
+  const fileRepositoryFolders = await dirnames(fileRepositoryPath);
+
+  // Find all directories that include an nvidia-smi.exe file.
+  const candidateFolders = [
+    ...fileRepositoryFolders
+      .filter(name => name.startsWith('nv'))
+      .map(name => path.join(fileRepositoryPath, name)),
+    path.join(PATH_PROGRAM_FILES, 'NVIDIA Corporation', 'NVSMI'),
+  ];
+
+  const candidates = await Promise.all(
+    candidateFolders.map(async dir => {
+      const filePath = path.join(dir, 'nvidia-smi.exe');
+      try {
+        const stat = await fs.stat(filePath);
+        return {
+          filePath,
+          stat,
+        };
+      } catch {
+        return undefined;
+      }
+    }),
+  );
+
+  const sorted = candidates
+    .filter(item => typeof item === 'object')
+    .sort((a, b) => b.stat.ctimeMs - a.stat.ctimeMs);
+  const first = sorted[0].filePath;
+  return first || undefined;
+}
 
 async function _locateSmi() {
   switch (os.platform()) {
-    case 'win32': {
-      const basePath = WINDIR + '\\System32\\DriverStore\\FileRepository';
-      // find all directories that have an nvidia-smi.exe file
-      const candidates = await Promise.all(
-        (await fs.readdir(basePath)).map(async dir => {
-          const filePath = path.join(basePath, dir, 'nvidia-smi.exe');
-          try {
-            const stat = await fs.stat(filePath);
-            return {
-              filePath,
-              stat,
-            };
-          } catch {
-            return undefined;
-          }
-        }),
-      );
-      const sorted = candidates
-        .filter(item => typeof item === 'object')
-        .sort((a, b) => b.stat.ctimeMs - a.stat.ctimeMs);
-      const first = sorted[0].filePath;
-      return first || undefined;
-    }
+    case 'win32':
+      return await _locateSmiWin32();
     case 'linux':
       return await which('nvidia-smi');
   }
