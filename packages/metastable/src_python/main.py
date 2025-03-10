@@ -3,14 +3,21 @@ output.configure(3)
 
 import sys
 import os
-import cli_args
-sys.modules['comfy.cli_args'] = cli_args
-args = cli_args.args
+import comfy_patch
+args = comfy_patch.get_args()
 
 use_zluda = args.zluda_path and args.hip_path and args.hip_version
 if use_zluda:
     from zluda import enable_zluda
     enable_zluda()
+
+if __name__ == "__main__":
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    if args.cuda_device is not None:
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(args.cuda_device)
+        print("Set cuda device to:", args.cuda_device)
+
+import cuda_malloc
 
 import torch
 if not torch.cuda.is_available() and not args.directml and not torch.backends.mps.is_available():
@@ -28,13 +35,6 @@ import importlib.util
 if os.name == "nt":
     import logging
     logging.getLogger("xformers").addFilter(lambda record: 'A matching Triton is not available' not in record.getMessage())
-
-if __name__ == "__main__":
-    if args.cuda_device is not None:
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(args.cuda_device)
-        print("Set cuda device to:", args.cuda_device)
-
-    import cuda_malloc
 
 import comfy.utils
 
@@ -63,13 +63,13 @@ def handle(rpc, request):
 async def run(rpc):
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(4)
-    
+
     while True:
         request_str = await loop.run_in_executor(None, sys.stdin.readline)
 
         if not request_str:
             break
-        
+
         try:
             executor.submit(handle, rpc, json.loads(request_str))
         except:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     rpc = RPC()
-    
+
     namespaces = ['base']
     if args.namespace:
         namespaces.extend(args.namespace)

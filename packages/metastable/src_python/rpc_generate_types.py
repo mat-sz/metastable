@@ -7,10 +7,7 @@ output.configure(1)
 
 import sys
 import os
-import cli_args
-sys.modules['comfy.cli_args'] = cli_args
-args = cli_args.args
-
+import comfy_patch
 from rpc import RPC
 from inspect import signature
 import importlib.util
@@ -46,13 +43,13 @@ def annotation_to_js_type(annotation):
             "properties": {},
             "required": list(annotation.__required_keys__)
         }
-        
+
         for name, value in annotation.__annotations__.items():
             if get_origin(value) == NotRequired:
                 value = get_args(value)[0]
-            
+
             type_def["properties"][name] = annotation_to_js_type(value)
-        
+
         return type_def
     elif get_origin(annotation) == dict:
         args = get_args(annotation)
@@ -101,7 +98,7 @@ def annotation_to_js_type(annotation):
 namespace_defs = {}
 for namespace_name, namespace in rpc.namespaces.items():
     method_defs = {}
-    
+
     for method_name, method in namespace.methods.items():
         full_name = f'{namespace_name}:{method_name}'
         sig = signature(method.func)
@@ -118,9 +115,9 @@ for namespace_name, namespace in rpc.namespaces.items():
 
             if param.default is param.empty:
                 params_schema["required"].append(param.name)
-            
+
             params_schema["properties"][param.name] = annotation_to_js_type(param.annotation)
-        
+
         method_defs[method_name] = {
             "parameters": params_schema,
             "returns": annotation_to_js_type(sig.return_annotation),
