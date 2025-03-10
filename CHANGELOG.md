@@ -1,5 +1,11 @@
 # 0.0.23 (Upcoming)
 
+## Features
+
+- Added keyboard shortcuts for project view:
+  - `Ctrl+Up` - selects previous output
+  - `Ctrl+Down` - selects next output
+
 ## Bug fixes
 
 - Fixed issues with NVIDIA driver detection on Windows.

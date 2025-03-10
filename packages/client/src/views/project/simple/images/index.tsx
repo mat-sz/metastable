@@ -1,8 +1,10 @@
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { SplitView } from '$components/splitView';
+import { useHotkey } from '$hooks/useHotkey';
+import { MAX_DISPLAY_OUTPUTS } from '$stores/project/simple';
 import styles from './index.module.scss';
 import { Prompt } from './Prompt';
 import { useSimpleProject } from '../../context';
@@ -26,6 +28,15 @@ const Preview: React.FC = observer(() => {
 export const Images: React.FC = observer(() => {
   const project = useSimpleProject();
   const { imagesSplit = [9, 1] } = project.ui;
+
+  const previousOutput = useCallback(() => {
+    project.selectOutputByOffset(1, MAX_DISPLAY_OUTPUTS);
+  }, [project]);
+  const nextOutput = useCallback(() => {
+    project.selectOutputByOffset(-1, MAX_DISPLAY_OUTPUTS);
+  }, [project]);
+  useHotkey('project_previousOutput', previousOutput);
+  useHotkey('project_nextOutput', nextOutput);
 
   return (
     <div className={styles.main}>

@@ -12,6 +12,7 @@ import {
 } from 'react-icons/bs';
 
 import { ProgressCircle } from '$components/progressCircle';
+import { MAX_DISPLAY_OUTPUTS } from '$stores/project/simple';
 import { resolveImage } from '$utils/url';
 import { Grid } from './grid';
 import { Images } from './images';
@@ -19,8 +20,6 @@ import styles from './index.module.scss';
 import { useSimpleProject } from '../context';
 
 const ImageEditor = React.lazy(() => import('./editor'));
-
-const MAX_DISPLAY_OUTPUTS = 25;
 
 export const SimpleProjectView: React.FC = observer(() => {
   const project = useSimpleProject();

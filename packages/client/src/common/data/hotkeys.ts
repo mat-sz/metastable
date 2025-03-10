@@ -47,6 +47,19 @@ export const hotkeyGroups: Record<string, HotkeyGroup> = {
       },
     },
   },
+  project: {
+    label: 'Project view',
+    hotkeys: {
+      previousOutput: {
+        label: 'Previous output',
+        defaultKeys: 'CmdOrCtrl+Up',
+      },
+      nextOutput: {
+        label: 'Next output',
+        defaultKeys: 'CmdOrCtrl+Down',
+      },
+    },
+  },
   prompt: {
     label: 'Prompt',
     hotkeys: {

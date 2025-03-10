@@ -38,11 +38,14 @@ import { ImageFileTreeItem, ImageFileTreeNode } from '$types/project';
 import { randomSeed } from '$utils/comfy';
 import { EXTENSIONS, filesize } from '$utils/file';
 import { detectOrientation, fileToBase64 } from '$utils/image';
+import { wrapAround } from '$utils/math';
 import { get, set } from '$utils/object';
 import { removeEmptyGroups } from '$utils/tree';
 import { isLocalUrl, resolveImage } from '$utils/url';
 import { BaseProject, ProjectSaveOptions } from './base';
 import { mainStore } from '../MainStore';
+
+export const MAX_DISPLAY_OUTPUTS = 25;
 
 class SimpleProjectValidator {
   errors: string[] = [];
@@ -263,6 +266,8 @@ export class SimpleProject extends BaseProject<
       beforeRequest: action,
       imageFiles: computed,
       viewTask: computed,
+      currentOutputIndex: computed,
+      selectOutputByOffset: action,
     });
 
     mainStore.tasks.on('delete', (task: Task<ProjectTaskData>) => {
@@ -603,6 +608,12 @@ export class SimpleProject extends BaseProject<
     );
   }
 
+  get currentOutputIndex() {
+    return this.files.output.findIndex(
+      item => item.mrn === this.currentOutput?.mrn,
+    );
+  }
+
   async request() {
     await this.handleImages();
     this.beforeRequest();
@@ -636,6 +647,22 @@ export class SimpleProject extends BaseProject<
     this.mode = 'images';
     this.currentOutput = output;
     this.currentTask = undefined;
+  }
+
+  selectOutputByOffset(offset: number, limit?: number) {
+    const maxIndex = this.files.output.length - 1;
+    const index =
+      limit && maxIndex > limit
+        ? wrapAround(
+            this.currentOutputIndex + offset,
+            maxIndex - limit + 1,
+            maxIndex,
+          )
+        : wrapAround(this.currentOutputIndex + offset, 0, maxIndex);
+    const file = this.files.output[index];
+    if (file) {
+      this.selectOutput(file);
+    }
   }
 
   onTaskDone(task: Task<ProjectTaskData>) {
