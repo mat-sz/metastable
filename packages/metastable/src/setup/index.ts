@@ -116,8 +116,8 @@ export class Setup extends EventEmitter<SetupEvents> {
             vendor: item.vendor || 'unknown',
             name: item.name!,
             vram: item.vram,
-            torchModes: [],
-            potentialTorchModes: [],
+            torchModes,
+            potentialTorchModes,
           };
         }),
       storage: await disk.usage(dataRoot),

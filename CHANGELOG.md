@@ -1,3 +1,9 @@
+# 0.0.24 (Upcoming)
+
+## Bug fixes
+
+- Resolve GPU detection issues during installation.
+
 # 0.0.23 (2025-03-11)
 
 ## Features
