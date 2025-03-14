@@ -17,9 +17,9 @@ import { ProjectMenu } from '$components/projectMenu';
 import { useDrag, useDrop } from '$hooks/dnd';
 import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { useHotkey } from '$hooks/useHotkey';
+import { useUIStore } from '$store/ui';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
-import { uiStore } from '$stores/UIStore';
 import { IS_DEV, IS_ELECTRON, IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
@@ -167,6 +167,7 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
 export const TabBar: React.FC = observer(() => {
   const params = useRoute('/project/:id')[1];
   const [location, navigate] = useLocation();
+  const isFullScreen = useUIStore(state => state.isFullScreen);
 
   const { connect: drop } = useDrop(
     () => ({
@@ -195,8 +196,7 @@ export const TabBar: React.FC = observer(() => {
     0,
   );
 
-  const areTrafficLightsVisible =
-    IS_ELECTRON && IS_MAC && !uiStore.isFullScreen;
+  const areTrafficLightsVisible = IS_ELECTRON && IS_MAC && !isFullScreen;
 
   const selectOffset = useCallback(
     (offset: number) => {

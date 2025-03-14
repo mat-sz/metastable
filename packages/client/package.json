@@ -61,6 +61,7 @@
     "vite": "^6.0.11",
     "vite-bundle-visualizer": "^1.1.0",
     "vite-plugin-native": "^2.2.2",
-    "wouter": "^3.6.0"
+    "wouter": "^3.6.0",
+    "zustand": "^5.0.3"
   }
 }

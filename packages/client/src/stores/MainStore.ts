@@ -10,6 +10,8 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { API, linkManager } from '$api';
 import { defaultHotkeys } from '$data/hotkeys';
 import { parseHotkey } from '$hooks/useHotkey';
+import { useUIStore } from '$store/ui';
+import { useUpdateStore } from '$store/update';
 import { fuzzy, strIncludes } from '$utils/fuzzy';
 import { combineUnsubscribables } from '$utils/trpc';
 import { ConfigStore } from './ConfigStore';
@@ -18,7 +20,6 @@ import { ProjectStore } from './ProjectStore';
 import { setupStore } from './SetupStore';
 import { TaskStore } from './TaskStore';
 import { uiStore } from './UIStore';
-import { updateStore } from './UpdateStore';
 
 const MAX_LOG_ITEMS = 100;
 
@@ -186,7 +187,7 @@ class MainStore {
       return;
     }
 
-    if (uiStore.focused) {
+    if (useUIStore.getState().isFocused) {
       return;
     }
 
@@ -213,7 +214,7 @@ class MainStore {
       });
       await Promise.all([
         this.refreshModelCache(),
-        updateStore.refresh(),
+        useUpdateStore.getState().refresh(),
         this.projects.refresh(),
         this.tasks.refresh(),
         modelStore.refresh(),

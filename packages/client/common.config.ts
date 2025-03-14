@@ -46,6 +46,7 @@ export function getConfig(mode: string): any {
         $editor: path.resolve(__dirname, './src/common/editor'),
         $hooks: path.resolve(__dirname, './src/common/hooks'),
         $modals: path.resolve(__dirname, './src/modals'),
+        $store: path.resolve(__dirname, './src/store'),
         $stores: path.resolve(__dirname, './src/stores'),
         $types: path.resolve(__dirname, './src/common/types'),
         $utils: path.resolve(__dirname, './src/common/utils'),

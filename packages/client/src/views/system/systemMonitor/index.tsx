@@ -3,13 +3,15 @@ import { BsXLg } from 'react-icons/bs';
 
 import { IconButton } from '$components/iconButton';
 import { Tab, TabContent, TabPanel, Tabs, TabView } from '$components/tabs';
-import { uiStore } from '$stores/UIStore';
+import { useUIStore } from '$store/ui';
 import styles from './index.module.scss';
 import { Logs } from './Logs';
 import { Utilization } from './Utilization';
 import { LoadedModelsList } from '../../common/backend/LoadedModelsList';
 
 export const SystemMonitor: React.FC = () => {
+  const toggleSystemMonitor = useUIStore(state => state.toggleSystemMonitor);
+
   return (
     <div className={styles.systemMonitor}>
       <TabView defaultTab="loadedModels" className={styles.tabs}>
@@ -28,7 +30,7 @@ export const SystemMonitor: React.FC = () => {
       </TabView>
       <div className={styles.right}>
         <div className={styles.rightHeader}>
-          <IconButton onClick={() => uiStore.toggleSystemMonitor()}>
+          <IconButton onClick={toggleSystemMonitor}>
             <BsXLg />
           </IconButton>
         </div>

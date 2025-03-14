@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
+import { useUpdateStore } from '$store/update';
 import { setupStore } from '$stores/SetupStore';
-import { updateStore } from '$stores/UpdateStore';
 import { Checking } from './Checking';
 import { ConnectionError } from './ConnectionError';
 import { OutOfDate } from './OutOfDate';
@@ -10,11 +10,14 @@ import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 
 export const Setup: React.FC = observer(() => {
-  if (!updateStore.ready) {
+  const ready = useUpdateStore(state => state.ready);
+  const info = useUpdateStore(state => state.info);
+
+  if (!ready) {
     return <Checking />;
-  } else if (!updateStore.info.latestVersion) {
+  } else if (!info.latestVersion) {
     return <ConnectionError />;
-  } else if (!updateStore.info.isUpToDate) {
+  } else if (!info.isUpToDate) {
     return <OutOfDate />;
   }
 

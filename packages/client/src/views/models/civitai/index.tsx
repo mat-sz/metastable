@@ -1,6 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { runInAction } from 'mobx';
-import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import {
   BsDownload,
@@ -16,7 +14,8 @@ import { Card, CardTags, List } from '$components/list';
 import { Loading } from '$components/loading';
 import { Tag } from '$components/tag';
 import { Toggle } from '$components/toggle';
-import { CivitAIArgs, uiStore } from '$stores/UIStore';
+import { useUIStore } from '$store/ui';
+import { CivitAIArgs } from '$store/ui/types';
 import styles from './index.module.scss';
 import { Model } from './Model';
 import { CivitAIModel, CivitAIResponse } from './types';
@@ -93,11 +92,12 @@ const CivitAIBaseModels = [
   'Other',
 ];
 
-export const CivitAI: React.FC = observer(() => {
+export const CivitAI: React.FC = () => {
   const [query, setQuery] = useState('');
 
   const [cursorHistory, setCursorHistory] = useState<string[]>([]);
-  const args = uiStore.civitaiArgs;
+  const args = useUIStore(state => state.civitaiArgs);
+  const setArgs = useUIStore(state => state.setCivitaiArgs);
   const [item, setItem] = useState<CivitAIModel | undefined>();
   const { data, error, isLoading } = useQuery({
     queryKey: [
@@ -123,9 +123,7 @@ export const CivitAI: React.FC = observer(() => {
 
     const previous = cursorHistory[cursorHistory.length - 2];
     setCursorHistory(history => history.slice(0, -1));
-    runInAction(() => {
-      uiStore.civitaiArgs = { ...uiStore.civitaiArgs, cursor: previous };
-    });
+    setArgs({ cursor: previous });
   };
 
   const updateArgs = (newArgs: Partial<CivitAIArgs>) => {
@@ -136,13 +134,7 @@ export const CivitAI: React.FC = observer(() => {
       setCursorHistory([]);
     }
 
-    runInAction(() => {
-      uiStore.civitaiArgs = {
-        ...uiStore.civitaiArgs,
-        cursor: undefined,
-        ...newArgs,
-      };
-    });
+    setArgs({ cursor: undefined, ...newArgs });
   };
 
   return (
@@ -269,4 +261,4 @@ export const CivitAI: React.FC = observer(() => {
       </div>
     </div>
   );
-});
+};

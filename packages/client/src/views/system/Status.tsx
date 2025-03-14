@@ -12,8 +12,8 @@ import { Button } from '$components/button';
 import { LogoIcon } from '$components/logoIcon';
 import { useModalCondition } from '$hooks/useModal';
 import { InstanceBackendError } from '$modals/instance/backendError';
+import { useUIStore } from '$store/ui';
 import { mainStore } from '$stores/MainStore';
-import { uiStore } from '$stores/UIStore';
 import styles from './Status.module.scss';
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
 
 export const Status: React.FC<Props> = observer(({ className }) => {
   const status = mainStore.status;
+  const toggleSystemMonitor = useUIStore(state => state.toggleSystemMonitor);
 
   const isError = status === 'error';
   useModalCondition(<InstanceBackendError />, () => isError, [isError]);
@@ -48,7 +49,7 @@ export const Status: React.FC<Props> = observer(({ className }) => {
         <Button
           onClick={e => {
             e.stopPropagation();
-            uiStore.toggleSystemMonitor();
+            toggleSystemMonitor();
           }}
           icon={<BsPcDisplayHorizontal />}
         >

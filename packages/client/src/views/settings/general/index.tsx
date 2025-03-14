@@ -9,10 +9,17 @@ import {
   VarSwitch,
   VarToggle,
 } from '$components/var';
-import { uiStore } from '$stores/UIStore';
+import { useUIStore } from '$store/ui';
 import styles from './index.module.scss';
 
 export const SettingsGeneral: React.FC = observer(() => {
+  const notificationPermission = useUIStore(
+    state => state.notificationPermission,
+  );
+  const checkNotificationPermission = useUIStore(
+    state => state.checkNotificationPermission,
+  );
+
   return (
     <TabPanel id="general">
       <h2>General</h2>
@@ -38,13 +45,13 @@ export const SettingsGeneral: React.FC = observer(() => {
           showInput
         />
         <VarToggle path="fuzzySearch" label="Use fuzzy search" />
-        {uiStore.notificationPermission !== 'denied' ? (
+        {notificationPermission !== 'denied' ? (
           <VarToggle
             path="notifications"
             label="Enable notifications"
             onChange={value => {
               if (value) {
-                uiStore.checkNotificationPermission();
+                checkNotificationPermission();
               }
             }}
           />

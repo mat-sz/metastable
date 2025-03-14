@@ -29,6 +29,7 @@
       "$editor/*": ["src/common/editor/*"],
       "$hooks/*": ["src/common/hooks/*"],
       "$modals/*": ["src/modals/*"],
+      "$store/*": ["src/store/*"],
       "$stores/*": ["src/stores/*"],
       "$types/*": ["src/common/types/*"],
       "$utils/*": ["src/common/utils/*"],

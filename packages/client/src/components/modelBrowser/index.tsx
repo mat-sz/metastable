@@ -29,7 +29,6 @@ import { ModelDelete } from '$modals/model/delete';
 import { ModelEdit } from '$modals/model/edit';
 import { mainStore } from '$stores/MainStore';
 import { modelStore } from '$stores/ModelStore';
-import { uiStore } from '$stores/UIStore';
 import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
 import { removeEmptyGroups } from '$utils/tree';
@@ -80,12 +79,7 @@ export const ModelBrowser: React.FC<Props> = observer(
           return (
             <>
               {variant === 'small' && (
-                <IconButton
-                  title="Add more models"
-                  onClick={() => {
-                    uiStore.setView('models');
-                  }}
-                >
+                <IconButton title="Add more models" href="/models">
                   <BsPlusLg />
                 </IconButton>
               )}
@@ -194,7 +188,7 @@ export const ModelBrowser: React.FC<Props> = observer(
         noResultsView={
           <>
             <div className={styles.hint}>No models found.</div>
-            <Button onClick={() => uiStore.setView('models')} icon={<BsBox />}>
+            <Button href="/models" icon={<BsBox />}>
               Download models
             </Button>
           </>

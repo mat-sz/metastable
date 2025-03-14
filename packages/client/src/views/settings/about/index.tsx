@@ -9,13 +9,16 @@ import { VarButton, VarCategory, VarToggle } from '$components/var';
 import { useModalWrapperContext } from '$hooks/useModal';
 import { InstanceBundleReset } from '$modals/instance/bundleReset';
 import { InstanceSettingsReset } from '$modals/instance/settingsReset';
+import { useUpdateStore } from '$store/update';
 import { mainStore } from '$stores/MainStore';
-import { updateStore } from '$stores/UpdateStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Social } from '../../common/Social';
 
 export const SettingsAbout: React.FC = observer(() => {
+  const info = useUpdateStore(state => state.info);
+  const ready = useUpdateStore(state => state.ready);
+  const refresh = useUpdateStore(state => state.refresh);
   const canResetBundle = mainStore.config.data?.python.mode === 'static';
   const modalWrapper = useModalWrapperContext();
 
@@ -46,27 +49,24 @@ export const SettingsAbout: React.FC = observer(() => {
           />
         )}
       </VarCategory>
-      {(updateStore.info.isAutoUpdateAvailable ||
-        updateStore.info.canCheckForUpdate) && (
+      {(info.isAutoUpdateAvailable || info.canCheckForUpdate) && (
         <VarCategory label="Updates">
-          {updateStore.info.isAutoUpdateAvailable && (
+          {info.isAutoUpdateAvailable && (
             <VarToggle path="app.autoUpdate" label="Enable automatic updates" />
           )}
-          {updateStore.info.canCheckForUpdate && (
+          {info.canCheckForUpdate && (
             <div className={styles.info}>
               <div>
-                {updateStore.ready
-                  ? typeof updateStore.info.isUpToDate === 'undefined'
+                {ready
+                  ? typeof info.isUpToDate === 'undefined'
                     ? 'Unable to check for updates.'
-                    : updateStore.info.isUpToDate
+                    : info.isUpToDate
                       ? 'Up to date.'
-                      : `New version available: ${updateStore.info.latestVersion}.`
+                      : `New version available: ${info.latestVersion}.`
                   : 'Loading...'}
               </div>
               <div className={styles.buttons}>
-                <Button onClick={() => updateStore.refresh()}>
-                  Check for updates
-                </Button>
+                <Button onClick={refresh}>Check for updates</Button>
                 <Button href="https://github.com/mat-sz/metastable/blob/main/CHANGELOG.md">
                   View changelog
                 </Button>
