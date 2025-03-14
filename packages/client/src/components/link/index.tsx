@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link as WouterLink } from 'wouter';
 
 import styles from './index.module.scss';
 
@@ -19,16 +20,17 @@ export const Link: React.FC<LinkProps> = ({
   download,
   ...props
 }) => {
+  const Component = href?.startsWith('/') ? WouterLink : 'a';
   return (
-    <a
+    <Component
       className={clsx(styles.link, className)}
-      href={href}
+      href={href!}
       download={download}
       rel="noreferrer noopener"
       target="_blank"
       {...props}
     >
       {children}
-    </a>
+    </Component>
   );
 };

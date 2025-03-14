@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Router } from 'wouter';
 
 import { API, TRPC } from '$api';
 import { App } from './App.tsx';
@@ -15,7 +16,9 @@ root.render(
     <TRPC.Provider client={API} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <Suspense fallback="Loading...">
-          <App />
+          <Router>
+            <App />
+          </Router>
         </Suspense>
       </QueryClientProvider>
     </TRPC.Provider>

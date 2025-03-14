@@ -152,9 +152,7 @@ export class TaskStore {
           `Generation ${
             event.state === TaskState.SUCCESS ? 'successful' : 'failed'
           }`,
-          () => {
-            mainStore.projects.select(task.data.projectId);
-          },
+          () => mainStore.redirectTo(`/project/${task.data.projectId}`),
         );
       }
     }

@@ -41,6 +41,7 @@ class MainStore {
   forceExit = false;
   authorizationRequired = false;
   token: string | undefined = undefined;
+  redirect: { path: string; ifPathStartsWith?: string } | undefined = undefined;
 
   constructor() {
     makeAutoObservable(this);
@@ -100,6 +101,15 @@ class MainStore {
     this.init();
   }
 
+  redirectTo(path?: string, ifPathStartsWith?: string) {
+    if (!path) {
+      this.redirect = undefined;
+      return;
+    }
+
+    this.redirect = { path, ifPathStartsWith };
+  }
+
   get theme() {
     const theme = mainStore.config.data?.ui.theme || 'dark';
     if (theme !== 'system') {
@@ -123,10 +133,6 @@ class MainStore {
     }
 
     return '(Unknown)';
-  }
-
-  get project() {
-    return this.projects.current;
   }
 
   get projectFields() {

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link as WouterLink } from 'wouter';
 
 import styles from './index.module.scss';
 
@@ -50,9 +51,11 @@ export const Button = React.forwardRef(
     );
 
     if (href) {
+      const Component = href.startsWith('/') ? WouterLink : 'a';
       return (
-        <a
+        <Component
           className={buttonClassName}
+          role="button"
           href={href}
           download={download}
           rel="noreferrer noopener"
@@ -62,7 +65,7 @@ export const Button = React.forwardRef(
           ref={ref as any}
         >
           {contents}
-        </a>
+        </Component>
       );
     }
 

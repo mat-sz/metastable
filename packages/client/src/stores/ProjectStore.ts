@@ -7,16 +7,15 @@ import { tryParse } from '$utils/json';
 import { wrapAround } from '$utils/math';
 import { filterDraft } from '$utils/project';
 import { combineUnsubscribables } from '$utils/trpc';
+import { mainStore } from './MainStore';
 import { createProject } from './project';
 import { BaseProject } from './project/base';
 import { defaultSettings } from './project/simple';
-import { uiStore } from './UIStore';
 
 const LS_RECENT = 'metastable_recent_projects';
 const MAX_RECENT_ITEMS = 15;
 export class ProjectStore {
   projects: BaseProject[] = [];
-  currentId: APIProject['id'] | undefined = undefined;
   recent: APIProject[] = [];
   all: APIProject[] = [];
   loading = false;
@@ -42,10 +41,6 @@ export class ProjectStore {
 
   get draft() {
     return filterDraft(this.projects);
-  }
-
-  get current() {
-    return this.projects.find(project => project.id === this.currentId);
   }
 
   get favorite() {
@@ -80,7 +75,7 @@ export class ProjectStore {
     return this.projects.filter(project => ids.includes(project.id));
   }
 
-  find(id: string) {
+  find(id?: string) {
     return this.projects.find(project => project.id === id);
   }
 
@@ -151,7 +146,7 @@ export class ProjectStore {
 
       runInAction(() => {
         this.projects.push(createProject(json));
-        this.select(json.id);
+        mainStore.redirectTo(`/project/${json.id}`);
       });
 
       if (!draft) {
@@ -188,7 +183,7 @@ export class ProjectStore {
         ];
 
         if (select) {
-          this.select(json.id);
+          mainStore.redirectTo(`/project/${json.id}`);
         }
       });
 
@@ -206,22 +201,14 @@ export class ProjectStore {
     await this.refresh();
   }
 
-  get currentIndex() {
-    return this.projects.findIndex(p => p.id === this.currentId);
-  }
-
-  selectOffset(offset: number) {
+  getByOffset(offset: number, id?: string) {
+    const currentIndex = this.projects.findIndex(p => p.id === id);
     const index = wrapAround(
-      this.currentIndex + offset,
+      currentIndex + offset,
       0,
       this.projects.length - 1,
     );
-    this.select(this.projects[index].id);
-  }
-
-  select(id?: APIProject['id']) {
-    this.currentId = id;
-    uiStore.setView(id ? 'project' : 'home');
+    return this.projects[index];
   }
 
   move(fromId: APIProject['id'], toId?: APIProject['id']) {
@@ -233,17 +220,14 @@ export class ProjectStore {
   }
 
   dismiss(id: APIProject['id']) {
-    const index = this.currentIndex ?? 0;
+    const fallbackProject = this.getByOffset(1, id);
     this.projects = this.projects.filter(project => project.id !== id);
 
-    if (id === this.currentId) {
-      const selectId = this.projects[index === 0 ? 0 : index - 1]?.id;
-      if (uiStore.view === 'project') {
-        this.select(selectId);
-      } else {
-        this.currentId = selectId;
-      }
-    }
+    const fallbackId = fallbackProject?.id;
+    mainStore.redirectTo(
+      fallbackId && fallbackId !== id ? `/project/${fallbackId}` : '/',
+      `/project/${id}`,
+    );
   }
 
   close(id: APIProject['id'], force?: boolean) {

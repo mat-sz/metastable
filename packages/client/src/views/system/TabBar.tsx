@@ -1,7 +1,7 @@
 import { ProjectType, TaskState } from '@metastable/types';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   BsBoxFill,
   BsGearFill,
@@ -9,6 +9,7 @@ import {
   BsPlusLg,
   BsXLg,
 } from 'react-icons/bs';
+import { useLocation, useRoute } from 'wouter';
 
 import { ContextMenuItem, useContextMenu } from '$components/contextMenu';
 import { ProgressBar } from '$components/progressBar';
@@ -18,7 +19,7 @@ import { useHorizontalScroll } from '$hooks/useHorizontalScroll';
 import { useHotkey } from '$hooks/useHotkey';
 import { mainStore } from '$stores/MainStore';
 import type { BaseProject } from '$stores/project';
-import { uiStore, ViewName } from '$stores/UIStore';
+import { uiStore } from '$stores/UIStore';
 import { IS_DEV, IS_ELECTRON, IS_MAC } from '$utils/config';
 import { Controls } from './Controls';
 import { Logo } from './Logo';
@@ -26,7 +27,7 @@ import styles from './TabBar.module.scss';
 
 const TAB_ITEM = 'project_tab';
 
-interface BaseTabProps {
+interface BaseTabProps extends React.PropsWithChildren {
   badge?: string | number;
   value?: number;
   max?: number;
@@ -38,10 +39,7 @@ interface BaseTabProps {
   menu?: React.ReactNode;
 }
 
-export const BaseTab = React.forwardRef<
-  HTMLDivElement,
-  React.PropsWithChildren<BaseTabProps>
->(
+export const BaseTab = React.forwardRef<HTMLDivElement, BaseTabProps>(
   (
     {
       badge,
@@ -101,6 +99,25 @@ export const BaseTab = React.forwardRef<
   },
 );
 
+interface ViewTabProps extends Omit<BaseTabProps, 'onClick' | 'isSelected'> {
+  href: string;
+}
+
+export const ViewTab = React.forwardRef<HTMLDivElement, ViewTabProps>(
+  ({ href, ...props }, ref) => {
+    const [location, navigate] = useLocation();
+
+    return (
+      <BaseTab
+        onClick={() => navigate(href)}
+        isSelected={href === '/' ? location === '/' : location.startsWith(href)}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+
 interface ProjectDragItem {
   id: string;
 }
@@ -130,14 +147,10 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
     const marquee = project.progressMarquee;
 
     return (
-      <BaseTab
+      <ViewTab
+        href={`/project/${project.id}`}
         ref={ref}
-        isSelected={
-          uiStore.view === 'project' &&
-          mainStore.projects.currentId === project.id
-        }
         opacity={isDragging || isOver ? 0.5 : 1}
-        onClick={() => mainStore.projects.select(project.id)}
         onClose={shiftPressed => project.close(shiftPressed)}
         badge={project.queueCount}
         value={value}
@@ -146,35 +159,15 @@ export const ProjectTab: React.FC<{ project: BaseProject }> = observer(
         menu={<ProjectMenu projectId={project.id} isTab />}
       >
         {project.name}
-      </BaseTab>
+      </ViewTab>
     );
   },
 );
 
-export const ViewTab: React.FC<
-  React.PropsWithChildren<{
-    viewId: ViewName;
-    badge?: string | number;
-    value?: number;
-    max?: number;
-    marquee?: boolean;
-  }>
-> = observer(({ viewId, badge, value, max, marquee, children }) => {
-  return (
-    <BaseTab
-      onClick={() => uiStore.setView(viewId)}
-      badge={badge}
-      value={value}
-      max={max}
-      marquee={marquee}
-      isSelected={uiStore.view === viewId}
-    >
-      {children}
-    </BaseTab>
-  );
-});
-
 export const TabBar: React.FC = observer(() => {
+  const params = useRoute('/project/:id')[1];
+  const [location, navigate] = useLocation();
+
   const { connect: drop } = useDrop(
     () => ({
       accept: TAB_ITEM,
@@ -205,34 +198,55 @@ export const TabBar: React.FC = observer(() => {
   const areTrafficLightsVisible =
     IS_ELECTRON && IS_MAC && !uiStore.isFullScreen;
 
-  const previous = useCallback(() => mainStore.projects.selectOffset(-1), []);
-  const next = useCallback(() => mainStore.projects.selectOffset(1), []);
+  const selectOffset = useCallback(
+    (offset: number) => {
+      const project = mainStore.projects.getByOffset(offset, params?.id);
+      if (!project) {
+        return;
+      }
+
+      navigate(`/projects/${project.id}`);
+    },
+    [params],
+  );
+
+  const previous = useCallback(() => selectOffset(-1), [selectOffset]);
+  const next = useCallback(() => selectOffset(1), [selectOffset]);
   const newProject = useCallback(() => mainStore.projects.create(), []);
-  const close = useCallback(() => mainStore.project?.close(), []);
-  const forceClose = useCallback(() => mainStore.project?.close(true), []);
 
   useHotkey('projects_next', next);
   useHotkey('projects_previous', previous);
   useHotkey('projects_new', newProject);
-  useHotkey('projects_close', close);
-  useHotkey('projects_forceClose', forceClose);
+
+  useEffect(() => {
+    const redirect = mainStore.redirect;
+    if (redirect) {
+      if (
+        !redirect.ifPathStartsWith ||
+        location.startsWith(redirect.ifPathStartsWith)
+      ) {
+        navigate(redirect.path);
+      }
+      mainStore.redirectTo();
+    }
+  }, [navigate, location, mainStore.redirect]);
 
   return (
     <div
       className={clsx(styles.tabs, { [styles.mac]: areTrafficLightsVisible })}
     >
       {!(IS_ELECTRON && IS_MAC) && <Logo />}
-      <ViewTab viewId="home">
+      <ViewTab href="/">
         <BsHouseFill />
       </ViewTab>
       <ViewTab
-        viewId="settings"
+        href="/settings"
         marquee={!!mainStore.tasks.queues.settings.length}
       >
         <BsGearFill />
       </ViewTab>
       <ViewTab
-        viewId="models"
+        href="/models"
         badge={remaining.length}
         value={downloadValue}
         max={downloadMax}

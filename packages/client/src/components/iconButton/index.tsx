@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link as WouterLink } from 'wouter';
 
 import styles from './index.module.scss';
 
@@ -23,14 +24,18 @@ export const IconButton: React.FC<IconButtonProps> = ({
   disabled,
   ...props
 }) => {
+  const buttonClassName = clsx(
+    styles.iconButton,
+    { [styles.round]: round, [styles.disabled]: disabled },
+    className,
+  );
+
   if (href) {
+    const Component = href.startsWith('/') ? WouterLink : 'a';
     return (
-      <a
-        className={clsx(
-          styles.iconButton,
-          { [styles.round]: round, [styles.disabled]: disabled },
-          className,
-        )}
+      <Component
+        className={buttonClassName}
+        role="button"
         href={href}
         download={download}
         rel="noreferrer noopener"
@@ -38,16 +43,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
         {...props}
       >
         {children}
-      </a>
+      </Component>
     );
   }
 
   return (
-    <button
-      className={clsx(styles.iconButton, { [styles.round]: round }, className)}
-      disabled={disabled}
-      {...props}
-    >
+    <button className={buttonClassName} disabled={disabled} {...props}>
       {children}
     </button>
   );

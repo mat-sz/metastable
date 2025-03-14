@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { Suspense, useLayoutEffect } from 'react';
+import { Route, Switch } from 'wouter';
 
 import { ModalWrapperProvider } from '$hooks/useModal';
 import { mainStore } from '$stores/MainStore';
 import { setupStore } from '$stores/SetupStore';
-import { uiStore } from '$stores/UIStore';
 import { withoutTransitions } from '$utils/css';
 import { lazyPreload } from '$utils/react';
 import './index.scss';
@@ -16,28 +16,10 @@ const Settings = lazyPreload(() => import('./views/settings'));
 const Setup = lazyPreload(() => import('./views/setup'));
 const ModelManager = lazyPreload(() => import('./views/models'));
 
-const View: React.FC = observer(() => {
-  if (setupStore?.status !== 'done') {
-    return <Setup />;
-  }
-
-  mainStore.removeLoading();
-
-  switch (uiStore.view) {
-    case 'project':
-      return <Project />;
-    case 'settings':
-      return <Settings />;
-    case 'models':
-      return <ModelManager />;
-    default:
-      return <Home />;
-  }
-});
-
 export const App: React.FC = observer(() => {
   const theme = mainStore.theme;
   const fontSize = mainStore.config.data?.ui.fontSize || 16;
+  const isSetup = setupStore?.status !== 'done';
 
   useLayoutEffect(() => {
     withoutTransitions(() => {
@@ -50,7 +32,24 @@ export const App: React.FC = observer(() => {
     <ModalWrapperProvider>
       <Main>
         <Suspense fallback={<>Loading...</>}>
-          <View />
+          {isSetup ? (
+            <Setup />
+          ) : (
+            <Switch>
+              <Route path="/project/:id">
+                <Project />
+              </Route>
+              <Route path="/settings">
+                <Settings />
+              </Route>
+              <Route path="/models">
+                <ModelManager />
+              </Route>
+              <Route path="/">
+                <Home />
+              </Route>
+            </Switch>
+          )}
         </Suspense>
       </Main>
     </ModalWrapperProvider>

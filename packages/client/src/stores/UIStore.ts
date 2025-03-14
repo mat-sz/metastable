@@ -22,8 +22,6 @@ class UIStore {
 
   notificationPermission = Notification.permission;
 
-  view: ViewName = 'home';
-
   civitaiArgs: CivitAIArgs = {
     query: '',
     type: 'Checkpoint',
@@ -85,10 +83,6 @@ class UIStore {
     runInAction(() => {
       this.notificationPermission = Notification.permission;
     });
-  }
-
-  setView(view: ViewName) {
-    this.view = view;
   }
 
   toggleSystemMonitor() {
