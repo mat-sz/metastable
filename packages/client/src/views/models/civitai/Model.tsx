@@ -84,10 +84,12 @@ const ModelVersion: React.FC<ModelVersionProps> = ({ model, version }) => {
     </div>
   );
 };
+
 interface ModelProps {
   model: CivitAIModel;
   onClose: () => void;
 }
+
 export const Model: React.FC<ModelProps> = ({ model, onClose }) => {
   return (
     <div className={styles.model}>

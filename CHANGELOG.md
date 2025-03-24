@@ -1,3 +1,9 @@
+# 0.0.25 (Upcoming)
+
+## Bug fixes
+
+- Fixed issues with downloading models.
+
 # 0.0.24 (2025-03-11)
 
 ## Bug fixes

@@ -1,4 +1,3 @@
-import { DownloadSettings } from '@metastable/types';
 import { toJS } from 'mobx';
 import React, { useEffect, useState } from 'react';
 
@@ -7,19 +6,12 @@ import { Modal, ModalActions } from '$components/modal';
 import { Tag } from '$components/tag';
 import { VarArray, VarSelect, VarUI } from '$components/var';
 import { mainStore } from '$stores/MainStore';
+import { DownloadFileInfo } from '$types/download';
 import { filesize } from '$utils/file';
 import styles from './index.module.scss';
 
-export interface DownloadFileState {
-  settings: DownloadSettings;
-  state: 'downloaded' | 'queued' | 'failed' | 'not_queued';
-  size?: number;
-  offset?: number;
-  error?: string;
-}
-
 interface Props {
-  downloads: DownloadFileState[];
+  downloads: DownloadFileInfo[];
   onDownload?: () => void;
 }
 
@@ -53,7 +45,7 @@ export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
         <VarUI values={data} onChange={setData}>
           <VarArray path="">
             {({ element }) => {
-              const download = element as DownloadFileState;
+              const download = element as DownloadFileInfo;
               const folders =
                 mainStore.config.data?.modelFolders?.[download.settings.type] ||
                 [];
