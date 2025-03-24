@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Fixed issues with downloading models.
+- Fixed thumbnail generation issues on Linux.
 
 # 0.0.24 (2025-03-11)
 
