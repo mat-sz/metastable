@@ -1,25 +1,33 @@
-import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useState } from 'react';
 
+import { TRPC } from '$api';
 import { Tag } from '$components/tag';
 import { ThumbnailDisplay } from '$components/thumbnailDisplay';
-import { mainStore } from '$stores/MainStore';
 import { modelStore } from '$stores/ModelStore';
 import { basename, filesize } from '$utils/file';
 import { stringToColor } from '$utils/string';
 import { resolveImage } from '$utils/url';
 import styles from './LoadedModelsList.module.scss';
 
-export const LoadedModelsList: React.FC = observer(() => {
+interface LoadedModel {
+  path: string;
+  size?: number;
+}
+
+export const LoadedModelsList: React.FC = () => {
+  const [models, setModels] = useState<LoadedModel[]>([]);
+  TRPC.instance.onModelCacheChange.useSubscription(undefined, {
+    onData: setModels,
+  });
   return (
     <div>
-      {mainStore.modelCache.length === 0 && (
+      {models.length === 0 && (
         <div className={styles.empty}>
           No models are currently loaded into memory.
         </div>
       )}
       <ul className={styles.list}>
-        {mainStore.modelCache.map(item => {
+        {models.map(item => {
           const model = modelStore.findByPath(item.path);
 
           if (!model) {
@@ -46,4 +54,4 @@ export const LoadedModelsList: React.FC = observer(() => {
       </ul>
     </div>
   );
-});
+};

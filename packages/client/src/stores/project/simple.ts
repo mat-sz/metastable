@@ -33,6 +33,7 @@ import { qualitySamplerSettings } from '$data/samplerSettings';
 import { PROMPT_STYLES } from '$data/styles';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
+import { useBackendStore } from '$store/backend';
 import { modelStore } from '$stores/ModelStore';
 import { ImageFileTreeItem, ImageFileTreeNode } from '$types/project';
 import { randomSeed } from '$utils/comfy';
@@ -439,7 +440,7 @@ export class SimpleProject extends BaseProject<
     const validator = new SimpleProjectValidator(this.settings);
     const { errors, warnings } = validator;
 
-    if (mainStore.status !== 'ready') {
+    if (useBackendStore.getState().status !== 'ready') {
       errors.push('Backend is not ready.');
     }
 

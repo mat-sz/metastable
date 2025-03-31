@@ -1,10 +1,10 @@
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Log } from '$components/log';
-import { mainStore } from '$stores/MainStore';
+import { useBackendStore } from '$store/backend';
 import styles from './Logs.module.scss';
 
-export const Logs: React.FC = observer(() => {
-  return <Log className={styles.log} items={mainStore.backendLog} />;
-});
+export const Logs: React.FC = () => {
+  const log = useBackendStore(state => state.log);
+  return <Log className={styles.log} items={log} />;
+};

@@ -1,5 +1,3 @@
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   BsDisplay,
@@ -15,7 +13,8 @@ import {
 import { LogoIcon } from '$components/logoIcon';
 import { Tab, TabContent, Tabs, TabView } from '$components/tabs';
 import { VarUI } from '$components/var';
-import { mainStore } from '$stores/MainStore';
+import { useConfigStore } from '$store/config';
+import { useInstanceStore } from '$store/instance';
 import { IS_DEV } from '$utils/config';
 import { SettingsAbout } from './about';
 import { SettingsBackend } from './backend';
@@ -29,21 +28,19 @@ import { SettingsModelFolders } from './modelFolders';
 import { SettingsStyles } from './styles';
 import { SettingsUsers } from './users';
 
-export const Settings: React.FC = observer(() => {
-  const config = mainStore.config;
+export const Settings: React.FC = () => {
+  const config = useConfigStore(state => state.data);
+  const setConfig = useConfigStore(state => state.update);
+  const info = useInstanceStore(state => state.info);
 
-  if (!config.data) {
+  if (!config) {
     return <div>Loading...</div>;
   }
 
-  const showUsers = mainStore.info.authAvailable;
+  const showUsers = info?.authAvailable;
 
   return (
-    <VarUI
-      values={toJS(config.data!)}
-      onChange={value => config.set(value)}
-      className={styles.settings}
-    >
+    <VarUI values={config} onChange={setConfig} className={styles.settings}>
       <TabView
         className={styles.view}
         defaultTab="general"
@@ -81,6 +78,6 @@ export const Settings: React.FC = observer(() => {
       </TabView>
     </VarUI>
   );
-});
+};
 
 export default Settings;

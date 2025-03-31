@@ -195,12 +195,15 @@ export const router = t.router({
       signal,
       ctx: { metastable },
     }) {
+      const getCache = () =>
+        metastable.comfy?.rpc.api.instance.loadedModels() || [];
+      yield await getCache();
       const iter = on(metastable, 'comfy.modelCacheChange', {
         signal,
       });
 
       while (true) {
-        yield;
+        yield await getCache();
         await iter.next();
       }
     }),

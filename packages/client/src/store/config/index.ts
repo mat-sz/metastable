@@ -1,7 +1,8 @@
 import { ConfigType } from '@metastable/types';
 import { create } from 'zustand';
 
-import { API } from '$api';
+import { API, linkManager } from '$api';
+import { combineUnsubscribables } from '$utils/trpc';
 
 type State = {
   data?: ConfigType;
@@ -34,3 +35,13 @@ export const useConfigStore = create<State & Actions>((set, get) => ({
     get().triggerAutosave();
   },
 }));
+
+linkManager.subscribe(
+  combineUnsubscribables(() => [
+    API.instance.onInfoUpdate.subscribe(undefined, {
+      onData: () => {
+        useConfigStore.getState().refresh();
+      },
+    }),
+  ]),
+);

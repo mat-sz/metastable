@@ -4,10 +4,11 @@ import { API } from '$api';
 import { Button } from '$components/button';
 import { ModalActions, ModalContainer } from '$components/modal';
 import { VarString, VarUI } from '$components/var';
-import { mainStore } from '$stores/MainStore';
+import { useInstanceStore } from '$store/instance';
 import styles from './LogIn.module.scss';
 
 export const LogIn: React.FC = () => {
+  const setToken = useInstanceStore(state => state.setToken);
   const [data, setData] = useState<{ username: string; password: string }>({
     username: '',
     password: '',
@@ -21,7 +22,7 @@ export const LogIn: React.FC = () => {
         onSubmit={async () => {
           const result = await API.auth.authenticate.mutate(data);
           if (result.token) {
-            mainStore.setToken(result.token);
+            setToken(result.token);
           }
         }}
       >

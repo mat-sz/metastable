@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Log } from '$components/log';
 import { TabPanel } from '$components/tabs';
-import { mainStore } from '$stores/MainStore';
+import { useBackendStore } from '$store/backend';
 
-export const LogsTab: React.FC = observer(() => {
+export const LogsTab: React.FC = () => {
+  const log = useBackendStore(state => state.log);
   return (
     <TabPanel id="logs">
-      <Log items={mainStore.backendLog} />
+      <Log items={log} />
     </TabPanel>
   );
-});
+};

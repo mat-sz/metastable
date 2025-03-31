@@ -8,6 +8,7 @@ import {
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { API, linkManager } from '$api';
+import { notify } from '$store/actions';
 import { combineUnsubscribables } from '$utils/trpc';
 import { mainStore } from './MainStore';
 
@@ -147,7 +148,7 @@ export class TaskStore {
         event.state === TaskState.SUCCESS ||
         event.state === TaskState.FAILED
       ) {
-        mainStore.notify(
+        notify(
           `${task.data.projectId}`,
           `Generation ${
             event.state === TaskState.SUCCESS ? 'successful' : 'failed'

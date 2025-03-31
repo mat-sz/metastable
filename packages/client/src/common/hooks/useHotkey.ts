@@ -1,6 +1,7 @@
 import { DependencyList, useCallback, useEffect, useState } from 'react';
 
-import { mainStore } from '$stores/MainStore';
+import { defaultHotkeys } from '$data/hotkeys';
+import { useConfigStore } from '$store/config';
 import { IS_MAC } from '$utils/config';
 
 let disableHotkeys = false;
@@ -130,11 +131,30 @@ const isHotkeyMatchingKeyboardEvent = (
   return false;
 };
 
+let parsedHotkeys: Record<string, ParsedHotkey> = {};
+
+useConfigStore.subscribe(state => {
+  const overrides = state.data?.app?.hotkeys;
+  const hotkeys = { ...defaultHotkeys };
+
+  if (overrides) {
+    for (const [key, value] of Object.entries(overrides)) {
+      if (value && key in hotkeys) {
+        hotkeys[key] = value;
+      }
+    }
+  }
+
+  parsedHotkeys = Object.fromEntries(
+    Object.entries(hotkeys).map(([id, keys]) => [id, parseHotkey(keys)]),
+  );
+});
+
 export function matchHotkey(
   e: KeyboardEvent | React.KeyboardEvent,
   group?: string,
 ) {
-  for (const [id, parsed] of Object.entries(mainStore.hotkeys)) {
+  for (const [id, parsed] of Object.entries(parsedHotkeys)) {
     if (group && !id.startsWith(`${group}_`)) {
       continue;
     }
@@ -240,7 +260,7 @@ export function useHotkey(
   dependencies?: DependencyList,
 ) {
   useEffect(() => {
-    if (!mainStore.hotkeys[id]) {
+    if (!defaultHotkeys[id]) {
       console.warn(`Unregistered hotkey ID: ${id}`);
     }
 

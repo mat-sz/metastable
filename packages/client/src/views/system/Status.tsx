@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { observer } from 'mobx-react-lite';
 import React from 'react';
 import {
   BsFillCheckCircleFill,
@@ -12,16 +11,16 @@ import { Button } from '$components/button';
 import { LogoIcon } from '$components/logoIcon';
 import { useModalCondition } from '$hooks/useModal';
 import { InstanceBackendError } from '$modals/instance/backendError';
+import { useStatus } from '$store/backend/hooks';
 import { useUIStore } from '$store/ui';
-import { mainStore } from '$stores/MainStore';
 import styles from './Status.module.scss';
 
 interface Props {
   className?: string;
 }
 
-export const Status: React.FC<Props> = observer(({ className }) => {
-  const status = mainStore.status;
+export const Status: React.FC<Props> = ({ className }) => {
+  const status = useStatus();
   const toggleSystemMonitor = useUIStore(state => state.toggleSystemMonitor);
 
   const isError = status === 'error';
@@ -61,4 +60,4 @@ export const Status: React.FC<Props> = observer(({ className }) => {
       </div>
     </div>
   );
-});
+};

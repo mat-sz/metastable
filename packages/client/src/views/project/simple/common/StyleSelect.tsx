@@ -7,7 +7,7 @@ import { TreeBrowser } from '$components/treeBrowser';
 import { VarBase } from '$components/var';
 import { PROMPT_STYLE_NONE_ID } from '$data/styles';
 import { usePopover } from '$hooks/usePopover';
-import { mainStore } from '$stores/MainStore';
+import { useSearchFn } from '$store/config/hooks';
 import styles from './StyleSelect.module.scss';
 import { useSimpleProject } from '../../context';
 
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export const StyleSelect: React.FC<Props> = observer(({ className }) => {
+  const searchFn = useSearchFn();
   const project = useSimpleProject();
 
   const availableStyles = [...project.availableStyles];
@@ -55,7 +56,7 @@ export const StyleSelect: React.FC<Props> = observer(({ className }) => {
         </IconButton>
       }
       quickFilter={(nodes, search) =>
-        mainStore.searchFn(nodes, search, item => item?.name ?? 'None')
+        searchFn(nodes, search, item => item?.name ?? 'None')
       }
     />,
   );

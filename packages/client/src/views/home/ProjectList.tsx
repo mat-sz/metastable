@@ -4,6 +4,7 @@ import { BsPlus } from 'react-icons/bs';
 
 import { Card, CardFavorite, List } from '$components/list';
 import { ProjectMenu } from '$components/projectMenu';
+import { useSearchFn } from '$store/config/hooks';
 import { mainStore } from '$stores/MainStore';
 import { resolveImage } from '$utils/url';
 
@@ -18,6 +19,8 @@ export const ProjectList: React.FC<Props> = ({
   title,
   searchable,
 }) => {
+  const searchFn = useSearchFn();
+
   return (
     <List
       header={<h2>{title}</h2>}
@@ -25,7 +28,7 @@ export const ProjectList: React.FC<Props> = ({
       quickFilter={
         searchable
           ? (data, search) =>
-              mainStore.searchFn(data, search, item =>
+              searchFn(data, search, item =>
                 typeof item === 'object' ? item.name : '',
               )
           : undefined

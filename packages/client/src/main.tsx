@@ -4,9 +4,12 @@ import { createRoot } from 'react-dom/client';
 import { Router } from 'wouter';
 
 import { API, TRPC } from '$api';
+import { refreshAll } from '$store/actions.ts';
 import { App } from './App.tsx';
 import './onError.ts';
 import './i18n.ts';
+
+refreshAll();
 
 const queryClient = new QueryClient();
 

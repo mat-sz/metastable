@@ -10,15 +10,19 @@ import { Button } from '$components/button';
 import { LogSimple } from '$components/log';
 import { TabPanel } from '$components/tabs';
 import { VarToggle } from '$components/var';
+import { useConfigStore } from '$store/config';
+import { useInstanceStore } from '$store/instance';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
 export const SettingsFeatures: React.FC = observer(() => {
-  const bundleVersion = mainStore.config.data?.python.bundleVersion || '0.0.0';
+  const config = useConfigStore(state => state.data);
+  const info = useInstanceStore(state => state.info);
+  const bundleVersion = config?.python.bundleVersion || '0.0.0';
   const available =
     import.meta.env.VITE_APP_ENABLE_OPTIONAL_FEATURES ||
     semverCompare(bundleVersion, '0.1.3') >= 0;
-  const features = available ? mainStore.info.features : [];
+  const features = available ? info!.features : [];
 
   return (
     <TabPanel id="features">

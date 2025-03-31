@@ -27,7 +27,7 @@ import { TreeBrowser } from '$components/treeBrowser';
 import { useModalWrapperContext } from '$hooks/useModal';
 import { ModelDelete } from '$modals/model/delete';
 import { ModelEdit } from '$modals/model/edit';
-import { mainStore } from '$stores/MainStore';
+import { useSearchFn } from '$store/config/hooks';
 import { modelStore } from '$stores/ModelStore';
 import { IS_ELECTRON } from '$utils/config';
 import { removeFileExtension, stringToColor } from '$utils/string';
@@ -53,6 +53,7 @@ export const ModelBrowser: React.FC<Props> = observer(
     architecture,
     allowReset,
   }) => {
+    const searchFn = useSearchFn();
     const modalWrapper = useModalWrapperContext();
     const [compatibleOnly, setCompatibleOnly] = useState(true);
     const types = Array.isArray(type) ? type : [type];
@@ -194,7 +195,7 @@ export const ModelBrowser: React.FC<Props> = observer(
           </>
         }
         quickFilter={(models, search) =>
-          mainStore.searchFn(
+          searchFn(
             models,
             search,
             item =>

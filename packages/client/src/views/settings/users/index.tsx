@@ -9,12 +9,14 @@ import { IconButton } from '$components/iconButton';
 import { LoadingOverlay } from '$components/loadingOverlay';
 import { TabPanel } from '$components/tabs';
 import { useModalWrapperContext } from '$hooks/useModal';
+import { useInstanceStore } from '$store/instance';
 import styles from './index.module.scss';
 import { UserAdd } from './modals/add';
 import { UserDelete } from './modals/delete';
 import { UserEdit } from './modals/edit';
 
 export const SettingsUsers: React.FC = observer(() => {
+  const refreshAuth = useInstanceStore(state => state.refresh);
   const { data, isLoading, error, refetch } = TRPC.auth.get.useQuery();
   const setEnabledMutation = TRPC.auth.setEnabled.useMutation();
   const modalWrapper = useModalWrapperContext();
@@ -32,7 +34,11 @@ export const SettingsUsers: React.FC = observer(() => {
             <Button
               onClick={async () => {
                 await setEnabledMutation.mutateAsync(!data.enabled);
-                refetch();
+                if (data.enabled) {
+                  refreshAuth();
+                } else {
+                  refetch();
+                }
               }}
             >
               {data.enabled ? 'Disable' : 'Enable'} authentication
