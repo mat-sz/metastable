@@ -34,6 +34,7 @@ import { PROMPT_STYLES } from '$data/styles';
 import { Editor } from '$editor';
 import { Point } from '$editor/types';
 import { useBackendStore } from '$store/backend';
+import { useConfigStore } from '$store/config';
 import { modelStore } from '$stores/ModelStore';
 import { ImageFileTreeItem, ImageFileTreeNode } from '$types/project';
 import { randomSeed } from '$utils/comfy';
@@ -177,7 +178,8 @@ export function convertSettings(
 
 export function defaultSettings(): ProjectSimpleSettings {
   const checkpoint = modelStore.defaultModel(ModelType.CHECKPOINT);
-  const generationSettings = mainStore.config.data?.generation;
+  const config = useConfigStore.getState().data;
+  const generationSettings = config?.generation;
   const { defaultPrompt } = generationSettings ?? {};
 
   return {
@@ -444,7 +446,8 @@ export class SimpleProject extends BaseProject<
       errors.push('Backend is not ready.');
     }
 
-    if (mainStore.config.data?.generation?.memoryWarnings) {
+    const config = useConfigStore.getState().data;
+    if (config?.generation?.memoryWarnings) {
       const memoryUsage = this.memoryUsage;
       if (memoryUsage > mainStore.info.vram) {
         warnings.push(
@@ -475,9 +478,11 @@ export class SimpleProject extends BaseProject<
         source: 'system',
       }),
     );
-    const userStyles: PromptStyleNodeWithSource[] = (
-      mainStore.config.data?.styles || []
-    ).map(style => ({ ...style, source: 'user' }));
+
+    const config = useConfigStore.getState().data;
+    const userStyles: PromptStyleNodeWithSource[] = (config?.styles || []).map(
+      style => ({ ...style, source: 'user' }),
+    );
     const allStyles = [...systemStyles, ...userStyles];
     const filtered = allStyles.filter(style =>
       style.nodeType === 'item'

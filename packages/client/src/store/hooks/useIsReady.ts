@@ -1,7 +1,8 @@
+import { useConfigStore } from '$store/config';
 import { useInstanceStore } from '$store/instance';
 
 export function useIsReady() {
   const isInstanceReady = useInstanceStore(state => state.ready);
-
-  return isInstanceReady;
+  const isConfigReady = useConfigStore(state => !!state.data);
+  return isInstanceReady && isConfigReady;
 }

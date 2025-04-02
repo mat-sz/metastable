@@ -16,13 +16,14 @@ import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 
 export const SettingsFeatures: React.FC = observer(() => {
-  const config = useConfigStore(state => state.data);
-  const info = useInstanceStore(state => state.info);
-  const bundleVersion = config?.python.bundleVersion || '0.0.0';
+  const bundleVersion = useConfigStore(
+    state => state.data?.python.bundleVersion || '0.0.0',
+  );
+  const infoFeatures = useInstanceStore(state => state.info!.features);
   const available =
     import.meta.env.VITE_APP_ENABLE_OPTIONAL_FEATURES ||
     semverCompare(bundleVersion, '0.1.3') >= 0;
-  const features = available ? info!.features : [];
+  const features = available ? infoFeatures : [];
 
   return (
     <TabPanel id="features">

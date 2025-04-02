@@ -9,8 +9,9 @@ import { VarButton, VarCategory, VarToggle } from '$components/var';
 import { useModalWrapperContext } from '$hooks/useModal';
 import { InstanceBundleReset } from '$modals/instance/bundleReset';
 import { InstanceSettingsReset } from '$modals/instance/settingsReset';
+import { useConfigStore } from '$store/config';
+import { useInstanceStore } from '$store/instance';
 import { useUpdateStore } from '$store/update';
-import { mainStore } from '$stores/MainStore';
 import { IS_ELECTRON } from '$utils/config';
 import styles from './index.module.scss';
 import { Social } from '../../common/Social';
@@ -19,7 +20,10 @@ export const SettingsAbout: React.FC = observer(() => {
   const info = useUpdateStore(state => state.info);
   const ready = useUpdateStore(state => state.ready);
   const refresh = useUpdateStore(state => state.refresh);
-  const canResetBundle = mainStore.config.data?.python.mode === 'static';
+  const canResetBundle = useConfigStore(
+    state => state.data?.python.mode === 'static',
+  );
+  const dataRoot = useInstanceStore(state => state.info!.dataRoot);
   const modalWrapper = useModalWrapperContext();
 
   return (
@@ -36,16 +40,13 @@ export const SettingsAbout: React.FC = observer(() => {
       <VarCategory label="Storage">
         <div className={styles.info}>
           <div>
-            <strong>Application data is stored at:</strong>{' '}
-            {mainStore.info.dataRoot}
+            <strong>Application data is stored at:</strong> {dataRoot}
           </div>
         </div>
         {IS_ELECTRON && (
           <VarButton
             buttonLabel="Reveal in explorer"
-            onClick={() =>
-              API.electron.shell.openPath.mutate(mainStore.info.dataRoot)
-            }
+            onClick={() => API.electron.shell.openPath.mutate(dataRoot)}
           />
         )}
       </VarCategory>

@@ -57,10 +57,9 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = ({
   parentId,
   parentName,
 }) => {
-  const config = useConfigStore(state => state.data);
-  const setConfig = useConfigStore(state => state.update);
+  const allStyles = useConfigStore(state => state.data?.styles || []);
+  const setConfigValue = useConfigStore(state => state.set);
 
-  const allStyles = config?.styles || [];
   const currentStyles = allStyles.filter(item => item.parentId === parentId);
   const groups = currentStyles.filter(item => item.nodeType === 'group');
   const items = currentStyles.filter(item => item.nodeType === 'item');
@@ -79,14 +78,14 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = ({
                     <GroupModal
                       isEdit
                       name={parentName}
-                      onSave={name => {
-                        setConfig({
-                          ...config!,
-                          styles: config!.styles.map(item =>
+                      onSave={name =>
+                        setConfigValue(
+                          'styles',
+                          allStyles.map(item =>
                             item.id === parentId ? { ...item, name } : item,
                           ),
-                        });
-                      }}
+                        )
+                      }
                     />,
                   );
                 }}
@@ -99,12 +98,10 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = ({
                     parentId,
                     ...getDescendants(allStyles, parentId).map(item => item.id),
                   ];
-                  setConfig({
-                    ...config!,
-                    styles: config!.styles.filter(
-                      item => !removeIds.includes(item.id),
-                    ),
-                  });
+                  setConfigValue(
+                    'styles',
+                    allStyles.filter(item => !removeIds.includes(item.id)),
+                  );
                 }}
               >
                 <BsTrash />
@@ -127,17 +124,17 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = ({
         editModalTitle="Edit prompt style"
         value={items}
         onAdd={item => {
-          setConfig({ ...config!, styles: [...config!.styles, item] });
+          setConfigValue('styles', [...allStyles, item]);
         }}
         onUpdate={(item, index) => {
-          const styles = [...config!.styles];
+          const styles = [...allStyles];
           styles[index] = item;
-          setConfig({ ...config!, styles });
+          setConfigValue('styles', styles);
         }}
         onRemove={(_, index) => {
-          const styles = [...config!.styles];
+          const styles = [...allStyles];
           styles.splice(index, 1);
-          setConfig({ ...config!, styles });
+          setConfigValue('styles', styles);
         }}
         footer={({ add }) => (
           <div className={styles.actions}>
@@ -148,18 +145,15 @@ const SettingsStylesFolder: React.FC<SettingsStylesFolderProps> = ({
                 modalWrapper.open(
                   <GroupModal
                     onSave={name => {
-                      setConfig({
-                        ...config!,
-                        styles: [
-                          ...config!.styles,
-                          {
-                            id: nanoid(),
-                            name,
-                            nodeType: 'group',
-                            parentId,
-                          },
-                        ],
-                      });
+                      setConfigValue('styles', [
+                        ...allStyles,
+                        {
+                          id: nanoid(),
+                          name,
+                          nodeType: 'group',
+                          parentId,
+                        },
+                      ]);
                     }}
                   />,
                 );

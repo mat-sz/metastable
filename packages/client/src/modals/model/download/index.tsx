@@ -5,6 +5,7 @@ import { Button } from '$components/button';
 import { Modal, ModalActions } from '$components/modal';
 import { Tag } from '$components/tag';
 import { VarArray, VarSelect, VarUI } from '$components/var';
+import { useConfigStore } from '$store/config';
 import { mainStore } from '$stores/MainStore';
 import { DownloadFileInfo } from '$types/download';
 import { filesize } from '$utils/file';
@@ -17,6 +18,7 @@ interface Props {
 
 export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
   const [data, setData] = useState(toJS(downloads));
+  const modelFolders = useConfigStore(state => state.data?.modelFolders);
 
   useEffect(() => {
     setData(toJS(downloads));
@@ -46,9 +48,7 @@ export const ModelDownload: React.FC<Props> = ({ downloads, onDownload }) => {
           <VarArray path="">
             {({ element }) => {
               const download = element as DownloadFileInfo;
-              const folders =
-                mainStore.config.data?.modelFolders?.[download.settings.type] ||
-                [];
+              const folders = modelFolders?.[download.settings.type] || [];
 
               return (
                 <li>

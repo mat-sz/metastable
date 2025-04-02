@@ -13,6 +13,7 @@ import {
   TabView,
 } from '$components/tabs';
 import { TagIcon } from '$components/tagIcon';
+import { useConfigStore } from '$store/config';
 import { mainStore } from '$stores/MainStore';
 import styles from './index.module.scss';
 import { ProjectList } from './ProjectList';
@@ -20,6 +21,8 @@ import { Social } from '../common/Social';
 
 export const Home: React.FC = observer(() => {
   const { recent, all, favorite, tags } = mainStore.projects;
+  const showWelcome = useConfigStore(state => !state.data?.app.hideWelcome);
+  const setConfigValue = useConfigStore(state => state.set);
 
   return (
     <div className={styles.home}>
@@ -52,19 +55,12 @@ export const Home: React.FC = observer(() => {
         </Tabs>
         <TabContent>
           <TabPanel id="recent">
-            {!mainStore.config.data?.app?.hideWelcome && (
+            {showWelcome && (
               <div className={styles.welcome}>
                 <div className={styles.welcomeHeader}>
                   <h2>Welcome to {__APP_NAME__}</h2>
                   <Button
-                    onClick={async () => {
-                      const config = mainStore.config;
-                      await config.refresh();
-                      config.set({
-                        ...config.data!,
-                        app: { ...config.data!.app, hideWelcome: true },
-                      });
-                    }}
+                    onClick={() => setConfigValue('app.hideWelcome', true)}
                     icon={<BsXLg />}
                   >
                     Close

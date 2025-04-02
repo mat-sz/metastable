@@ -3,8 +3,7 @@ import React, { Suspense, useLayoutEffect } from 'react';
 import { Route, Switch } from 'wouter';
 
 import { ModalWrapperProvider } from '$hooks/useModal';
-import { useConfigStore } from '$store/config';
-import { useUIStore } from '$store/ui';
+import { useFontSize, useTheme } from '$store/config/hooks';
 import { setupStore } from '$stores/SetupStore';
 import { withoutTransitions } from '$utils/css';
 import { lazyPreload } from '$utils/react';
@@ -18,11 +17,8 @@ const Setup = lazyPreload(() => import('./views/setup'));
 const ModelManager = lazyPreload(() => import('./views/models'));
 
 export const App: React.FC = observer(() => {
-  const config = useConfigStore(state => state.data);
-  const systemTheme = useUIStore(state => state.systemTheme);
-  const configTheme = config?.ui.theme || 'dark';
-  const theme = configTheme === 'system' ? systemTheme : configTheme;
-  const fontSize = config?.ui.fontSize || 16;
+  const theme = useTheme();
+  const fontSize = useFontSize();
   const isSetup = setupStore?.status !== 'done';
 
   useLayoutEffect(() => {
